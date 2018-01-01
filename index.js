@@ -56,7 +56,7 @@ function log(...messages) {
 const client = new Discord.Client();
 
 client.on("ready", () => {
-    console.log("I am ready");
+    log("I am ready");
 
     client.user.setGame("!dbhelp for help");
 });

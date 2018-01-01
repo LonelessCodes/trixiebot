@@ -1,0 +1,25 @@
+{
+  "name": "trixiebot",
+  "version": "1.0.0",
+  "description": "Discord Bot to query Derpibooru.org!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "derpibooru"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "discord.js": "^11.2.1",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint": "^3.19.0"
+  }
+}

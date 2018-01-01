@@ -68,7 +68,7 @@ const usage = `Usage: \`!db <?amount> <order:first|latest|top|random> <query>\`
 
 async function onmessage(message) {
     if (message.content.startsWith("!ping")) {
-        message.channel.send("pong!");
+        message.channel.send("pong! Wee hehe");
         return;
     }
     if (message.content.startsWith("!dbhelp")) {
@@ -129,7 +129,7 @@ async function onmessage(message) {
         }
 
         let order = "";
-        while (current_char !== " ") {
+        while (i < msg.length && current_char !== " ") {
             order += current_char;
             i++;
             current_char = msg.charAt(i);
@@ -139,6 +139,11 @@ async function onmessage(message) {
 
         if (!/first|latest|top|random/.test(order)) {
             message.channel.send("\`order\` must be either \`first, latest, top\` or \`random\`!\n\n" + usage);
+            return;
+        }
+
+        if (i >= msg.length) {
+            message.channel.send("\`query\` **must** be given\n\n" + usage);
             return;
         }
 
@@ -201,12 +206,12 @@ async function onmessage(message) {
                 images.push(get({
                     q: query,
                     random_image: "true"
-                }).then(({id}) => get({
+                }).then(({ id }) => get({
                     scope: id
                 })));
             }
             images = await Promise.all(images);
-            ids = images.map(image => image.id);    
+            ids = images.map(image => image.id);
             images = images.map(image => "https:" + image.representations.large);
             break;
         }

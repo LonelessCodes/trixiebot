@@ -38,6 +38,8 @@ Usage: \`!selfrole remove <role>\` to remove
 *TrixieBot v${p.version}*`;
 
 client.on("message", async message => {
+    if (message.author.bot) return;
+    
     // ping pong
     if (message.content === "!ping" || message.content === `${prefix} ping`) {
         const m = await message.channel.send("pong! Wee hehe");

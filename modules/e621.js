@@ -30,6 +30,8 @@ const usage = `Usage: \`!e621 <?amount> <order:latest> <query>\`
 \`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`;
 
 async function onmessage(message) {
+    if (message.author.bot) return;
+    
     // e621 help
     if (message.content.startsWith("!e621help") || message.content.startsWith("!trixie e621")) {
         log("Requested Help");

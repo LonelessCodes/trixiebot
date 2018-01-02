@@ -32,6 +32,8 @@ Usage: \`!selfrole remove <role>\`
 \`role\` - The role you would like to have removed`;
 
 const onmessage = async message => {
+    if (message.author.bot) return;
+
     let text = message.content.toLowerCase();
     if (text.startsWith("!selfrole remove") ||
         text.startsWith("!trixie selfrole remove")) {

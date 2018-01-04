@@ -19,7 +19,7 @@ const onmessage = async message => {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
 
-    if (/\!fuck\ add/i.test(message.content)) {
+    if (/^\!fuck\ add/i.test(message.content)) {
         const text = message.content.substring(10);
         if (text === "") {
             message.channel.send(usage);
@@ -50,7 +50,7 @@ const onmessage = async message => {
         log(`Added fuck phrase: ${text}`);
         return;
     }
-    if (/\!fuck/i.test(message.content)) {
+    if (/^\!fuck/i.test(message.content)) {
         if (message.mentions.members.first()) {
             const mention = message.mentions.members.first();
             const phrases = await db.all("SELECT text, author FROM fucks");

@@ -29,6 +29,12 @@ Usage: \`!e621 <?amount> <order:latest> <query>\`
 \`order\` - string of either \`latest\`
 \`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)
 
+__**Giphy**__
+Usage:
+\`!gif <query>\` - returns the top result for the given \`query\`
+\`!gif random <query>\` - returns a random gif for the given \`query\`
+\`!gif trending\` - returns a random trending gif
+
 __**Roles**__
 Usage: \`!selfrole <role>\` to add
 \`role\` - The role you would like to have added
@@ -37,12 +43,27 @@ Usage: \`!selfrole remove <role>\` to remove
 \`role\` - The role you would like to have removed
 
 __**Trash**__
-Usage: \`!fuck <user>\`
+Flip a coin: \`!coin <bet>\`
+\`bet\` - your bet. Either \`heads\` or \`tails\`
+
+Fuck a user: \`!fuck <user>\`
 \`user\` - the username of the user to fuck
 
 \`!fuck add <text>\`
 \`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set.
            E.g.: \`!fuck add rides \${name}'s skin bus into tuna town\`
+
+Flip a user: \`!flip <user>\`
+\`user\` - user to flip
+
+\`!unflip <user>\`
+\`user\` - user to unflip
+
+Flip the table:
+\`!tableflip\`
+\`!untableflip\`
+
+\`!cat\`
 
 *TrixieBot v${p.version}*`;
 
@@ -56,17 +77,26 @@ client.on("message", async message => {
         m.edit("pong! Wee hehe\n" +
             `:stopwatch: \`Latency is ${m.createdTimestamp - message.createdTimestamp}ms\`\n` +
             `:heartbeat: \`API Latency is ${Math.round(client.ping)}ms\``);
+        return;
     }
     else if (message.content.toLowerCase() === prefix) {
         message.channel.send(usage);
+        return;
     }
 
     if (message.content.toLowerCase() === "!tableflip" || message.content.toLowerCase() === "!tf") {
         message.channel.send("(╯°□°）╯︵ ┻━┻");
         log("Flipped table successfully!!!");
+        return;
     }
 
-    if (/\!flip/i.test(message.content)) {
+    if (message.content.toLowerCase() === "!untableflip" || message.content.toLowerCase() === "!uf") {
+        message.channel.send("┬─┬ ノ( ゜-゜ノ)");
+        log("Unflipped table successfully!!!");
+        return;
+    }
+
+    if (/^\!flip/i.test(message.content)) {
         const mention = message.mentions.members.first();
         if (!mention) {
             message.channel.send("Usage: `!flip <user>`");
@@ -74,12 +104,28 @@ client.on("message", async message => {
         }
         message.channel.send(`(╯°□°）╯︵ ${fliptext(mention.displayName)}`);
         log(`Flipped ${mention.user.username}`);
+        return;
+    }
+
+    if (/^\!unflip/i.test(message.content)) {
+        const mention = message.mentions.members.first();
+        if (!mention) {
+            message.channel.send("Usage: `!unflip <user>`");
+            return;
+        }
+        message.channel.send(`${mention.displayName} ノ( ゜-゜ノ)`);
+        log(`Unflipped ${mention.user.username}`);
+        return;
     }
 });
 
 require("./modules/selfrole")(client);
-require("./modules/fuck")(client);
+
 require("./modules/derpi")(client);
 require("./modules/e621")(client);
+require("./modules/gif")(client);
+require("./modules/coin")(client);
+require("./modules/fuck")(client);
+require("./modules/cat")(client);
 
 client.login(discord.token);

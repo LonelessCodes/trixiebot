@@ -31,13 +31,13 @@ async function onmessage(message) {
     if (message.channel.type !== "text") return;
     
     // db help
-    if (/\!dbhelp/i.test(message.content) || /\!trixie\ db/i.test(message.content)) {
+    if (/^\!dbhelp/i.test(message.content)) {
         log("Requested Help");
         message.channel.send(usage);
         return;
     }
     // derpibooru    
-    else if (/\!db/i.test(message.content)) {
+    else if (/^\!db/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**

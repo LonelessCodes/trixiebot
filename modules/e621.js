@@ -34,13 +34,13 @@ async function onmessage(message) {
     if (message.channel.type !== "text") return;
     
     // e621 help
-    if (/\!e621help/i.test(message.content) || /\!trixie\ e621help/i.test(message.content)) {
+    if (/^\!e621help/i.test(message.content)) {
         log("Requested Help");
         message.channel.send(usage);
         return;
     }
     // e621    
-    else if (/\!e621/i.test(message.content)) {
+    else if (/^\!e621/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**

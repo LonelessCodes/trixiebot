@@ -33,6 +33,7 @@ Usage: \`!selfrole remove <role>\`
 
 const onmessage = async message => {
     if (message.author.bot) return;
+    if (message.channel.type !== "text") return;
 
     let text = message.content.toLowerCase();
     if (text.startsWith("!selfrole remove") ||

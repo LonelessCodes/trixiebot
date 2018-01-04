@@ -31,15 +31,16 @@ const usage = `Usage: \`!e621 <?amount> <order:latest> <query>\`
 
 async function onmessage(message) {
     if (message.author.bot) return;
+    if (message.channel.type !== "text") return;
     
     // e621 help
-    if (message.content.startsWith("!e621help") || message.content.startsWith("!trixie e621")) {
+    if (/\!e621help/i.test(message.content) || /\!trixie\ e621help/i.test(message.content)) {
         log("Requested Help");
         message.channel.send(usage);
         return;
     }
     // e621    
-    else if (message.content.startsWith("!e621")) {
+    else if (/\!e621/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**

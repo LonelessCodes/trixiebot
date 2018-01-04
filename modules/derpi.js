@@ -28,15 +28,16 @@ const usage = `Usage: \`!db <?amount> <order:first|latest|top|random> <query>\`
 
 async function onmessage(message) {
     if (message.author.bot) return;
+    if (message.channel.type !== "text") return;
     
     // db help
-    if (message.content.startsWith("!dbhelp") || message.content.startsWith("!trixie db")) {
+    if (/\!dbhelp/i.test(message.content) || /\!trixie\ db/i.test(message.content)) {
         log("Requested Help");
         message.channel.send(usage);
         return;
     }
     // derpibooru    
-    else if (message.content.startsWith("!db")) {
+    else if (/\!db/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**
@@ -160,9 +161,8 @@ async function onmessage(message) {
         case "random":
             result = await get({
                 q: query
-            });
-            const total = result.total;
-            for (let i = 0; i < Math.min(num, total); i++) {
+            });    
+            for (let i = 0; i < Math.min(num, result.total); i++) {
                 images.push(get({
                     q: query,
                     random_image: "true"

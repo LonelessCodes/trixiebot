@@ -37,16 +37,18 @@ const onmessage = async message => {
             message.channel.send("You must add \`\${name}\` in the place the username should be set.\n\n" + usage);
             return;
         }
-        if (db.get(`SELECT * FROM fucks WHERE lowercase = "${text.toLowerCase()}"`)) {
+        if (await db.get(`SELECT * FROM fucks WHERE lowercase = "${text.toLowerCase()}"`)) {
             message.channel.send("This phrase already exists!");
             return;
         }
-        await db.run("INSERT INTO fucks (text, lowercase, author) VALUES (?, ?, ?)", [text, text.toLowerCase(), message.author.member.displayName]);
+        await db.run("INSERT INTO fucks (text, lowercase, author) VALUES (?, ?, ?)", [text, text.toLowerCase(), message.member.displayName]);
         added_recently.push(message.author.id);
         setTimeout(() => {
             // Removes the user from the set after 2.5 seconds
             added_recently.splice(added_recently.indexOf(message.author.id));
         }, 1000 * 60 * 60); // 60 minutes
+
+        await message.channel.send("Added!");
         log(`Added fuck phrase: ${text}`);
         return;
     }

@@ -4,9 +4,7 @@ const request = require("request");
 const Command = require("../modules/Command");
 
 const command = new Command(async function onmessage(message) {
-    let msg = message.content;
-    while (/ \ /g.test(msg))
-        msg = msg.replace(/ \ /g, " ");
+    let msg = message.content.trim().split(/ +/g).join(" "); // remove double spaces
 
     if (/^\!tts/i.test(message.content)) {
         const src = msg.substring(5);
@@ -30,11 +28,11 @@ const command = new Command(async function onmessage(message) {
 
         if (src.length > 100) {
             message.react("❌");
-            message.channel.send("I'm sorry to disappoint you, but I may only use 100 character :/");
+            message.channel.send("I'm sorry to disappoint you, but I may only use up to 100 character :/");
             return;
         }
 
-        const url = `http://api.voicerss.org/?key=${voicerss.key}&hl=en-gb&f=8khz_8bit_mono&c=OGG&src=${src}`;
+        const url = `http://api.voicerss.org/?key=${voicerss.key}&hl=en-gb&f=22khz_8bit_mono&c=OGG&src=${src}`;
 
         const connection = await message.member.voiceChannel.join();
         message.react("👍");

@@ -2,7 +2,7 @@ const log = require("../modules/log");
 const Command = require("../modules/Command");
 
 const available_roles = {
-    "Other": [
+    "Artist Stuff": [
         "artist",
         "Commissions Open"
     ],
@@ -28,10 +28,9 @@ for (let category in available_roles)
 
 const command = new Command(async function onmessage(message) {
     let text = message.content.toLowerCase();
-    if (text.startsWith("!selfrole remove") ||
-        text.startsWith("!trixie selfrole remove")) {
-        while (/\ \ /g.test(text)) text = text.replace(/\ \ /g, " "); // remove double spaces
-        let role = text.replace("!selfrole remove", "").replace("!trixie selfrole remove", "");
+    if (text.startsWith("!selfrole remove")) {
+        text = text.trim().split(/ +/g).join(" "); // remove double spaces
+        let role = text.replace("!selfrole remove", "");
         if (role === "") {
             message.channel.send(this.usage);
             return;
@@ -58,10 +57,9 @@ const command = new Command(async function onmessage(message) {
         message.channel.send("Role removed.");
         log(`Removed role ${roles_array[role]} from user ${message.member.user.username}`);
     }
-    else if (text.startsWith("!selfrole") ||
-        text.startsWith("!trixie selfrole")) {
-        while (/\ \ /g.test(text)) text = text.replace(/\ \ /g, " "); // remove double spaces
-        let role = text.replace("!selfrole", "").replace("!trixie selfrole", "");
+    else if (text.startsWith("!selfrole")) {
+        text = text.trim().split(/ +/g).join(" "); // remove double spaces
+        let role = text.replace("!selfrole", "");
         if (role === "") {
             message.channel.send(this.usage);
             return;

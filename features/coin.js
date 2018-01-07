@@ -10,9 +10,7 @@ const coin = ["heads", "tails"];
 
 const command = new Command(async function onmessage(message) {
     if (/^\!coin/i.test(message.content)) {
-        let msg = message.content;
-        while (/ \ /g.test(msg))
-            msg = msg.replace(/ \ /g, " ");
+        let msg = message.content.trim().split(/ +/g).join(" "); // remove double spaces
 
         let bet = msg.substring(6).toLowerCase();
         if (bet === "") {

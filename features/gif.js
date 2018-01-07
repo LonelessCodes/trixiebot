@@ -7,10 +7,8 @@ Array.prototype.random = function () {
 };
 
 const command = new Command(async function onmessage(message) {
-    let msg = message.content;
-    while (/ \ /g.test(msg))
-        msg = msg.replace(/ \ /g, " ");
-
+    let msg = message.content.trim().split(/ +/g).join(" "); // remove double spaces
+    
     if (/^\!gif\ random/i.test(message.content)) {
         const query = msg.substring(12);
         let gif;

@@ -4,6 +4,10 @@ const request = promisify(require("request"));
 const p = require("../package.json");
 const Command = require("../modules/Command");
 
+Array.prototype.random = function () {
+    return this[Math.floor(Math.random() * this.length)];
+};
+
 async function get(params) {
     const scope = params.scope || "index";
     delete params.scope;
@@ -94,8 +98,8 @@ const command = new Command(async function onmessage(message) {
         i++;
         current_char = msg.charAt(i);
 
-        if (!/latest/.test(order)) {
-            message.channel.send("\`order\` must be either \`latest\`!\n\n" + this.usage);
+        if (!/latest|random/.test(order)) {
+            message.channel.send("\`order\` must be either \`latest\` or \`random\`!\n\n" + this.usage);
             return;
         }
 
@@ -130,6 +134,19 @@ const command = new Command(async function onmessage(message) {
                 ids.push(image.id);
             }
             break;
+        case "random":
+            result = await get({
+                tags: query,
+                sf: "id",
+                sd: "desc",
+                limit: 320
+            });
+            for (let i = 0; i < Math.min(num, result.length); i++) {
+                const image = result.random();
+                images.push(image.file_url);
+                ids.push(image.id);
+            }
+            break;
         }
 
         if (images.length === 0) {
@@ -149,9 +166,9 @@ const command = new Command(async function onmessage(message) {
         log("Found images", ...ids, `[${Date.now() - timestamp}ms]`);
     }
 }, {
-    usage: `\`!e621 <?amount> <order:latest> <query>\`
+    usage: `\`!e621 <?amount> <order:latest|random> <query>\`
 \`amount\` - optional - number ranging from 1 to 5 for how many results to return
-\`order\` - string of either \`latest\`
+\`order\` - string of either \`latest\` or \`random\`
 \`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`    
 });
 

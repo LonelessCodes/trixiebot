@@ -46,6 +46,7 @@ async function onmessage(message) {
 async function init(client) {
     client.on("message", message => onmessage(message).catch(err => {
         log(err);
+        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
     }));
 }
 

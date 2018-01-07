@@ -43,6 +43,11 @@ Usage: \`!selfrole remove <role>\` to remove
 \`role\` - The role you would like to have removed
 
 __**Trash**__
+Uberfacts: \`!fact\` gets random UberFacts fact
+
+TTS:
+\`!tts <message>\` - joins the user's current voice channel and reads the message out aloud.
+
 Flip a coin: \`!coin <bet>\`
 \`bet\` - your bet. Either \`heads\` or \`tails\`
 
@@ -58,6 +63,8 @@ Flip a user: \`!flip <user>\`
 
 \`!unflip <user>\`
 \`user\` - user to unflip
+
+Textfaces: \`!face\` returns a random ASCII face
 
 Flip the table:
 \`!tableflip\`
@@ -119,13 +126,15 @@ client.on("message", async message => {
     }
 });
 
-require("./modules/selfrole")(client);
-
+require("./modules/cat")(client);
+require("./modules/coin")(client);
 require("./modules/derpi")(client);
 require("./modules/e621")(client);
-require("./modules/gif")(client);
-require("./modules/coin")(client);
+require("./modules/faces")(client);
+require("./modules/fact")(client);
 require("./modules/fuck")(client);
-require("./modules/cat")(client);
+require("./modules/gif")(client);
+require("./modules/selfrole")(client);
+require("./modules/tts")(client);
 
 client.login(discord.token);

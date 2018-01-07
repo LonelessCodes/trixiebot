@@ -31,13 +31,14 @@ async function random() {
     return url;
 }
 
-const usage = "Usage: `!cat` returns cat image :3";
-
 const command = new Command(async function onmessage(message) {
     if (/^\!cat/i.test(message.content)) {
         await message.channel.send("meow :3 " + await random());
         log("Random cat :3 meow");
     }
+}, {
+    usage: "`!cat` returns cat image :3",
+    category: "Trash"
 });
 
 module.exports = command;

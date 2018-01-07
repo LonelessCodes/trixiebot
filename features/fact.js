@@ -67,14 +67,14 @@ async function getFact() {
     return [...facts].random();
 }
 
-const usage = "Usage: `!fact` gets random UberFacts fact";
-
 const command = new Command(async function onmessage(message) {
     if (/^\!fact/i.test(message.content)) {
         const fact = await getFact();
         await message.channel.send(fact);
         log("Fact requested");
     }
+}, {
+    usage: "`!fact` gets random UberFacts fact"    
 });
 
 module.exports = command;

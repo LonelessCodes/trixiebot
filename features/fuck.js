@@ -7,20 +7,13 @@ Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-const usage = `Usage: \`!fuck <user>\`
-\`user\` - the username of the user to fuck
-
-\`!fuck add <text>\`
-\`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set.
-           E.g.: \`!fuck add rides \${name}'s skin bus into tuna town\``;
-
 const added_recently = new Array();
 
 const command = new Command(async message => {
     if (/^\!fuck\ add/i.test(message.content)) {
         const text = message.content.substring(10);
         if (text === "") {
-            message.channel.send(usage);
+            message.channel.send(this.usage);
             return;
         }
         if (added_recently.filter(id => message.author.id === id).length > 5) {
@@ -28,11 +21,11 @@ const command = new Command(async message => {
             return;
         }
         if (text.length <= 10 || text.length > 256) {
-            message.channel.send("Text must be longer than 10 and shorter than 256 characters.\n\n" + usage);
+            message.channel.send("Text must be longer than 10 and shorter than 256 characters.\n\n" + this.usage);
             return;
         }
         if (!/\$\{name\}/g.test(text)) {
-            message.channel.send("You must add \`\${name}\` in the place the username should be set.\n\n" + usage);
+            message.channel.send("You must add \`\${name}\` in the place the username should be set.\n\n" + this.usage);
             return;
         }
         if (await db.get(`SELECT * FROM fucks WHERE lowercase = "${text.toLowerCase()}"`)) {
@@ -66,11 +59,17 @@ const command = new Command(async message => {
             log("Served fuck phrase: " + text);
             return;
         }
-        message.channel.send(usage);
+        message.channel.send(this.usage);
         return;
     }
 }, async function init() {
     await db.run("CREATE TABLE IF NOT EXISTS fucks (text TEXT, lowercase TEXT, author TEXT)");
+}, {
+    usage: `\`!fuck <user>\`
+\`user\` - the username of the user to fuck
+
+\`!fuck add <text>\`
+\`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set. E.g.: \`!fuck add rides \${name}'s skin bus into tuna town\``    
 });
 
 module.exports = command;

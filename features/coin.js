@@ -6,9 +6,6 @@ Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-const usage = `Usage: \`!coin <bet>\`
-\`bet\` - your bet. Either \`heads\` or \`tails\``;
-
 const coin = ["heads", "tails"];
 
 const command = new Command(async function onmessage(message) {
@@ -19,7 +16,7 @@ const command = new Command(async function onmessage(message) {
 
         let bet = msg.substring(6).toLowerCase();
         if (bet === "") {
-            message.channel.send(usage);
+            message.channel.send(this.usage);
             return;
         }
 
@@ -40,6 +37,9 @@ const command = new Command(async function onmessage(message) {
             `Sorry! The coin landed on ${result}.`);
         log(`Flipped coin. Bet ${bet}. Result ${result}`);
     }
+}, {
+    usage: `\`!coin <bet>\`
+\`bet\` - your bet. Either \`heads\` or \`tails\``
 });
 
 module.exports = command;

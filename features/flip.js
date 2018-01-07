@@ -36,6 +36,15 @@ const command = new Command(async function onmessage(message) {
         log(`Unflipped ${mention.user.username}`);
         return;
     }
+}, {
+    usage: `\`!flip <user>\`
+\`user\` - user to flip
+
+\`!unflip <user>\`
+\`user\` - user to unflip
+
+\`!tableflip\`
+\`!untableflip\``
 });
 
 module.exports = command;

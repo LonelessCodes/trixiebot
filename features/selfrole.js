@@ -26,12 +26,6 @@ for (let category in available_roles)
     for (let role of available_roles[category])
         roles_array[role.toLowerCase()] = role;
 
-const usage = `Usage: \`!selfrole <role>\`
-\`role\` - The role you would like to have added
-
-Usage: \`!selfrole remove <role>\`
-\`role\` - The role you would like to have removed`;
-
 const command = new Command(async function onmessage(message) {
     let text = message.content.toLowerCase();
     if (text.startsWith("!selfrole remove") ||
@@ -39,7 +33,7 @@ const command = new Command(async function onmessage(message) {
         while (/\ \ /g.test(text)) text = text.replace(/\ \ /g, " "); // remove double spaces
         let role = text.replace("!selfrole remove", "").replace("!trixie selfrole remove", "");
         if (role === "") {
-            message.channel.send(usage);
+            message.channel.send(this.usage);
             return;
         }
         role = role.substring(1);
@@ -69,7 +63,7 @@ const command = new Command(async function onmessage(message) {
         while (/\ \ /g.test(text)) text = text.replace(/\ \ /g, " "); // remove double spaces
         let role = text.replace("!selfrole", "").replace("!trixie selfrole", "");
         if (role === "") {
-            message.channel.send(usage);
+            message.channel.send(this.usage);
             return;
         }
         role = role.substring(1);
@@ -94,6 +88,12 @@ const command = new Command(async function onmessage(message) {
         message.channel.send("Role added! /)");
         log(`Added role ${roles_array[role]} to user ${message.member.user.username}`);
     }
+}, {
+    usage: `\`!selfrole <role>\` to add
+\`role\` - The role you would like to have added
+
+\`!selfrole remove <role>\` to remove
+\`role\` - The role you would like to have removed`
 });
 
 module.exports = command;

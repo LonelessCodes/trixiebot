@@ -25,16 +25,11 @@ async function get(params) {
     return result;
 }
 
-const usage = `Usage: \`!e621 <?amount> <order:latest> <query>\`
-\`amount\` - optional - number ranging from 1 to 5 for how many results to return
-\`order\` - string of either \`latest\`
-\`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`;
-
 const command = new Command(async function onmessage(message) {
     // e621 help
     if (/^\!e621help/i.test(message.content)) {
         log("Requested Help");
-        message.channel.send(usage);
+        message.channel.send(this.usage);
         return;
     }
     // e621    
@@ -49,7 +44,7 @@ const command = new Command(async function onmessage(message) {
         msg = msg.substring(6, Math.max(6, msg.length));
 
         if (msg === "") {
-            message.channel.send(usage);
+            message.channel.send(this.usage);
             return;
         }
 
@@ -73,13 +68,13 @@ const command = new Command(async function onmessage(message) {
                 try {
                     const numParse = parseInt(num);
                     if (numParse < 1 || numParse > 5) {
-                        message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + usage);
+                        message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
                         log("Amount out of range");
                         return;
                     }
                     num = numParse;
                 } catch (err) {
-                    message.channel.send("Invalid input\n\n" + usage);
+                    message.channel.send("Invalid input\n\n" + this.usage);
                     log("Invalid input");
                     return;
                 }
@@ -100,12 +95,12 @@ const command = new Command(async function onmessage(message) {
         current_char = msg.charAt(i);
 
         if (!/latest/.test(order)) {
-            message.channel.send("\`order\` must be either \`latest\`!\n\n" + usage);
+            message.channel.send("\`order\` must be either \`latest\`!\n\n" + this.usage);
             return;
         }
 
         if (i >= msg.length) {
-            message.channel.send("\`query\` **must** be given\n\n" + usage);
+            message.channel.send("\`query\` **must** be given\n\n" + this.usage);
             return;
         }
 
@@ -122,19 +117,19 @@ const command = new Command(async function onmessage(message) {
 
         let result;
         switch (order) {
-            case "latest":
-                result = await get({
-                    tags: query,
-                    sf: "id",
-                    sd: "desc",
-                    limit: num
-                });
-                for (let i = 0; i < Math.min(num, result.length); i++) {
-                    const image = result[i];
-                    images.push(image.file_url);
-                    ids.push(image.id);
-                }
-                break;
+        case "latest":
+            result = await get({
+                tags: query,
+                sf: "id",
+                sd: "desc",
+                limit: num
+            });
+            for (let i = 0; i < Math.min(num, result.length); i++) {
+                const image = result[i];
+                images.push(image.file_url);
+                ids.push(image.id);
+            }
+            break;
         }
 
         if (images.length === 0) {
@@ -153,6 +148,11 @@ const command = new Command(async function onmessage(message) {
 
         log("Found images", ...ids, `[${Date.now() - timestamp}ms]`);
     }
+}, {
+    usage: `\`!e621 <?amount> <order:latest> <query>\`
+\`amount\` - optional - number ranging from 1 to 5 for how many results to return
+\`order\` - string of either \`latest\`
+\`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`    
 });
 
 module.exports = command;

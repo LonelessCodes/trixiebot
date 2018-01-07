@@ -136,8 +136,6 @@ const faces = [
     "(･.◤)"
 ];
 
-const usage = "Usage: `!face` returns a random ASCII face";
-
 const command = new Command(async function onmessage(message) {
     if (/^\!face/i.test(message.content)) {
         message.channel.send(faces.random());
@@ -148,6 +146,8 @@ const command = new Command(async function onmessage(message) {
     else if (/^\!shrug/i.test(message.content)) {
         message.channel.send(faces[1]);
     }
+}, {
+    usage: "`!face` returns a random ASCII face"    
 });
 
 module.exports = command;

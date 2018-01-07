@@ -4,11 +4,18 @@ class Command {
     /**
      * @param {function(Discord.Message)} onmessage 
      * @param {function(Discord.Client)} init 
-     * @this {Command}
      */
-    constructor(onmessage, init) {
-        this._onmessage = onmessage.bind(this);
-        this._init = (init || (async () => { })).bind(this);
+    constructor(onmessage, init = (async () => { }), opts = {}) {
+        this.onmessage = onmessage.bind(this);
+        this._init = (async () => { });
+        if (typeof init === "function") {
+            this._init = init.bind(this);
+            if (opts.usage && typeof opts.usage === "string") this.usage = opts.usage;
+            if (opts.category && typeof opts.category === "string") this.category = opts.category;
+        } else {
+            if (init.usage && typeof init.usage === "string") this.usage = init.usage;
+            if (init.category && typeof init.category === "string") this.category = init.category;
+        }
     }
 
     /**
@@ -20,7 +27,7 @@ class Command {
             if (message.author.bot) return;
             if (message.channel.type !== "text") return;
 
-            this._onmessage(message).catch(err => {
+            this.onmessage(message).catch(err => {
                 log(err);
                 message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
             });

@@ -6,11 +6,6 @@ Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-const usage = `Usage:
-\`!gif <query>\` - returns the top result for the given \`query\`
-\`!gif random <query>\` - returns a random gif for the given \`query\`
-\`!gif trending\` - returns a random trending gif`;
-
 const command = new Command(async function onmessage(message) {
     let msg = message.content;
     while (/ \ /g.test(msg))
@@ -65,7 +60,7 @@ const command = new Command(async function onmessage(message) {
     if (/^\!gif/i.test(message.content)) {
         const query = msg.substring(5);
         if (query === "") {
-            message.channel.send(usage);
+            message.channel.send(this.usage);
             return;
         }
 
@@ -86,6 +81,10 @@ const command = new Command(async function onmessage(message) {
 
         return;
     }
+}, {
+    usage: `\`!gif <query>\` - returns the top result for the given \`query\`
+\`!gif random <query>\` - returns a random gif for the given \`query\`
+\`!gif trending\` - returns a random trending gif`    
 });
 
 module.exports = command;

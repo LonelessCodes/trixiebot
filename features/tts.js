@@ -1,11 +1,12 @@
-const log = require("./log");
+const log = require("../modules/log");
 const voicerss = require("../keys/voicerss.json");
 const request = require("request");
+const Command = require("../modules/Command");
 
 const usage = `Usage:
 \`!tts <message>\` - joins the user's current voice channel and reads the message out aloud.`;
 
-async function onmessage(message) {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
 
@@ -63,16 +64,6 @@ async function onmessage(message) {
         });
         return;
     }
-}
+});
 
-async function init(client) {
-    client.on("message", message => {
-        message.client = client;
-        onmessage(message).catch(err => {
-            log(err);
-            message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-        })
-    });
-}
-
-module.exports = init;
+module.exports = command;

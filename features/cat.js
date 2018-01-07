@@ -1,7 +1,8 @@
 const pixabay = require("../keys/pixabay.json");
 const { promisify } = require("util");
 const request = promisify(require("request"));
-const log = require("./log");
+const log = require("../modules/log");
+const Command = require("../modules/Command");
 
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
@@ -21,7 +22,6 @@ async function get() {
 
 async function random() {
     const result = (await get()).hits;
-    console.log(result);
 
     const random = result[Math.floor(Math.random() * result.length)];
 
@@ -33,7 +33,7 @@ async function random() {
 
 const usage = "Usage: `!cat` returns cat image :3";
 
-async function onmessage(message) {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
     
@@ -41,13 +41,6 @@ async function onmessage(message) {
         await message.channel.send("meow :3 " + await random());
         log("Random cat :3 meow");
     }
-}
+});
 
-async function init(client) {
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

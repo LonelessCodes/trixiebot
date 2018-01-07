@@ -1,10 +1,11 @@
-const derpibooru = require("../keys/derpibooru.json");
-const log = require("./log");
+const log = require("../modules/log");
 const { promisify } = require("util");
 const request = promisify(require("request"));
+const p = require("../package.json");
+const Command = require("../modules/Command");
 
 async function get(params) {
-    const scope = params.scope || "search";
+    const scope = params.scope || "index";
     delete params.scope;
 
     let string = [];
@@ -14,30 +15,33 @@ async function get(params) {
     string = string.join("&");
 
     const result = (await request({
-        url: `https://derpibooru.org/${scope}.json?key=${derpibooru.key}&${string}`,
+        url: `https://e621.net/post/${scope}.json?${string}`,
+        json: true,
         timeout: 10000,
-        json: true
+        headers: {
+            "User-Agent": `TrixieBot/${p.version} (by Loneless on e621)`
+        }
     })).body;
     return result;
 }
 
-const usage = `Usage: \`!db <?amount> <order:first|latest|top|random> <query>\`
+const usage = `Usage: \`!e621 <?amount> <order:latest> <query>\`
 \`amount\` - optional - number ranging from 1 to 5 for how many results to return
-\`order\` - string of either \`first, latest, top\` or \`random\`
-\`query\` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)`;
+\`order\` - string of either \`latest\`
+\`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`;
 
-async function onmessage(message) {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
     
-    // db help
-    if (/^\!dbhelp/i.test(message.content)) {
+    // e621 help
+    if (/^\!e621help/i.test(message.content)) {
         log("Requested Help");
         message.channel.send(usage);
         return;
     }
-    // derpibooru    
-    else if (/^\!db/i.test(message.content)) {
+    // e621    
+    else if (/^\!e621/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**
@@ -45,14 +49,14 @@ async function onmessage(message) {
          */
         let msg = message.content;
         while (msg.indexOf("  ") > -1) msg = msg.replace(/\ \ /g, " "); // remove double spaces
-        msg = msg.substring(4, Math.max(4, msg.length));
+        msg = msg.substring(6, Math.max(6, msg.length));
 
         if (msg === "") {
             message.channel.send(usage);
             return;
         }
 
-        log("Used !db with:", msg);
+        log("Used !e621 with:", msg);
 
         let i = 0;
         let current_char = msg.charAt(i);
@@ -98,8 +102,8 @@ async function onmessage(message) {
         i++;
         current_char = msg.charAt(i);
 
-        if (!/first|latest|top|random/.test(order)) {
-            message.channel.send("\`order\` must be either \`first, latest, top\` or \`random\`!\n\n" + usage);
+        if (!/latest/.test(order)) {
+            message.channel.send("\`order\` must be either \`latest\`!\n\n" + usage);
             return;
         }
 
@@ -114,7 +118,6 @@ async function onmessage(message) {
             i++;
             current_char = msg.charAt(i);
         }
-        query = query.replace(/\,\ /g, ",");
         query = query.replace(/\ /g, "+");
 
         let images = [];
@@ -122,58 +125,19 @@ async function onmessage(message) {
 
         let result;
         switch (order) {
-        case "first":
-            result = await get({
-                q: query,
-                sf: "id",
-                sd: "asc"
-            });
-            for (let i = 0; i < Math.min(num, result.search.length); i++) {
-                const image = result.search[i];
-                images.push("https:" + image.representations.large);
-                ids.push(image.id);
-            }
-            break;
-        case "latest":
-            result = await get({
-                q: query,
-                sf: "id",
-                sd: "desc"
-            });
-            for (let i = 0; i < Math.min(num, result.search.length); i++) {
-                const image = result.search[i];
-                images.push("https:" + image.representations.large);
-                ids.push(image.id);
-            }
-            break;
-        case "top":
-            result = await get({
-                q: query,
-                sf: "score",
-                sd: "desc"
-            });
-            for (let i = 0; i < Math.min(num, result.search.length); i++) {
-                const image = result.search[i];
-                images.push("https:" + image.representations.large);
-                ids.push(image.id);
-            }
-            break;
-        case "random":
-            result = await get({
-                q: query
-            });    
-            for (let i = 0; i < Math.min(num, result.total); i++) {
-                images.push(get({
-                    q: query,
-                    random_image: "true"
-                }).then(({ id }) => get({
-                    scope: id
-                })));
-            }
-            images = await Promise.all(images);
-            ids = images.map(image => image.id);
-            images = images.map(image => "https:" + image.representations.large);
-            break;
+            case "latest":
+                result = await get({
+                    tags: query,
+                    sf: "id",
+                    sd: "desc",
+                    limit: num
+                });
+                for (let i = 0; i < Math.min(num, result.length); i++) {
+                    const image = result[i];
+                    images.push(image.file_url);
+                    ids.push(image.id);
+                }
+                break;
         }
 
         if (images.length === 0) {
@@ -192,13 +156,6 @@ async function onmessage(message) {
 
         log("Found images", ...ids, `[${Date.now() - timestamp}ms]`);
     }
-}
+});
 
-function init(client) {
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

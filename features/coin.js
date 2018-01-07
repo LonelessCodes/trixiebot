@@ -1,5 +1,6 @@
-const log = require("./log");
-const { timeout } = require("./util");
+const log = require("../modules/log");
+const { timeout } = require("../modules/util");
+const Command = require("../modules/Command");
 
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
@@ -10,7 +11,7 @@ const usage = `Usage: \`!coin <bet>\`
 
 const coin = ["heads", "tails"];
 
-async function onmessage(message) {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
     
@@ -42,13 +43,6 @@ async function onmessage(message) {
             `Sorry! The coin landed on ${result}.`);
         log(`Flipped coin. Bet ${bet}. Result ${result}`);
     }
-}
+});
 
-async function init(client) {
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

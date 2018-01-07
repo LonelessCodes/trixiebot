@@ -1,7 +1,8 @@
 const Twit = require("twit");
 const { promisify } = require("util");
-const { timeout } = require("./util");
-const log = require("./log");
+const { timeout } = require("../modules/util");
+const log = require("../modules/log");
+const Command = require("../modules/Command");
 
 Array.prototype.last = function () {
     return this[this.length - 1];
@@ -38,7 +39,7 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
         await timeout(60000 * 15 / 900); // care about rate limits
     }
 
-    console.log("FINAL " + facts.size);
+    log("Loaded all facts:", facts.size);
 
     async function loadMoreTweets() {
         const data = await twitter.get("statuses/user_timeline", {
@@ -57,7 +58,7 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
             newest_id = data[0].id_str;
             data.filter(tweet => !tweet.entities.urls[0]).map(tweet => facts.add(tweet.text));
         }
-        console.log(data.length);
+        log(`Loaded ${data.length} more facts`);
     }, 3600000);
 }).catch(console.error);
 
@@ -68,7 +69,7 @@ async function getFact() {
 
 const usage = "Usage: `!fact` gets random UberFacts fact";
 
-async function onmessage(message) {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
 
@@ -77,13 +78,6 @@ async function onmessage(message) {
         await message.channel.send(fact);
         log("Fact requested");
     }
-}
+});
 
-async function init(client) {
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

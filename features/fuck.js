@@ -1,6 +1,7 @@
-const log = require("./log");
-const sql = require("./database");
+const log = require("../modules/log");
+const sql = require("../modules/database");
 const db = new sql.Database("./data/fucks.sqlite");
+const Command = require("../modules/Command");
 
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
@@ -15,7 +16,7 @@ const usage = `Usage: \`!fuck <user>\`
 
 const added_recently = new Array();
 
-const onmessage = async message => {
+const command = new Command(async message => {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
 
@@ -71,15 +72,8 @@ const onmessage = async message => {
         message.channel.send(usage);
         return;
     }
-};
-
-async function init(client) {
+}, async function init() {
     await db.run("CREATE TABLE IF NOT EXISTS fucks (text TEXT, lowercase TEXT, author TEXT)");
+});
 
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

@@ -3,6 +3,8 @@ const log = require("./modules/log");
 const Discord = require("discord.js");
 const p = require("./package.json");
 const fliptext = require("flip-text");
+const path = require("path");
+const fs = require("fs");
 
 const client = new Discord.Client();
 
@@ -77,7 +79,7 @@ Flip the table:
 client.on("message", async message => {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
-    
+
     // ping pong
     if (message.content.toLowerCase() === "!ping" || message.content.toLowerCase() === `${prefix} ping`) {
         const m = await message.channel.send("pong! Wee hehe");
@@ -126,15 +128,22 @@ client.on("message", async message => {
     }
 });
 
-require("./modules/cat")(client);
-require("./modules/coin")(client);
-require("./modules/derpi")(client);
-require("./modules/e621")(client);
-require("./modules/faces")(client);
-require("./modules/fact")(client);
-require("./modules/fuck")(client);
-require("./modules/gif")(client);
-require("./modules/selfrole")(client);
-require("./modules/tts")(client);
+// require("./features/cat")(client);
+// require("./features/coin")(client);
+// require("./features/derpi")(client);
+// require("./features/e621")(client);
+// require("./features/faces")(client);
+// require("./features/fact")(client);
+// require("./features/fuck")(client);
+// require("./features/gif")(client);
+// require("./features/selfrole")(client);
+// require("./features/tts")(client);
+
+const files = fs.readdirSync("./features");
+for (let file of files)
+    if (path.extname(file) === ".js")
+        require("./features/" + file).init(client);
 
 client.login(discord.token);
+
+global.client = client;

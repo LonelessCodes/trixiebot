@@ -1,4 +1,5 @@
-const log = require("./log");
+const log = require("../modules/log");
+const Command = require("../modules/Command");
 
 const available_roles = {
     "Other": [
@@ -31,7 +32,7 @@ const usage = `Usage: \`!selfrole <role>\`
 Usage: \`!selfrole remove <role>\`
 \`role\` - The role you would like to have removed`;
 
-const onmessage = async message => {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
 
@@ -96,13 +97,6 @@ const onmessage = async message => {
         message.channel.send("Role added! /)");
         log(`Added role ${roles_array[role]} to user ${message.member.user.username}`);
     }
-};
+});
 
-function init(client) {
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

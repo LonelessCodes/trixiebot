@@ -1,4 +1,5 @@
-const log = require("./log");
+const log = require("../modules/log");
+const Command = require("../modules/Command");
 
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
@@ -137,26 +138,19 @@ const faces = [
 
 const usage = "Usage: `!face` returns a random ASCII face";
 
-async function onmessage(message) {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
     
     if (/^\!face/i.test(message.content)) {
         message.channel.send(faces.random());
     }
-    else if(/^\!lenny/i.test(message.content)) {
+    else if (/^\!lenny/i.test(message.content)) {
         message.channel.send(faces[0]);
     }
-    else if(/^\!shrug/i.test(message.content)) {
+    else if (/^\!shrug/i.test(message.content)) {
         message.channel.send(faces[1]);
     }
-}
+});
 
-async function init(client) {
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

@@ -1,5 +1,6 @@
 const giphy = require('giphy-api')(require("../keys/giphy.json").key);
-const log = require("./log");
+const log = require("../modules/log");
+const Command = require("../modules/Command");
 
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
@@ -10,7 +11,7 @@ const usage = `Usage:
 \`!gif random <query>\` - returns a random gif for the given \`query\`
 \`!gif trending\` - returns a random trending gif`;
 
-async function onmessage(message) {
+const command = new Command(async function onmessage(message) {
     if (message.author.bot) return;
     if (message.channel.type !== "text") return;
     
@@ -41,7 +42,6 @@ async function onmessage(message) {
             }
         }
 
-        console.log(gif);
         const url = gif.data.image_original_url;
 
         await message.channel.send(url);
@@ -89,13 +89,6 @@ async function onmessage(message) {
 
         return;
     }
-}
+});
 
-async function init(client) {
-    client.on("message", message => onmessage(message).catch(err => {
-        log(err);
-        message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    }));
-}
-
-module.exports = init;
+module.exports = command;

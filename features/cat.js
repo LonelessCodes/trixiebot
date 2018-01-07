@@ -34,9 +34,6 @@ async function random() {
 const usage = "Usage: `!cat` returns cat image :3";
 
 const command = new Command(async function onmessage(message) {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-    
     if (/^\!cat/i.test(message.content)) {
         await message.channel.send("meow :3 " + await random());
         log("Random cat :3 meow");

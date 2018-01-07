@@ -12,9 +12,6 @@ const usage = `Usage: \`!coin <bet>\`
 const coin = ["heads", "tails"];
 
 const command = new Command(async function onmessage(message) {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-    
     if (/^\!coin/i.test(message.content)) {
         let msg = message.content;
         while (/ \ /g.test(msg))

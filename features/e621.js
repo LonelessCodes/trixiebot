@@ -31,9 +31,6 @@ const usage = `Usage: \`!e621 <?amount> <order:latest> <query>\`
 \`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`;
 
 const command = new Command(async function onmessage(message) {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-    
     // e621 help
     if (/^\!e621help/i.test(message.content)) {
         log("Requested Help");

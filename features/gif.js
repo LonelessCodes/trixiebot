@@ -12,9 +12,6 @@ const usage = `Usage:
 \`!gif trending\` - returns a random trending gif`;
 
 const command = new Command(async function onmessage(message) {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-    
     let msg = message.content;
     while (/ \ /g.test(msg))
         msg = msg.replace(/ \ /g, " ");

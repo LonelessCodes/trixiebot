@@ -17,9 +17,6 @@ const usage = `Usage: \`!fuck <user>\`
 const added_recently = new Array();
 
 const command = new Command(async message => {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-
     if (/^\!fuck\ add/i.test(message.content)) {
         const text = message.content.substring(10);
         if (text === "") {

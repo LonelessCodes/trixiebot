@@ -28,9 +28,6 @@ const usage = `Usage: \`!db <?amount> <order:first|latest|top|random> <query>\`
 \`query\` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)`;
 
 const command = new Command(async function onmessage(message) {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-    
     // db help
     if (/^\!dbhelp/i.test(message.content)) {
         log("Requested Help");

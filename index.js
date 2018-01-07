@@ -2,7 +2,6 @@ const discord = require("./keys/discord.json");
 const log = require("./modules/log");
 const Discord = require("discord.js");
 const p = require("./package.json");
-const fliptext = require("flip-text");
 const path = require("path");
 const fs = require("fs");
 
@@ -92,52 +91,7 @@ client.on("message", async message => {
         message.channel.send(usage);
         return;
     }
-
-    if (message.content.toLowerCase() === "!tableflip" || message.content.toLowerCase() === "!tf") {
-        message.channel.send("(╯°□°）╯︵ ┻━┻");
-        log("Flipped table successfully!!!");
-        return;
-    }
-
-    if (message.content.toLowerCase() === "!untableflip" || message.content.toLowerCase() === "!uf") {
-        message.channel.send("┬─┬ ノ( ゜-゜ノ)");
-        log("Unflipped table successfully!!!");
-        return;
-    }
-
-    if (/^\!flip/i.test(message.content)) {
-        const mention = message.mentions.members.first();
-        if (!mention) {
-            message.channel.send("Usage: `!flip <user>`");
-            return;
-        }
-        message.channel.send(`(╯°□°）╯︵ ${fliptext(mention.displayName)}`);
-        log(`Flipped ${mention.user.username}`);
-        return;
-    }
-
-    if (/^\!unflip/i.test(message.content)) {
-        const mention = message.mentions.members.first();
-        if (!mention) {
-            message.channel.send("Usage: `!unflip <user>`");
-            return;
-        }
-        message.channel.send(`${mention.displayName} ノ( ゜-゜ノ)`);
-        log(`Unflipped ${mention.user.username}`);
-        return;
-    }
 });
-
-// require("./features/cat")(client);
-// require("./features/coin")(client);
-// require("./features/derpi")(client);
-// require("./features/e621")(client);
-// require("./features/faces")(client);
-// require("./features/fact")(client);
-// require("./features/fuck")(client);
-// require("./features/gif")(client);
-// require("./features/selfrole")(client);
-// require("./features/tts")(client);
 
 const files = fs.readdirSync("./features");
 for (let file of files)
@@ -145,5 +99,3 @@ for (let file of files)
         require("./features/" + file).init(client);
 
 client.login(discord.token);
-
-global.client = client;

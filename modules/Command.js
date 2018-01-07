@@ -4,10 +4,11 @@ class Command {
     /**
      * @param {function(Discord.Message)} onmessage 
      * @param {function(Discord.Client)} init 
+     * @this {Command}
      */
     constructor(onmessage, init) {
-        this._onmessage = onmessage;
-        this._init = init || (async () => { });
+        this._onmessage = onmessage.bind(this);
+        this._init = (init || (async () => { })).bind(this);
     }
 
     /**
@@ -16,6 +17,9 @@ class Command {
     async init(client) {
         await this._init(client);
         client.on("message", message => {
+            if (message.author.bot) return;
+            if (message.channel.type !== "text") return;
+
             this._onmessage(message).catch(err => {
                 log(err);
                 message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");

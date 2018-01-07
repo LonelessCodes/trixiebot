@@ -139,9 +139,6 @@ const faces = [
 const usage = "Usage: `!face` returns a random ASCII face";
 
 const command = new Command(async function onmessage(message) {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-    
     if (/^\!face/i.test(message.content)) {
         message.channel.send(faces.random());
     }

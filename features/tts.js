@@ -7,9 +7,6 @@ const usage = `Usage:
 \`!tts <message>\` - joins the user's current voice channel and reads the message out aloud.`;
 
 const command = new Command(async function onmessage(message) {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-
     let msg = message.content;
     while (/ \ /g.test(msg))
         msg = msg.replace(/ \ /g, " ");

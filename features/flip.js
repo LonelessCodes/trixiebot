@@ -44,7 +44,8 @@ const command = new Command(async function onmessage(message) {
 \`user\` - user to unflip
 
 \`!tableflip\`
-\`!untableflip\``
+\`!untableflip\``,
+    ignore: true
 });
 
 module.exports = command;

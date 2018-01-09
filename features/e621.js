@@ -169,7 +169,8 @@ const command = new Command(async function onmessage(message) {
     usage: `\`!e621 <?amount> <order:latest|random> <query>\`
 \`amount\` - optional - number ranging from 1 to 5 for how many results to return
 \`order\` - string of either \`latest\` or \`random\`
-\`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`    
+\`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`,
+    ignore: true
 });
 
 module.exports = command;

@@ -37,7 +37,8 @@ const command = new Command(async function onmessage(message) {
     }
 }, {
     usage: `\`!coin <bet>\`
-\`bet\` - your bet. Either \`heads\` or \`tails\``
+\`bet\` - your bet. Either \`heads\` or \`tails\``,
+    ignore: true
 });
 
 module.exports = command;

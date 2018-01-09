@@ -58,7 +58,8 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 }, {
-    usage: "`!tts <message>` - joins the user's current voice channel and reads the message out aloud."
+    usage: "`!tts <message>` - joins the user's current voice channel and reads the message out aloud.",
+    ignore: true
 });
 
 module.exports = command;

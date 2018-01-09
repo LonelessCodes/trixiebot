@@ -4,6 +4,7 @@ const Discord = require("discord.js");
 const p = require("./package.json");
 const path = require("path");
 const fs = require("fs");
+const Command = require("./modules/Command");
 
 const client = new Discord.Client();
 
@@ -25,10 +26,7 @@ for (let file of fs.readdirSync("./features")) {
     }
 }
 
-client.on("message", async message => {
-    if (message.author.bot) return;
-    if (message.channel.type !== "text") return;
-
+const command = new Command(async message => {
     // ping pong
     if (message.content.toLowerCase() === "!ping" || message.content.toLowerCase() === `${prefix} ping`) {
         const m = await message.channel.send("pong! Wee hehe");
@@ -51,11 +49,17 @@ client.on("message", async message => {
             .addField("Fuck a User", features["fuck"].usage)
             .addField("Flip Things", features["flip"].usage)
             .addField("Text Faces", features["face"].usage)
+            .addField("Larson", features["larson"].usage)
             .addField("CATS", features["cat"].usage)
+            .addBlankField()
+            .addField("Admin", features["admin"].usage)
             .setFooter(`TrixieBot v${p.version}`, client.user.avatarURL);
         message.channel.send({ embed: usage });
         return;
     }
+}, {
+    ignore: true    
 });
+command.init(client);
 
 client.login(discord.token);

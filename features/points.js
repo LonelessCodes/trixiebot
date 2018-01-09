@@ -3,10 +3,19 @@ const sql = require("../modules/database");
 const db = new sql.Database("./data/points.sqlite");
 const Command = require("../modules/Command");
 
+function get_level(points) {
+    return Math.floor(0.1 * Math.sqrt(points));
+}
+
+const cooldown = new Map;
+const cooldowntime = 60 * 1000;
 let lastUser = null;
 const command = new Command(async function onmessage(message) {
-    if (lastUser === message.author.id) return;
+    if (lastUser === message.author.id || cooldown.has(message.member)) return;
+
     lastUser = message.author.id;
+    cooldown.set(message.member, "1");
+    setTimeout(() => cooldown.delete(message.member), cooldowntime);
 
     try {
         const row = await db.get(`SELECT * FROM scores \
@@ -14,17 +23,18 @@ const command = new Command(async function onmessage(message) {
         if (!row) {
             await db.run("INSERT INTO scores (guildId, userId, points, level) VALUES (?, ?, ?, ?)", [message.guild.id, message.author.id, 1, 0]);
         } else {
-            let curLevel = Math.floor(0.1 * Math.sqrt(row.points + 1));
+            row.points++;
+            let curLevel = get_level(row.points);
             if (curLevel > row.level) {
                 row.level = curLevel;
                 await db.run(`UPDATE scores \
-                SET points = ${row.points + 1}, level = ${row.level} \
+                SET points = ${row.points}, level = ${row.level} \
                 WHERE userId = "${message.author.id}" AND guildId = "${message.guild.id}"`);
-                // await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy?`);
+                await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy?`);
                 log(`Level-up ${message.author.displayName} ${curLevel - 1} => ${curLevel}`);
             }
             else await db.run(`UPDATE scores \
-            SET points = ${row.points + 1} \
+            SET points = ${row.points} \
             WHERE userId = "${message.author.id}" AND guildId = "${message.guild.id}"`);
         }
     } catch (err) {
@@ -32,6 +42,8 @@ const command = new Command(async function onmessage(message) {
     }
 }, async function init() {
     await db.run("CREATE TABLE IF NOT EXISTS scores (guildId TEXT, userId TEXT, points INTEGER, level INTEGER)");
+}, {
+    ignore: true
 });
 
 module.exports = command;

@@ -189,7 +189,8 @@ const command = new Command(async function onmessage(message) {
     usage: `\`!db <?amount> <order:first|latest|top|random> <query>\`
 \`amount\` - optional - number ranging from 1 to 5 for how many results to return
 \`order\` - string of either \`first, latest, top\` or \`random\`
-\`query\` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)`    
+\`query\` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)`    ,
+    ignore: true
 });
 
 module.exports = command;

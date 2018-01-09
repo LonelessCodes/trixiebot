@@ -1,4 +1,5 @@
 const log = require("./log");
+const ignore = require("./ignore");
 
 class Command {
     /**
@@ -12,9 +13,11 @@ class Command {
             this._init = init.bind(this);
             if (opts.usage && typeof opts.usage === "string") this.usage = opts.usage;
             if (opts.category && typeof opts.category === "string") this.category = opts.category;
+            this.ignore = !!opts.ignore;
         } else {
             if (init.usage && typeof init.usage === "string") this.usage = init.usage;
             if (init.category && typeof init.category === "string") this.category = init.category;
+            this.ignore = !!init.ignore;
         }
     }
 
@@ -23,9 +26,11 @@ class Command {
      */
     async init(client) {
         await this._init(client);
-        client.on("message", message => {
+        if (!ignore.initialized) await ignore.init();
+        client.on("message", async message => {
             if (message.author.bot) return;
             if (message.channel.type !== "text") return;
+            if (this.ignore && await ignore.has(message.guild.id, message.member.id)) return;
 
             this.onmessage(message).catch(err => {
                 log(err);

@@ -69,7 +69,8 @@ const command = new Command(async message => {
 \`user\` - the username of the user to fuck
 
 \`!fuck add <text>\`
-\`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set. E.g.: \`!fuck add rides \${name}'s skin bus into tuna town\``    
+\`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set. E.g.: \`!fuck add rides \${name}'s skin bus into tuna town\``,
+    ignore: true
 });
 
 module.exports = command;

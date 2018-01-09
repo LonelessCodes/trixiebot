@@ -74,7 +74,8 @@ const command = new Command(async function onmessage(message) {
         log("Fact requested");
     }
 }, {
-    usage: "`!fact` gets random UberFacts fact"    
+    usage: "`!fact` gets random UberFacts fact",
+    ignore: true
 });
 
 module.exports = command;

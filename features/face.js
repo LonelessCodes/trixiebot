@@ -147,7 +147,8 @@ const command = new Command(async function onmessage(message) {
         message.channel.send(faces[1]);
     }
 }, {
-    usage: "`!face` returns a random ASCII face"    
+    usage: "`!face` returns a random ASCII face",
+    ignore: true
 });
 
 module.exports = command;

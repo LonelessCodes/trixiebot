@@ -91,7 +91,8 @@ const command = new Command(async function onmessage(message) {
 \`role\` - The role you would like to have added
 
 \`!selfrole remove <role>\` to remove
-\`role\` - The role you would like to have removed`
+\`role\` - The role you would like to have removed`,
+    ignore: true
 });
 
 module.exports = command;

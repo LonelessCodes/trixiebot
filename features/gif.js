@@ -82,7 +82,8 @@ const command = new Command(async function onmessage(message) {
 }, {
     usage: `\`!gif <query>\` - returns the top result for the given \`query\`
 \`!gif random <query>\` - returns a random gif for the given \`query\`
-\`!gif trending\` - returns a random trending gif`    
+\`!gif trending\` - returns a random trending gif`,
+    ignore: true
 });
 
 module.exports = command;

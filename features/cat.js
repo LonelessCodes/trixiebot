@@ -38,7 +38,8 @@ const command = new Command(async function onmessage(message) {
     }
 }, {
     usage: "`!cat` returns cat image :3",
-    category: "Trash"
+    category: "Trash",
+    ignore: true
 });
 
 module.exports = command;

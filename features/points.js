@@ -9,11 +9,9 @@ function get_level(points) {
 
 const cooldown = new Map;
 const cooldowntime = 60 * 1000;
-let lastUser = null;
 const command = new Command(async function onmessage(message) {
-    if (lastUser === message.author.id || cooldown.has(message.member)) return;
+    if (cooldown.has(message.member)) return;
 
-    lastUser = message.author.id;
     cooldown.set(message.member, "1");
     setTimeout(() => cooldown.delete(message.member), cooldowntime);
 

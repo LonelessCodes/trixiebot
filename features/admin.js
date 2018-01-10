@@ -126,12 +126,16 @@ const command = new Command(async function onmessage(message) {
         }
 
         const members = message.mentions.members.array();
-        members.forEach(member =>
+
+        for (const member of members) {
+            if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {
+                message.channel.send("You cannot timeout other moderators or admins");
+            }
             msg = msg.replace(
                 new RegExp(member.toString(), "g"),
                 ""
-            )
-        );
+            );
+        }
 
         msg = msg.trim();
         

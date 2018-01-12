@@ -64,7 +64,7 @@ const command = new Command(async function onmessage(message) {
                 member.removeRole(role_obj);
             }
             message.channel.send("Role removed.");
-            log(`Removed role ${roles_array[role]} from users ${members.map(member => member.toString()).join(" ")}`);
+            log(`Removed role ${role2} from users ${members.map(member => member.toString()).join(" ")}`);
         } else {
             const role2 = permission ? role : roles_array[role.toLowerCase()];
             if (!role2) {
@@ -129,7 +129,7 @@ const command = new Command(async function onmessage(message) {
                 await member.addRole(role_obj);
             }
             message.channel.send("Role added! /)");
-            log(`Added role ${roles_array[role]} to users ${members.map(member => member.toString()).join(" ")}`);
+            log(`Added role ${role2} to users ${members.map(member => member.toString()).join(" ")}`);
         } else {
             const role2 = permission ? role : roles_array[role.toLowerCase()];
             if (!role2) {

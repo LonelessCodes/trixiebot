@@ -100,7 +100,7 @@ const command = new Command(async function onmessage(message) {
 
         await message.channel.send(`Removed timeouts for ${members.map(member => member.toString()).join(" ")} successfully`);
 
-        await promises;
+        await Promise.all(promises);
         log(`Removed timeout from users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name}`);
         return;
     }
@@ -164,7 +164,7 @@ const command = new Command(async function onmessage(message) {
 
         await message.channel.send(`Timeouted ${members.map(member => member.toString()).join(" ")} for ${msg} successfully`);
         
-        await promises;
+        await Promise.all(promises);
         log(`Timeouted users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name} with ${msg}`);
         return;
     }

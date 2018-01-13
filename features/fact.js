@@ -39,7 +39,7 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
         await timeout(60000 * 15 / 900); // care about rate limits
     }
 
-    log("Loaded all facts:", facts.size);
+    log("Loaded all uberfacts:", facts.size);
 
     async function loadMoreTweets() {
         const data = await twitter.get("statuses/user_timeline", {
@@ -58,9 +58,9 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
             newest_id = data[0].id_str;
             data.filter(tweet => !tweet.entities.urls[0]).map(tweet => facts.add(tweet.text));
         }
-        log(`Loaded ${data.length} more facts`);
+        log(`Loaded ${data.length} more uberfacts`);
     }, 3600000);
-}).catch(console.error);
+}).catch(log);
 
 async function getFact() {
     const facts = await firstSetLoaded;

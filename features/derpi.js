@@ -23,14 +23,8 @@ async function get(params) {
 }
 
 const command = new Command(async function onmessage(message) {
-    // db help
-    if (/^\!dbhelp/i.test(message.content)) {
-        log("Requested Help");
-        message.channel.send(this.usage);
-        return;
-    }
-    // derpibooru    
-    else if (/^\!db/i.test(message.content)) {
+    // derpibooru
+    if (/^\!db/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**
@@ -41,7 +35,8 @@ const command = new Command(async function onmessage(message) {
         msg = msg.substring(4, Math.max(4, msg.length));
 
         if (msg === "") {
-            message.channel.send(this.usage);
+            await message.channel.send(this.usage);
+            log("No arguments given. Sent derpi help");
             return;
         }
 
@@ -50,36 +45,40 @@ const command = new Command(async function onmessage(message) {
         let i = 0;
         let current_char = msg.charAt(i);
 
-        let num = 1;
+        let amount = 1;
         try {
             const a = parseInt(current_char);
             if (typeof a === "number" && !Number.isNaN(a)) {
-                num = "";
+                amount = "";
                 while (current_char !== " ") {
-                    num += current_char;
+                    amount += current_char;
                     i++;
                     current_char = msg.charAt(i);
                 }
                 i++;
                 current_char = msg.charAt(i);
                 try {
-                    const numParse = parseInt(num);
-                    if (numParse < 1 || numParse > 5) {
-                        message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
-                        log("Amount out of range");
+                    const amountParse = parseInt(amount);
+                    if (amountParse < 1 || amountParse > 5) {
+                        await message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
+                        log("Gracefully aborted attempt to request derpi image. Amount out of range");
                         return;
                     }
-                    num = numParse;
+                    amount = amountParse;
                 } catch (err) {
-                    message.channel.send("Invalid input\n\n" + this.usage);
-                    log("Invalid input");
+                    await message.channel.send("Invalid input\n\n" + this.usage);
+                    log("Gracefully aborted attempt to request derpi image. Invalid amount input");
                     return;
                 }
             } else throw new Error(); // go to catch
         } catch (err) {
+            if (err.message !== "") {
+                log(err);
+                return;
+            }
             i = 0;
             current_char = msg.charAt(i);
-            num = 1;
+            amount = 1;
         }
 
         let order = "";
@@ -92,12 +91,14 @@ const command = new Command(async function onmessage(message) {
         current_char = msg.charAt(i);
 
         if (!/first|latest|top|random/.test(order)) {
-            message.channel.send("\`order\` must be either \`first, latest, top\` or \`random\`!\n\n" + this.usage);
+            await message.channel.send("\`order\` must be either \`first, latest, top\` or \`random\`!\n\n" + this.usage);
+            log(`Gracefully aborted attempt to request derpi image. ${order} is not a valid type of order`);
             return;
         }
 
         if (i >= msg.length) {
-            message.channel.send("\`query\` **must** be given\n\n" + this.usage);
+            await message.channel.send("\`query\` **must** be given\n\n" + this.usage);
+            log("Gracefully aborted attempt to request derpi image. No query given");
             return;
         }
 
@@ -121,7 +122,7 @@ const command = new Command(async function onmessage(message) {
                 sf: "id",
                 sd: "asc"
             });
-            for (let i = 0; i < Math.min(num, result.search.length); i++) {
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 images.push("https:" + image.representations.large);
                 ids.push(image.id);
@@ -133,7 +134,7 @@ const command = new Command(async function onmessage(message) {
                 sf: "id",
                 sd: "desc"
             });
-            for (let i = 0; i < Math.min(num, result.search.length); i++) {
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 images.push("https:" + image.representations.large);
                 ids.push(image.id);
@@ -145,7 +146,7 @@ const command = new Command(async function onmessage(message) {
                 sf: "score",
                 sd: "desc"
             });
-            for (let i = 0; i < Math.min(num, result.search.length); i++) {
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 images.push("https:" + image.representations.large);
                 ids.push(image.id);
@@ -155,7 +156,7 @@ const command = new Command(async function onmessage(message) {
             result = await get({
                 q: query
             });
-            for (let i = 0; i < Math.min(num, result.total); i++) {
+            for (let i = 0; i < Math.min(amount, result.total); i++) {
                 images.push(get({
                     q: query,
                     random_image: "true"
@@ -170,8 +171,8 @@ const command = new Command(async function onmessage(message) {
         }
 
         if (images.length === 0) {
-            message.channel.send("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-            log("No images found");
+            await message.channel.send("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+            log(`No derpi images found for ${msg}`);
             return;
         }
 
@@ -181,9 +182,9 @@ const command = new Command(async function onmessage(message) {
             output += image;
         }
 
-        message.channel.send(output);
+        await message.channel.send(output);
 
-        log("Found images", ...ids, `[${Date.now() - timestamp}ms]`);
+        log("Found derpi images", ...ids, `[${Date.now() - timestamp}ms]`);
     }
 }, {
     usage: `\`!db <?amount> <order:first|latest|top|random> <query>\`

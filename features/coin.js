@@ -14,7 +14,8 @@ const command = new Command(async function onmessage(message) {
 
         let bet = msg.substring(6).toLowerCase();
         if (bet === "") {
-            message.channel.send(this.usage);
+            await message.channel.send(this.usage);
+            log("Gracefully aborted attempt to flip coin: No bet given. Sent usage information");
             return;
         }
 
@@ -22,7 +23,8 @@ const command = new Command(async function onmessage(message) {
         else if (bet === "tail") bet = "tails";
 
         if (!coin.includes(bet)) {
-            message.channel.send(`\`${bet}\` isn't a valid side of le coin. \`heads\` or \`tails\`?!\n\n`);
+            await message.channel.send(`\`${bet}\` isn't a valid side of le coin. \`heads\` or \`tails\`?!\n\n`);
+            log(`Bet "${bet}" isn't a valid side of a coin`);
             return;
         }
 

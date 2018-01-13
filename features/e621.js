@@ -30,14 +30,8 @@ async function get(params) {
 }
 
 const command = new Command(async function onmessage(message) {
-    // e621 help
-    if (/^\!e621help/i.test(message.content)) {
-        log("Requested Help");
-        message.channel.send(this.usage);
-        return;
-    }
-    // e621    
-    else if (/^\!e621/i.test(message.content)) {
+    // e621
+    if (/^\!e621/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**
@@ -48,7 +42,8 @@ const command = new Command(async function onmessage(message) {
         msg = msg.substring(6, Math.max(6, msg.length));
 
         if (msg === "") {
-            message.channel.send(this.usage);
+            await message.channel.send(this.usage);
+            log("Sent e621 help");
             return;
         }
 
@@ -72,18 +67,22 @@ const command = new Command(async function onmessage(message) {
                 try {
                     const numParse = parseInt(num);
                     if (numParse < 1 || numParse > 5) {
-                        message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
-                        log("Amount out of range");
+                        await message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
+                        log("Gracefully aborted attempt to request e621 image. Amount out of range");
                         return;
                     }
                     num = numParse;
                 } catch (err) {
                     message.channel.send("Invalid input\n\n" + this.usage);
-                    log("Invalid input");
+                    log("Gracefully aborted attempt to request e621 image. Invalid amount input");
                     return;
                 }
             } else throw new Error(); // go to catch
         } catch (err) {
+            if (err.message !== "") {
+                log(err);
+                return;
+            }
             i = 0;
             current_char = msg.charAt(i);
             num = 1;
@@ -99,12 +98,14 @@ const command = new Command(async function onmessage(message) {
         current_char = msg.charAt(i);
 
         if (!/latest|random/.test(order)) {
-            message.channel.send("\`order\` must be either \`latest\` or \`random\`!\n\n" + this.usage);
+            await message.channel.send("\`order\` must be either \`latest\` or \`random\`!\n\n" + this.usage);
+            log(`Gracefully aborted attempt to request e621 image. ${order} is not a valid type of order`);
             return;
         }
 
         if (i >= msg.length) {
-            message.channel.send("\`query\` **must** be given\n\n" + this.usage);
+            await message.channel.send("\`query\` **must** be given\n\n" + this.usage);
+            log("Gracefully aborted attempt to request e621 image. No query given");
             return;
         }
 
@@ -150,8 +151,8 @@ const command = new Command(async function onmessage(message) {
         }
 
         if (images.length === 0) {
-            message.channel.send("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-            log("No images found");
+            await message.channel.send("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+            log(`No e621 images found for ${msg}`);
             return;
         }
 
@@ -161,9 +162,9 @@ const command = new Command(async function onmessage(message) {
             output += image;
         }
 
-        message.channel.send(output);
+        await message.channel.send(output);
 
-        log("Found images", ...ids, `[${Date.now() - timestamp}ms]`);
+        log("Found e621 images", ...ids, `[${Date.now() - timestamp}ms]`);
     }
 }, {
     usage: `\`!e621 <?amount> <order:latest|random> <query>\`

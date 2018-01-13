@@ -29,7 +29,7 @@ const command = new Command(async function onmessage(message) {
                 SET points = ${row.points}, level = ${row.level} \
                 WHERE userId = "${message.author.id}" AND guildId = "${message.guild.id}"`);
                 await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy?`);
-                log(`Level-up ${message.author.displayName} ${curLevel - 1} => ${curLevel}`);
+                log(`Level-up ${message.author.username} ${curLevel - 1} => ${curLevel}`);
             }
             else await db.run(`UPDATE scores \
             SET points = ${row.points} \

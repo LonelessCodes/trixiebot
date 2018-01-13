@@ -1,3 +1,4 @@
+const log = require("../modules/log");
 const Discord = require("discord.js");
 const { timeout, deletedMessages } = require("../modules/admin");
 const Command = require("../modules/Command");
@@ -58,13 +59,15 @@ const command = new Command(async function onmessage(message) {
         const content = message.content;
         await message.delete();
         await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${toHumanTime((await timeout.get(message.guild.id, message.member.id)).getTime() - Date.now())}**__`);
+        log(`Sent timeout notice to user ${message.member.user.username} in guild ${message.guild.name} and saved their message before deletion`);
         return;
     }
 
     if (/^\!kick\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.KICK_MEMBERS);
         if (!permission) {
-            message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Kick");
+            await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Kick");
+            log("Gracefully aborted attempt to kick user without the required rights to do so");
             return;
         }
 
@@ -74,7 +77,8 @@ const command = new Command(async function onmessage(message) {
     if (/^\!ban\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.BAN_MEMBERS);
         if (!permission) {
-            message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Ban");
+            await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Ban");
+            log("Gracefully aborted attempt to ban user without the required rights to do so");
             return;
         }
 
@@ -85,15 +89,19 @@ const command = new Command(async function onmessage(message) {
     if (/^\!timeout remove\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) {
-            message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
+            await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
+            log("Gracefully aborted attempt to remove timeout from user without the required rights to do so");
             return;
         }
 
         const members = message.mentions.members.array();
 
-        members.forEach(async member => await timeout.delete(member.guild.id, member.id));
+        const promises = members.map(member => timeout.delete(member.guild.id, member.id));
 
-        message.channel.send(`Removed timeouts for ${members.map(member => member.toString()).join(" ")} successfully`);
+        await message.channel.send(`Removed timeouts for ${members.map(member => member.toString()).join(" ")} successfully`);
+
+        await promises;
+        log(`Removed timeout from users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name}`);
         return;
     }
 
@@ -101,6 +109,7 @@ const command = new Command(async function onmessage(message) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) {
             message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
+            log("Gracefully aborted attempt to timeout user without the required rights to do so");
             return;
         }
 
@@ -111,17 +120,20 @@ const command = new Command(async function onmessage(message) {
         msg = msg.substring(9, Math.max(9, msg.length));
 
         if (msg === "") {
-            message.channel.send(this.usage);
+            await message.channel.send(this.usage);
+            log("Requested usage of timeout command");
             return;
         }
 
         if (message.mentions.members.has(message.member.id)) {
-            message.channel.send("You cannot timeout yourself, dummy!");
+            await message.channel.send("You cannot timeout yourself, dummy!");
+            log("Gracefully aborted attempt to timeout themselves");
             return;
         }
 
         if (message.mentions.members.has(message.client.user.id)) {
-            message.channel.send("You cannot timeout TrixieBot! I own you.");
+            await message.channel.send("You cannot timeout TrixieBot! I own you.");
+            log("Gracefully aborted attempt to timeout TrixieBot");
             return;
         }
 
@@ -129,7 +141,9 @@ const command = new Command(async function onmessage(message) {
 
         for (const member of members) {
             if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {
-                message.channel.send("You cannot timeout other moderators or admins");
+                await message.channel.send("You cannot timeout other moderators or admins");
+                log("Gracefully aborted attempt to timeout other user with permissions to manage messages");
+                return;
             }
             msg = msg.replace(
                 new RegExp(member.toString(), "g"),
@@ -141,13 +155,17 @@ const command = new Command(async function onmessage(message) {
 
         const timeout = parseHumanTime(msg);
         if (timeout < 10000 || timeout > 1000 * 3600 * 24 * 3) {
-            message.channel.send("Timeout length should be at least 10 seconds long and shorter than 3 days");
+            await message.channel.send("Timeout length should be at least 10 seconds long and shorter than 3 days");
+            log(`Gracefully aborted attempt to timeout for longer or shorter than allowed. Value: ${msg}`);
             return;
         }
 
-        members.forEach(async member => await timeout.set(member.guild.id, member.id, timeout));
+        const promises = members.map(member => timeout.set(member.guild.id, member.id, timeout));
 
-        message.channel.send(`Timeouted ${members.map(member => member.toString()).join(" ")} for ${msg} successfully`);
+        await message.channel.send(`Timeouted ${members.map(member => member.toString()).join(" ")} for ${msg} successfully`);
+        
+        await promises;
+        log(`Timeouted users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name} with ${msg}`);
         return;
     }
 }, {

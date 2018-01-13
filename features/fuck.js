@@ -13,29 +13,33 @@ const command = new Command(async message => {
     if (/^\!fuck\ add/i.test(message.content)) {
         const text = message.content.substring(10);
         if (text === "") {
-            message.channel.send(this.usage);
+            await message.channel.send(this.usage);
+            log("Sent fuck add usage");
             return;
         }
         if (added_recently.filter(id => message.author.id === id).length > 5) {
-            message.channel.send("Cool down, bro. I can't let you add so much at once! Come back in an hour or so.");
+            await message.channel.send("Cool down, bro. I can't let you add so much at once! Come back in an hour or so.");
+            log(`Gracefully aborted adding fuck text. User ${message.author.username} reached cooldown`);
             return;
         }
         if (text.length <= 10 || text.length > 256) {
-            message.channel.send("Text must be longer than 10 and shorter than 256 characters.\n\n" + this.usage);
+            await message.channel.send("Text must be longer than 10 and shorter than 256 characters.\n\n" + this.usage);
+            log("Gracefully aborted adding fuck text. Text too long");
             return;
         }
         if (!/\$\{name\}/g.test(text)) {
-            message.channel.send("You must add \`\${name}\` in the place the username should be set.\n\n" + this.usage);
+            await message.channel.send("You must add \`\${name}\` in the place the username should be set.\n\n" + this.usage);
+            log("Gracefully aborted adding fuck text. Missing ${name} in text");
             return;
         }
         if (await db.get(`SELECT * FROM fucks WHERE lowercase = "${text.toLowerCase()}"`)) {
-            message.channel.send("This phrase already exists!");
+            await message.channel.send("This phrase already exists!");
+            log("Gracefully aborted adding fuck text. Text already exists");
             return;
         }
         await db.run("INSERT INTO fucks (text, lowercase, author) VALUES (?, ?, ?)", [text, text.toLowerCase(), message.member.displayName]);
         added_recently.push(message.author.id);
         setTimeout(() => {
-            // Removes the user from the set after 2.5 seconds
             added_recently.splice(added_recently.indexOf(message.author.id));
         }, 1000 * 60 * 60); // 60 minutes
 
@@ -59,7 +63,8 @@ const command = new Command(async message => {
             log("Served fuck phrase: " + text);
             return;
         }
-        message.channel.send(this.usage);
+        await message.channel.send(this.usage);
+        log("Sent fuck usage");
         return;
     }
 }, async function init() {

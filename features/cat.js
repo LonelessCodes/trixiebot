@@ -26,7 +26,6 @@ async function random() {
     const random = result[Math.floor(Math.random() * result.length)];
 
     const url = random.webformatURL;
-    // const source = random.pageURL;
 
     return url;
 }
@@ -34,11 +33,10 @@ async function random() {
 const command = new Command(async function onmessage(message) {
     if (/^\!cat/i.test(message.content)) {
         await message.channel.send("meow :3 " + await random());
-        log("Random cat :3 meow");
+        log("Requested random cat :3 meow");
     }
 }, {
     usage: "`!cat` returns cat image :3",
-    category: "Trash",
     ignore: true
 });
 

@@ -4,13 +4,13 @@ const Command = require("../modules/Command");
 
 const command = new Command(async function onmessage(message) {
     if (message.content.toLowerCase() === "!tableflip" || message.content.toLowerCase() === "!tf") {
-        message.channel.send("(╯°□°）╯︵ ┻━┻");
+        await message.channel.send("(╯°□°）╯︵ ┻━┻");
         log("Flipped table successfully!!!");
         return;
     }
 
     if (message.content.toLowerCase() === "!untableflip" || message.content.toLowerCase() === "!uf") {
-        message.channel.send("┬─┬ ノ( ゜-゜ノ)");
+        await message.channel.send("┬─┬ ノ( ゜-゜ノ)");
         log("Unflipped table successfully!!!");
         return;
     }
@@ -18,10 +18,11 @@ const command = new Command(async function onmessage(message) {
     if (/^\!flip/i.test(message.content)) {
         const mention = message.mentions.members.first();
         if (!mention) {
-            message.channel.send("Usage: `!flip <user>`");
+            await message.channel.send("Usage: `!flip <user>`");
+            log("Sent flip usage");
             return;
         }
-        message.channel.send(`(╯°□°）╯︵ ${fliptext(mention.displayName)}`);
+        await message.channel.send(`(╯°□°）╯︵ ${fliptext(mention.displayName)}`);
         log(`Flipped ${mention.user.username}`);
         return;
     }
@@ -29,10 +30,11 @@ const command = new Command(async function onmessage(message) {
     if (/^\!unflip/i.test(message.content)) {
         const mention = message.mentions.members.first();
         if (!mention) {
-            message.channel.send("Usage: `!unflip <user>`");
+            await message.channel.send("Usage: `!unflip <user>`");
+            log("Sent unflip usage");
             return;
         }
-        message.channel.send(`${mention.displayName} ノ( ゜-゜ノ)`);
+        await message.channel.send(`${mention.displayName} ノ( ゜-゜ノ)`);
         log(`Unflipped ${mention.user.username}`);
         return;
     }

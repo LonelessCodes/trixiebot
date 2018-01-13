@@ -30,9 +30,11 @@ const command = new Command(async message => {
     // ping pong
     if (message.content.toLowerCase() === "!ping" || message.content.toLowerCase() === `${prefix} ping`) {
         const m = await message.channel.send("pong! Wee hehe");
-        m.edit("pong! Wee hehe\n" +
-            `:stopwatch: \`Latency is ${m.createdTimestamp - message.createdTimestamp}ms\`\n` +
+        const ping = m.createdTimestamp - message.createdTimestamp;
+        await m.edit("pong! Wee hehe\n" +
+            `:stopwatch: \`Latency is ${ping}ms\`\n` +
             `:heartbeat: \`API Latency is ${Math.round(client.ping)}ms\``);
+        log(`Requested ping. Got ping of ${ping}ms`);
         return;
     }
     else if (message.content.toLowerCase() === prefix) {
@@ -56,10 +58,13 @@ const command = new Command(async message => {
             .addBlankField()
             .addField("Admin", features["admin"].usage)
             .setFooter(`TrixieBot v${p.version}`, client.user.avatarURL);
-        message.channel.send({ embed: usage });
+        await message.channel.send({ embed: usage });
+        log("Requested usage");
         return;
     } else if (/^!version\b/i.test(message.content)) {
-        message.channel.send(`v${p.version}`);
+        await message.channel.send(`v${p.version}`);
+        log("Requested version");
+        return;
     }
 }, {
     ignore: true    

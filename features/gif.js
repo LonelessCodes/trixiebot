@@ -27,7 +27,8 @@ const command = new Command(async function onmessage(message) {
                 rating: "r"
             });
             if (!gif.data.image_original_url) {
-                message.channel.send("No GIFs were found matching this query.");
+                await message.channel.send("No GIFs were found matching this query.");
+                log(`No random gifs found for query: ${query}`);
                 return;
             }
         }
@@ -44,7 +45,8 @@ const command = new Command(async function onmessage(message) {
             limit: 100
         });
         if (gif.data.length === 0) {
-            message.channel.send("Apparently nothing is trending right now.");
+            await message.channel.send("Apparently nothing is trending right now.");
+            log("No gifs trending right now");
             return;
         }
 
@@ -58,7 +60,8 @@ const command = new Command(async function onmessage(message) {
     if (/^\!gif/i.test(message.content)) {
         const query = msg.substring(5);
         if (query === "") {
-            message.channel.send(this.usage);
+            await message.channel.send(this.usage);
+            log("Sent gif usage");
             return;
         }
 
@@ -68,7 +71,8 @@ const command = new Command(async function onmessage(message) {
             rating: "r"
         });
         if (gif.data.length === 0) {
-            message.channel.send("No GIFs were found matching this query.");
+            await message.channel.send("No GIFs were found matching this query.");
+            log(`No gifs found for query: ${query}`);
             return;
         }
 

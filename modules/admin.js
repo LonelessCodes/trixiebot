@@ -1,9 +1,9 @@
-if (!global._ignore) {
+if (!global._admin) {
     const Cron = require("cron");
     const sql = require("./database");
     const db = new sql.Database("./data/admin.sqlite");
 
-    const ignore = {
+    const timeout = {
         /**
          * @type {Map<string, { job: Cron.CronJob; timeout: Date }>}
          */
@@ -19,28 +19,28 @@ if (!global._ignore) {
             const job = new Cron.CronJob({
                 cronTime: new Date(Date.now() + timeout),
                 onTick() {
-                    ignore.delete(guildId, userId);
+                    timeout.delete(guildId, userId);
                 },
                 start: true
             });
-            ignore.cache.set(`${guildId}:${userId}`, {
+            timeout.cache.set(`${guildId}:${userId}`, {
                 timeout: new Date(Date.now() + timeout),
                 job
             });
         },
         async get(guildId, userId) {
-            return ignore.cache.get(`${guildId}:${userId}`).timeout;
+            return timeout.cache.get(`${guildId}:${userId}`).timeout;
         },
         async has(guildId, userId) {
-            return ignore.cache.has(`${guildId}:${userId}`);
+            return timeout.cache.has(`${guildId}:${userId}`);
         },
         async delete(guildId, userId) {
-            ignore.cache.delete(`${guildId}:${userId}`);
+            timeout.cache.delete(`${guildId}:${userId}`);
             await db.get(`DELETE FROM timeouts WHERE guildId = "${guildId}" AND userId = "${userId}"`);
         },
         async init() {
-            if (ignore.initialized) return;
-            ignore.initialized = true;
+            if (timeout.initialized) return;
+            timeout.initialized = true;
 
             await db.run("CREATE TABLE IF NOT EXISTS timeouts (guildId TEXT, userId TEXT, timeout INTEGER)");
             const rows = await db.all("SELECT * FROM timeouts");
@@ -50,17 +50,17 @@ if (!global._ignore) {
                 const job = new Cron.CronJob({
                     cronTime: timeout,
                     onTick() {
-                        ignore.delete(row.guildId, row.userId);
+                        timeout.delete(row.guildId, row.userId);
                     },
                     start: true
                 });
 
                 if (!job.running) {
-                    ignore.delete(row.guildId, row.userId);
+                    timeout.delete(row.guildId, row.userId);
                 }
                 else {
                     // is in db, only add to cache
-                    ignore.cache.set(`${row.guildId}:${row.userId}`, {
+                    timeout.cache.set(`${row.guildId}:${row.userId}`, {
                         timeout,
                         job
                     });
@@ -69,17 +69,19 @@ if (!global._ignore) {
         }
     };
 
-    global._ignore = ignore;
+    global._admin = {
+        timeout,
+    };
 }
 
 /**
  * @type 
- {{ 
+ {{ timeout: { 
    set(guildId: string, memberId: string, timeout: number): Promise<void>;
    get(guildId: string, memberId: string): Promise<number>;
    has(guildId: string, memberId: string): Promise<boolean>;
    delete(guildId: string, memberId: string): Promise<void>;
    init(): Promise<void>;
- }}
+ }; }}
  */
-module.exports = global._ignore;
+module.exports = global._admin;

@@ -29,7 +29,6 @@
         ],
         "no-cond-assign": "off",
 
-        // disable rules from base configurations
         "no-console": "off"
     }
 }

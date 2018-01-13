@@ -1,5 +1,5 @@
 const log = require("./log");
-const ignore = require("./ignore");
+const { timeout } = require("./admin");
 
 class Command {
     /**
@@ -26,11 +26,11 @@ class Command {
      */
     async init(client) {
         await this._init(client);
-        if (!ignore.initialized) await ignore.init();
+        if (!timeout.initialized) await timeout.init();
         client.on("message", async message => {
             if (message.author.bot) return;
             if (message.channel.type !== "text") return;
-            if (this.ignore && await ignore.has(message.guild.id, message.member.id)) return;
+            if (this.ignore && await timeout.has(message.guild.id, message.member.id)) return;
 
             this.onmessage(message).catch(err => {
                 log(err);

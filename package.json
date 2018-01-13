@@ -1,6 +1,6 @@
 {
   "name": "trixiebot",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "description": "Discord Bot to query Derpibooru.org!",
   "main": "index.js",
   "scripts": {
@@ -22,8 +22,7 @@
     "node-opus": "^0.2.7",
     "request": "^2.83.0",
     "sqlite3": "^3.1.13",
-    "twit": "^2.2.9",
-    "uuid": "^3.1.0"
+    "twit": "^2.2.9"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",

@@ -52,11 +52,14 @@ const command = new Command(async message => {
             .addField("Mlem", features["mlem"].usage)
             .addField("Larson", features["larson"].usage)
             .addField("CATS", features["cat"].usage)
+            .addField("Version", "`!version`")
             .addBlankField()
             .addField("Admin", features["admin"].usage)
             .setFooter(`TrixieBot v${p.version}`, client.user.avatarURL);
         message.channel.send({ embed: usage });
         return;
+    } else if (/^!version\b/i.test(message.content)) {
+        message.channel.send(`v${p.version}`);
     }
 }, {
     ignore: true    

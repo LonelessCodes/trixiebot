@@ -1,12 +1,12 @@
 const Discord = require("discord.js");
-const ignore = require("../modules/ignore");
+const { timeout, deletedMessages } = require("../modules/admin");
 const Command = require("../modules/Command");
 
 const names = ["d", "h", "m", "s"];
 
 function pad(num, size) {
-    const s = "000000000" + num;
-    return s.substr(s.length-size);
+    const s = "00" + num;
+    return s.substr(s.length - size);
 }
 
 function toHumanTime(ms) {
@@ -54,10 +54,10 @@ function parseHumanTime(string) {
 }
 
 const command = new Command(async function onmessage(message) {
-    if (await ignore.has(message.guild.id, message.member.id)) {
+    if (await timeout.has(message.guild.id, message.member.id)) {
         const content = message.content;
         await message.delete();
-        await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${toHumanTime((await ignore.get(message.guild.id, message.member.id)).getTime() - Date.now())}**__`);
+        await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${toHumanTime((await timeout.get(message.guild.id, message.member.id)).getTime() - Date.now())}**__`);
         return;
     }
 
@@ -91,7 +91,7 @@ const command = new Command(async function onmessage(message) {
 
         const members = message.mentions.members.array();
 
-        members.forEach(async member => await ignore.delete(member.guild.id, member.id));
+        members.forEach(async member => await timeout.delete(member.guild.id, member.id));
 
         message.channel.send(`Removed timeouts for ${members.map(member => member.toString()).join(" ")} successfully`);
         return;
@@ -138,14 +138,14 @@ const command = new Command(async function onmessage(message) {
         }
 
         msg = msg.trim();
-        
+
         const timeout = parseHumanTime(msg);
         if (timeout < 10000 || timeout > 1000 * 3600 * 24 * 3) {
             message.channel.send("Timeout length should be at least 10 seconds long and shorter than 3 days");
             return;
         }
 
-        members.forEach(async member => await ignore.set(member.guild.id, member.id, timeout));
+        members.forEach(async member => await timeout.set(member.guild.id, member.id, timeout));
 
         message.channel.send(`Timeouted ${members.map(member => member.toString()).join(" ")} for ${msg} successfully`);
         return;

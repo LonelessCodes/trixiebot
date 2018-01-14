@@ -13,29 +13,6 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!kick\b/i.test(message.content)) {
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.KICK_MEMBERS);
-        if (!permission) {
-            await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Kick");
-            log("Gracefully aborted attempt to kick user without the required rights to do so");
-            return;
-        }
-
-        // const member = 
-        return;
-    }
-    if (/^\!ban\b/i.test(message.content)) {
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.BAN_MEMBERS);
-        if (!permission) {
-            await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Ban");
-            log("Gracefully aborted attempt to ban user without the required rights to do so");
-            return;
-        }
-
-        // const member = 
-        return;
-    }
-
     if (/^\!timeout list\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) {

@@ -117,6 +117,14 @@ const command = new Command(async function onmessage(message) {
         }
         query = query.replace(/\ /g, "+");
 
+        if (!message.channel.nsfw &&
+            query.indexOf("rating:e") === -1 &&
+            query.indexOf("rating:q") === -1 &&
+            query.indexOf("rating:explicit") === -1 &&
+            query.indexOf("rating:questionable") === -1) {
+            query += " rating:s";
+        }
+
         let images = [];
         let ids = [];
 

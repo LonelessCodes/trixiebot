@@ -15,16 +15,16 @@ const command = new Command(async function onmessage(message) {
         if (query === "") {
             gif = await giphy.random({
                 limit: 1,
-                rating: "r"
+                rating: message.channel.nsfw ? "r" : "s"
             });
             if (!gif.data.image_original_url) {
                 throw new Error("Empty response for global random gif");
-            }
+            }    
         } else {
             gif = await giphy.random({
                 limit: 1,
                 tag: query,
-                rating: "r"
+                rating: message.channel.nsfw ? "r" : "s"
             });
             if (!gif.data.image_original_url) {
                 await message.channel.send("No GIFs were found matching this query.");
@@ -68,7 +68,7 @@ const command = new Command(async function onmessage(message) {
         const gif = await giphy.search({
             q: query,
             limit: 1,
-            rating: "r"
+            rating: message.channel.nsfw ? "r" : "s"
         });
         if (gif.data.length === 0) {
             await message.channel.send("No GIFs were found matching this query.");

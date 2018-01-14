@@ -111,6 +111,15 @@ const command = new Command(async function onmessage(message) {
         query = query.replace(/\,\ /g, ",");
         query = query.replace(/\ /g, "+");
 
+        if (!message.channel.nsfw &&
+            query.indexOf("explicit") === -1 &&
+            query.indexOf("questionable") === -1 &&
+            query.indexOf("grimdark") === -1 &&
+            query.indexOf("semi-grimdark") === -1 &&
+            query.indexOf("grotesque") === -1) {
+            query += ",(safe OR suggestive)";
+        }
+
         let images = [];
         let ids = [];
 

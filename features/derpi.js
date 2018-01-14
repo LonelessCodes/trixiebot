@@ -24,7 +24,7 @@ async function get(params) {
 
 const command = new Command(async function onmessage(message) {
     // derpibooru
-    if (/^\!db/i.test(message.content)) {
+    if (/^\!db\b/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**

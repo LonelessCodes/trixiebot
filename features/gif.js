@@ -1,4 +1,4 @@
-const giphy = require('giphy-api')(require("../keys/giphy.json").key);
+const giphy = require("giphy-api")(require("../keys/giphy.json").key);
 const log = require("../modules/log");
 const Command = require("../modules/Command");
 
@@ -7,9 +7,9 @@ Array.prototype.random = function () {
 };
 
 const command = new Command(async function onmessage(message) {
-    let msg = message.content.trim().split(/ +/g).join(" "); // remove double spaces
+    let msg = message.content.trim().replace(/\s+/g, " "); // remove double spaces
     
-    if (/^\!gif\ random/i.test(message.content)) {
+    if (/^\!gif random\b/i.test(message.content)) {
         const query = msg.substring(12);
         let gif;
         if (query === "") {
@@ -40,7 +40,7 @@ const command = new Command(async function onmessage(message) {
 
         return;
     }
-    if (/^\!gif\ trending/i.test(message.content)) {
+    if (/^\!gif trending\b/i.test(message.content)) {
         const gif = await giphy.trending({
             limit: 100
         });
@@ -57,7 +57,7 @@ const command = new Command(async function onmessage(message) {
 
         return;
     }
-    if (/^\!gif/i.test(message.content)) {
+    if (/^\!gif\b/i.test(message.content)) {
         const query = msg.substring(5);
         if (query === "") {
             await message.channel.send(this.usage);

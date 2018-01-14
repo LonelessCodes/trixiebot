@@ -10,7 +10,7 @@ Array.prototype.random = function () {
 const added_recently = new Array();
 
 const command = new Command(async message => {
-    if (/^\!fuck\ add/i.test(message.content)) {
+    if (/^\!fuck add\b/i.test(message.content)) {
         const text = message.content.substring(10);
         if (text === "") {
             await message.channel.send(this.usage);
@@ -47,7 +47,7 @@ const command = new Command(async message => {
         log(`Added fuck phrase: ${text}`);
         return;
     }
-    if (/^\!fuck/i.test(message.content)) {
+    if (/^\!fuck\b/i.test(message.content)) {
         if (message.mentions.members.first()) {
             const mention = message.mentions.members.first();
             const phrases = await db.all("SELECT text, author FROM fucks");

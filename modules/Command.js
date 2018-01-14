@@ -34,7 +34,8 @@ class Command {
 
             this.onmessage(message).catch(err => {
                 log(err);
-                message.channel.send("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
+                message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...
+\`${err.name}: ${err.message}\``);
             });
         });
     }

@@ -68,7 +68,7 @@ async function getFact() {
 }
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!fact/i.test(message.content)) {
+    if (/^\!fact\b/i.test(message.content)) {
         const fact = await getFact();
         await message.channel.send(fact);
         log("Fact requested");

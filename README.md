@@ -12,7 +12,7 @@ A feature-rich Discord Bot for pony lovers (or losers, your choice), including i
 with features of
 
 * point system
-* managing roles
+* vote on polls
 * timeouting users
 * and having sexual intercourse with another user
 

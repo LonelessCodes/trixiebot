@@ -31,7 +31,7 @@ async function get(params) {
 
 const command = new Command(async function onmessage(message) {
     // e621
-    if (/^\!e621/i.test(message.content)) {
+    if (/^\!e621\b/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**

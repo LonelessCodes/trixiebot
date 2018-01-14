@@ -45,6 +45,7 @@ const command = new Command(async message => {
             .addField("E621", features["e621"].usage)
             .addField("Giphy", features["gif"].usage)
             .addField("Roles", features["role"].usage)
+            .addField("Polls", features["poll"].usage)
             .addField("Uberfacts", features["fact"].usage)
             .addField("TTS", features["tts"].usage)
             .addField("Flip a Coin", features["coin"].usage)
@@ -61,7 +62,7 @@ const command = new Command(async message => {
         await message.channel.send({ embed: usage });
         log("Requested usage");
         return;
-    } else if (/^!version\b/i.test(message.content)) {
+    } else if (/^\!version\b/i.test(message.content)) {
         await message.channel.send(`v${p.version}`);
         log("Requested version");
         return;

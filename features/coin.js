@@ -9,8 +9,8 @@ Array.prototype.random = function () {
 const coin = ["heads", "tails"];
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!coin/i.test(message.content)) {
-        let msg = message.content.trim().split(/ +/g).join(" "); // remove double spaces
+    if (/^\!coin\b/i.test(message.content)) {
+        let msg = message.content.trim().replace(/\s+/g, " "); // remove double spaces
 
         let bet = msg.substring(6).toLowerCase();
         if (bet === "") {

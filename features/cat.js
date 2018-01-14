@@ -31,7 +31,7 @@ async function random() {
 }
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!cat/i.test(message.content)) {
+    if (/^\!cat\b/i.test(message.content)) {
         await message.channel.send("meow :3 " + await random());
         log("Requested random cat :3 meow");
     }

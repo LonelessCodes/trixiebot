@@ -4,10 +4,8 @@ const request = require("request");
 const Command = require("../modules/Command");
 
 const command = new Command(async function onmessage(message) {
-    let msg = message.content.trim().replace(/\s+/g, " "); // remove double spaces
-
     if (/^\!tts\b/i.test(message.content)) {
-        const src = msg.substring(5);
+        const src = message.content.substr(5);
         if (src === "") {
             await message.channel.send("Usage: " + this.usage);
             log("Sent tts usage");

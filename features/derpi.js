@@ -30,9 +30,7 @@ const command = new Command(async function onmessage(message) {
         /**
          * @type {string}
          */
-        let msg = message.content;
-        while (msg.indexOf("  ") > -1) msg = msg.replace(/\ \ /g, " "); // remove double spaces
-        msg = msg.substring(4, Math.max(4, msg.length));
+        let msg = message.content.substr(4);
 
         if (msg === "") {
             await message.channel.send(this.usage);

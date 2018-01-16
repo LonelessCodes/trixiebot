@@ -10,9 +10,7 @@ const coin = ["heads", "tails"];
 
 const command = new Command(async function onmessage(message) {
     if (/^\!coin\b/i.test(message.content)) {
-        let msg = message.content.trim().replace(/\s+/g, " "); // remove double spaces
-
-        let bet = msg.substring(6).toLowerCase();
+        let bet = message.content.substr(6).toLowerCase();
         if (bet === "") {
             await message.channel.send(this.usage);
             log("Gracefully aborted attempt to flip coin: No bet given. Sent usage information");

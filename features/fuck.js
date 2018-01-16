@@ -11,7 +11,7 @@ const added_recently = new Array();
 
 const command = new Command(async message => {
     if (/^\!fuck add\b/i.test(message.content)) {
-        const text = message.content.substring(10);
+        const text = message.content.substr(10);
         if (text === "") {
             await message.channel.send(this.usage);
             log("Sent fuck add usage");

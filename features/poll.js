@@ -21,7 +21,7 @@ const command = new Command(async function onmessage(message) {
         /**
          * @type {string}
          */
-        let msg = message.content.replace(/\s+/g, " ").substr(6).trim();
+        let msg = message.content.substr(6).trim();
         if (msg === "") {
             await message.channel.send(this.usage);
             log("Sent poll usage");
@@ -73,7 +73,7 @@ const command = new Command(async function onmessage(message) {
 
         const total = (await message.channel.awaitMessages(message => {
             for (let option of options) {
-                if (option.toLowerCase() === message.content.replace(/\s+/g, " ").toLowerCase() &&
+                if (option.toLowerCase() === message.content.toLowerCase() &&
                     !users.includes(message.member.id)) {
                     users.push(message.member.id);
                     votes[option]++;

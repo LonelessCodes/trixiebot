@@ -22,7 +22,7 @@ for (let file of fs.readdirSync("./features")) {
     if (path.extname(file) === ".js") {
         const feature = require("./features/" + file);
         feature.init(client);
-        features[file.substring(0, file.length - path.extname(file).length)] = feature;
+        features[file.substr(0, file.length - path.extname(file).length)] = feature;
     }
 }
 

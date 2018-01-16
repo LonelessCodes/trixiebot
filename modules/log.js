@@ -16,11 +16,11 @@ function getTimeString(blank) {
     const d = new Date();
 
     const time =
-        toString(d.getMonth() + 1, 2) + "." +
         toString(d.getDate(), 2) + " " +
+        toString(d.getMonth() + 1, 2) + "." +
         toString(d.getHours(), 2) + ":" +
         toString(d.getMinutes(), 2) + ":" +
-        toString(d.getSeconds(), 2) + ":" +
+        toString(d.getSeconds(), 2) + "." +
         toString(d.getMilliseconds(), 3);
 
     if (blank) return time + "> ";

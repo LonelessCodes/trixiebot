@@ -95,8 +95,7 @@ const command = new Command(async function onmessage(message) {
         /**
          * @type {string}
          */
-        let msg = message.content.trim().replace(/\s+/g, " ");
-        msg = msg.substring(9, Math.max(9, msg.length));
+        let msg = message.content.substr(9);
 
         if (msg === "") {
             await message.channel.send(this.usage);

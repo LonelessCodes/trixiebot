@@ -6,11 +6,9 @@ Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-const command = new Command(async function onmessage(message) {
-    let msg = message.content.trim().replace(/\s+/g, " "); // remove double spaces
-    
+const command = new Command(async function onmessage(message) {    
     if (/^\!gif random\b/i.test(message.content)) {
-        const query = msg.substring(12);
+        const query = message.content.substr(12);
         let gif;
         if (query === "") {
             gif = await giphy.random({
@@ -58,7 +56,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
     if (/^\!gif\b/i.test(message.content)) {
-        const query = msg.substring(5);
+        const query = message.content.substr(5);
         if (query === "") {
             await message.channel.send(this.usage);
             log("Sent gif usage");

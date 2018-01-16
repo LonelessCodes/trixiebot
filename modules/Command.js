@@ -32,6 +32,9 @@ class Command {
             if (message.channel.type !== "text") return;
             if (this.ignore && await timeout.has(message.guild.id, message.member.id)) return;
 
+            // clean up multiple whitespaces
+            message.content = message.content.replace(/\s+/g, " ").trim();
+
             this.onmessage(message).catch(err => {
                 log(err);
                 message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...

@@ -29,7 +29,7 @@ for (let category in available_roles)
 
 const command = new Command(async function onmessage(message) {
     if (/^\!role remove\b/i.test(message.content)) {
-        const msg = message.content.trim().replace(/\s+/g, " ").substr(13);
+        const msg = message.content.substr(13);
         if (msg === "") {
             await message.channel.send(this.usage);
             log("Sent role remove usage");
@@ -101,7 +101,7 @@ const command = new Command(async function onmessage(message) {
         }
     }
     else if (/^\!role\b/i.test(message.content)) {
-        const msg = message.content.trim().replace(/\s+/g, " ").substr(6);
+        const msg = message.content.substr(6);
         if (msg === "") {
             await message.channel.send(this.usage);
             log("Sent role usage");

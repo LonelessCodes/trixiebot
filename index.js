@@ -6,14 +6,9 @@ const path = require("path");
 const fs = require("fs");
 const Command = require("./modules/Command");
 
-const client = new Discord.Client();
+const client = new Discord.Client({ autoReconnect: true });
 
-client.on("ready", () => {
-    log("I am ready");
-
-    client.user.setStatus("online");
-    client.user.setGame("!trixie for help");
-});
+client.setMaxListeners(Infinity); // we're never removing and later adding listeners, so Infinity is ok
 
 const prefix = "!trixie";
 
@@ -28,7 +23,8 @@ for (let file of fs.readdirSync("./features")) {
 
 const command = new Command(async message => {
     // ping pong
-    if (message.content.toLowerCase() === "!ping" || message.content.toLowerCase() === `${prefix} ping`) {
+    if (message.content.toLowerCase() === "!ping" ||
+        message.content.toLowerCase() === `${prefix} ping`) {
         const m = await message.channel.send("pong! Wee hehe");
         const ping = m.createdTimestamp - message.createdTimestamp;
         await m.edit("pong! Wee hehe\n" +
@@ -70,6 +66,40 @@ const command = new Command(async message => {
 }, {
     ignore: true    
 });
+
 command.init(client);
+
+client.on("ready", () => {
+    log("I am ready");
+
+    client.user.setStatus("online");
+    client.user.setActivity("!trixie for help", { type: "LISTENING" });
+});
+
+client.on("warn", warn => log.warn(warn));
+
+client.on("error", error => log.error(error.stack));
+
+client.on("debug", debug => {
+    if (/heartbeat/i.test(debug)) return;
+    log.debug("discord.js", debug);
+});
+
+client.on("disconnect", closeEvent => log.debug("discord.js", closeEvent));
+
+client.on("reconnecting", () => log.debug("discord.js", "Reconnecting"));
+
+client.on("resume", replayed => log.debug("discord.js", `Resumed ${replayed} time`));
+
+process.on("uncaughtException", error => log.error(error.stack));
+
+process.on("unhandledRejection", (reason, p) => {
+    log.warn("Unhandled Rejection at:", p, "reason:", reason);
+});
+
+process.on("warning", (warning) => {
+    log.warn(warning.message); // Print the warning message
+    log.warn(warning.stack);   // Print the stack trace
+});
 
 client.login(discord.token);

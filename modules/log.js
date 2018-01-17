@@ -12,23 +12,51 @@ function toString(input, length) {
     return string;
 }
 
-function getTimeString(blank) {
+function getTimeString() {
     const d = new Date();
 
     const time =
-        toString(d.getDate(), 2) + " " +
-        toString(d.getMonth() + 1, 2) + "." +
+        toString(d.getDate(), 2) + "." +
+        toString(d.getMonth() + 1, 2) + ". " +
         toString(d.getHours(), 2) + ":" +
         toString(d.getMinutes(), 2) + ":" +
         toString(d.getSeconds(), 2) + "." +
         toString(d.getMilliseconds(), 3);
 
-    if (blank) return time + "> ";
-    else return colors.cyan.bold(time) + "> ";
+    return colors.cyan.bold(time) + "> ";
 }
 
-function log(...messages) {
-    console.log(getTimeString(), ...messages);
+
+/**
+ * Logger
+ */
+
+class Logger extends Function {
+    /**
+     * @returns {function(...messages: any[]): void}
+     */
+    constructor() {
+        /**
+         * @param {any[]} messages
+         */
+        function log(...messages) { 
+            console.log(getTimeString(), ...messages);
+        }
+        Object.setPrototypeOf(log, Logger.prototype);
+        return log;
+    }
+
+    warn(...messages) {
+        console.warn(getTimeString(), colors.yellow("warn"), ...messages);
+    }
+
+    error(...messages) {
+        console.error(getTimeString(), colors.bgRed.white.bold("error"), ...messages);
+    }
+
+    debug(file, ...messages) {
+        console.debug(getTimeString(), colors.cyan.bold(file), ...messages);
+    }
 }
 
-module.exports = log;
+module.exports = new Logger;

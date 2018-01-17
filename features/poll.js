@@ -55,7 +55,7 @@ const command = new Command(async function onmessage(message) {
             return;
         }
 
-        const options = msg.split(/,\s*/g);
+        const options = msg.split(/,\s*/g).sort((a, b) => b.length - a.length); // longest to shortest
         if (options.length < 2) {
             await message.channel.send("To create a poll you must give at least two options to choose from.\n\n" + this.usage);
             log("Gracefully aborted attempt to create poll. Too little options");
@@ -73,7 +73,7 @@ const command = new Command(async function onmessage(message) {
 
         const total = (await message.channel.awaitMessages(message => {
             for (let option of options) {
-                if (option.toLowerCase() === message.content.toLowerCase() &&
+                if (new RegExp(`^${option}`, "i").test(message.content) &&
                     !users.includes(message.member.id)) {
                     users.push(message.member.id);
                     votes[option]++;

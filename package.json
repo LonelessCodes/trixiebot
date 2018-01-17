@@ -1,6 +1,6 @@
 {
   "name": "trixiebot",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "much",
     "more"
   ],
-  "author": "",
+  "author": "Chris Shepherd",
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",

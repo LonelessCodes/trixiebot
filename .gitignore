@@ -1,5 +1,4 @@
 data/
 keys/
+logs/
 node_modules/
-out.log
-err.log

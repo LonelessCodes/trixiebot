@@ -13,7 +13,7 @@ client.setMaxListeners(Infinity); // we're never removing and later adding liste
 const prefix = "!trixie";
 
 const features = {};
-for (let file of fs.readdirSync("./features")) {
+for (let file of fs.readdirSync(__dirname + "/features")) {
     if (path.extname(file) === ".js") {
         const feature = require("./features/" + file);
         feature.init(client);
@@ -73,12 +73,12 @@ client.on("ready", () => {
     log("I am ready");
 
     client.user.setStatus("online");
-    client.user.setActivity("!trixie for help", { type: "LISTENING" });
+    client.user.setActivity("!trixie for help", { type: "PLAYING" });
 });
 
 client.on("warn", warn => log.warn(warn));
 
-client.on("error", error => log.error(error.stack));
+client.on("error", error => log.error(error.stack || error));
 
 client.on("debug", debug => {
     if (/heartbeat/i.test(debug)) return;
@@ -91,13 +91,13 @@ client.on("reconnecting", () => log.debug("discord.js", "Reconnecting"));
 
 client.on("resume", replayed => log.debug("discord.js", `Resumed ${replayed} time`));
 
-process.on("uncaughtException", error => log.error(error.stack));
+process.on("uncaughtException", error => log.error(error.stack || error));
 
 process.on("unhandledRejection", (reason, p) => {
     log.warn("Unhandled Rejection at:", p, "reason:", reason);
 });
 
-process.on("warning", (warning) => {
+process.on("warning", warning => {
     log.warn(warning.message); // Print the warning message
     log.warn(warning.stack);   // Print the stack trace
 });

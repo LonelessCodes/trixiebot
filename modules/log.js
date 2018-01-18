@@ -23,7 +23,7 @@ function getTimeString() {
         toString(d.getSeconds(), 2) + "." +
         toString(d.getMilliseconds(), 3);
 
-    return colors.cyan.bold(time) + "> ";
+    return colors.cyan.bold(time) + ">";
 }
 
 

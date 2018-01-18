@@ -11,7 +11,7 @@ Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-const twitter = new Twit(require("../keys/twitter.json"));
+const twitter = new Twit(require("../../keys/twitter.json"));
 twitter.get = promisify(twitter.get);
 
 const facts = new Set();

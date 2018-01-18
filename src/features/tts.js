@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const voicerss = require("../keys/voicerss.json");
+const voicerss = require("../../keys/voicerss.json");
 const request = require("request");
 const Command = require("../modules/Command");
 

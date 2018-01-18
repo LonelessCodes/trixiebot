@@ -1,7 +1,7 @@
 const log = require("../modules/log");
 const { promisify } = require("util");
 const request = promisify(require("request"));
-const p = require("../package.json");
+const p = require("../../package.json");
 const Command = require("../modules/Command");
 
 Array.prototype.random = function () {

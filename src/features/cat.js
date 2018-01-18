@@ -1,4 +1,4 @@
-const pixabay = require("../keys/pixabay.json");
+const pixabay = require("../../keys/pixabay.json");
 const { promisify } = require("util");
 const request = promisify(require("request"));
 const log = require("../modules/log");

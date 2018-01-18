@@ -1,4 +1,4 @@
-const derpibooru = require("../keys/derpibooru.json");
+const derpibooru = require("../../keys/derpibooru.json");
 const log = require("../modules/log");
 const { promisify } = require("util");
 const request = promisify(require("request"));

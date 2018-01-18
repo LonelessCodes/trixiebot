@@ -1,4 +1,4 @@
-const giphy = require("giphy-api")(require("../keys/giphy.json").key);
+const giphy = require("giphy-api")(require("../../keys/giphy.json").key);
 const log = require("../modules/log");
 const Command = require("../modules/Command");
 

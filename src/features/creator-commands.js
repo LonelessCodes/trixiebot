@@ -6,6 +6,14 @@ const { promisify } = require("util");
 const readLastLines = require("read-last-lines");
 const Command = require("../modules/Command");
 
+const extnames = {
+    ".js": "javascript",
+    ".css": "css",
+    ".html": "html",
+    ".md": "markdown",
+    ".json": "json"
+};
+
 const command = new Command(async function onmessage(message) {
     const permission = message.author.id === "108391799185285120"; // this id is the bot's creator id
 
@@ -18,7 +26,8 @@ const command = new Command(async function onmessage(message) {
 
         const msg = message.content.substr(6);
         const content = await fs.readFile(path.join(process.cwd(), msg), "utf8");
-        await message.channel.send(msg + "\n```\n" + content + "\n```");
+        const language = extnames[path.extname(msg)] || "";
+        await message.channel.send(`\`\`\`${language}\n${content}\n\`\`\``);
         log(`Sent file contents of ${msg}`);
         return;
     }

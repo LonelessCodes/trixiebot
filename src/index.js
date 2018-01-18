@@ -78,7 +78,12 @@ client.on("ready", () => {
 
 client.on("warn", warn => log.warn(warn));
 
-client.on("error", error => log.error(error.stack || error));
+client.on("error", error => log.error(
+    error.stack ||
+    error.error ?
+        error.error.stack || error.error :
+        error
+));
 
 client.on("debug", debug => {
     if (/heartbeat/i.test(debug)) return;

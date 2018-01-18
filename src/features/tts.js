@@ -34,7 +34,7 @@ const command = new Command(async function onmessage(message) {
             return;
         }
 
-        const url = `http://api.voicerss.org/?key=${voicerss.key}&hl=en-gb&f=22khz_8bit_mono&c=OGG&src=${src}`;
+        const url = `http://api.voicerss.org/?key=${voicerss.key}&hl=en-gb&f=44khz_16bit_mono&c=OGG&src=${src}`;
 
         const connection = await message.member.voiceChannel.join();
         message.react("👍");

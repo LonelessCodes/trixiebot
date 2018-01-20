@@ -21,7 +21,7 @@ module.exports.toHumanTime = function toHumanTime(ms) {
     const d = new Date(ms);
     const arr = [
         d.getDate() - 1,
-        d.getHours() - 1,
+        d.getHours(),
         d.getMinutes(),
         d.getSeconds()
     ];

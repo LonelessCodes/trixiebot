@@ -43,7 +43,7 @@ const command = new Command(async function onmessage(message) {
 
         const duration = parseHumanTime(duration_string);
         if (duration < 60000 || duration > 1000 * 3600 * 24 * 3) {
-            await message.channel.send("`duration` should be at least 10m and max 3d\n\n" + this.usage);
+            await message.channel.send("`duration` should be at least 1m and max 3d\n\n" + this.usage);
             log("Gracefully aborted attempt to create poll. Duration out of range");
             return;
         }
@@ -66,6 +66,7 @@ const command = new Command(async function onmessage(message) {
         polls[message.guild.id][message.channel.id] = options;
 
         await message.channel.send(`@here Poll is starting! **${toHumanTime(duration)}** left to vote\nYou vote by simply posting \`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\` in this channel`);
+        log(`Poll started. ${duration}ms. ${options.join(", ")}`);
 
         const users = [];
         const votes = {};
@@ -77,6 +78,7 @@ const command = new Command(async function onmessage(message) {
                     !users.includes(message.member.id)) {
                     users.push(message.member.id);
                     votes[option]++;
+                    log(`User voted for ${option}`);
                     return true;
                 }
             }
@@ -88,9 +90,8 @@ const command = new Command(async function onmessage(message) {
         if (total < 1) {
             const embed = new Discord.RichEmbed;
             embed.setColor(0x71B3E6);
-            embed.setTitle("__Poll is over!__");
             embed.setDescription("But no one voted :c");
-            await message.channel.send(message.member.toString(), { embed });
+            await message.channel.send(message.member.toString() + " Poll ended!", { embed });
             log("Poll ended. No one voted");
             return;
         }
@@ -104,13 +105,11 @@ const command = new Command(async function onmessage(message) {
 
         const embed = new Discord.RichEmbed;
         embed.setColor(0x71B3E6);
-        embed.setTitle("__Poll is over!__");
-        embed.addBlankField();
         for (let vote of result) {
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
         }
 
-        await message.channel.send(message.member.toString(), { embed });
+        await message.channel.send(message.member.toString() + " Poll ended!", { embed });
         log(`Poll ended. ${result[0].text} won with ${result[0].votes / total * 100}% votes`);
     }
 }, {

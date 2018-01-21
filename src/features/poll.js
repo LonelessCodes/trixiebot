@@ -128,6 +128,8 @@ Poll.add = function add(poll) {
 };
 
 async function init(client) {
+    await pollDB.loadDatabase();
+
     const polls = await pollDB.find({});
     for (let poll of polls) {
         const guild = client.guild.get(poll.guildId);

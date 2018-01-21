@@ -13,20 +13,19 @@ client.setMaxListeners(Infinity); // we're never removing and later adding liste
 const prefix = "!trixie";
 
 const features = {};
-/**
- * @type {Promise[]}
- */
-const feature_init = [];
-for (let file of fs.readdirSync(__dirname + "/features")) {
-    if (path.extname(file) === ".js") {
-        /**
-         * @type {Command}
-         */
-        const feature = require("./features/" + file);
-        feature_init.push(feature.init(client));
-        features[file.substr(0, file.length - path.extname(file).length)] = feature;
+(async function () {
+    for (let file of fs.readdirSync(__dirname + "/features")) {
+        if (path.extname(file) === ".js") {
+            /**
+             * @type {Command}
+             */
+            const feature = require("./features/" + file);
+            await feature.init(client);
+            log.debug(file, "loaded");
+            features[file.substr(0, file.length - path.extname(file).length)] = feature;
+        }
     }
-}
+})();
 
 const command = new Command(async message => {
     // ping pong
@@ -76,7 +75,7 @@ const command = new Command(async message => {
 
 command.init(client);
 
-client.on("ready", async () => {
+client.on("ready", () => {
     log("I am ready");
 
     client.user.setStatus("online");

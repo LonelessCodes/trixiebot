@@ -29,9 +29,6 @@ class Command {
         client.on("message", async message => {
             if (message.author.bot) return;
             if (message.channel.type !== "text") return;
-            console.log("ignore");
-            console.log(await timeout.has({ guildId: message.guild.id, memberId: message.member.id }));
-            console.log("through");
             if (this.ignore &&
                 await timeout.has({ guildId: message.guild.id, memberId: message.member.id })) return;
             

@@ -71,6 +71,8 @@ const command = new Command(async message => {
         log("Sent fuck usage");
         return;
     }
+}, async function init() {
+    await fucks.loadDatabase();
 }, {
     usage: `\`!fuck <user>\`
 \`user\` - the username of the user to fuck

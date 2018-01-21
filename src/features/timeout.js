@@ -219,6 +219,9 @@ const command = new Command(async function onmessage(message) {
         log(`Timeouted users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name} with ${msg}`);
         return;
     }
+}, async function init() {
+    await timeout.loadDatabase();
+    await timeout_messages.loadDatabase();
 }, {
     usage: `\`!timeout <time> <user mention 1> <user mention 2> ... \`
 \`time\` - timeout length. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs

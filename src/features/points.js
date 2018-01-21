@@ -51,6 +51,8 @@ const command = new Command(async function onmessage(message) {
     } catch (err) {
         log("Points Error", err);
     }
+}, async function init() {
+    await pointsDB.loadDatabase();
 }, {
     ignore: true
 });

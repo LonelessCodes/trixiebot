@@ -31,7 +31,7 @@ const command = new Command(async function onmessage(message) {
         log(`Sent file contents of ${msg}`);
         return;
     }
-    
+
     if (/^\!log\b/i.test(message.content)) {
         if (!permission) {
             await message.channel.send("no");
@@ -52,10 +52,10 @@ const command = new Command(async function onmessage(message) {
             log("Gracefully aborted attempt to access creator functions");
             return;
         }
-        
+
         const msg = message.content.substr(6);
         const content = await promisify(exec)(msg);
-        await message.channel.send("```\n" + content.stdout.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "") + "\n```");
+        await message.channel.send("```\n" + (content.stdout + content.stderr).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "") + "\n```");
         log(`Sent stdout for command ${msg}`);
         return;
     }

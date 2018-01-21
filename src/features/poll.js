@@ -8,7 +8,7 @@ function progressBar(v, a, b) {
     const str = new Array(length);
     str.fill(a);
     str.fill(b, Math.round(v * length));
-    return `[${str.join("")}] ${(v * 100).toFixed(1)}%`;
+    return `${str.join("")} ${(v * 100).toFixed(1)}%`;
 }
 
 /**
@@ -108,6 +108,7 @@ const command = new Command(async function onmessage(message) {
         for (let vote of result) {
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
         }
+        embed.setFooter(`${total} ${total === 1 ? "vote" : "votes"}`);
 
         await message.channel.send(message.member.toString() + " Poll ended!", { embed });
         log(`Poll ended. ${result[0].text} won with ${result[0].votes / total * 100}% votes`);

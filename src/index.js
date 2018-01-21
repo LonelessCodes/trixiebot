@@ -13,10 +13,17 @@ client.setMaxListeners(Infinity); // we're never removing and later adding liste
 const prefix = "!trixie";
 
 const features = {};
+/**
+ * @type {Promise[]}
+ */
+const feature_init = [];
 for (let file of fs.readdirSync(__dirname + "/features")) {
     if (path.extname(file) === ".js") {
+        /**
+         * @type {Command}
+         */
         const feature = require("./features/" + file);
-        feature.init(client);
+        feature_init.push(feature.init(client));
         features[file.substr(0, file.length - path.extname(file).length)] = feature;
     }
 }
@@ -53,23 +60,23 @@ const command = new Command(async message => {
             .addField("CATS", features["cat"].usage)
             .addField("Version", "`!version`")
             .addBlankField()
-            .addField("Admin", features["admin"].usage)
+            .addField("Admin", features["timeout"].usage)
             .setFooter(`TrixieBot v${p.version}`, client.user.avatarURL);
         await message.channel.send({ embed: usage });
         log("Requested usage");
         return;
-    } else if (/^\!version\b/i.test(message.content)) {
+    } else if (/^!version\b/i.test(message.content)) {
         await message.channel.send(`v${p.version}`);
         log("Requested version");
         return;
     }
 }, {
-    ignore: true    
+    ignore: true
 });
 
 command.init(client);
 
-client.on("ready", () => {
+client.on("ready", async () => {
     log("I am ready");
 
     client.user.setStatus("online");
@@ -80,7 +87,7 @@ client.on("warn", warn => log.warn(warn));
 
 client.on("error", error => log.error(
     error.stack ||
-    error.error ?
+        error.error ?
         error.error.stack || error.error :
         error
 ));

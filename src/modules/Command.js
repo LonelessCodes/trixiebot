@@ -1,5 +1,5 @@
 const log = require("./log");
-const { timeout } = require("./admin");
+const timeout = require("./database/timeout");
 
 class Command {
     /**
@@ -26,11 +26,15 @@ class Command {
      */
     async init(client) {
         await this._init(client);
-        if (!timeout.initialized) await timeout.init();
         client.on("message", async message => {
             if (message.author.bot) return;
             if (message.channel.type !== "text") return;
-            if (this.ignore && await timeout.has(message.guild.id, message.member.id)) return;
+            console.log("ignore");
+            console.log(await timeout.has({ guildId: message.guild.id, memberId: message.member.id }));
+            console.log("through");
+            if (this.ignore &&
+                await timeout.has({ guildId: message.guild.id, memberId: message.member.id })) return;
+            
 
             // clean up multiple whitespaces
             message.content = message.content.replace(/\s+/g, " ").trim();
@@ -41,6 +45,7 @@ class Command {
 \`${err.name}: ${err.message}\``);
             });
         });
+        return;
     }
 }
 

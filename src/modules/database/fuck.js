@@ -1,3 +1,8 @@
-const db = require("./Datastore");
+const { getDatabase } = require("./getDatabase");
 
-module.exports = new db.Collection("fuck");
+module.exports = {
+    async initialize() {
+        const db = await getDatabase();
+        return db.collection("fuck");
+    }
+};

@@ -9,7 +9,7 @@ Array.prototype.random = function () {
 const coin = ["heads", "tails"];
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!coin\b/i.test(message.content)) {
+    if (/^!coin\b/i.test(message.content)) {
         let bet = message.content.substr(6).toLowerCase();
         if (bet === "") {
             await message.channel.send(this.usage);

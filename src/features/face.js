@@ -137,16 +137,16 @@ const faces = [
 ];
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!face\b/i.test(message.content)) {
+    if (/^!face\b/i.test(message.content)) {
         const face = faces.random();
         await message.channel.send(face);
         log(`Requested random face. Given ${face}`);
     }
-    else if (/^\!lenny\b/i.test(message.content)) {
+    else if (/^!lenny\b/i.test(message.content)) {
         await message.channel.send(faces[0]);
         log("Requested lenny emoticon");
     }
-    else if (/^\!shrug\b/i.test(message.content)) {
+    else if (/^!shrug\b/i.test(message.content)) {
         await message.channel.send(faces[1]);
         log("Requested shrug emoticon");
     }

@@ -17,7 +17,7 @@ const extnames = {
 const command = new Command(async function onmessage(message) {
     const permission = message.author.id === "108391799185285120"; // this id is the bot's creator id
 
-    if (/^\!file\b/i.test(message.content)) {
+    if (/^!file\b/i.test(message.content)) {
         if (!permission) {
             await message.channel.send("no");
             log("Gracefully aborted attempt to access creator functions");
@@ -32,7 +32,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!log\b/i.test(message.content)) {
+    if (/^!log\b/i.test(message.content)) {
         if (!permission) {
             await message.channel.send("no");
             log("Gracefully aborted attempt to access creator functions");
@@ -46,7 +46,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!exec\b/i.test(message.content)) {
+    if (/^!exec\b/i.test(message.content)) {
         if (!permission) {
             await message.channel.send("no");
             log("Gracefully aborted attempt to access creator functions");

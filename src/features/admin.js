@@ -13,7 +13,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!timeout list\b/i.test(message.content)) {
+    if (/^!timeout list\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) {
             await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-List-Timeouts. To use the timeout command you must have permissions to manage messages.");
@@ -50,7 +50,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!timeout clear\b/i.test(message.content)) {
+    if (/^!timeout clear\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) {
             await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
@@ -65,7 +65,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!timeout remove\b/i.test(message.content)) {
+    if (/^!timeout remove\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) {
             await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
@@ -84,7 +84,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!timeout\b/i.test(message.content)) {
+    if (/^!timeout\b/i.test(message.content)) {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) {
             message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");

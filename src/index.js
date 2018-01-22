@@ -62,10 +62,6 @@ const command = new Command(async message => {
         await message.channel.send(`v${p.version}`);
         log("Requested version");
         return;
-    } else if (/^!invite\b/i.test(message.content)) {
-        const link = await client.generateInvite(["SEND_MESSAGES", "MANAGE_GUILD", "MENTION_EVERYONE"]);
-        await message.channel.send(link);
-        return;
     }
 }, {
     ignore: true    

@@ -9,8 +9,8 @@ Array.prototype.random = function () {
 
 const added_recently = new Array();
 
-const command = new Command(async message => {
-    if (/^\!fuck add\b/i.test(message.content)) {
+const command = new Command(async function onmessage(message) {
+    if (/^!fuck add\b/i.test(message.content)) {
         const text = message.content.substr(10);
         if (text === "") {
             await message.channel.send(this.usage);
@@ -28,7 +28,7 @@ const command = new Command(async message => {
             return;
         }
         if (!/\$\{name\}/g.test(text)) {
-            await message.channel.send("You must add \`\${name}\` in the place the username should be set.\n\n" + this.usage);
+            await message.channel.send("You must add `${name}` in the place the username should be set.\n\n" + this.usage);
             log("Gracefully aborted adding fuck text. Missing ${name} in text");
             return;
         }
@@ -47,7 +47,7 @@ const command = new Command(async message => {
         log(`Added fuck phrase: ${text}`);
         return;
     }
-    if (/^\!fuck\b/i.test(message.content)) {
+    if (/^!fuck\b/i.test(message.content)) {
         if (message.mentions.members.first()) {
             const mention = message.mentions.members.first();
             const phrases = await db.all("SELECT text, author FROM fucks");

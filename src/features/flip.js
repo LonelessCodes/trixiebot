@@ -15,7 +15,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!flip\b/i.test(message.content)) {
+    if (/^!flip\b/i.test(message.content)) {
         const mention = message.mentions.members.first();
         if (!mention) {
             await message.channel.send("Usage: `!flip <user>`");
@@ -27,7 +27,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^\!unflip\b/i.test(message.content)) {
+    if (/^!unflip\b/i.test(message.content)) {
         const mention = message.mentions.members.first();
         if (!mention) {
             await message.channel.send("Usage: `!unflip <user>`");

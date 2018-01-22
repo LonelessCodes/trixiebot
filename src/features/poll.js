@@ -17,7 +17,7 @@ function progressBar(v, a, b) {
 const polls = {};
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!poll\b/i.test(message.content)) {
+    if (/^!poll\b/i.test(message.content)) {
         /**
          * @type {string}
          */

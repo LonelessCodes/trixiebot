@@ -1,5 +1,5 @@
 const log = require("./log");
-const timeout = require("./database/timeout");
+const timeoutDB = require("./database/timeout");
 
 class Command {
     /**
@@ -30,7 +30,7 @@ class Command {
             if (message.author.bot) return;
             if (message.channel.type !== "text") return;
             if (this.ignore &&
-                await timeout.has({ guildId: message.guild.id, memberId: message.member.id })) return;
+                await timeoutDB.findOne({ guildId: message.guild.id, memberId: message.member.id })) return;
             
 
             // clean up multiple whitespaces

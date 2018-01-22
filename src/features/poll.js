@@ -36,19 +36,19 @@ class Poll {
 
     async init() {
         // insert into database
-        if (!(await pollDB.has({
+        if (!(await pollDB.findOne({
             guildId: this.guild.id,
             channelId: this.channel.id
         }))) {
             // all the way up in the message handler we checked if DB includes 
             // this channel already.So now we can go the efficient insert way
-            await pollDB.insert({
+            await pollDB.save({
                 guildId: this.guild.id,
                 channelId: this.channel.id,
-                creatorId: this.member.id,
+                creatorId: this.creator.id,
                 votes: this.votes,
                 users: Array.from(this.users.keys()), // get all ids from the Collection
-                endDate: this.endDate
+                endDate: this.endDate.getTime()
             });
         }
 
@@ -61,7 +61,10 @@ class Poll {
             return false;
         }, { time: this.endDate.getTime() - Date.now() })).size;
 
-        // document is removed from DB automatically, but from array not
+        pollDB.remove({
+            guildId: this.guild.id,
+            channelId: this.channel.id
+        });
         Poll.polls.splice(Poll.polls.indexOf(this));
 
         if (total < 1) {
@@ -102,10 +105,8 @@ class Poll {
                 guildId: this.guild.id,
                 channelId: this.channel.id
             }, {
-                $set: update, // could use inc, but want to keep everything easy to overview,
-                $push: {
-                    "votes": member.id
-                }
+                votes: this.votes,
+                users: [...this.users.keys()]
             });
             
             log(`User voted for ${option}`);
@@ -128,11 +129,9 @@ Poll.add = function add(poll) {
 };
 
 async function init(client) {
-    await pollDB.loadDatabase();
-
-    const polls = await pollDB.find({});
+    const polls = await pollDB.find();
     for (let poll of polls) {
-        const guild = client.guild.get(poll.guildId);
+        const guild = client.guilds.get(poll.guildId);
         if (!guild) {
             await pollDB.remove({ _id: poll._id });
             continue;
@@ -149,7 +148,7 @@ async function init(client) {
             toString() { return `<@${poll.creatorId}>`; }
         };
 
-        const endDate = poll.endDate;
+        const endDate = new Date(poll.endDate);
 
         const votes = poll.votes;
 
@@ -181,7 +180,8 @@ async function onmessage(message) {
             return;
         }
 
-        if (await pollDB.has({ guildId: message.guild.id, channelId: message.channel.id })) {
+        console.log(pollDB.find({ guildId: message.guild.id, channelId: message.channel.id }));
+        if (await pollDB.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
             await message.channel.send("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
             log("Gracefully aborted attempt to create poll. Poll already exists in this channel");
             return;
@@ -229,7 +229,7 @@ async function onmessage(message) {
         );
         Poll.add(poll);
 
-        await this.channel.send(`@here Poll is starting! **${toHumanTime(duration)}** left to vote\nYou vote by simply posting \`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\` in this channel`);
+        await message.channel.send(`@here Poll is starting! **${toHumanTime(duration)}** left to vote\nYou vote by simply posting \`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\` in this channel`);
         log(`Poll started. ${duration}ms. ${options.join(", ")}`);
     }
 }

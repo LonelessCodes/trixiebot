@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const fucks = require("../modules/database/fuck");
+const fuckDB = require("../modules/database/fuck");
 const Command = require("../modules/Command");
 
 Array.prototype.random = function () {
@@ -31,12 +31,12 @@ const command = new Command(async message => {
             log("Gracefully aborted adding fuck text. Missing ${name} in text");
             return;
         }
-        if (await fucks.has({ lowercase: text.toLowerCase() })) {
+        if (await fuckDB.findOne({ lowercase: text.toLowerCase() })) {
             await message.channel.send("This phrase already exists!");
             log("Gracefully aborted adding fuck text. Text already exists");
             return;
         }
-        await fucks.insert({
+        await fuckDB.save({
             text,
             lowercase: text.toLowerCase(),
             author: message.member.displayName,
@@ -54,7 +54,7 @@ const command = new Command(async message => {
     if (/^!fuck\b/i.test(message.content)) {
         if (message.mentions.members.first()) {
             const mention = message.mentions.members.first();
-            const phrases = await fucks.find({}, { text: 1, author: 1 }); // return only text and author
+            const phrases = await fuckDB.find(); // return only text and author
             const phrase = phrases.random();
             const author = phrase.author;
             let text = phrase.text;
@@ -71,8 +71,6 @@ const command = new Command(async message => {
         log("Sent fuck usage");
         return;
     }
-}, async function init() {
-    await fucks.loadDatabase();
 }, {
     usage: `\`!fuck <user>\`
 \`user\` - the username of the user to fuck

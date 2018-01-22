@@ -24,7 +24,7 @@ const command = new Command(async function onmessage(message) {
             memberId: message.member.id
         });
         if (!row) {
-            await pointsDB.insert({
+            await pointsDB.save({
                 guildId: message.guild.id,
                 memberId: message.member.id,
                 points: random_point(),
@@ -42,17 +42,13 @@ const command = new Command(async function onmessage(message) {
                 guildId: message.guild.id,
                 memberId: message.member.id
             }, {
-                $set: {
-                    points: row.points,
-                    level: row.level
-                }
+                points: row.points,
+                level: row.level
             });
         }
     } catch (err) {
         log("Points Error", err);
     }
-}, async function init() {
-    await pointsDB.loadDatabase();
 }, {
     ignore: true
 });

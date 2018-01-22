@@ -105,7 +105,7 @@ client.on("resume", replayed => log.debug("discord.js", `Resumed ${replayed} tim
 process.on("uncaughtException", error => log.error(error.stack || error));
 
 process.on("unhandledRejection", (reason, p) => {
-    log.warn("Unhandled Rejection at:", p, "reason:", reason);
+    log.warn("Unhandled Rejection at:", p);
 });
 
 process.on("warning", warning => {

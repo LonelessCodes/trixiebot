@@ -1,5 +1,4 @@
 const log = require("../modules/log");
-const fuckDB = require("../modules/database/fuck");
 const Command = require("../class/Command");
 
 Array.prototype.random = function () {
@@ -8,7 +7,7 @@ Array.prototype.random = function () {
 
 const added_recently = new Array();
 
-const command = new Command(async message => {
+const command = new Command(async function onmessage(message) {
     if (/^!fuck add\b/i.test(message.content)) {
         const text = message.content.substr(10);
         if (text === "") {
@@ -31,12 +30,12 @@ const command = new Command(async message => {
             log("Gracefully aborted adding fuck text. Missing ${name} in text");
             return;
         }
-        if (await fuckDB.findOne({ lowercase: text.toLowerCase() })) {
+        if (await this.db.findOne({ lowercase: text.toLowerCase() })) {
             await message.channel.send("This phrase already exists!");
             log("Gracefully aborted adding fuck text. Text already exists");
             return;
         }
-        await fuckDB.save({
+        await this.db.insertOne({
             text,
             lowercase: text.toLowerCase(),
             author: message.member.displayName,
@@ -54,7 +53,13 @@ const command = new Command(async message => {
     if (/^!fuck\b/i.test(message.content)) {
         if (message.mentions.members.first()) {
             const mention = message.mentions.members.first();
-            const phrases = await fuckDB.find(); // return only text and author
+            const phrases = await this.db.find({}).toArray(); // return only text and author
+            if (phrases.length === 0) {
+                message.channel.send("I'm sorry, but... I don't have any fucks to give. Add fucks using `!fuck add`");
+                log("Couldn't serve fuck phrase. No fuck phrases in DB");
+                return;
+            }
+
             const phrase = phrases.random();
             const author = phrase.author;
             let text = phrase.text;
@@ -71,6 +76,8 @@ const command = new Command(async message => {
         log("Sent fuck usage");
         return;
     }
+}, function init(client, db) {
+    this.db = db.collection("fuck");
 }, {
     usage: `\`!fuck <user>\`
 \`user\` - the username of the user to fuck

@@ -1,5 +1,4 @@
 const log = require("../modules/log");
-const pointsDB = require("../modules/database/points");
 const Command = require("../class/Command");
 
 function get_level(points) {
@@ -19,12 +18,12 @@ const command = new Command(async function onmessage(message) {
     setTimeout(() => cooldown.delete(message.member), cooldowntime);
 
     try {
-        const row = await pointsDB.findOne({
+        const row = await this.db.findOne({
             guildId: message.guild.id,
             memberId: message.member.id
         });
         if (!row) {
-            await pointsDB.save({
+            await this.db.insertOne({
                 guildId: message.guild.id,
                 memberId: message.member.id,
                 points: random_point(),
@@ -35,20 +34,24 @@ const command = new Command(async function onmessage(message) {
             let curLevel = get_level(row.points);
             if (curLevel > row.level) {
                 row.level = curLevel;
-                await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy?`);
+                await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy? (This is completely useless right now)`);
                 log(`Level-up ${message.author.username} ${curLevel - 1} => ${curLevel}`);
             }
-            await pointsDB.update({
+            await this.db.updateOne({
                 guildId: message.guild.id,
                 memberId: message.member.id
             }, {
-                points: row.points,
-                level: row.level
+                $set: {
+                    points: row.points,
+                    level: row.level
+                }
             });
         }
     } catch (err) {
         log("Points Error", err);
     }
+}, function init(client, db) {
+    this.db = db.collection("points");
 }, {
     ignore: true
 });

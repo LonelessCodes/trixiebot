@@ -1,5 +1,4 @@
 const log = require("../modules/log");
-const pollDB = require("../modules/database/poll");
 const { parseHumanTime, toHumanTime } = require("../modules/util");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
@@ -22,7 +21,8 @@ class Poll {
      * @param {{ [x: string]: number; }} votes 
      * @param {Discord.Collection<any, Discord.GuildMember>} users 
      */
-    constructor(guild, channel, creator, endDate, votes, users) {
+    constructor(db, guild, channel, creator, endDate, votes, users) {
+        this.db = db;
         this.guild = guild;
         this.channel = channel;
         this.creator = creator;
@@ -36,36 +36,41 @@ class Poll {
 
     async init() {
         // insert into database
-        if (!(await pollDB.findOne({
+        if (!(await this.db.findOne({
             guildId: this.guild.id,
             channelId: this.channel.id
         }))) {
             // all the way up in the message handler we checked if DB includes 
             // this channel already.So now we can go the efficient insert way
-            await pollDB.save({
+            await this.db.insertOne({
                 guildId: this.guild.id,
                 channelId: this.channel.id,
                 creatorId: this.creator.id,
                 votes: this.votes,
                 users: Array.from(this.users.keys()), // get all ids from the Collection
-                endDate: this.endDate.getTime()
+                endDate: this.endDate
             });
         }
 
-        const total = (await this.channel.awaitMessages(message => {
-            for (let option of this.options) {
-                if (new RegExp(`^${option}`, "i").test(message.content)) {
-                    return this.vote(message.member, option);
+        const timeLeft = this.endDate.getTime() - Date.now();
+        if (timeLeft > 0) {
+            await this.channel.awaitMessages(message => {
+                for (let option of this.options) {
+                    if (new RegExp(`^${option}`, "i").test(message.content)) {
+                        return this.vote(message.member, option);
+                    }
                 }
-            }
-            return false;
-        }, { time: this.endDate.getTime() - Date.now() })).size;
+                return false;
+            }, { time: timeLeft });
+        }
 
-        pollDB.remove({
+        await this.db.deleteOne({
             guildId: this.guild.id,
             channelId: this.channel.id
         });
         Poll.polls.splice(Poll.polls.indexOf(this));
+
+        const total = this.users.size; // get num of votes
 
         if (total < 1) {
             const embed = new Discord.RichEmbed;
@@ -101,12 +106,14 @@ class Poll {
 
             const update = {};
             update["votes." + option] = this.votes[option];
-            pollDB.update({
+            this.db.updateOne({
                 guildId: this.guild.id,
                 channelId: this.channel.id
             }, {
-                votes: this.votes,
-                users: [...this.users.keys()]
+                $set: {
+                    votes: this.votes,
+                    users: [...this.users.keys()]
+                }    
             });
             
             log(`User voted for ${option}`);
@@ -128,18 +135,20 @@ Poll.add = function add(poll) {
     if (poll instanceof Poll) Poll.polls.push(poll);
 };
 
-async function init(client) {
-    const polls = await pollDB.find();
+async function init(client, db) {
+    this.db = db.collection("poll"); 
+
+    const polls = await this.db.find({}).toArray();
     for (let poll of polls) {
         const guild = client.guilds.get(poll.guildId);
         if (!guild) {
-            await pollDB.remove({ _id: poll._id });
+            await this.db.deleteOne({ _id: poll._id });
             continue;
         }
 
         const channel = guild.channels.get(poll.channelId);
         if (!channel) {
-            await pollDB.remove({ _id: poll._id });
+            await this.db.deleteOne({ _id: poll._id });
             continue;
         }
 
@@ -148,7 +157,7 @@ async function init(client) {
             toString() { return `<@${poll.creatorId}>`; }
         };
 
-        const endDate = new Date(poll.endDate);
+        const endDate = poll.endDate;
 
         const votes = poll.votes;
 
@@ -157,6 +166,7 @@ async function init(client) {
         }));
 
         const poll_object = new Poll(
+            this.db,
             guild,
             channel,
             creator,
@@ -180,8 +190,7 @@ async function onmessage(message) {
             return;
         }
 
-        console.log(pollDB.find({ guildId: message.guild.id, channelId: message.channel.id }));
-        if (await pollDB.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
+        if (await this.db.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
             await message.channel.send("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
             log("Gracefully aborted attempt to create poll. Poll already exists in this channel");
             return;
@@ -220,6 +229,7 @@ async function onmessage(message) {
         for (let option of options) votes[option] = 0;
 
         const poll = new Poll(
+            this.db,
             message.guild,
             message.channel,
             message.member,

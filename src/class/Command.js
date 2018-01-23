@@ -1,5 +1,3 @@
-const log = require("../modules/log");
-const timeoutDB = require("../modules/database/timeout");
 const Discord = require("discord.js");
 
 class Command {
@@ -28,25 +26,8 @@ class Command {
     /**
      * @param {Discord.Client} client 
      */
-    async init(client) {
-        await this._init(client);
-
-        client.on("message", async message => {
-            if (message.author.bot) return;
-            if (message.channel.type !== "text") return;
-            if (this.ignore &&
-                await timeoutDB.findOne({ guildId: message.guild.id, memberId: message.member.id })) return;
-
-
-            // clean up multiple whitespaces
-            message.content = message.content.replace(/\s+/g, " ").trim();
-
-            this.onmessage(message).catch(err => {
-                log(err);
-                message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...
-\`${err.name}: ${err.message}\``);
-            });
-        });
+    async init(client, db) {
+        await this._init(client, db);
         return this;
     }
 }

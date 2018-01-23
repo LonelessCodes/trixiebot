@@ -31,7 +31,7 @@ async function get(params) {
 
 const command = new Command(async function onmessage(message) {
     // e621
-    if (/^\!e621\b/i.test(message.content)) {
+    if (/^!e621\b/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**
@@ -65,7 +65,7 @@ const command = new Command(async function onmessage(message) {
                 try {
                     const numParse = parseInt(num);
                     if (numParse < 1 || numParse > 5) {
-                        await message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
+                        await message.channel.send("`amount` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
                         log("Gracefully aborted attempt to request e621 image. Amount out of range");
                         return;
                     }
@@ -96,13 +96,13 @@ const command = new Command(async function onmessage(message) {
         current_char = msg.charAt(i);
 
         if (!/latest|random/.test(order)) {
-            await message.channel.send("\`order\` must be either \`latest\` or \`random\`!\n\n" + this.usage);
+            await message.channel.send("`order` must be either `latest` or `random`!\n\n" + this.usage);
             log(`Gracefully aborted attempt to request e621 image. ${order} is not a valid type of order`);
             return;
         }
 
         if (i >= msg.length) {
-            await message.channel.send("\`query\` **must** be given\n\n" + this.usage);
+            await message.channel.send("`query` **must** be given\n\n" + this.usage);
             log("Gracefully aborted attempt to request e621 image. No query given");
             return;
         }
@@ -113,7 +113,7 @@ const command = new Command(async function onmessage(message) {
             i++;
             current_char = msg.charAt(i);
         }
-        query = query.replace(/\ /g, "+");
+        query = query.replace(/\s/g, "+");
 
         if (!message.channel.nsfw &&
             query.indexOf("rating:e") === -1 &&

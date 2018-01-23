@@ -26,6 +26,7 @@ async function onmessage(client, features, message) {
         const usage = new Discord.RichEmbed()
             .setColor(0x71B3E6)
             .setDescription("`!trixie` to get this help message.")
+            .addField("Invite to your server", "`!invite`")
             .addField("Derpibooru", features.get("derpi").usage)
             .addField("E621", features.get("e621").usage)
             .addField("Giphy", features.get("gif").usage)
@@ -50,6 +51,27 @@ async function onmessage(client, features, message) {
     } else if (/^!version\b/i.test(message.content)) {
         await message.channel.send(`v${packageFile.version}`);
         log("Requested version");
+        return;
+    } else if (/^!invite\b/i.test(message.content)) {
+        const FLAGS = Discord.Permissions.FLAGS;
+        const link = await client.generateInvite([
+            FLAGS.MANAGE_ROLES,
+            FLAGS.MANAGE_CHANNELS,
+            FLAGS.CHANGE_NICKNAME,
+            FLAGS.MANAGE_NICKNAMES,
+            FLAGS.VIEW_CHANNEL,
+            FLAGS.READ_MESSAGES,
+            FLAGS.SEND_MESSAGES,
+            FLAGS.MANAGE_MESSAGES,
+            FLAGS.EMBED_LINKS,
+            FLAGS.ATTACH_FILES,
+            FLAGS.READ_MESSAGE_HISTORY,
+            FLAGS.MENTION_EVERYONE,
+            FLAGS.ADD_REACTIONS,
+            FLAGS.CONNECT,
+            FLAGS.SPEAK
+        ]);
+        await message.channel.send(link);
         return;
     }
 }

@@ -1,9 +1,9 @@
 const log = require("../modules/log");
-const Discord = require("discord.js");
 const timeoutDB = require("../modules/database/timeout");
 const timeout_messagesDB = require("../modules/database/timeout_messages");
 const { toHumanTime, parseHumanTime } = require("../modules/util");
-const Command = require("../modules/Command");
+const Discord = require("discord.js");
+const Command = require("../class/Command");
 
 const command = new Command(async function onmessage(message) {
     const timeout_entry = await timeoutDB.findOne({ guildId: message.guild.id, memberId: message.member.id });

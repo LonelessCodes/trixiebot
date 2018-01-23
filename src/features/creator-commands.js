@@ -4,7 +4,7 @@ const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
 const readLastLines = require("read-last-lines");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 const extnames = {
     ".js": "javascript",

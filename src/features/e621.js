@@ -1,8 +1,8 @@
 const log = require("../modules/log");
 const { promisify } = require("util");
 const request = promisify(require("request"));
-const p = require("../../package.json");
-const Command = require("../modules/Command");
+const packageFile = require("../../package.json");
+const Command = require("../class/Command");
 
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
@@ -23,7 +23,7 @@ async function get(params) {
         json: true,
         timeout: 10000,
         headers: {
-            "User-Agent": `TrixieBot/${p.version} (by Loneless on e621)`
+            "User-Agent": `TrixieBot/${packageFile.version} (by Loneless on e621)`
         }
     })).body;
     return result;

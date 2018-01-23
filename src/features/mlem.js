@@ -1,9 +1,9 @@
 const log = require("../modules/log");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 const Discord = require("discord.js");
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!mlem\b/i.test(message.content)) {
+    if (/^!mlem\b/i.test(message.content)) {
         const embed = new Discord.RichEmbed()
             .setColor(0x71B3E6)
             .setTitle("MLEM o3o")
@@ -14,7 +14,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
     
-    if (/^\!blep\b/i.test(message.content)) {
+    if (/^!blep\b/i.test(message.content)) {
         const embed = new Discord.RichEmbed()
             .setColor(0x71B3E6)
             .setTitle("BLEP o3o")

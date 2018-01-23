@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const pointsDB = require("../modules/database/points");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 function get_level(points) {
     return Math.floor(0.1 * Math.sqrt(points));

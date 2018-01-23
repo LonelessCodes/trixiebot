@@ -1,6 +1,6 @@
-const log = require("./log");
+const log = require("../modules/log");
 const Discord = require("discord.js");
-const Command = require("./Command");
+const Command = require("../class/Command");
 
 class SimpleCommand extends Command {
     /**

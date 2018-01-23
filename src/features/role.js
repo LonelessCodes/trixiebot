@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const Discord = require("discord.js");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 const available_roles = {
     "Artist Stuff": [
@@ -28,7 +28,7 @@ for (let category in available_roles)
         roles_array[role.toLowerCase()] = role;
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!role remove\b/i.test(message.content)) {
+    if (/^!role remove\b/i.test(message.content)) {
         const msg = message.content.substr(13);
         if (msg === "") {
             await message.channel.send(this.usage);
@@ -100,7 +100,7 @@ const command = new Command(async function onmessage(message) {
             log(`Removed role ${role} from user ${message.member.user.username}`);
         }
     }
-    else if (/^\!role\b/i.test(message.content)) {
+    else if (/^!role\b/i.test(message.content)) {
         const msg = message.content.substr(6);
         if (msg === "") {
             await message.channel.send(this.usage);

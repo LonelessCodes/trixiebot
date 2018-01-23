@@ -1,11 +1,10 @@
-const request = require("request");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 const log = require("../modules/log");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 const privateKey = fs.readFileSync("/etc/letsencrypt/live/trixie.loneless.org-0003/privkey.pem", "utf8");
 const certificate = fs.readFileSync("/etc/letsencrypt/live/trixie.loneless.org-0003/cert.pem", "utf8");

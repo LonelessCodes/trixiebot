@@ -1,36 +1,42 @@
-const discord = require("../keys/discord.json");
+const discordKeys = require("../keys/discord.json");
+const packageFile = require("../package.json");
 const log = require("./modules/log");
-const Discord = require("discord.js");
-const p = require("../package.json");
 const path = require("path");
-const fs = require("fs");
-const Command = require("./modules/Command");
+const fs = require("fs-extra");
+const Discord = require("discord.js");
+const { MongoClient } = require("mongodb");
+const Command = require("./class/Command");
 
-const client = new Discord.Client({ autoReconnect: true });
+// we're never removing and later adding listeners, so Infinity in .setMaxListeners() is ok
+const client = new Discord.Client({ autoReconnect: true }).setMaxListeners(Infinity);
 
-client.setMaxListeners(Infinity); // we're never removing and later adding listeners, so Infinity is ok
+const dbPromise = MongoClient
+    .connect("mongodb://localhost:27017/", { autoReconnect: true })
+    .then(client => client.db("trixiebot"));
 
-const prefix = "!trixie";
+dbPromise.then(db => {
 
-const features = {};
+});
+
+/** @type {Map<string, Command>} */
+const features = new Map;
 (async function () {
-    for (let file of fs.readdirSync(__dirname + "/features")) {
-        if (path.extname(file) === ".js") {
-            /**
-             * @type {Command}
-             */
-            const feature = require("./features/" + file);
-            await feature.init(client);
-            log.debug(file, "loaded");
-            features[file.substr(0, file.length - path.extname(file).length)] = feature;
-        }
+    const filenames = await fs.readdir(__dirname + "/features");
+    for (let file of filenames) {
+        if (path.extname(file) !== ".js") continue;
+
+        /** @type {Command} */
+        const feature = require("./features/" + file);
+        await feature.init(client);
+        log.debug(file, "loaded");
+        features[file.substr(0, file.length - path.extname(file).length)] = feature;
     }
 })();
 
-const command = new Command(async message => {
+async function onmessage(message) {
     // ping pong
-    if (message.content.toLowerCase() === "!ping" ||
-        message.content.toLowerCase() === `${prefix} ping`) {
+    if (/^!ping\b/i.test(message.content) ||
+        /^!trixie ping\b/i.test(message.content)) {
         const m = await message.channel.send("pong! Wee hehe");
         const ping = m.createdTimestamp - message.createdTimestamp;
         await m.edit("pong! Wee hehe\n" +
@@ -39,41 +45,39 @@ const command = new Command(async message => {
         log(`Requested ping. Got ping of ${ping}ms`);
         return;
     }
-    else if (message.content.toLowerCase() === prefix) {
+    else if (/^!trixie\b/.test(message.content)) {
         const usage = new Discord.RichEmbed()
             .setColor(0x71B3E6)
             .setDescription("`!trixie` to get this help message.")
-            .addField("Derpibooru", features["derpi"].usage)
-            .addField("E621", features["e621"].usage)
-            .addField("Giphy", features["gif"].usage)
-            .addField("Roles", features["role"].usage)
-            .addField("Polls", features["poll"].usage)
-            .addField("Uberfacts", features["fact"].usage)
-            .addField("TTS", features["tts"].usage)
-            .addField("Flip a Coin", features["coin"].usage)
-            .addField("Fuck a User", features["fuck"].usage)
-            .addField("Flip Things", features["flip"].usage)
-            .addField("Text Faces", features["face"].usage)
-            .addField("Mlem", features["mlem"].usage)
-            .addField("Larson", features["larson"].usage)
-            .addField("CATS", features["cat"].usage)
+            .addField("Derpibooru", features.get("derpi").usage)
+            .addField("E621", features.get("e621").usage)
+            .addField("Giphy", features.get("gif").usage)
+            .addField("Roles", features.get("role").usage)
+            .addField("Polls", features.get("poll").usage)
+            .addField("Uberfacts", features.get("fact").usage)
+            .addField("TTS", features.get("tts").usage)
+            .addField("Flip a Coin", features.get("coin").usage)
+            .addField("Fuck a User", features.get("fuck").usage)
+            .addField("Flip Things", features.get("flip").usage)
+            .addField("Text Faces", features.get("face").usage)
+            .addField("Mlem", features.get("mlem").usage)
+            .addField("Larson", features.get("larson").usage)
+            .addField("CATS", features.get("cat").usage)
             .addField("Version", "`!version`")
             .addBlankField()
-            .addField("Admin", features["timeout"].usage)
-            .setFooter(`TrixieBot v${p.version}`, client.user.avatarURL);
+            .addField("Admin", features.get("timeout").usage)
+            .setFooter(`TrixieBot v${packageFile.version}`, client.user.avatarURL);
         await message.channel.send({ embed: usage });
         log("Requested usage");
         return;
     } else if (/^!version\b/i.test(message.content)) {
-        await message.channel.send(`v${p.version}`);
+        await message.channel.send(`v${packageFile.version}`);
         log("Requested version");
         return;
     }
-}, {
-    ignore: true
-});
+}
 
-command.init(client);
+new Command(onmessage, { ignore: true }).init(client);
 
 client.on("ready", () => {
     log("I am ready");
@@ -113,4 +117,4 @@ process.on("warning", warning => {
     log.warn(warning.stack);   // Print the stack trace
 });
 
-client.login(discord.token);
+client.login(discordKeys.token);

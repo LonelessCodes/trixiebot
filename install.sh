@@ -3,6 +3,10 @@
 # update all packages
 sudo apt-get update
 
+# open ports for HTTP and HTTPS server
+sudo ufw allow 80/tcp # HTTP
+sudo ufw allow 443/tcp # HTTPS
+
 # prepare nodejs installation
 curl -sL https://deb.nodesource.com/setup_9.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh

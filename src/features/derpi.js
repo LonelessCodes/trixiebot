@@ -1,8 +1,8 @@
-const derpibooru = require("../../keys/derpibooru.json");
+const derpibooruKey = require("../../keys/derpibooru.json");
 const log = require("../modules/log");
 const { promisify } = require("util");
 const request = promisify(require("request"));
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 async function get(params) {
     const scope = params.scope || "search";
@@ -15,7 +15,7 @@ async function get(params) {
     string = string.join("&");
 
     const result = (await request({
-        url: `https://derpibooru.org/${scope}.json?key=${derpibooru.key}&${string}`,
+        url: `https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`,
         timeout: 10000,
         json: true
     })).body;
@@ -24,7 +24,7 @@ async function get(params) {
 
 const command = new Command(async function onmessage(message) {
     // derpibooru
-    if (/^\!db\b/i.test(message.content)) {
+    if (/^!db\b/i.test(message.content)) {
         const timestamp = Date.now();
 
         /**
@@ -58,7 +58,7 @@ const command = new Command(async function onmessage(message) {
                 try {
                     const amountParse = parseInt(amount);
                     if (amountParse < 1 || amountParse > 5) {
-                        await message.channel.send("\`amount\` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
+                        await message.channel.send("`amount` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
                         log("Gracefully aborted attempt to request derpi image. Amount out of range");
                         return;
                     }
@@ -89,13 +89,13 @@ const command = new Command(async function onmessage(message) {
         current_char = msg.charAt(i);
 
         if (!/first|latest|top|random/.test(order)) {
-            await message.channel.send("\`order\` must be either \`first, latest, top\` or \`random\`!\n\n" + this.usage);
+            await message.channel.send("`order` must be either `first`, `latest`, `top` or `random`!\n\n" + this.usage);
             log(`Gracefully aborted attempt to request derpi image. ${order} is not a valid type of order`);
             return;
         }
 
         if (i >= msg.length) {
-            await message.channel.send("\`query\` **must** be given\n\n" + this.usage);
+            await message.channel.send("`query` **must** be given\n\n" + this.usage);
             log("Gracefully aborted attempt to request derpi image. No query given");
             return;
         }
@@ -106,8 +106,8 @@ const command = new Command(async function onmessage(message) {
             i++;
             current_char = msg.charAt(i);
         }
-        query = query.replace(/\,\ /g, ",");
-        query = query.replace(/\ /g, "+");
+        query = query.replace(/,\s/g, ",");
+        query = query.replace(/\s/g, "+");
 
         if (!message.channel.nsfw &&
             query.indexOf("explicit") === -1 &&

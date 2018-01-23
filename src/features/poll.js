@@ -1,7 +1,7 @@
 const log = require("../modules/log");
 const pollDB = require("../modules/database/poll");
 const { parseHumanTime, toHumanTime } = require("../modules/util");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 const Discord = require("discord.js");
 
 function progressBar(v, a, b) {

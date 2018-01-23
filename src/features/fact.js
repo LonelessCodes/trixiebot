@@ -1,8 +1,8 @@
-const Twit = require("twit");
 const { promisify } = require("util");
 const { timeout } = require("../modules/util");
 const log = require("../modules/log");
-const Command = require("../modules/Command");
+const Twit = require("twit");
+const Command = require("../class/Command");
 
 Array.prototype.last = function () {
     return this[this.length - 1];
@@ -68,7 +68,7 @@ async function getFact() {
 }
 
 const command = new Command(async function onmessage(message) {
-    if (/^\!fact\b/i.test(message.content)) {
+    if (/^!fact\b/i.test(message.content)) {
         const fact = await getFact();
         await message.channel.send(fact);
         log("Fact requested");

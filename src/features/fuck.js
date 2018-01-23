@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const fuckDB = require("../modules/database/fuck");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];

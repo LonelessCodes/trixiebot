@@ -13,13 +13,19 @@ client.setMaxListeners(Infinity); // we're never removing and later adding liste
 const prefix = "!trixie";
 
 const features = {};
-for (let file of fs.readdirSync(__dirname + "/features")) {
-    if (path.extname(file) === ".js") {
-        const feature = require("./features/" + file);
-        feature.init(client);
-        features[file.substr(0, file.length - path.extname(file).length)] = feature;
+(async function () {
+    for (let file of fs.readdirSync(__dirname + "/features")) {
+        if (path.extname(file) === ".js") {
+            /**
+             * @type {Command}
+             */
+            const feature = require("./features/" + file);
+            await feature.init(client);
+            log.debug(file, "loaded");
+            features[file.substr(0, file.length - path.extname(file).length)] = feature;
+        }
     }
-}
+})();
 
 const command = new Command(async message => {
     // ping pong
@@ -53,7 +59,7 @@ const command = new Command(async message => {
             .addField("CATS", features["cat"].usage)
             .addField("Version", "`!version`")
             .addBlankField()
-            .addField("Admin", features["admin"].usage)
+            .addField("Admin", features["timeout"].usage)
             .setFooter(`TrixieBot v${p.version}`, client.user.avatarURL);
         await message.channel.send({ embed: usage });
         log("Requested usage");
@@ -64,7 +70,7 @@ const command = new Command(async message => {
         return;
     }
 }, {
-    ignore: true    
+    ignore: true
 });
 
 command.init(client);
@@ -80,7 +86,7 @@ client.on("warn", warn => log.warn(warn));
 
 client.on("error", error => log.error(
     error.stack ||
-    error.error ?
+        error.error ?
         error.error.stack || error.error :
         error
 ));
@@ -99,7 +105,7 @@ client.on("resume", replayed => log.debug("discord.js", `Resumed ${replayed} tim
 process.on("uncaughtException", error => log.error(error.stack || error));
 
 process.on("unhandledRejection", (reason, p) => {
-    log.warn("Unhandled Rejection at:", p, "reason:", reason);
+    log.warn("Unhandled Rejection at:", p);
 });
 
 process.on("warning", warning => {

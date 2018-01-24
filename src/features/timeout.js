@@ -1,15 +1,67 @@
 const log = require("../modules/log");
-const Discord = require("discord.js");
-const { timeout, deletedMessages } = require("../modules/admin");
 const { toHumanTime, parseHumanTime } = require("../modules/util");
-const Command = require("../modules/Command");
+const Discord = require("discord.js");
+const Command = require("../class/Command");
+
+/** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
+const timeout_notices = new Object;
 
 const command = new Command(async function onmessage(message) {
-    if (await timeout.has(message.guild.id, message.member.id)) {
+    if (!timeout_notices[message.channel.id])
+        timeout_notices[message.channel.id] = {};
+    
+    const timeout_entry = await this.db.findOne({ guildId: message.guild.id, memberId: message.member.id });
+    if (timeout_entry) {
         const content = message.content;
         await message.delete();
-        await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${toHumanTime((await timeout.get(message.guild.id, message.member.id)).expiresAt.getTime() - Date.now())}**__`);
+
+        const expiresIn = toHumanTime(timeout_entry.expiresAt.getTime() - Date.now());
+
+        if (timeout_notices[message.channel.id].time &&
+            (timeout_notices[message.channel.id].last ||
+            timeout_notices[message.channel.id].time.getTime() + 60000 * 10 > Date.now())) {
+            
+            timeout_notices[message.channel.id].message.edit(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
+            return;
+        }
+
+        const notice = await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
+        
+        await this.db_messages.insertOne({
+            guildId: message.guild.id,
+            memberId: message.member.id,
+            message: content,
+            timeoutEnd: timeout_entry.expiresAt
+        });
+
+        timeout_notices[message.channel.id] = {
+            last: true,
+            time: new Date,
+            message: notice,
+        };
+
         log(`Sent timeout notice to user ${message.member.user.username} in guild ${message.guild.name} and saved their message before deletion`);
+        return;
+    }
+
+    timeout_notices[message.channel.id].last = false;
+
+    if (/^!timeout my messages\b/i.test(message.content)) {
+        const messages = await this.db_messages.find({
+            guildId: message.guild.id,
+            memberId: message.member.id
+        }).toArray();
+
+        if (messages.length === 0) {
+            await message.channel.send(`${message.member.toString()} I didn't delete any messages ¯\\_(ツ)_/¯`);
+            log("Gracefully aborted attempt to list deleted messages. No deleted messages");
+            return;
+        }
+
+        await message.channel.send(`${message.member.toString()} here you dirty boi${messages.map(message => {
+            return `\n\n${message.message}`;
+        })}`);
+        log(`Sent ${message.member.displayName} their dirty deleted messages`);
         return;
     }
 
@@ -23,26 +75,26 @@ const command = new Command(async function onmessage(message) {
 
         let longestName = 0;
         let longestString = 0;
-        const timeouts = (await timeout.entries(message.guild.id)).map(timeout => {
-            timeout.member = message.guild.members.has(timeout.memberId) ?
-                message.guild.members.get(timeout.memberId) :
+        const docs = (await this.db.find({ guildId: message.guild.id }).toArray()).map(doc => {
+            doc.member = message.guild.members.has(doc.memberId) ?
+                message.guild.members.get(doc.memberId) :
                 null;
-            if (longestName < timeout.member.displayName.length) {
-                longestName = timeout.member.displayName.length;
+            if (longestName < doc.member.displayName.length) {
+                longestName = doc.member.displayName.length;
             }
-            timeout.string = toHumanTime(timeout.expiresAt.getTime() - Date.now());
-            if (longestString < timeout.string.length) {
-                longestString = timeout.string.length;
+            doc.string = toHumanTime(doc.expiresAt.getTime() - Date.now());
+            if (longestString < doc.string.length) {
+                longestString = doc.string.length;
             }
-            return timeout;
-        }).filter(timeout => !!timeout.member);
+            return doc;
+        }).filter(doc => !!doc.member);
         let str = "```";
-        for (let timeout of timeouts) {
+        for (let doc of docs) {
             str += "\n";
-            str += timeout.member.displayName;
-            str += new Array(longestName - timeout.member.displayName.length).fill(" ").join("");
+            str += doc.member.displayName;
+            str += new Array(longestName - doc.member.displayName.length).fill(" ").join("");
             str += " | ";
-            str += timeout.string;
+            str += doc.string;
         }
         str += "\n```";
         await message.channel.send(str);
@@ -58,7 +110,20 @@ const command = new Command(async function onmessage(message) {
             return;
         }
 
-        await timeout.delete(message.guild.id);
+        const timeouts = await this.db.find({ guildId: message.guild.id }).toArray();
+
+        for (let timeout of timeouts) {
+            await this.db_messages.updateMany({
+                guildId: message.guild.id,
+                memberId: timeout.memberId
+            }, {
+                $set: {
+                    timeoutEnd: new Date
+                }
+            });
+        }
+
+        await this.db.deleteMany({ guildId: message.guild.id });
 
         await message.channel.send("Removed all timeouts successfully");
         log(`Removed all timeouts in guild ${message.guild.name}`);
@@ -74,8 +139,19 @@ const command = new Command(async function onmessage(message) {
         }
 
         const members = message.mentions.members.array();
+        
+        for (let member of members) {
+            await this.db_messages.updateMany({
+                guildId: message.guild.id,
+                memberId: member.id
+            }, {
+                $set: {
+                    timeoutEnd: new Date
+                }    
+            });
+        }
 
-        const promises = members.map(member => timeout.delete(member.guild.id, member.id));
+        const promises = members.map(member => this.db.deleteOne({ guildId: member.guild.id, memberId: member.id }));
 
         await message.channel.send(`Removed timeouts for ${members.map(member => member.displayName).join(" ")} successfully`);
 
@@ -138,7 +214,21 @@ const command = new Command(async function onmessage(message) {
             return;
         }
 
-        const promises = members.map(member => timeout.set(member.guild.id, member.id, ms));
+        const expiresAt = new Date(Date.now() + ms);
+
+        // update message deletion if there
+        for (let member of members) {
+            await this.db_messages.update({
+                guildId: message.guild.id,
+                memberId: member.id
+            }, {
+                $set: {
+                    timeoutEnd: expiresAt
+                }    
+            });
+        }
+
+        const promises = members.map(member => this.db.updateOne({ guildId: member.guild.id, memberId: member.id }, { $set: { expiresAt } }, { upsert: true }));
 
         await message.channel.send(`Timeouted ${members.map(member => member.displayName).join(" ")} for ${msg} successfully`);
         
@@ -146,6 +236,11 @@ const command = new Command(async function onmessage(message) {
         log(`Timeouted users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name} with ${msg}`);
         return;
     }
+}, function init(client, db) {
+    this.db = db.collection("timeout");
+    this.db.createIndex("expiresAt", { expireAfterSeconds: 0 });
+    this.db_messages = db.collection("timeout_messages");
+    this.db_messages.createIndex("timeoutEnd", { expireAfterSeconds: 24 * 3600 });
 }, {
     usage: `\`!timeout <time> <user mention 1> <user mention 2> ... \`
 \`time\` - timeout length. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
@@ -156,7 +251,9 @@ const command = new Command(async function onmessage(message) {
 
 \`!timeout clear\` remove all timeouts
 
-\`!timeout list\` list all timeouts present at the moment`
+\`!timeout list\` list all timeouts present at the moment
+        
+\`!timeout my messages\` list your by me deleted messages`
 });
 
 module.exports = command;

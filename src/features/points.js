@@ -1,10 +1,12 @@
 const log = require("../modules/log");
-const sql = require("../modules/database");
-const db = new sql.Database("./data/points.sqlite");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 function get_level(points) {
     return Math.floor(0.1 * Math.sqrt(points));
+}
+
+function random_point() {
+    return [10, 15][Math.floor(Math.random() * 2)];
 }
 
 const cooldown = new Map;
@@ -16,30 +18,40 @@ const command = new Command(async function onmessage(message) {
     setTimeout(() => cooldown.delete(message.member), cooldowntime);
 
     try {
-        const row = await db.get(`SELECT * FROM scores \
-        WHERE userId = "${message.author.id}" AND guildId = "${message.guild.id}"`);
+        const row = await this.db.findOne({
+            guildId: message.guild.id,
+            memberId: message.member.id
+        });
         if (!row) {
-            await db.run("INSERT INTO scores (guildId, userId, points, level) VALUES (?, ?, ?, ?)", [message.guild.id, message.author.id, 1, 0]);
+            await this.db.insertOne({
+                guildId: message.guild.id,
+                memberId: message.member.id,
+                points: random_point(),
+                level: 0
+            });
         } else {
-            row.points++;
+            row.points += random_point();
             let curLevel = get_level(row.points);
             if (curLevel > row.level) {
                 row.level = curLevel;
-                await db.run(`UPDATE scores \
-                SET points = ${row.points}, level = ${row.level} \
-                WHERE userId = "${message.author.id}" AND guildId = "${message.guild.id}"`);
-                await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy?`);
+                await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy? (This is completely useless right now)`);
                 log(`Level-up ${message.author.username} ${curLevel - 1} => ${curLevel}`);
             }
-            else await db.run(`UPDATE scores \
-            SET points = ${row.points} \
-            WHERE userId = "${message.author.id}" AND guildId = "${message.guild.id}"`);
+            await this.db.updateOne({
+                guildId: message.guild.id,
+                memberId: message.member.id
+            }, {
+                $set: {
+                    points: row.points,
+                    level: row.level
+                }
+            });
         }
     } catch (err) {
         log("Points Error", err);
     }
-}, async function init() {
-    await db.run("CREATE TABLE IF NOT EXISTS scores (guildId TEXT, userId TEXT, points INTEGER, level INTEGER)");
+}, function init(client, db) {
+    this.db = db.collection("points");
 }, {
     ignore: true
 });

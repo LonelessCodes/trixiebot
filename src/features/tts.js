@@ -1,7 +1,7 @@
 const log = require("../modules/log");
-const voicerss = require("../../keys/voicerss.json");
+const voicerssKey = require("../../keys/voicerss.json");
 const request = require("request");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 const command = new Command(async function onmessage(message) {
     if (!/^!tts\b/i.test(message.content)) return;
@@ -35,7 +35,7 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    const url = `http://api.voicerss.org/?key=${voicerss.key}&hl=en-gb&f=44khz_16bit_mono&c=OGG&src=${src}`;
+    const url = `http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-gb&f=44khz_16bit_mono&c=OGG&src=${src}`;
 
     const connection = await message.member.voiceChannel.join();
     message.react("👍");

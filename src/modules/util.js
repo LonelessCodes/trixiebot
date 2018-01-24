@@ -2,7 +2,7 @@
  * @param {number} ms 
  * @returns {Promise<void>}
  */
-module.exports.timeout = function (ms) {
+module.exports.timeout = function timeout(ms) {
     return new Promise(res => setTimeout(res, ms));
 };
 
@@ -60,4 +60,11 @@ module.exports.parseHumanTime = function parseHumanTime(string) {
     }
 
     return ms;
+};
+
+/**
+ * @param {string} string 
+ */
+module.exports.resolveStdout = function resolveStdout(string) {
+    return string.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 };

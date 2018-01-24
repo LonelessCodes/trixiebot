@@ -1,6 +1,7 @@
 const log = require("../modules/log");
+const Command = require("../class/Command");
 
-function init(client) {
+async function init(client) {
     client.on("guildCreate", guild => {
         const defaultChannel = guild.channels.find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
 
@@ -26,4 +27,4 @@ function init(client) {
     });
 }
 
-module.exports.init = init;
+module.exports = new Command(null, init);

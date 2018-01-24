@@ -1,10 +1,10 @@
-const pixabay = require("../../keys/pixabay.json");
+const pixabayKey = require("../../keys/pixabay.json");
 const { promisify } = require("util");
 const request = promisify(require("request"));
 const log = require("../modules/log");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
-Array.prototype.random = function () {
+Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
 };
 
@@ -12,7 +12,7 @@ let cache = null;
 async function get() {
     if (!cache) {
         cache = (await request({
-            url: `https://pixabay.com/api/?key=${pixabay.key}&q=cat&image_type=photo&order=popular&per_page=100`,
+            url: `https://pixabay.com/api/?key=${pixabayKey.key}&q=cat&image_type=photo&order=popular&per_page=100`,
             json: true
         })).body;
         setTimeout(() => cache = null, 1000 * 3600 * 24); // cache for 24 hours

@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const Discord = require("discord.js");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 const available_roles = {
     "Artist Stuff": [

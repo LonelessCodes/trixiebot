@@ -1,13 +1,13 @@
-const Twit = require("twit");
 const { promisify } = require("util");
 const { timeout } = require("../modules/util");
 const log = require("../modules/log");
-const Command = require("../modules/Command");
+const Twit = require("twit");
+const Command = require("../class/Command");
 
-Array.prototype.last = function () {
+Array.prototype.last = function lastItem() {
     return this[this.length - 1];
 };
-Array.prototype.random = function () {
+Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
 };
 
@@ -52,7 +52,7 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
         });
         return data;
     }
-    setInterval(async function () {
+    setInterval(async function loadMoreTweetsInterval() {
         const data = await loadMoreTweets();
         if (data.length !== 0) {
             newest_id = data[0].id_str;

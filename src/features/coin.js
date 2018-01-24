@@ -1,8 +1,8 @@
 const log = require("../modules/log");
 const { timeout } = require("../modules/util");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
-Array.prototype.random = function () {
+Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
 };
 

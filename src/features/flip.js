@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const fliptext = require("flip-text");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 const command = new Command(async function onmessage(message) {
     if (message.content.toLowerCase() === "!tableflip" || message.content.toLowerCase() === "!tf") {

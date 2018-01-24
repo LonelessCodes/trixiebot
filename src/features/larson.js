@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 
 const command = new Command(async function onmessage(message) {
     if (/^!larson\b/i.test(message.content)) {

@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const Command = require("../modules/Command");
+const Command = require("../class/Command");
 const Discord = require("discord.js");
 
 const command = new Command(async function onmessage(message) {

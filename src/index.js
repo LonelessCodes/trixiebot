@@ -1,8 +1,8 @@
 const discordKeys = require("../keys/discord.json");
 const packageFile = require("../package.json");
+const walk = require("./modules/walk");
 const log = require("./modules/log");
 const path = require("path");
-const fs = require("fs-extra");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
@@ -80,7 +80,15 @@ new class App {
     constructor() {
         // we're never removing and later adding listeners, so Infinity in .setMaxListeners() is ok
         this.client = new Discord.Client({ autoReconnect: true }).setMaxListeners(Infinity);
-        this.initialize();
+        this.initialize().then(() => {
+            log("I am ready");
+
+            this.client.user.setStatus("online");
+            this.client.user.setActivity("!trixie for help", { type: "PLAYING" });
+        }).catch(err => {
+            log("Failed to log in");
+            log.error(err);
+        });
     }
 
     async initialize() {
@@ -90,19 +98,21 @@ new class App {
 
         this.attachListeners();
 
-        this.client.login(discordKeys.token);
+        await new Promise(resolve => {
+            this.client.once("ready", () => resolve());
 
-        await new Promise(resolve => this.client.once("ready", () => resolve()));
+            this.client.login(discordKeys.token);
+        });
 
         /** @type {Map<string, Command>} */
         const features = new Map;
-        for (let file of await fs.readdir(__dirname + "/features")) {
+        for (let file of await walk(path.resolve(__dirname, "features"))) {
             if (path.extname(file) !== ".js") continue;
 
             /** @type {Command} */
-            const feature = require("./features/" + file);
+            const feature = require(path.resolve("./features", file));
             await feature.init(this.client, db);
-            features.set(file.substr(0, file.length - path.extname(file).length), feature);
+            features.set(file.substring(__dirname.length, file.length - path.extname(file).length), feature);
         }
         features.set("app", new Command(onmessage.bind(null, this.client, features), { ignore: true }).init(this.client, db));
 
@@ -120,16 +130,10 @@ new class App {
 
                 feature.onmessage(message).catch(err => {
                     log(err);
-                    message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...
-    \`${err.name}: ${err.message}\``);
+                    message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
                 });
             });
         });
-
-        log("I am ready");
-
-        this.client.user.setStatus("online");
-        this.client.user.setActivity("!trixie for help", { type: "PLAYING" });
     }
 
     attachListeners() {
@@ -152,16 +156,16 @@ new class App {
         this.client.on("reconnecting", () => log.debug("discord.js", "Reconnecting"));
 
         this.client.on("resume", replayed => log.debug("discord.js", `Resumed ${replayed} time`));
-
-        process.on("uncaughtException", error => log.error(error.stack || error));
-
-        process.on("unhandledRejection", (reason, p) => {
-            log.warn("Unhandled Rejection at:", p);
-        });
-
-        process.on("warning", warning => {
-            log.warn(warning.message); // Print the warning message
-            log.warn(warning.stack);   // Print the stack trace
-        });
     }
 };
+
+process.on("uncaughtException", error => log.error(error.stack || error));
+
+process.on("unhandledRejection", (reason, p) => {
+    log.warn("Unhandled Rejection at:", p);
+});
+
+process.on("warning", warning => {
+    log.warn(warning.message); // Print the warning message
+    log.warn(warning.stack);   // Print the stack trace
+});

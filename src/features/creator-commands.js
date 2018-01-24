@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
-const readLastLines = require("read-last-lines");
+const {resolveStdout} = require("../modules/util");
 const Command = require("../class/Command");
 
 const extnames = {
@@ -32,20 +32,6 @@ const command = new Command(async function onmessage(message) {
         return;
     }
 
-    if (/^!log\b/i.test(message.content)) {
-        if (!permission) {
-            await message.channel.send("no");
-            log("Gracefully aborted attempt to access creator functions");
-            return;
-        }
-
-        const msg = message.content.substr(5);
-        const content = await readLastLines.read(path.join(process.cwd(), msg), 15);
-        await message.channel.send(msg + "\n```\n" + content + "\n```");
-        log(`Sent file contents of ${msg}`);
-        return;
-    }
-
     if (/^!exec\b/i.test(message.content)) {
         if (!permission) {
             await message.channel.send("no");
@@ -55,7 +41,7 @@ const command = new Command(async function onmessage(message) {
 
         const msg = message.content.substr(6);
         const content = await promisify(exec)(msg);
-        await message.channel.send("```\n" + (content.stdout + content.stderr).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "") + "\n```");
+        await message.channel.send("```\n" + resolveStdout(content.stdout + content.stderr) + "\n```");
         log(`Sent stdout for command ${msg}`);
         return;
     }

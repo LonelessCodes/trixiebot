@@ -57,19 +57,13 @@ async function onmessage(client, features, message) {
         const link = await client.generateInvite([
             FLAGS.MANAGE_ROLES,
             FLAGS.MANAGE_CHANNELS,
-            FLAGS.CHANGE_NICKNAME,
             FLAGS.MANAGE_NICKNAMES,
             FLAGS.VIEW_CHANNEL,
-            FLAGS.READ_MESSAGES,
-            FLAGS.SEND_MESSAGES,
             FLAGS.MANAGE_MESSAGES,
             FLAGS.EMBED_LINKS,
-            FLAGS.ATTACH_FILES,
             FLAGS.READ_MESSAGE_HISTORY,
             FLAGS.MENTION_EVERYONE,
-            FLAGS.ADD_REACTIONS,
-            FLAGS.CONNECT,
-            FLAGS.SPEAK
+            FLAGS.ADD_REACTIONS
         ]);
         await message.channel.send(link);
         return;
@@ -114,7 +108,7 @@ new class App {
             await feature.init(this.client, db);
             features.set(file.substring(__dirname.length, file.length - path.extname(file).length), feature);
         }
-        features.set("app", new Command(onmessage.bind(null, this.client, features), { ignore: true }).init(this.client, db));
+        features.set("app", await new Command(onmessage.bind(null, this.client, features), { ignore: true }).init(this.client, db));
 
         this.client.on("message", async message => {
             if (message.author.bot) return;

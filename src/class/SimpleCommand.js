@@ -7,7 +7,7 @@ class SimpleCommand extends Command {
      * @param {{ [command: string]: function(message: Discord.Message)|Discord.RichEmbed|string; }} commands 
      */
     constructor(commands, opts = { ignore: true }) {
-        super(async function (message) {
+        super(async function onmessage(message) {
             for (const command in commands) {
                 if ((new RegExp(`^${command}\\b`, "i")).test(message.content)) {
                     if (typeof commands[command] === "string") {

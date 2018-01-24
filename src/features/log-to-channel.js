@@ -1,18 +1,17 @@
 const { resolveStdout } = require("../modules/util");
-const util = require("util");
 const Command = require("../class/Command");
 
 function hook_stdout(callback) {
     const old_write = process.stdout.write;
 
-    process.stdout.write = (function (write) {
-        return function (string, encoding, fd) {
+    process.stdout.write = (function writeSetup(write) {
+        return function writeFunc(string, encoding, fd) {
             write.apply(process.stdout, arguments);
             callback(string, encoding, fd);
         };
     })(process.stdout.write);
 
-    return function () {
+    return function removeCustomLogic() {
         process.stdout.write = old_write;
     };
 }
@@ -22,7 +21,7 @@ const command = new Command(null, async function init(client) {
 
     channel.send("`--------------------`");
 
-    hook_stdout(function (string) {
+    hook_stdout(function onlog(string) {
         channel.send(`\`${resolveStdout(string)}\``);
     });
 });

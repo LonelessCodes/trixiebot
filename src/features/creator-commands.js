@@ -45,6 +45,20 @@ const command = new Command(async function onmessage(message) {
         log(`Sent stdout for command ${msg}`);
         return;
     }
+
+    if (/^!eval\b/i.test(message.content)) {
+        if (!permission) {
+            await message.channel.send("no");
+            log("Gracefully aborted attempt to access creator functions");
+            return;
+        }
+
+        const msg = message.content.substr(6);
+        const content = await eval(msg);
+        await message.channel.send("```\n" + content + "\n```");
+        log(`Evaluated ${msg} and sent result`);
+        return;
+    }
 }, {
     usage: `\`!file <path>\`
 \`!exec <command>\``

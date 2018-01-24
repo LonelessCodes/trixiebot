@@ -29,7 +29,7 @@ http.createServer((req, res) => {
     res.end();
 }).listen(80);
 
-const command = new Command(async function (message) {
+const command = new Command(async function onmessage(message) {
 
 }, {});
 

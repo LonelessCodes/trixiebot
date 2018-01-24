@@ -2,7 +2,7 @@
  * @param {number} ms 
  * @returns {Promise<void>}
  */
-module.exports.timeout = function (ms) {
+module.exports.timeout = function timeout(ms) {
     return new Promise(res => setTimeout(res, ms));
 };
 

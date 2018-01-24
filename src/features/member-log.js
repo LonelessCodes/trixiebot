@@ -1,4 +1,5 @@
 const log = require("../modules/log");
+const Command = require("../class/Command");
 
 async function init(client) {
     client.on("guildCreate", guild => {
@@ -26,4 +27,4 @@ async function init(client) {
     });
 }
 
-module.exports.init = init;
+module.exports = new Command(null, init);

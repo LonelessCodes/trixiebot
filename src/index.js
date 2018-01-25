@@ -32,6 +32,7 @@ async function onmessage(client, features, message) {
             .addField("Giphy", features.get("gif").usage)
             .addField("Roles", features.get("role").usage)
             .addField("Polls", features.get("poll").usage)
+            .addField("Call into other servers", features.get("call").usage)
             .addField("Uberfacts", features.get("fact").usage)
             .addField("TTS", features.get("tts").usage)
             .addField("Flip a Coin", features.get("coin").usage)
@@ -106,7 +107,7 @@ new class App {
             /** @type {Command} */
             const feature = require(path.resolve("./features", file));
             await feature.init(this.client, db);
-            features.set(file.substring(__dirname.length, file.length - path.extname(file).length), feature);
+            features.set(file.substring((__dirname + "/features/").length, file.length - path.extname(file).length), feature);
         }
         features.set("app", await new Command(onmessage.bind(null, this.client, features), { ignore: true }).init(this.client, db));
 

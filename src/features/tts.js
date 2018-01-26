@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
-const request = require("request");
+const fetch = require("node-fetch");
 const Command = require("../class/Command");
 
 const command = new Command(async function onmessage(message) {
@@ -39,8 +39,9 @@ const command = new Command(async function onmessage(message) {
 
     const connection = await message.member.voiceChannel.join();
     message.react("👍");
-    const stream = request(url);
-    const dispatcher = connection.playStream(stream);
+
+    const request = await fetch(url);
+    const dispatcher = connection.playStream(request.body);
     dispatcher.on("end", async () => {
         await connection.disconnect();
         if (message.client.voiceConnections.get(message.channel.guild.id)) {

@@ -6,6 +6,7 @@ const path = require("path");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
+const WebServerApp = require("./web");
 
 /**
  * @param {Discord.Message} message 
@@ -90,6 +91,8 @@ new class App {
         const db = await MongoClient
             .connect("mongodb://localhost:27017/", { autoReconnect: true })
             .then(client => client.db("trixiebot"));
+
+        this.webServer = new WebServerApp(this.client, db);
 
         this.attachListeners();
 

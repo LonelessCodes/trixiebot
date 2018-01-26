@@ -1,7 +1,6 @@
 const derpibooruKey = require("../../keys/derpibooru.json");
 const log = require("../modules/log");
-const { promisify } = require("util");
-const request = promisify(require("request"));
+const fetch = require("node-fetch");
 const Command = require("../class/Command");
 
 async function get(params) {
@@ -14,12 +13,10 @@ async function get(params) {
     }
     string = string.join("&");
 
-    const result = (await request({
-        url: `https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`,
-        timeout: 10000,
-        json: true
-    })).body;
-    return result;
+    const result = await fetch(`https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`, {
+        timeout: 10000
+    });
+    return await result.json();
 }
 
 const command = new Command(async function onmessage(message) {

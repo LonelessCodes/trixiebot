@@ -5,6 +5,7 @@ const path = require("path");
 const { promisify } = require("util");
 const { resolveStdout } = require("../../modules/util");
 const Command = require("../../class/Command");
+const Discord = require("discord.js");
 
 const extnames = {
     ".js": "javascript",
@@ -58,6 +59,23 @@ class CreatorCommands extends Command {
             const content = await eval(msg);
             await message.channel.send("```\n" + content + "\n```");
             log(`Evaluated ${msg} and sent result`);
+            return;
+        }
+
+        if (/^!broadcast\b/i.test(message.content)) {
+            if (!permission) {
+                await message.channel.send("no");
+                log("Gracefully aborted attempt to access creator functions");
+                return;
+            }
+
+            const msg = message.content.substr(11);
+            this.client.guilds.forEach(guild => {
+                if (!guild.available) return;
+                const defaultChannel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+                defaultChannel.send("@here Broadcast from creator", { embed: new Discord.RichEmded().setDescription(msg) });
+            });
+            log(`Sent stdout for command ${msg}`);
             return;
         }
     }

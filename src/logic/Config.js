@@ -10,10 +10,10 @@ function isPlainObject(input) {
 // when bot gets bigger should limit cache to 1000 most active guilds or so 
 
 class Config extends Object {
-    // constructor(configuration) {
-    //     configuration = Object.setPrototypeOf(configuration, Config.prototype);
-    //     return configuration;
-    // }
+    constructor(configuration) {
+        configuration = Object.setPrototypeOf(configuration, Config.prototype);
+        return configuration;
+    }
 }
 
 class ConfigManager {
@@ -23,12 +23,12 @@ class ConfigManager {
      * @param {Db} db 
      * @param {{}} default_config 
      */
-    constructor(client, db, default_config = {}) {
+    constructor(client, db, default_config) {
         this.client = client;
         this.db = db.collection("guild-config");
         this.db.createIndex("guildId", { unique: true });
         this.db.createIndex("removedFrom", { expireAfterSeconds: 7 * 24 * 3600, sparse: true });
-        this.default_config = default_config;
+        this.default_config = default_config || {};
         /** @type {Map<string, Config>} */
         this._configs = new Map;
         this.initial_load = new Promise((resolve, reject) => {
@@ -64,7 +64,7 @@ class ConfigManager {
         else return new Config(Object.assign(this.default_config, { guildId }, { default: true }));
     }
 
-    async set(guildId, values) {
+    async set(guildId, values = {}) {
         if (!isPlainObject(values)) throw new Error("Values is not of type Object");
 
         await this.initial_load;

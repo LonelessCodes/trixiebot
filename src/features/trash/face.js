@@ -1,5 +1,5 @@
-const log = require("../modules/log");
-const Command = require("../class/Command");
+const log = require("../../modules/log");
+const Command = require("../../class/Command");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
@@ -136,23 +136,25 @@ const faces = [
     "(･.◤)"
 ];
 
-const command = new Command(async function onmessage(message) {
-    if (/^!face\b/i.test(message.content)) {
-        const face = faces.random();
-        await message.channel.send(face);
-        log(`Requested random face. Given ${face}`);
+class FaceCommand extends Command {
+    async onmessage(message) {
+        if (/^!face\b/i.test(message.content)) {
+            const face = faces.random();
+            await message.channel.send(face);
+            log(`Requested random face. Given ${face}`);
+        }
+        else if (/^!lenny\b/i.test(message.content)) {
+            await message.channel.send(faces[0]);
+            log("Requested lenny emoticon");
+        }
+        else if (/^!shrug\b/i.test(message.content)) {
+            await message.channel.send(faces[1]);
+            log("Requested shrug emoticon");
+        }
     }
-    else if (/^!lenny\b/i.test(message.content)) {
-        await message.channel.send(faces[0]);
-        log("Requested lenny emoticon");
+    get usage() {
+        return "`!face` returns a random ASCII face";
     }
-    else if (/^!shrug\b/i.test(message.content)) {
-        await message.channel.send(faces[1]);
-        log("Requested shrug emoticon");
-    }
-}, {
-    usage: "`!face` returns a random ASCII face",
-    ignore: true
-});
+}
 
-module.exports = command;
+module.exports = FaceCommand;

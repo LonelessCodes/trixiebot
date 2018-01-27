@@ -1,8 +1,8 @@
-const pixabayKey = require("../../keys/pixabay.json");
+const pixabayKey = require("../../../keys/pixabay.json");
 const { promisify } = require("util");
 const request = promisify(require("request"));
-const log = require("../modules/log");
-const Command = require("../class/Command");
+const log = require("../../modules/log");
+const Command = require("../../class/Command");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
@@ -30,14 +30,16 @@ async function random() {
     return url;
 }
 
-const command = new Command(async function onmessage(message) {
-    if (/^!cat\b/i.test(message.content)) {
-        await message.channel.send("meow :3 " + await random());
-        log("Requested random cat :3 meow");
+class CatCommand extends Command{
+    async onmessage(message) {
+        if (/^!cat\b/i.test(message.content)) {
+            await message.channel.send("meow :3 " + await random());
+            log("Requested random cat :3 meow");
+        }
+    }    
+    get usage() {
+        return "`!cat` returns cat image :3";
     }
-}, {
-    usage: "`!cat` returns cat image :3",
-    ignore: true
-});
+}
 
-module.exports = command;
+module.exports = CatCommand;

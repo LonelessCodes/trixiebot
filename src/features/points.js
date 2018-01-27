@@ -11,49 +11,55 @@ function random_point() {
 
 const cooldown = new Map;
 const cooldowntime = 60 * 1000;
-const command = new Command(async function onmessage(message) {
-    if (cooldown.has(message.member)) return;
 
-    cooldown.set(message.member, "1");
-    setTimeout(() => cooldown.delete(message.member), cooldowntime);
+class PointsCommand extends Command {
+    constructor(client, config, db) {
+        super(client, config);
+        this.db = db.collection("points");
+    }
+    async onmessage(message) {
+        if (cooldown.has(message.member)) return;
 
-    try {
-        const row = await this.db.findOne({
-            guildId: message.guild.id,
-            memberId: message.member.id
-        });
-        if (!row) {
-            await this.db.insertOne({
-                guildId: message.guild.id,
-                memberId: message.member.id,
-                points: random_point(),
-                level: 0
-            });
-        } else {
-            row.points += random_point();
-            let curLevel = get_level(row.points);
-            if (curLevel > row.level) {
-                row.level = curLevel;
-                await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy? (This is completely useless right now)`);
-                log(`Level-up ${message.author.username} ${curLevel - 1} => ${curLevel}`);
-            }
-            await this.db.updateOne({
+        cooldown.set(message.member, "1");
+        setTimeout(() => cooldown.delete(message.member), cooldowntime);
+
+        try {
+            const row = await this.db.findOne({
                 guildId: message.guild.id,
                 memberId: message.member.id
-            }, {
-                $set: {
-                    points: row.points,
-                    level: row.level
-                }
             });
+            if (!row) {
+                await this.db.insertOne({
+                    guildId: message.guild.id,
+                    memberId: message.member.id,
+                    points: random_point(),
+                    level: 0
+                });
+            } else {
+                row.points += random_point();
+                let curLevel = get_level(row.points);
+                if (curLevel > row.level) {
+                    row.level = curLevel;
+                    await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy? (This is completely useless right now)`);
+                    log(`Level-up ${message.author.username} ${curLevel - 1} => ${curLevel}`);
+                }
+                await this.db.updateOne({
+                    guildId: message.guild.id,
+                    memberId: message.member.id
+                }, {
+                    $set: {
+                        points: row.points,
+                        level: row.level
+                    }
+                });
+            }
+        } catch (err) {
+            log("Points Error", err);
         }
-    } catch (err) {
-        log("Points Error", err);
     }
-}, function init(client, db) {
-    this.db = db.collection("points");
-}, {
-    ignore: true
-});
+    get ignore() {
+        return true;
+    }
+}
 
-module.exports = command;
+module.exports = PointsCommand;

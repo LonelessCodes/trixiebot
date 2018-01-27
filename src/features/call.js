@@ -86,7 +86,7 @@ class Call extends EventEmitter {
         this.message.channel.send("Alright!");
 
         this.receiverOrigin = this.connOrigin.createReceiver();
-        this.connOrigin.on("speaking", (user, speaking) => {
+        this.connOrigin.addListener("speaking", (user, speaking) => {
             if (this.connTarget && speaking && user.id !== this.client.user.id) {
                 this.connTarget.playOpusStream(this.receiverOrigin.createOpusStream(user));
             }
@@ -123,7 +123,7 @@ class Call extends EventEmitter {
                 dialingSound.end();
     
                 const noServersFound = this.connOrigin.playFile("./resources/call/no-servers-found.ogg");
-                noServersFound.on("end", () => {
+                noServersFound.addListener("end", () => {
                     this.destroy();
                 });
                 return;
@@ -141,7 +141,7 @@ class Call extends EventEmitter {
                 dialingSound.end();
     
                 const failedConnecting = this.connOrigin.playFile("./resources/call/failed-connecting.ogg");
-                failedConnecting.on("end", () => {
+                failedConnecting.addListener("end", () => {
                     this.destroy();
                 });
                 return;
@@ -155,15 +155,15 @@ class Call extends EventEmitter {
         const incomingTransmissionTTS = this.connTarget.playStream(incomingTransmissionTTSStream);
 
         await new Promise(resolve => {
-            incomingTransmissionTTS.on("end", resolve);
-            incomingTransmissionTTS.on("error", resolve);
+            incomingTransmissionTTS.addListener("end", resolve);
+            incomingTransmissionTTS.addListener("error", resolve);
         });
 
         dialingSound.end();
 
         this.receiverTarget = this.connTarget.createReceiver();
         
-        this.connTarget.on("speaking", (user, speaking) => {
+        this.connTarget.addListener("speaking", (user, speaking) => {
             if (speaking && user.id !== this.client.user.id) {
                 this.connOrigin.playOpusStream(this.receiverTarget.createOpusStream(user));
             }
@@ -181,7 +181,7 @@ class Call extends EventEmitter {
             });
         });
 
-        this.client.on("voiceStateUpdate", this.voiceStateChanged);
+        this.client.addListener("voiceStateUpdate", this.voiceStateChanged);
     }
 
     endTarget() {
@@ -284,9 +284,14 @@ async function onmessage(message) {
     }
 }
 
-const command = new Command(onmessage, {
-    usage: "`!call` - calls into a random server Trixie happens to be in as well.\n`!call hangup` - hang up on an incoming call or, in case your server started the call, end the session entirely",
-    ignore: true
-});
+class CallCommand extends Command {
+    constructor(client, config) {
+        super(client, config);
+        this.onmessage = onmessage.bind(this);
+    }
+    get usage() {
+        return "`!call` - calls into a random server Trixie happens to be in as well.\n`!call hangup` - hang up on an incoming call or, in case your server started the call, end the session entirely";
+    }
+}
 
-module.exports = command;
+module.exports = CallCommand;

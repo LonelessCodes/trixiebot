@@ -3,25 +3,24 @@ const Discord = require("discord.js");
 const Command = require("../class/Command");
 
 class SimpleCommand extends Command {
-    /**
-     * @param {{ [command: string]: function(message: Discord.Message)|Discord.RichEmbed|string; }} commands 
-     */
-    constructor(commands, opts = { ignore: true }) {
-        super(async function onmessage(message) {
-            for (const command in commands) {
-                if ((new RegExp(`^${command}\\b`, "i")).test(message.content)) {
-                    if (typeof commands[command] === "string") {
-                        await message.channel.send(commands[command]);
-                    } else if (typeof commands[command] === "function") {
-                        await commands[command].apply(this, message);
-                    } else if (commands[command] instanceof Discord.RichEmbed) {
-                        await message.channel.send({ embed: commands[command] });
-                    }
-                    log(`${command} executed`);
-                    return;
+    get commands() {
+        return { };
+    }
+
+    async onmessage(message) {
+        for (const command in this.commands) {
+            if ((new RegExp(`^${command}\\b`, "i")).test(message.content)) {
+                if (typeof this.commands[command] === "string") {
+                    await message.channel.send(this.commands[command]);
+                } else if (typeof this.commands[command] === "function") {
+                    await this.commands[command].apply(this, message);
+                } else if (this.commands[command] instanceof Discord.RichEmbed) {
+                    await message.channel.send({ embed: this.commands[command] });
                 }
+                log(`${command} executed`);
+                return;
             }
-        }, opts);
+        }
     }
 }
 

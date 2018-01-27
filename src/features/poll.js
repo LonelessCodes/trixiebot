@@ -135,12 +135,10 @@ Poll.add = function add(poll) {
     if (poll instanceof Poll) Poll.polls.push(poll);
 };
 
-async function init(client, db) {
-    this.db = db.collection("poll"); 
-
+async function init() {
     const polls = await this.db.find({}).toArray();
     for (let poll of polls) {
-        const guild = client.guilds.get(poll.guildId);
+        const guild = this.client.guilds.get(poll.guildId);
         if (!guild) {
             await this.db.deleteOne({ _id: poll._id });
             continue;
@@ -244,10 +242,21 @@ async function onmessage(message) {
     }
 }
 
-const command = new Command(onmessage, init, {
-    ignore: true,
-    usage: `\`!poll <duration> <option 1>, <option 2>, ..., <option n>\`
-\`duration\` - Duration of the poll. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
-\`option\` - a comma seperated list of options to vote for` });
+class PollCommand extends Command {
+    constructor(client, config, db) {
+        super(client, config);
 
-module.exports = command;
+        this.db = db.collection("poll");
+
+        this.init = init.bind(this);
+        this.onmessage = onmessage.bind(this);
+        this.init();
+    }
+    get usage() {
+        return `\`!poll <duration> <option 1>, <option 2>, ..., <option n>\`
+\`duration\` - Duration of the poll. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
+\`option\` - a comma seperated list of options to vote for`;
+    }
+}
+
+module.exports = PollCommand;

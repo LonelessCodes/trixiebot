@@ -29,8 +29,4 @@ http.createServer((req, res) => {
     res.end();
 }).listen(80);
 
-const command = new Command(async function onmessage(message) {
-
-}, {});
-
-module.exports = command;
+module.exports = Command; // placeholder. File will be deleted with incoming branch web-dashboard anyways

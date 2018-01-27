@@ -3,6 +3,7 @@ const packageFile = require("../package.json");
 const { walk } = require("./modules/util");
 const log = require("./modules/log");
 const path = require("path");
+const statistics = require("./logic/statistics");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
@@ -30,11 +31,14 @@ new class App {
             .connect("mongodb://localhost:27017/", { autoReconnect: true })
             .then(client => client.db("trixiebot"));
 
-        this.configManager = new ConfigManager(this.client, this.db, {
+        statistics.get(statistics.STATS.SHARDS).set(1); // Sharding not implemented, so only one process of Trixie running
+
+        this.config = new ConfigManager(this.client, this.db, {
             prefix: "!",
             calling: false
         });
-        this.webServer = new WebServerApp(this.client, this.db);
+
+        this.webServer = new WebServerApp(this.client, this.config, this.db);
 
         this.attachListeners();
 
@@ -57,7 +61,7 @@ new class App {
             const Feature = require(path.resolve("./features", file));
             features.set(
                 file.substring((__dirname + "/features/").length, file.length - path.extname(file).length).replace(/\\/g, "/"),
-                new Feature(this.client, this.configManager, this.db));
+                new Feature(this.client, this.config, this.db));
         }
         features.set("app", new AppCommand(this.client, this.config, features));
 

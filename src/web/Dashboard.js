@@ -1,10 +1,11 @@
 const express = require("express");
 
 module.exports = class Dashboard {
-    constructor(app, client, db) {
+    constructor(app, client, config, db) {
         this.router = express.Router();
         this.app = app;
         this.client = client;
+        this.config = config;
         this.db = db;
 
         this.addMiddlewares();

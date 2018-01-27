@@ -7,6 +7,7 @@ const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
 const ConfigManager = require("./logic/Config");
+const WebServerApp = require("./web");
 
 new class App {
     constructor() {
@@ -33,6 +34,7 @@ new class App {
             prefix: "!",
             calling: false
         });
+        this.webServer = new WebServerApp(this.client, this.db);
 
         this.attachListeners();
 

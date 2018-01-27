@@ -1,0 +1,48 @@
+<dl>
+    <style>
+        dt {
+            font-size: 1.5em;
+            font-weight: bold
+        }
+
+        a.twitter-mention-button {
+            font-size: 13px;
+            line-height: 26px;
+            background-color: #1b95e0;
+            color: white;
+            border-radius: 3px;
+            padding: 0px 7px;
+            font-weight: 500;
+        }
+
+        iframe.twitter-mention-button {
+            box-sizing: content-box !important;
+            margin: 4px 16px -4px 0;
+        }
+    </style>
+
+    <% function button(text) { %>
+        <a href="https://twitter.com/intent/tweet?screen_name=AltBronyRT" class="twitter-mention-button" data-size="large" data-text="!<%- text %>"
+            data-related="AltBronyRT,LonelessArt" data-lang="en" data-show-count="false">Tweet to @AltBronyRT</a>
+    <% } %>
+    <% function command(c, text, alias) { %>
+        <dt id="<%- c %> <% alias || "" %>">
+        !<%= c %>
+        <% if (alias) { %><span style="font-weight: normal; font-size: .8em"> alias !rank</span><% } %>
+        <% button(c) %></dt>
+        <dd><%- text %></dd>
+    <% } %>
+
+    <% command("ignore", "Makes Alt Brony RT stop retweeting your tweets and collecting data about your tweets."); %>
+    <br />
+    <% command("notice", 'After a call to <a href="#ignore">!ignore</a>, get noticed again.'); %>
+    <br />
+    <% command("stats", 'Review all data, in analysed form, Alt Brony RT has collected about you compared to data of other users', "rank"); %>
+    <br />
+    <% command("about", 'Gets you a short text describing this bot.'); %>
+    <br />
+    <% command("help", 'Get directed to this site.', "commands"); %>
+
+    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script src="/static/js/highlight.js"></script>
+</dl>

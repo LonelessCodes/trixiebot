@@ -1,7 +1,7 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
 const { timeout } = require("../modules/util");
-const request = require("request");
+const fetch = require("node-fetch");
 const EventEmitter = require("events");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
@@ -151,7 +151,8 @@ class Call extends EventEmitter {
         this.guildIdTarget = this.connTarget.voiceChannel.guild.id;
         Call.targets.set(this.guildIdTarget, this);
 
-        const incomingTransmissionTTSStream = request(`http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-us&f=44khz_16bit_mono&c=OGG&src=Hi, it's Trixie again! Incoming transmission from ${this.message.guild.name}. Have fun`);
+        const incomingTransmissionTTSRequest = await fetch(`http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-us&f=44khz_16bit_mono&c=OGG&src=Hi, it's Trixie again! Incoming transmission from ${this.message.guild.name}. Have fun`);
+        const incomingTransmissionTTSStream = incomingTransmissionTTSRequest.body;
         const incomingTransmissionTTS = this.connTarget.playStream(incomingTransmissionTTSStream);
 
         await new Promise(resolve => {

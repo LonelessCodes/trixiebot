@@ -1,6 +1,5 @@
 const log = require("../modules/log");
-const { promisify } = require("util");
-const request = promisify(require("request"));
+const fetch = require("node-fetch");
 const packageFile = require("../../package.json");
 const Command = require("../class/Command");
 
@@ -18,15 +17,13 @@ async function get(params) {
     }
     string = string.join("&");
 
-    const result = (await request({
-        url: `https://e621.net/post/${scope}.json?${string}`,
-        json: true,
+    const result = await fetch(`https://e621.net/post/${scope}.json?${string}`, {
         timeout: 10000,
         headers: {
             "User-Agent": `TrixieBot/${packageFile.version} (by Loneless on e621)`
         }
-    })).body;
-    return result;
+    });
+    return await result.json();
 }
 
 class E621Command extends Command {

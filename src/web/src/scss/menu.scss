@@ -1,0 +1,62 @@
+#fadeout {
+    opacity: 0;
+    transition: opacity .4s;
+    pointer-events: none;
+    position: fixed;
+    z-index: 20;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background: $color3;
+    will-change: opacity;
+}
+
+#menu {
+    background: $color7;
+
+    height: 100vh;
+    width: 300px;
+    padding: 1.5em;
+    position: fixed;
+    top: 0;
+    right: -300px;
+    z-index: 30;
+    transition: transform .4s;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+
+    overflow: hidden;
+    overflow-y: auto;
+
+    .top {
+        @extend .clear;
+        width: 100%;
+        margin: -.5em -.5em .5em .5em;
+    }
+
+    nav {
+        font-size: .8em;
+        li {
+            list-style: none;
+            padding: .5em 0;
+            border-bottom: solid 1px darken($color7, 10%);
+        }
+        a {
+            border: none;
+            &:last-child {
+                li { border-bottom: none; }
+            }
+        }
+    }
+}
+
+body.menu {
+    #fadeout {
+        opacity: 0.7;
+        pointer-events: all;
+    }
+    #menu {
+        transform: translate3d(-300px, 0, 0);
+    }
+}

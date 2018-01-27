@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#" lang="en">
+
+<head>
+	<%- include("../partials/head") %>
+</head>
+
+<body>
+	<div id="content">
+		<header id="header" class="<%= is_index ? 'alt' : '' %>">
+			<div class="left spacing">
+				<a href="/">TRIXIE BOT</a>
+			</div>
+			<div class="right">
+				<div class="menu_button" onclick="openMenu()">
+					<div style="float: left; padding-right: .8em" class="spacing400 text">MENU</div>
+					<svg width="30" height="20">
+						<g style="fill: white">
+							<rect x="0" y="0" width="30" height="2" />
+							<rect x="0" y="9" width="30" height="2" />
+							<rect x="0" y="18" width="30" height="2" />
+						</g>
+					</svg>
+				</div>
+			</div>
+		</header>
+		<div class="content"<% if (!is_index) { %> style="padding-top: 60px" <% } %>>

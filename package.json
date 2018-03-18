@@ -1,6 +1,6 @@
 {
   "name": "trixiebot",
-  "version": "1.8.5",
+  "version": "1.8.6",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
   "main": "index.js",
   "scripts": {
@@ -19,29 +19,29 @@
   "author": "Chris Shepherd",
   "license": "MIT",
   "dependencies": {
-    "colors": "^1.1.2",
-    "compression": "^1.7.1",
+    "colors": "^1.2.1",
+    "compression": "^1.7.2",
     "connect-mongo": "^2.0.1",
-    "discord.js": "^11.3.0",
-    "express": "^4.16.2",
+    "discord.js": "^11.3.2",
+    "express": "^4.16.3",
     "express-session": "^1.15.6",
     "flip-text": "^1.1.0",
     "fs-extra": "^5.0.0",
     "giphy-api": "^1.2.7",
-    "helmet": "^3.10.0",
-    "mongodb": "^3.0.1",
+    "helmet": "^3.12.0",
+    "mongodb": "^3.0.4",
     "node-fetch": "^1.7.3",
     "node-opus": "^0.2.7",
-    "serve-static": "^1.13.1",
+    "serve-static": "^1.13.2",
     "socket.io": "^2.0.4",
     "tiny-text": "^1.0.1",
     "twit": "^2.2.9"
   },
   "devDependencies": {
     "@types/cron": "^1.2.1",
-    "@types/mongodb": "^3.0.3",
-    "@types/node": "^9.3.0",
+    "@types/mongodb": "^3.0.8",
+    "@types/node": "^9.4.7",
     "@types/node-fetch": "^1.6.7",
-    "eslint": "^4.16.0"
+    "eslint": "^4.19.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "trixiebot",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,7 @@
     "node-opus": "^0.2.7",
     "serve-static": "^1.13.1",
     "socket.io": "^2.0.4",
+    "tiny-text": "^1.0.1",
     "twit": "^2.2.9"
   },
   "devDependencies": {

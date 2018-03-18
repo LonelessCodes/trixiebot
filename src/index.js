@@ -142,6 +142,7 @@ class AppCommand extends Command {
                 .addField("Text Faces", this.features.get("trash/face").usage)
                 .addField("Mlem", this.features.get("trash/mlem").usage)
                 .addField("Hugs", this.features.get("trash/hugs").usage)
+                .addField("Smolerize", this.features.get("trash/smol").usage)
                 .addField("Larson", this.features.get("trash/larson").usage)
                 .addField("CATS", this.features.get("trash/cat").usage)
                 .addField("Version", "`!version`")

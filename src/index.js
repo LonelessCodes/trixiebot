@@ -8,7 +8,6 @@ const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
 const ConfigManager = require("./logic/Config");
-const WebServerApp = require("./web");
 
 new class App {
     constructor() {
@@ -37,8 +36,6 @@ new class App {
             prefix: "!",
             calling: false
         });
-
-        this.webServer = new WebServerApp(this.client, this.config, this.db);
 
         this.attachListeners();
 
@@ -144,6 +141,7 @@ class AppCommand extends Command {
                 .addField("Flip Things", this.features.get("trash/flip").usage)
                 .addField("Text Faces", this.features.get("trash/face").usage)
                 .addField("Mlem", this.features.get("trash/mlem").usage)
+                .addField("Hugs", this.features.get("trash/hugs").usage)
                 .addField("Larson", this.features.get("trash/larson").usage)
                 .addField("CATS", this.features.get("trash/cat").usage)
                 .addField("Version", "`!version`")

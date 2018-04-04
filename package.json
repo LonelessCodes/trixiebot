@@ -1,6 +1,6 @@
 {
   "name": "trixiebot",
-  "version": "1.8.7",
+  "version": "1.8.8",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
   "main": "index.js",
   "scripts": {

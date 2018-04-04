@@ -21,36 +21,45 @@ class TimeoutCommand extends Command {
     
         const timeout_entry = await this.db.findOne({ guildId: message.guild.id, memberId: message.member.id });
         if (timeout_entry) {
-            const content = message.content;
-            await message.delete();
+            const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
+            if (timeleft > 0) {
+                const content = message.content;
+                await message.delete();
 
-            const expiresIn = toHumanTime(timeout_entry.expiresAt.getTime() - Date.now());
+                const expiresIn = toHumanTime(timeleft);
 
-            if (timeout_notices[message.channel.id].time &&
-                (timeout_notices[message.channel.id].last ||
-                    timeout_notices[message.channel.id].time.getTime() + 60000 * 10 > Date.now())) {
+                if (timeout_notices[message.channel.id].time &&
+                    (timeout_notices[message.channel.id].last ||
+                        timeout_notices[message.channel.id].time.getTime() + 60000 * 10 > Date.now())) {
             
-                timeout_notices[message.channel.id].message.edit(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
-                return;
-            }
+                    timeout_notices[message.channel.id].message.edit(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
+                    return;
+                }
 
-            const notice = await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
+                const notice = await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
         
-            await this.db_messages.insertOne({
-                guildId: message.guild.id,
-                memberId: message.member.id,
-                message: content,
-                timeoutEnd: timeout_entry.expiresAt
-            });
+                await this.db_messages.insertOne({
+                    guildId: message.guild.id,
+                    memberId: message.member.id,
+                    message: content,
+                    timeoutEnd: timeout_entry.expiresAt
+                });
 
-            timeout_notices[message.channel.id] = {
-                last: true,
-                time: new Date,
-                message: notice,
-            };
+                timeout_notices[message.channel.id] = {
+                    last: true,
+                    time: new Date,
+                    message: notice,
+                };
 
-            log(`Sent timeout notice to user ${message.member.user.username} in guild ${message.guild.name} and saved their message before deletion`);
-            return;
+                log(`Sent timeout notice to user ${message.member.user.username} in guild ${message.guild.name} and saved their message before deletion`);
+                return;
+            } else if (timeleft <= 0) {
+                // mongodb has some problems with syncing the expiresAt index properly.
+                // It can take up to a minute for it to remove the document, so we just remove it manually if it hasn't been cleared already
+                try {
+                    this.db.deleteOne({ _id: timeout_entry._id });
+                } catch (err) { }
+            }
         }
 
         timeout_notices[message.channel.id].last = false;

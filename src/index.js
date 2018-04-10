@@ -127,13 +127,13 @@ class AppCommand extends Command {
             const usage = new Discord.RichEmbed()
                 .setColor(0x71B3E6)
                 .setDescription("`!trixie` to get this help message.")
-                .addField("Invite to your server", "`!invite`")
+                // .addField("Invite to your server", "`!invite`")
                 .addField("Derpibooru", this.features.get("derpi").usage)
                 .addField("E621", this.features.get("e621").usage)
                 .addField("Giphy", this.features.get("gif").usage)
                 .addField("Roles", this.features.get("role").usage)
                 .addField("Polls", this.features.get("poll").usage)
-                .addField("Call into other servers", this.features.get("call").usage)
+                // .addField("Call into other servers", this.features.get("call").usage)
                 .addField("Uberfacts", this.features.get("trash/fact").usage)
                 .addField("TTS", this.features.get("tts").usage)
                 .addField("Flip a Coin", this.features.get("coin").usage)
@@ -157,20 +157,21 @@ class AppCommand extends Command {
             log("Requested version");
             return;
         } else if (/^!invite\b/i.test(message.content)) {
-            const FLAGS = Discord.Permissions.FLAGS;
-            const link = await this.client.generateInvite([
-                FLAGS.MANAGE_ROLES,
-                FLAGS.MANAGE_CHANNELS,
-                FLAGS.MANAGE_NICKNAMES,
-                FLAGS.VIEW_CHANNEL,
-                FLAGS.MANAGE_MESSAGES,
-                FLAGS.EMBED_LINKS,
-                FLAGS.READ_MESSAGE_HISTORY,
-                FLAGS.MENTION_EVERYONE,
-                FLAGS.ADD_REACTIONS
-            ]);
-            await message.channel.send(link);
-            return;
+            // const FLAGS = Discord.Permissions.FLAGS;
+            // const link = await this.client.generateInvite([
+            //     FLAGS.MANAGE_ROLES,
+            //     FLAGS.MANAGE_CHANNELS,
+            //     FLAGS.MANAGE_NICKNAMES,
+            //     FLAGS.VIEW_CHANNEL,
+            //     FLAGS.MANAGE_MESSAGES,
+            //     FLAGS.EMBED_LINKS,
+            //     FLAGS.READ_MESSAGE_HISTORY,
+            //     FLAGS.MENTION_EVERYONE,
+            //     FLAGS.ADD_REACTIONS
+            // ]);
+            // await message.channel.send(link);
+            // return;
+            await message.channel.send("Wait for v2.x. Current version: " + packageFile.version);
         }
     }
 }

@@ -7,7 +7,7 @@ Array.prototype.random = function randomItem() {
 
 const added_recently = new Array();
 
-class FuckCommand extends Command{
+class FuckCommand extends Command {
     constructor(client, config, db) {
         super(client, config);
         this.db = db.collection("fuck");

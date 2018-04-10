@@ -2,34 +2,162 @@ const log = require("../modules/log");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 
-const available_roles = {
-    "Artist Stuff": [
-        "artist",
-        "Commissions Open"
-    ],
-    "Conventions/Meetups": [
-        "GalaCon 2018",
-        "DerpyFest 2018"
-    ]
-};
+async function rolesMessage(guild, db) {
+    const roles = await db.find({
+        guildId: guild.id
+    }).toArray();
 
-let roles_message = "";
-for (let category in available_roles) {
-    roles_message += `__**${category}**__\n`;
-    roles_message += "```\n";
-    for (let role of available_roles[category])
-        roles_message += `${role}\n`;
-    roles_message += "```\n";
+    const available_roles = {};
+    for (let role of roles) {
+        let role_obj = guild.roles.get(role.roleId);
+        if (!role_obj) continue;
+
+        role.category = role.category || "Other";
+        if (!available_roles[role.category])
+            available_roles[role.category] = [];
+        available_roles[role.category].push(role_obj);
+    }
+
+    let roles_message = "";
+    for (let category in available_roles) {
+        roles_message += `__**${category}**__\n`;
+        roles_message += "```\n";
+        for (let role of available_roles[category])
+            roles_message += `${role.name}\n`;
+        roles_message += "```\n";
+    }
+    
+    if (roles_message === "") {
+        return "This server doesn't have any publicly available roles :/";
+    } else {
+        return "Here's a list of available ones:\n" + roles_message;
+    }
 }
 
-const roles_array = {};
-for (let category in available_roles)
-    for (let role of available_roles[category])
-        roles_array[role.toLowerCase()] = role;
+function findArgs(str) {
+    const array = new Array;
+    let tmp = "";
+    let inquote = false;
+    let quote = "";
+    let i = 0;
+    let char = "";
+    while (i < str.length) {
+        char = str.charAt(i);
+        i++;
+
+        if (char === "\"" || char === "'") {
+            if (!inquote) {
+                quote = char;
+                inquote = true;
+            } else if (quote !== char) {
+                tmp += char;
+                continue;
+            } else if (quote === char) {
+                inquote = false;
+            }
+        } else if (char === " ") {
+            if (inquote) {
+                tmp += char;
+                continue;
+            }
+        } else {
+            tmp += char;
+            continue;
+        }
+
+        if (tmp !== "") {
+            array.push(tmp);
+            tmp = "";
+        }
+    }
+
+    if (tmp !== "") {
+        array.push(tmp);
+        tmp = "";
+    }
+
+    return array;
+}
 
 class RoleCommand extends Command {
+    constructor(client, config, db) {
+        super(client, config);
+        this.db = db.collection("roles");
+    }
     async onmessage(message) {
-        if (/^!role remove\b/i.test(message.content)) {
+        if (/^!role config\b/i.test(message.content)) {
+            // ADMIN AREA
+            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
+            if (!permission) {
+                await message.channel.send("IDK what you're doing here");
+                log("Grafully aborted attempt to config roles without the required permissions");
+                return;
+            }
+
+            let msg = message.content.substr(13);
+
+            if (/^add\b/.test(msg)) {
+                msg = msg.substr(4);
+                const args = findArgs(msg);
+                const role = args[0];
+                const category = args[1] || undefined;
+                
+                const role_obj = message.guild.roles.find("name", role);
+                if (!role_obj) {
+                    await message.channel.send("Uh apparently this server doesn't have this role available right now.");
+                    log(`Couldn't find role ${role} in server ${message.guild.name}`);
+                    return;
+                }
+
+                const compare = role_obj.comparePositionTo(message.member.highestRole);
+                if (compare > 0) {
+                    await message.channel.send("Sorry, you can't add a role to the config that is more powerful than your owns.");
+                    log(`Couldn't add role ${role} to config. Role too high`);
+                    return;
+                }
+
+                await this.db.updateOne({
+                    guildId: message.guild.id,
+                    roleId: role_obj.id
+                }, {
+                    $set: {
+                        category
+                    }
+                }, { upsert: true });
+                await message.channel.send("Made the role available for everyone! Yay");
+                log(`Added role ${role} to config of guild ${message.guild.name}`);
+                return;
+            }
+            else if (/^remove\b/.test(msg)) {
+                msg = msg.substr(7);
+                const args = findArgs(msg);
+                console.log(msg, args);
+                const role = args[0];
+                
+                const role_obj = message.guild.roles.find("name", role);
+                if (!role_obj) {
+                    await message.channel.send("Uh apparently this server doesn't have this role available right now.");
+                    log(`Couldn't find role ${role} in server ${message.guild.name}`);
+                    return;
+                }
+
+                const compare = role_obj.comparePositionTo(message.member.highestRole);
+                if (compare > 0) {
+                    await message.channel.send("Sorry, you can't remove a role to the config that is more powerful than your owns.");
+                    log(`Couldn't remove role ${role} to config. Role too high`);
+                    return;
+                }
+
+                await this.db.deleteOne({
+                    guildId: message.guild.id,
+                    roleId: role_obj.id
+                });
+                await message.channel.send("Remove the role from the config.");
+                log(`Removed role ${role} from config of guild ${message.guild.name}`);
+                return;
+            }
+
+        } else if (/^!role remove\b/i.test(message.content)) {
             const msg = message.content.substr(13);
             if (msg === "") {
                 await message.channel.send(this.usage);
@@ -50,7 +178,7 @@ class RoleCommand extends Command {
 
                 for (const member of members) {
                     if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_ROLES)) {
-                        await message.channel.send("You cannot add roles to other users with Manage Roles permission.");
+                        await message.channel.send("You cannot remove roles from other users with Manage Roles permission.");
                         log("Gracefully aborted attempt to remove role from somebody else with permission to manage roles");
                         return;
                     }
@@ -71,47 +199,82 @@ class RoleCommand extends Command {
                 await message.channel.send("Role removed.");
                 log(`Removed role ${role} from users ${members.map(member => member.toString()).join(" ")}`);
             } else {
-                if (!roles_array[msg.toLowerCase()] && !permission) {
-                    await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Remove-Role-From-Somebody-Else. To use the role command you must have permissions to manage roles.");
-                    log("Grafully aborted attempt to remove role without the required permissions");
-                    return;
-                }
-                const role = permission ? msg : roles_array[msg.toLowerCase()];
-                if (!role) {
-                    await message.channel.send("Hmm... I couldn't really find your role. Check that again");
-                    log(`Couldn't find role ${role} in predefined sets`);
-                    return;
-                }
+                let role = msg;
 
-                const role_obj = message.guild.roles.find("name", role);
-                if (!role_obj) {
-                    await message.channel.send("Uh apparently this server doesn't have this role available right now.");
-                    log(`Couldn't find role ${role} in guild ${message.guild.name}`);
-                    return;
-                }
+                if (permission) {
+                    const role_obj = message.guild.roles.find("name", role);
+                    if (!role_obj) {
+                        await message.channel.send("Uh apparently this server doesn't have this role available right now.");
+                        log(`Couldn't find role ${role} in guild ${message.guild.name}`);
+                        return;
+                    }
 
-                if (!message.member.roles.has(role_obj.id)) {
-                    message.channel.send("Can't remove a role without having it first.");
-                    log("Couldn't remove role. User didn't have role in the first place");
-                    return;
-                }
+                    if (!message.member.roles.has(role_obj.id)) {
+                        message.channel.send("Can't remove a role without having it first.");
+                        log("Couldn't remove role. User didn't have role in the first place");
+                        return;
+                    }
 
-                await message.member.removeRole(role_obj);
-                await message.channel.send("Role removed.");
-                log(`Removed role ${role} from user ${message.member.user.username}`);
+                    await message.member.removeRole(role_obj);
+                    await message.channel.send("Role removed.");
+                    log(`Removed role ${role} from user ${message.member.user.username}`);
+                } else {
+                    const role_obj = message.guild.roles.find("name", role);
+                    if (!role_obj) {
+                        await message.channel.send("This role doesn't exist so you can't have it. " + await rolesMessage(message.guild, this.db));
+                        log(`Couldn't find role ${role} in server ${message.guild.name}`);
+                        return;
+                    }
+
+                    const role_query = await this.db.findOne({
+                        guildId: message.guild.id,
+                        roleId: role_obj.id
+                    });
+
+                    if (!role_query) {
+                        await message.channel.send("You don't have permission to remove this role. " + await rolesMessage(message.guild, this.db));
+                        log(`Couldn't remove role ${role}. Not in presets, aka no permission`);
+                        return;
+                    }
+
+                    if (!message.member.roles.has(role_obj.id)) {
+                        message.channel.send("Can't remove a role without having it first.");
+                        log("Couldn't remove role. User didn't have role in the first place");
+                        return;
+                    }
+    
+                    await message.member.removeRole(role_obj);
+                    await message.channel.send("Role removed.");
+                    log(`Removed role ${role} from user ${message.member.user.username}`);
+                }
             }
-        }
-        else if (/^!role\b/i.test(message.content)) {
-            const msg = message.content.substr(6);
+        } else if (/^!role available\b/.test(message.content)) {
+            await message.channel.send(await rolesMessage(message.guild, this.db));
+            log(`Requested available roles for guild ${message.guild.name}`);
+            return;
+        } else if (/^!role\b/i.test(message.content)) {
+            // get the role name
+            let msg;
+            if (/^!role add\b/i.test(message.content)) {
+                msg = message.content.substr(10);
+            } else {
+                msg = message.content.substr(6);
+            }
+
+            // if no role name return the usage
             if (msg === "") {
                 await message.channel.send(this.usage);
                 log("Sent role usage");
                 return;
             }
 
+            // get all mentions
             const members = message.mentions.members.array();
+            // check permission of author
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
+            // if there are mentions perform action to add roles to other users
             if (members.length > 0) {
+                // adding roles to others requires manage roles permission
                 const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
                 if (!permission) {
                     await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Add-Role-To-Somebody-Else. To use the role command you must have permissions to manage roles.");
@@ -120,7 +283,7 @@ class RoleCommand extends Command {
                 }
 
                 let role = msg;
-
+                // check permissions of users mentioned and remove their id string from msg to get the role name in the end
                 for (const member of members) {
                     if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_ROLES)) {
                         await message.channel.send("You cannot add roles to other users with Manage Roles permission.");
@@ -131,6 +294,7 @@ class RoleCommand extends Command {
                 }
                 role = role.trim();
 
+                // see if role is available
                 const role_obj = message.guild.roles.find("name", role);
                 if (!role_obj) {
                     await message.channel.send("Uh apparently this server doesn't have this role available right now.");
@@ -138,45 +302,65 @@ class RoleCommand extends Command {
                     return;
                 }
 
+                // add the role
                 for (const member of members) {
                     await member.addRole(role_obj);
                 }
                 await message.channel.send("Role added! /)");
                 log(`Added role ${role} to users ${members.map(member => member.toString()).join(" ")}`);
             } else {
-                if (!roles_array[msg.toLowerCase()] && !permission) {
-                    await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Remove-Role-From-Somebody-Else. To use the role command you must have permissions to manage roles.");
-                    log("Gracefully aborted attempt to add role without having the required permissions");
-                    return;
-                }
-                const role = permission ? msg : roles_array[msg.toLowerCase()];
-                if (!role) {
-                    await message.channel.send("Hmm... I couldn't really find your role. Here's a list of available ones:\n" + roles_message);
-                    log(`Couldn't find role ${role} in presets`);
-                    return;
-                }
+                let role = msg;
+                if (permission) {
+                    const role_obj = message.guild.roles.find("name", role);
+                    if (!role_obj) {
+                        await message.channel.send("Uh apparently this server doesn't have this role available right now.");
+                        log(`Couldn't find role ${role} in server ${message.guild.name}`);
+                        return;
+                    }
 
-                const role_obj = message.guild.roles.find("name", role);
-                if (!role_obj) {
-                    await message.channel.send("Uh apparently this server doesn't have this role available right now.");
-                    log(`Couldn't find role ${role} in guild ${message.guild.name}`);
-                    return;
-                }
+                    if (message.member.roles.has(role_obj.id)) {
+                        await message.channel.send("You already have this role! Yay?");
+                        log("Couldn't add role: already has role");
+                        return;
+                    }
+    
+                    await message.member.addRole(role_obj);
+                    await message.channel.send("Role added! /)");
+                    log(`Added role ${role} to user ${message.member.user.username}`);
+                } else {
+                    const role_obj = message.guild.roles.find("name", role);
+                    if (!role_obj) {
+                        await message.channel.send("Uh apparently this server doesn't have this role available right now. " + await rolesMessage(message.guild, this.db));
+                        log(`Couldn't find role ${role} in server ${message.guild.name}`);
+                        return;
+                    }
 
-                if (message.member.roles.has(role_obj.id)) {
-                    await message.channel.send("You already have this role! Yay?");
-                    log("Couldn't add role: already has role");
-                    return;
-                }
+                    const role_query = await this.db.findOne({
+                        guildId: message.guild.id,
+                        roleId: role_obj.id
+                    });
 
-                await message.member.addRole(role_obj);
-                await message.channel.send("Role added! /)");
-                log(`Added role ${role} to user ${message.member.user.username}`);
+                    if (!role_query) {
+                        await message.channel.send("Hmm... I couldn't really find your role. " + await rolesMessage(message.guild, this.db));
+                        log(`Couldn't find role ${role} in presets`);
+                        return;
+                    }
+
+                    if (message.member.roles.has(role_obj.id)) {
+                        await message.channel.send("You already have this role! Yay?");
+                        log("Couldn't add role: already has role");
+                        return;
+                    }
+    
+                    await message.member.addRole(role_obj);
+                    await message.channel.send("Role added! /)");
+                    log(`Added role ${role} to user ${message.member.user.username}`);
+                }
             }
         }
     }
     get usage() {
-        return `\`!role <role> <?user mention 1> <?user mention 2> ...\` to add
+        return `\`!role <role> <?user mention 1> <?user mention 2> ...\` to add (alias \`!role add\`)
 \`role\` - The role you would like to have added
 \`user mention\` - this is irrelevant to you, if you don't have rights to manage roles yourself.
 

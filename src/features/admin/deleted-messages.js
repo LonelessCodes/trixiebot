@@ -10,6 +10,7 @@ class DeletedMessagesCommand extends Command {
         this.db.createIndex("timestamp", { expireAfterSeconds: 7 * 24 * 3600 });
 
         this.client.on("messageDelete", async message => {
+            if (message.content === "") return;
             await this.db.insertOne({
                 guildId: message.guild.id,
                 memberId: message.member.id,
@@ -62,27 +63,29 @@ class DeletedMessagesCommand extends Command {
                     channels[deletedMessage.channelId].push(deletedMessage) :
                     channels[deletedMessage.channelId] = [deletedMessage]);
 
-            let str = "";
+            const embed = new Discord.RichEmbed;
 
             for (let channelId in channels) {
                 const messages = channels[channelId].sort((a, b) => b.timestamp - a.timestamp);
 
-                str += `<#${channelId}>\n`;
+                let str = "";
 
                 for (let deletedMessage of messages) {
-                    const timestamp = new Date(deletedMessage.timestamp).toLocaleString();
-                    str += timestamp + " ";
+                    const timestamp = new Date(deletedMessage.timestamp).toLocaleString().slice(0, -3);
+                    str += `\`${timestamp}\` `;
 
                     const member = message.guild.members.get(deletedMessage.memberId);
-                    if (member) str += `${member.displayName} `;
+                    if (member) str += `**${member.displayName}**: `;
 
-                    str += `\`${deletedMessage.message.replace(/`/g, "\\´")}\``;
+                    str += `\`${deletedMessage.message.replace(/`/g, "´")}\``;
                     str += "\n";
                 }
                 str += "\n";
+
+                embed.addField(`#${message.guild.channels.get(channelId).name}`, str);
             }
 
-            await message.channel.send(str);
+            await message.channel.send({ embed });
             log("Sent deleted messages");
             return;
         }

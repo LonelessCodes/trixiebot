@@ -9,7 +9,7 @@ class StatCommand extends Command {
     }
 
     async onmessage(message) {
-        if (/^!stat\b/i.test(message.content)) {
+        if (/^!stats\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
                 .setColor(0x71B3E6)
                 .addField("Server Count", statistics.get(statistics.STATS.SERVER_COUNT).get().toLocaleString("en"), true)
@@ -27,7 +27,7 @@ class StatCommand extends Command {
     }
 
     get usage() {
-        return "`!stat` to get some statistics from Trixie regarding herself";
+        return "`!stats` to get some statistics from Trixie regarding herself";
     }
 }
 

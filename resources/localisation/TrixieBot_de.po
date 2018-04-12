@@ -1,0 +1,310 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: TrixieBot\n"
+"Language: de\n"
+
+#: loco:5acdf530a39ff3732b8b4567
+msgctxt "A request failed to resolve"
+msgid "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though..."
+msgstr "Äh... Ich... ähm, ich glaube... es gab da ein Problem...? Es ist aber nicht deine Schuld..."
+
+#. Try to keep a lightened up sound. TrixieBot is a cheerful and playful bot.
+#: loco:5acdf817a39ff3f42e8b4574
+msgctxt "Trixie can't find a list of deleted messages"
+msgid "Yeeeeah, nothing found"
+msgstr "Tja, nichts gefunden"
+
+#: loco:5acdf9fda39ff398328b4567
+msgctxt "Trixie has cleared her memory of deleted messages."
+msgid "Removed all deleted messages successfully"
+msgstr "Alle gelöschten Nachrichten gecleart"
+
+#: loco:5acdfa8ba39ff3e1328b4567
+msgctxt "Trixie lists all available roles below"
+msgid "Here's a list of available roles:"
+msgstr "Hier ist eine Liste verfügbarer Rollen:"
+
+#: loco:5acdfb76a39ff318338b4567
+msgctxt "Part of the !trixie help command"
+msgid "`!trixie` to get this help message."
+msgstr "`!trixie` um diese Hilfsnachricht zu erhalten."
+
+#: loco:5acdfbd6a39ff3fa328b4568
+msgctxt "Added new role to !role command"
+msgid "Made the role available for everyone! Yay"
+msgstr "Hab die Rolle für jeden verfügbar gemacht! Yay"
+
+#: loco:5acdfbf7a39ff31b338b4569
+msgctxt "Added role to a user"
+msgid "Role added! /)"
+msgstr "Rolle geadded!"
+
+#: loco:5acdfd3ca39ff372358b456f
+msgctxt "Timeouted user %s for the time %s"
+msgid "%s is now timeouted for the next %s!"
+msgstr "%s ist jetzt für die nächsten %s getimeoutet"
+
+#: loco:5acf7d50c430fe480a8b4567
+msgctxt "Missing permission"
+msgid "no"
+msgstr "nö"
+
+#: loco:5acf7dc5c430fe420a8b4568
+msgctxt "Requested path is not a file"
+msgid "Not a file. Sorry :("
+msgstr "Keine Datei. 'Tschuldigung :("
+
+#: loco:5acf7e5cc430febc0a8b4567
+msgctxt "Requested file is too big"
+msgid "File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: %d kb"
+msgstr "Datei zu groß!!! Sie sollte schon noch ein bissl kleiner sein als 15kb sein und diese ist RIESIG: %d kb"
+
+#: loco:5acf7efec430febf0a8b4567
+msgctxt "A broadcast from the developer is sent to a server"
+msgid "@here Broadcast from creator"
+msgstr "@here Broadcast vom Entwickler"
+
+#: loco:5acf7fa6c430feb60a8b4567
+msgctxt "Missing permission to clear/view deleted messages"
+msgid "No boi, git gud"
+msgstr "Ne, versuch's nett erst"
+
+#: loco:5acf8338c430fe2d0b8b4567
+msgctxt "Message sent when timeouted user tries to write"
+msgid "You've been timeouted from writing in this server. Your timeout is over in %s"
+msgstr "Du wurdest vom schreiben in diesem Server getimeoutet! In %s kann's wieder weiter geh'n"
+
+#: loco:5acf8577c430feda0b8b4567
+msgctxt "User tried to use !timeout without permissions"
+msgid "IDK what you're doing here. To use the timeout command you must have permissions to manage messages."
+msgstr "Also ich weiß ja nicht was du hier zu suchen hast. Um das Timeout Kommando zu nutzen musst du mindestens Nachrichten Verwalten können."
+
+#: loco:5acf8609c430fede0b8b4567
+msgid "Removed all timeouts successfully."
+msgstr "Alle Timeouts erfolgreich entfernt."
+
+#: loco:5acf8839c430fe910c8b4567
+msgctxt "Admin removed timeout from a users (%s = list)"
+msgid "Removed timeouts for %s successfully. Get dirty~"
+msgstr "Timeout von %s erfolgreich entfernt. Jetzt kann's weiter geh'n"
+
+#: loco:5acf8959c430fe8d0c8b4567
+msgid "You cannot timeout yourself, dummy!"
+msgstr "Du kannst dich nicht selber timeouten, Dummkopf!"
+
+#: loco:5acf8982c430fe870c8b4567
+msgid "You cannot timeout TrixieBot! I own you."
+msgstr "Hast du echt gedacht das würde gehen? Tsk tsk stk"
+
+#: loco:5acf89a9c430fe8e0c8b4567
+msgctxt "Attempted to timeout mods"
+msgid "You cannot timeout other moderators or admins. That's just rood"
+msgstr "Du kannst keine anderen Moderatoren oder Admins timeouten. Das ist einfach nur unhöflich"
+
+#: loco:5acf8a59c430fe4a0d8b4567
+msgid "Timeout length should be at least 10 seconds long and shorter than 3 days :3"
+msgstr "Timeoutlänge sollte mindestens 10 Sekunden kurz und maximal 3 Tage lang sein."
+
+#: 
+msgctxt "Sent cat image"
+msgid "meow :3"
+msgstr "Miau :3"
+
+#: 
+msgctxt "Sent dog image"
+msgid "woof 🐶"
+msgstr "Wuff 🐶"
+
+#: 
+msgctxt "MLEM"
+msgid "The chat got mlem'd by %s | Art by n0nnny"
+msgstr "Der Chat wurde gemlemt von %s | Bild von n0nnny"
+
+#: 
+msgctxt "BLEP"
+msgid "The chat got blep'd by %s | Art by n0nnny"
+msgstr "Der Chat wurde geblept von %s | Bild von n0nnny"
+
+#: 
+msgctxt "Called !cider"
+msgid "A round of cider is distributed in the chat!"
+msgstr "Eine Runde Cider wird im Chat verteilt!"
+
+#: 
+msgctxt "Called !call hangup to end the call to another server"
+msgid "Hung up on them"
+msgstr "Hab aufgelegt"
+
+#: 
+msgctxt "Called !call hangup in server that started the call"
+msgid "Hung up and cleared the session"
+msgstr "Aufgelegt und Session gecleart"
+
+#: 
+msgctxt "There's no active transmission to other servers"
+msgid "No call to hang up on"
+msgstr "Kein Anruf zum auflegen"
+
+#: 
+msgctxt "Called !call but user not in a voice channel"
+msgid "You need to join a voice channel first!"
+msgstr "Du musst erst einem Voicechannel beitreten!"
+
+#: 
+msgctxt "Called !call but there already is an active transmission"
+msgid "I only have one muzzle, you know!"
+msgstr "Ich hab nur eine Schnautze! Sage mal"
+
+#: 
+msgid "No GIFs were found matching this query."
+msgstr "Keine GIFs auf die Query gefunden."
+
+#: 
+msgctxt "No GIF is trending on Giphy"
+msgid "Apparently nothing is trending right now."
+msgstr "Irgendwie trendet gerade nichts ¯\_(ツ)_/¯"
+
+#: 
+msgctxt "Trixie introduces herself when joining a new server"
+msgid "Hi! I'm new here. Let me introduce myself: I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system :3\n"
+"Just call `!trixie` if you need help"
+msgstr "Hey! Ich bin neu hier. Wer mich nicht kennt, ich bin TrixieBot! Ein Discord Bot vollgepackt mit Features für Ponyliebhaber, inklusive Derpibooru-, e621-, Giphy- und so weiter Integration. Außerdem hab ich auch eine Handvoll nicen anderen Scheiß für Admins, wie z.B. Timeouts oder gelöschte Nachrichten ansehen. Ich kann dein kleiner Spaßbot sein oder ein erwachsenes Servermanagement Tool :3\n"
+"Schreib einfach `!trixie` und ich bin sofort zur Stelle"
+
+#: 
+msgctxt "A new member joined a server"
+msgid "New member joined our Guild, guys!"
+msgstr "Ein neues Mitglied ist zu uns gestoßen!"
+
+#: 
+msgctxt "A new member joined a server. first %s = user tag, second %s = rules channel tag"
+msgid "Hey, %s welcome to the baloney server! How 'bout throwing a quick look into %s?"
+msgstr "Hallo, %s willkommen in unserem geilen Server! Wie wer's wenn du mal hier rein guckst: %s"
+
+#: 
+msgctxt "A user left the server"
+msgid "A soldier has left us"
+msgstr "Ein einst strammer Mitstreiter hat und verlassen"
+
+#: 
+msgctxt "%s is the user tag"
+msgid "*%s* left the server. Bye bye"
+msgstr "*%s* hat den Server verlassen. Bye Bye"
+
+#: 
+msgid "Poll ended!"
+msgstr "Umfrage zuende!"
+
+#: 
+msgid "Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed"
+msgstr "Ruhig Brauner. In diesem Channel ist schon eine Umfrage am runnen. Nur eine Umfrage pro Channel ist erlaubt, um Verwirrung vorzubeugen"
+
+#: 
+msgctxt "A poll creation error: user didn't format the time the right way"
+msgid "`duration` must be formated as in the example."
+msgstr "`duration` muss so formatiert sein wie im Beispiel:"
+
+#: 
+msgctxt "The duration of a poll is out of range"
+msgid "`duration` should be at least 1m and max 3d"
+msgstr "`duration` muss mindestens 1m und max 3d sein"
+
+#: 
+msgctxt "The user forgot to give two options to vote for"
+msgid "To create a poll you must give at least two options to choose from."
+msgstr "Um eine Umfrage zu erstellen musst du zwei oder mehr Optionen angeben!"
+
+#: 
+msgid "Poll is starting!"
+msgstr "Umfrage hat begonnen!"
+
+#: 
+msgctxt "%s is the time in hours, minutes and seconds"
+msgid "**%s** left to vote"
+msgstr "**%s** übrig zum abstimmen"
+
+#: 
+msgctxt "%s is each an option to vote for"
+msgid "You vote by simply posting `%s` or `%s` in this channel"
+msgstr "Man wählt, indem man einfach `%s` oder `%s` in diesen Channel schreibt"
+
+#: 
+msgid "This server doesn't have any publicly available roles :/"
+msgstr "In diesem Server gibt es noch keine öffentlichen Rollen :/"
+
+#: 
+msgid "Here's a list of available roles:"
+msgstr "Hier ist eine Liste verfügbarer Rollen:"
+
+#: 
+msgctxt "User tried to change the role command's configs"
+msgid "IDK what you're doing here"
+msgstr "Also ich weiß ja nun gar nicht was du hier zu suchen hast"
+
+#: 
+msgid "Uh apparently this server doesn't have this role available right now."
+msgstr "Ähm, also so wie's aussieht ist diese Rolle gerade nicht verfügbar."
+
+#: 
+msgid "Sorry, you can't add a role to the config that is more powerful than your owns."
+msgstr "Tschuldigung, aber du kannst keine Rolle der Konfiguration hinzufügen, die höher im Rollenmanager in den Servereinstellungen ist als deine eigene höchte Rolle."
+
+#: 
+msgid "Made the role available for everyone! It's free real estate"
+msgstr "Rolle ist jetzt für jeden verfügbar! Es ist freier Grundbesitz"
+
+#: 
+msgid "Sorry, you can't remove a role from the config that is more powerful than your owns."
+msgstr "Du kannst keine Rolle von der Konfiguration entfernen die mächtiger ist als deine eigenen."
+
+#: 
+msgid "Removed the role from the config. Ouchie wouchie ;~;"
+msgstr "Rolle von der Konfiguration entfernt. Aua"
+
+#: 
+msgctxt "User tried to remove role from somebody else"
+msgid "IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles."
+msgstr "Also ich weiß ja nicht was gerade DU hier zu suchen hast, Mister. Um das role Kommando zu nutzen musst du Rollen verwalten dürfen."
+
+#: 
+msgid "You cannot remove roles from other users with Manage Roles permission."
+msgstr "Du kannst anderen Nutzern die auch Rollen verwalten dürfen nicht ihre Rollen wegnehmen! Bei uns nennt man das Betrug! Ne aber echt, das können sie auch selber machen."
+
+#: 
+msgid "Role removed."
+msgstr "Rolle entfernt."
+
+#: 
+msgctxt "User tried to remove rolethey didn't have in the first place"
+msgid "Can't remove a role without having it first."
+msgstr "Du kannst dir keine Rolle entnehmen, wenn du sie nichtmal hast :3"
+
+#: 
+msgid "This role doesn't exist so you can't have it."
+msgstr "Diese Rolle existiert nicht. Nach logischer Schlussfolgerung kannst du sie also nicht haben."
+
+#: 
+msgid "You don't have permission to remove this role."
+msgstr "Du hast keine Erlaubnis diese Rolle zu entfernen."
+
+#: 
+msgid "You cannot add roles to other users with Manage Roles permission."
+msgstr "Du kannst anderen Nutzern die auch Rollen verwalten dürfen keine Rollen zuteilen! Das können sie auch selber machen."
+
+#: 
+msgid "Role added! /)"
+msgstr "Rolle geadded!"
+
+#: 
+msgid "You already have this role! Yay?"
+msgstr "Du hast diese Rolle schon! Yay?"
+
+#: 
+msgctxt "The requested role is not part of the publicly available roles"
+msgid "Hmm... I couldn't really find your role."
+msgstr "Weird... ich konnte diese Rolle nicht finden."
+

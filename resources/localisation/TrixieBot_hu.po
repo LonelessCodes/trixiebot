@@ -1,0 +1,310 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: TrixieBot\n"
+"Language: hu\n"
+
+#: loco:5acdf530a39ff3732b8b4567
+msgctxt "A request failed to resolve"
+msgid "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though..."
+msgstr "upsz... lehet, hogy elnéztünk valamit... Több mint valószínű ez nem a te hibád..."
+
+#. Try to keep a lightened up sound. TrixieBot is a cheerful and playful bot.
+#: loco:5acdf817a39ff3f42e8b4574
+msgctxt "Trixie can't find a list of deleted messages"
+msgid "Yeeeeah, nothing found"
+msgstr "hááááááááát, semmit sem találtam"
+
+#: loco:5acdf9fda39ff398328b4567
+msgctxt "Trixie has cleared her memory of deleted messages."
+msgid "Removed all deleted messages successfully"
+msgstr "Az összes üzenet sikeresen törlésre került."
+
+#: loco:5acdfa8ba39ff3e1328b4567
+msgctxt "Trixie lists all available roles below"
+msgid "Here's a list of available roles:"
+msgstr "Itt van a jelenleg elérhető role-ok listája:"
+
+#: loco:5acdfb76a39ff318338b4567
+msgctxt "Part of the !trixie help command"
+msgid "`!trixie` to get this help message."
+msgstr "`!trixie` ahhoz, hogy előhívj"
+
+#: loco:5acdfbd6a39ff3fa328b4568
+msgctxt "Added new role to !role command"
+msgid "Made the role available for everyone! Yay"
+msgstr "A role mindenki számává elérhető lett! Yay!"
+
+#: loco:5acdfbf7a39ff31b338b4569
+msgctxt "Added role to a user"
+msgid "Role added! /)"
+msgstr "Role hozzáadva /)"
+
+#: loco:5acdfd3ca39ff372358b456f
+msgctxt "Timeouted user %s for the time %s"
+msgid "%s is now timeouted for the next %s!"
+msgstr "%s büntibe került az elkövetkezendő %s időtartamra!"
+
+#: loco:5acf7d50c430fe480a8b4567
+msgctxt "Missing permission"
+msgid "no"
+msgstr "nem"
+
+#: loco:5acf7dc5c430fe420a8b4568
+msgctxt "Requested path is not a file"
+msgid "Not a file. Sorry :("
+msgstr "Nem egy fájl. Bocsi :("
+
+#: loco:5acf7e5cc430febc0a8b4567
+msgctxt "Requested file is too big"
+msgid "File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: %d kb"
+msgstr "A fájl túl nagy. 15kb-nál kisebbnek kéne lennie de ez HATALMAS: %d kb"
+
+#: loco:5acf7efec430febf0a8b4567
+msgctxt "A broadcast from the developer is sent to a server"
+msgid "@here Broadcast from creator"
+msgstr "@here a fejlesztő közvetít! "
+
+#: loco:5acf7fa6c430feb60a8b4567
+msgctxt "Missing permission to clear/view deleted messages"
+msgid "No boi, git gud"
+msgstr "Nope ne haragudj haver nem engedem"
+
+#: loco:5acf8338c430fe2d0b8b4567
+msgctxt "Message sent when timeouted user tries to write"
+msgid "You've been timeouted from writing in this server. Your timeout is over in %s"
+msgstr "Ezen a szerveren büntetésbe kerültél. A büntetésednek %s múlva vége lesz"
+
+#: loco:5acf8577c430feda0b8b4567
+msgctxt "User tried to use !timeout without permissions"
+msgid "IDK what you're doing here. To use the timeout command you must have permissions to manage messages."
+msgstr "Nem tudom hogy hogy mit akarsz csinálni. Ahhoz, hogy a \"bünti\" parancsot használd, rendelkezned kell a \"manage messages\" engedéllyel."
+
+#: loco:5acf8609c430fede0b8b4567
+msgid "Removed all timeouts successfully."
+msgstr "Minden büntetés sikeresen eltávolításra került."
+
+#: loco:5acf8839c430fe910c8b4567
+msgctxt "Admin removed timeout from a users (%s = list)"
+msgid "Removed timeouts for %s successfully. Get dirty~"
+msgstr "Minden büntetést sikeresen kikapcsolva az elkövetkezendő %s időre. Hajrá~"
+
+#: loco:5acf8959c430fe8d0c8b4567
+msgid "You cannot timeout yourself, dummy!"
+msgstr "Nem büntizheted magadat, butus! "
+
+#: loco:5acf8982c430fe870c8b4567
+msgid "You cannot timeout TrixieBot! I own you."
+msgstr "Nem büntizheted TrixieBotot! Én irányítok!"
+
+#: loco:5acf89a9c430fe8e0c8b4567
+msgctxt "Attempted to timeout mods"
+msgid "You cannot timeout other moderators or admins. That's just rood"
+msgstr "Nem büntethetsz más moderátorokat vagy adminisztrátorokat. Az csak szemétség!"
+
+#: loco:5acf8a59c430fe4a0d8b4567
+msgid "Timeout length should be at least 10 seconds long and shorter than 3 days :3"
+msgstr "A bünti hossza legalább 10 másodperc legyen de nem lehet hosszabb három napnál! :3"
+
+#: 
+msgctxt "Sent cat image"
+msgid "meow :3"
+msgstr "Mew~ :3"
+
+#: 
+msgctxt "Sent dog image"
+msgid "woof 🐶"
+msgstr "woof 🐶"
+
+#: 
+msgctxt "MLEM"
+msgid "The chat got mlem'd by %s | Art by n0nnny"
+msgstr "A chat lakosait %s megnyalta. | A rajzot n0nnny készítette"
+
+#: 
+msgctxt "BLEP"
+msgid "The chat got blep'd by %s | Art by n0nnny"
+msgstr "A chat lakosait %s megnyelvkidugásozta | A rajzot n0nnny készítette"
+
+#: 
+msgctxt "Called !cider"
+msgid "A round of cider is distributed in the chat!"
+msgstr "Egy kör sört kiosztottunk a chatben!"
+
+#: 
+msgctxt "Called !call hangup to end the call to another server"
+msgid "Hung up on them"
+msgstr "Hívás befejezve."
+
+#: 
+msgctxt "Called !call hangup in server that started the call"
+msgid "Hung up and cleared the session"
+msgstr "Hívás befejezve és értekezlet feltakarítva."
+
+#: 
+msgctxt "There's no active transmission to other servers"
+msgid "No call to hang up on"
+msgstr "Nincs hívás folyamatban"
+
+#: 
+msgctxt "Called !call but user not in a voice channel"
+msgid "You need to join a voice channel first!"
+msgstr "Először voice csatornát kell kreálnod!"
+
+#: 
+msgctxt "Called !call but there already is an active transmission"
+msgid "I only have one muzzle, you know!"
+msgstr "Ugye tudod, hogy egyszerre nem lehetek két helyen!"
+
+#: 
+msgid "No GIFs were found matching this query."
+msgstr "Ezen kritériumokra megfelelő GIF-et nem találtam"
+
+#: 
+msgctxt "No GIF is trending on Giphy"
+msgid "Apparently nothing is trending right now."
+msgstr "Úgy néz ki semmi sem felkapott"
+
+#: 
+msgctxt "Trixie introduces herself when joining a new server"
+msgid "Hi! I'm new here. Let me introduce myself: I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system :3\n"
+"Just call `!trixie` if you need help"
+msgstr "Üdv! Új vagyok itt. Hadd mutatkozzak be: TrixieBot vagyok, egy különféle funkciókkal teletömöt Discord bot a póniimádók (vagy vesztesek, a te döntésed) részére. A funkcióim részei a Derpibooru, e621, Giphy stb. keressés, továbbá adminisztrációs eszköz is vagyok például a \"büntetés\" funkció. A vicces robotod lehetek vagy akár komoly szervermoderációs célokra is felhaszálhatsz :3\n"
+"Segítség: `!trixie`"
+
+#: 
+msgctxt "A new member joined a server"
+msgid "New member joined our Guild, guys!"
+msgstr "Egy új taggal gazdagodott a szerverünk!"
+
+#: 
+msgctxt "A new member joined a server. first %s = user tag, second %s = rules channel tag"
+msgid "Hey, %s welcome to the baloney server! How 'bout throwing a quick look into %s?"
+msgstr "Helló %s Üdvözöllek a szerverünkön! Légy oly kedves és pillants bele a/az %s csatornába!"
+
+#: 
+msgctxt "A user left the server"
+msgid "A soldier has left us"
+msgstr "Elvesztettünk egy elvtársat."
+
+#: 
+msgctxt "%s is the user tag"
+msgid "*%s* left the server. Bye bye"
+msgstr "*%s* elhagyta a szerverünket. Viszlát!"
+
+#: 
+msgid "Poll ended!"
+msgstr "A szavazásnak vége!"
+
+#: 
+msgid "Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed"
+msgstr "Hékás! Egszerre egy szavazás folyhat egy csatornában!"
+
+#: 
+msgctxt "A poll creation error: user didn't format the time the right way"
+msgid "`duration` must be formated as in the example."
+msgstr "A szavazás készítése sikertelen; a szavazásnak ebben a formátumban kell megjelennie `hossz`"
+
+#: 
+msgctxt "The duration of a poll is out of range"
+msgid "`duration` should be at least 1m and max 3d"
+msgstr "a `hossz` legalább egy perc és maximum három nap lehet"
+
+#: 
+msgctxt "The user forgot to give two options to vote for"
+msgid "To create a poll you must give at least two options to choose from."
+msgstr "Ahhoz hogy szavazást indíts legalább kettő opciót kell megadnod."
+
+#: 
+msgid "Poll is starting!"
+msgstr "Egy új szavazás kezdődik!"
+
+#: 
+msgctxt "%s is the time in hours, minutes and seconds"
+msgid "**%s** left to vote"
+msgstr "**%s** maradt a választásra!"
+
+#: 
+msgctxt "%s is each an option to vote for"
+msgid "You vote by simply posting `%s` or `%s` in this channel"
+msgstr "Ahhoz hogy szavazatod leadd csak egyszerűen írj `%s`-t vagy `%s`-t a ebbe a csatornába"
+
+#: 
+msgid "This server doesn't have any publicly available roles :/"
+msgstr "Ez a szerver nem rendelkezik egyetlen nyilvánosan elérhető role-al sem :/"
+
+#: 
+msgid "Here's a list of available roles:"
+msgstr "Itt egy lista az elérhető role-okról:"
+
+#: 
+msgctxt "User tried to change the role command's configs"
+msgid "IDK what you're doing here"
+msgstr "Fogalmam sincs mit akartál csinálni"
+
+#: 
+msgid "Uh apparently this server doesn't have this role available right now."
+msgstr "Uhh úgy néz ki ez a szerver jelenleg nem rendelkezik elérhető role-al."
+
+#: 
+msgid "Sorry, you can't add a role to the config that is more powerful than your owns."
+msgstr "Bocsi, de nem változtathatsz meg olyan role-okat amelyek a tiednél magasabb szintűek."
+
+#: 
+msgid "Made the role available for everyone! It's free real estate"
+msgstr "Ez a role mostantól mindenki számára elérhető! Szabad a gazda!"
+
+#: 
+msgid "Sorry, you can't remove a role from the config that is more powerful than your owns."
+msgstr "Bocsi, de nem távolíthatsz el olya role-okat amelyek a tiednél magasabb szintűek."
+
+#: 
+msgid "Removed the role from the config. Ouchie wouchie ;~;"
+msgstr "A role-t eltávolítottam a konfigurációból. ;~;"
+
+#: 
+msgctxt "User tried to remove role from somebody else"
+msgid "IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles."
+msgstr "Nem tudom hogy mit akartál csinálni, de ahhoz hogy ezt a parancsot használd rendelkezned kell a \"manage roles\" engedéllyel."
+
+#: 
+msgid "You cannot remove roles from other users with Manage Roles permission."
+msgstr "Nem tudsz elvenni role-okat más felhasználóktól a \"manage roles\" engedéllyel."
+
+#: 
+msgid "Role removed."
+msgstr "Role eltávolítva."
+
+#: 
+msgctxt "User tried to remove rolethey didn't have in the first place"
+msgid "Can't remove a role without having it first."
+msgstr "Nem létető role-t nem tudok eltávolítani"
+
+#: 
+msgid "This role doesn't exist so you can't have it."
+msgstr "Ez a role nem létezik tehát nem kaphatod meg."
+
+#: 
+msgid "You don't have permission to remove this role."
+msgstr "Nincs engedélyed arra hogy eltávolítsd ezt a role-t."
+
+#: 
+msgid "You cannot add roles to other users with Manage Roles permission."
+msgstr "Nem adhatsz más felhasználóknak role-okat a \"manage roles\" engedéllyel."
+
+#: 
+msgid "Role added! /)"
+msgstr "Role hozzáadva! /)"
+
+#: 
+msgid "You already have this role! Yay?"
+msgstr "Már rendelkezel ezzel a role-al! Yay!"
+
+#: 
+msgctxt "The requested role is not part of the publicly available roles"
+msgid "Hmm... I couldn't really find your role."
+msgstr "Hmm... nem tudtam megtalálni a role-odat"
+

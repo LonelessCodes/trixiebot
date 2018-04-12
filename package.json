@@ -26,6 +26,7 @@
     "giphy-api": "^1.2.7",
     "mongodb": "^3.0.4",
     "node-fetch": "^1.7.3",
+    "node-gettext": "^2.0.0",
     "node-opus": "^0.2.7",
     "tiny-text": "^1.0.1",
     "twit": "^2.2.9"

@@ -30,7 +30,7 @@ async function rolesMessage(guild, db) {
     if (roles_message === "") {
         return "This server doesn't have any publicly available roles :/";
     } else {
-        return "Here's a list of available ones:\n" + roles_message;
+        return "Here's a list of available roles:\n" + roles_message;
     }
 }
 
@@ -124,7 +124,7 @@ class RoleCommand extends Command {
                         category
                     }
                 }, { upsert: true });
-                await message.channel.send("Made the role available for everyone! Yay");
+                await message.channel.send("Made the role available for everyone! It's free real estate");
                 log(`Added role ${role} to config of guild ${message.guild.name}`);
                 return;
             }
@@ -152,7 +152,7 @@ class RoleCommand extends Command {
                     guildId: message.guild.id,
                     roleId: role_obj.id
                 });
-                await message.channel.send("Remove the role from the config.");
+                await message.channel.send("Removed the role from the config. Ouchie wouchie ;~;");
                 log(`Removed role ${role} from config of guild ${message.guild.name}`);
                 return;
             }
@@ -169,7 +169,7 @@ class RoleCommand extends Command {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
             if (members.length > 0) {
                 if (!permission) {
-                    await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Remove-Role-From-Somebody-Else. To use the role command you must have permissions to manage roles.");
+                    await message.channel.send("IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles.");
                     log("Grafully aborted attempt to remove role from somebody else without the required permissions");
                     return;
                 }
@@ -277,7 +277,7 @@ class RoleCommand extends Command {
                 // adding roles to others requires manage roles permission
                 const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
                 if (!permission) {
-                    await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Add-Role-To-Somebody-Else. To use the role command you must have permissions to manage roles.");
+                    await message.channel.send("IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles.");
                     log("Gracefully aborted attempt to add role to another user without having the required permissions");
                     return;
                 }

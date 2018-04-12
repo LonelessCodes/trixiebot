@@ -32,11 +32,11 @@ class TimeoutCommand extends Command {
                     (timeout_notices[message.channel.id].last ||
                         timeout_notices[message.channel.id].time.getTime() + 60000 * 10 > Date.now())) {
             
-                    timeout_notices[message.channel.id].message.edit(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
+                    timeout_notices[message.channel.id].message.edit(`${message.member.toString()} You've been timeouted from writing in this server. Your timeout is over in __**${expiresIn}**__`);
                     return;
                 }
 
-                const notice = await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. I didn't throw your message away, you can check on it using \`!timeout my messages\`, so you can send it again when your timeout is over in __**${expiresIn}**__`);
+                const notice = await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. Your timeout is over in __**${expiresIn}**__`);
         
                 await this.db_messages.insertOne({
                     guildId: message.guild.id,
@@ -56,37 +56,16 @@ class TimeoutCommand extends Command {
             } else if (timeleft <= 0) {
                 // mongodb has some problems with syncing the expiresAt index properly.
                 // It can take up to a minute for it to remove the document, so we just remove it manually if it hasn't been cleared already
-                try {
-                    this.db.deleteOne({ _id: timeout_entry._id });
-                } catch (err) { }
+                this.db.deleteOne({ _id: timeout_entry._id }).catch(() => { });
             }
         }
 
         timeout_notices[message.channel.id].last = false;
 
-        if (/^!timeout my messages\b/i.test(message.content)) {
-            const messages = await this.db_messages.find({
-                guildId: message.guild.id,
-                memberId: message.member.id
-            }).toArray();
-
-            if (messages.length === 0) {
-                await message.channel.send(`${message.member.toString()} I didn't delete any messages ¯\\_(ツ)_/¯`);
-                log("Gracefully aborted attempt to list deleted messages. No deleted messages");
-                return;
-            }
-
-            await message.channel.send(`${message.member.toString()} here you dirty boi${messages.map(message => {
-                return `\n\n${message.message}`;
-            })}`);
-            log(`Sent ${message.member.displayName} their dirty deleted messages`);
-            return;
-        }
-
         if (/^!timeout list\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
-                await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-List-Timeouts. To use the timeout command you must have permissions to manage messages.");
+                await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to list timeouts without the required rights to do so");
                 return;
             }
@@ -123,7 +102,7 @@ class TimeoutCommand extends Command {
         if (/^!timeout clear\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
-                await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
+                await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to clear all timeouts without the required rights to do so");
                 return;
             }
@@ -151,7 +130,7 @@ class TimeoutCommand extends Command {
         if (/^!timeout remove\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
-                await message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
+                await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to remove timeout from user without the required rights to do so");
                 return;
             }
@@ -181,7 +160,7 @@ class TimeoutCommand extends Command {
         if (/^!timeout\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
-                message.channel.send("IDK what you're doing here, Mister Not-Allowed-To-Timeout. To use the timeout command you must have permissions to manage messages.");
+                message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to timeout user without the required rights to do so");
                 return;
             }
@@ -213,7 +192,7 @@ class TimeoutCommand extends Command {
 
             for (const member of members) {
                 if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {
-                    await message.channel.send("You cannot timeout other moderators or admins");
+                    await message.channel.send("You cannot timeout other moderators or admins. That's just rood");
                     log("Gracefully aborted attempt to timeout other user with permissions to manage messages");
                     return;
                 }
@@ -266,9 +245,7 @@ class TimeoutCommand extends Command {
 
 \`!timeout clear\` remove all timeouts
 
-\`!timeout list\` list all timeouts present at the moment
-        
-\`!timeout my messages\` list your by me deleted messages`;
+\`!timeout list\` list all timeouts present at the moment`;
     }
     get ignore() {
         return false;

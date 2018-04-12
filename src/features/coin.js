@@ -22,7 +22,7 @@ class CoinCommand extends Command {
             else if (bet === "tail") bet = "tails";
 
             if (!coin.includes(bet)) {
-                await message.channel.send(`\`${bet}\` isn't a valid side of le coin. \`heads\` or \`tails\`?!\n\n`);
+                await message.channel.send(`\`${bet}\` isn't a valid side of le coin. \`heads\` or \`tails\`?!`);
                 log(`Bet "${bet}" isn't a valid side of a coin`);
                 return;
             }

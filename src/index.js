@@ -48,6 +48,28 @@ new class App {
         await this.initializeFeatures();
     }
 
+    attachListeners() {
+        this.client.addListener("warn", warn => log.warn(warn));
+
+        this.client.addListener("error", error => log.error(
+            error.stack ||
+                error.error ?
+                error.error.stack || error.error :
+                error
+        ));
+
+        this.client.addListener("debug", debug => {
+            if (/heartbeat/i.test(debug)) return;
+            log.debug("discord.js", debug);
+        });
+
+        this.client.addListener("disconnect", closeEvent => log.debug("discord.js", closeEvent));
+
+        this.client.addListener("reconnecting", () => log.debug("discord.js", "Reconnecting"));
+
+        this.client.addListener("resume", replayed => log.debug("discord.js", `Resumed ${replayed} time`));
+    }
+
     async initializeFeatures() {
         /** @type {Map<string, Command>} */
         const features = new Map;
@@ -81,28 +103,6 @@ new class App {
                 }
             });
         });
-    }
-
-    attachListeners() {
-        this.client.addListener("warn", warn => log.warn(warn));
-
-        this.client.addListener("error", error => log.error(
-            error.stack ||
-                error.error ?
-                error.error.stack || error.error :
-                error
-        ));
-
-        this.client.addListener("debug", debug => {
-            if (/heartbeat/i.test(debug)) return;
-            log.debug("discord.js", debug);
-        });
-
-        this.client.addListener("disconnect", closeEvent => log.debug("discord.js", closeEvent));
-
-        this.client.addListener("reconnecting", () => log.debug("discord.js", "Reconnecting"));
-
-        this.client.addListener("resume", replayed => log.debug("discord.js", `Resumed ${replayed} time`));
     }
 };
 
@@ -172,6 +172,10 @@ class AppCommand extends Command {
             // await message.channel.send(link);
             // return;
             await message.channel.send("Wait for v2.x. Current version: " + packageFile.version);
+            return;
+        } else if (/^!donate\b/i.test(message.content)) {
+            await message.channel.send("https://ko-fi.com/loneless");
+            return;
         }
     }
 }

@@ -25,7 +25,7 @@ class ConfigManager {
      */
     constructor(client, db, default_config) {
         this.client = client;
-        this.db = db.collection("guild-config");
+        this.db = db.collection("guild_config");
         this.db.createIndex("guildId", { unique: true });
         this.db.createIndex("removedFrom", { expireAfterSeconds: 7 * 24 * 3600, sparse: true });
         this.default_config = default_config || {};

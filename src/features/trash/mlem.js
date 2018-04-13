@@ -2,7 +2,7 @@ const log = require("../../modules/log");
 const Command = require("../../class/Command");
 const Discord = require("discord.js");
 
-class MlemCommand extends Command{
+class MlemCommand extends Command {
     async onmessage(message) {
         if (/^!mlem\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
@@ -14,7 +14,7 @@ class MlemCommand extends Command{
             log("Requested mlem");
             return;
         }
-    
+
         if (/^!blep\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
                 .setColor(0x71B3E6)

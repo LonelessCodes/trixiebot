@@ -105,3 +105,37 @@ module.exports.parseHumanTime = function parseHumanTime(string) {
 module.exports.resolveStdout = function resolveStdout(string) {
     return string.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 };
+
+module.exports.removePrefix = async function removePrefix(message, client, config) {
+    let content = message.content;
+    // check prefixes
+    if (new RegExp(`^${client.user.toString()}\b`).test(content)) {
+        content = content.substring(client.user.toString().length + 1);
+    } else if (new RegExp(`^${await config.get(message.guild.id, "prefix")}`)) {
+        content = content.substring((await config.get(message.guild.id, "prefix")).length);
+    }
+
+    return Object.assign(message, { content, origContent: message.content });
+};
+
+module.exports.roll = async function roll(array, roller, end) {
+    return new Promise(resolve => {
+        let index = 0;
+        const next = () => {
+            index++;
+            if (index < array.length) {
+                const r = roller(array[index], index, () => next());
+                if (r.then) r.then(() => next());
+            } else {
+                if (end) { end(); resolve();}
+            }
+        };
+        if (array.length === 0) {
+            if (end) end();
+            resolve();
+            return;
+        }
+        const r = roller(array[index], index, next);
+        if (r.then) r.then(next);
+    });
+};

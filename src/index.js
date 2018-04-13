@@ -34,7 +34,10 @@ new class App {
 
         this.config = new ConfigManager(this.client, this.db, {
             prefix: "!",
-            calling: false
+            calling: false,
+            lang: "en",
+            explicit: false,
+            admin_role: null
         });
 
         this.attachListeners();
@@ -132,8 +135,11 @@ class AppCommand extends Command {
                 .addField("E621", this.features.get("e621").usage)
                 .addField("Giphy", this.features.get("gif").usage)
                 .addField("Roles", this.features.get("role").usage)
-                .addField("Polls", this.features.get("poll").usage)
-                // .addField("Call into other servers", this.features.get("call").usage)
+                .addField("Polls", this.features.get("poll").usage);
+            if (await this.config.get(message.guild.id, "calling")) {
+                // usage.addField("Call into other servers", this.features.get("call").usage);
+            }
+            usage
                 .addField("Uberfacts", this.features.get("trash/fact").usage)
                 .addField("TTS", this.features.get("tts").usage)
                 .addField("Flip a Coin", this.features.get("coin").usage)
@@ -148,6 +154,8 @@ class AppCommand extends Command {
                 .addField("Version", "`!version`")
                 .addBlankField()
                 .addField("Admin", this.features.get("admin/timeout").usage)
+                .addField("Deleted Messages", this.features.get("admin/deleted-messages").usage)
+                .addField("Trixie Config", this.features.get("admin/config").usage)
                 .setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
             await message.channel.send({ embed: usage });
             log("Requested usage");
@@ -172,9 +180,6 @@ class AppCommand extends Command {
             // await message.channel.send(link);
             // return;
             await message.channel.send("Wait for v2.x. Current version: " + packageFile.version);
-            return;
-        } else if (/^!donate\b/i.test(message.content)) {
-            await message.channel.send("https://ko-fi.com/loneless");
             return;
         }
     }

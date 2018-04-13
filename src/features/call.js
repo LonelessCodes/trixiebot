@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
-const { timeout } = require("../modules/util");
+const { timeout, roll } = require("../modules/util");
 const fetch = require("node-fetch");
 const EventEmitter = require("events");
 const Discord = require("discord.js");
@@ -16,22 +16,13 @@ async function disconnect(connection) {
 }
 
 function dialing(connection) {
-    function getDialer() {
-        const tmp = connection.playFile("./resources/call/dialing.ogg");
-        tmp.once("end", () => {
-            sound = getDialer();
-        });
-        return tmp;
-    }
-
-    let sound = getDialer();
+    const sound = connection.playFile("./resources/call/dialing.ogg");
 
     return {
         get destroyed() {
             return sound.destroyed;
         },
         end() {
-            sound.removeAllListeners("end");
             sound.end();
         },
         pause() {
@@ -65,8 +56,9 @@ class Call extends EventEmitter {
 
     async getRandomVoiceChannel() {
         const channels = new Discord.Collection;
-        this.client.guilds.forEach(guild => {
+        await roll(this.client.guilds.array(), async guild => {
             if (guild.id === this.message.guild.id) return;
+            if (!(await this.config.get(guild.id, "calling"))) return;
             guild.members.forEach(member => {
                 if (member.voiceChannelID &&
                     member.voiceChannel.permissionsFor(member.voiceChannel.guild.me).has(Discord.Permissions.FLAGS.SPEAK) &&

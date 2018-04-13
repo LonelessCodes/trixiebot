@@ -1,6 +1,6 @@
 const SimpleCommand = require("../../class/SimpleCommand");
 
-class TrashCommand extends SimpleCommand{
+class TrashCommand extends SimpleCommand {
     get commands() {
         return {
             "!cider": "**🍺 A round of cider is distributed in the chat!**",

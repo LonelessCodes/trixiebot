@@ -4,6 +4,7 @@ const { walk } = require("./modules/util");
 const log = require("./modules/log");
 const path = require("path");
 const statistics = require("./logic/statistics");
+const gt = require("./logic/locale");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
@@ -34,7 +35,8 @@ new class App {
 
         this.config = new ConfigManager(this.client, this.db, {
             prefix: "!",
-            calling: false
+            calling: false,
+            locale: "en"
         });
 
         this.attachListeners();
@@ -87,6 +89,9 @@ new class App {
         this.client.addListener("message", async message => {
             if (message.author.bot) return;
             if (message.channel.type !== "text") return;
+
+            gt.setLocale(await this.config.get(message.guild.id, "locale"));
+
             const timeouted = await this.db.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
 
             // clean up multiple whitespaces
@@ -99,7 +104,7 @@ new class App {
                     await feature.onmessage(message);
                 } catch (err) {
                     log(err);
-                    message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
+                    message.channel.send(gt.gettext("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...") + `\n\`${err.name}: ${err.message}\``);
                 }
             });
         });
@@ -176,6 +181,8 @@ class AppCommand extends Command {
         } else if (/^!donate\b/i.test(message.content)) {
             await message.channel.send("https://ko-fi.com/loneless");
             return;
+        } else if (/^!locale\b/i.test(message.content)) {
+            this.config.set(message.guild.id, { locale: message.content.substring(8) });
         }
     }
 }

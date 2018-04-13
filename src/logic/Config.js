@@ -56,12 +56,16 @@ class ConfigManager {
         });
     }
 
-    async get(guildId) {
+    async get(guildId, parameter) {
         // will fire instantly if loaded already, are wait 
         // till all configurations are initially loaded into memory
         await this.initial_load;
-        if (this._configs.has(guildId)) return this._configs.get(guildId);
-        else return new Config(Object.assign(this.default_config, { guildId }, { default: true }));
+        let config;
+        if (this._configs.has(guildId)) config =this._configs.get(guildId);
+        else config = new Config(Object.assign(this.default_config, { guildId }, { default: true }));
+        
+        if (parameter) return config[parameter];
+        else config;
     }
 
     async set(guildId, values = {}) {

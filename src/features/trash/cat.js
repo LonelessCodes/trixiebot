@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const cat = require("cat-ascii-faces");
 const log = require("../../modules/log");
 const Command = require("../../class/Command");
 
@@ -12,7 +13,7 @@ async function randomCat() {
 class CatCommand extends Command{
     async onmessage(message) {
         if (/^!cat\b/i.test(message.content)) {
-            await message.channel.send("meow :3 " + await randomCat());
+            await message.channel.send("meow " + cat() + " " + await randomCat());
             log("Requested random cat :3 meow");
         }
     }

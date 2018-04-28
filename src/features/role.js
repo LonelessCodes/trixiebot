@@ -1,4 +1,5 @@
 const log = require("../modules/log");
+const { findArgs } = require("../modules/util");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 
@@ -32,51 +33,6 @@ async function rolesMessage(guild, db) {
     } else {
         return "Here's a list of available roles:\n" + roles_message;
     }
-}
-
-function findArgs(str) {
-    const array = new Array;
-    let tmp = "";
-    let inquote = false;
-    let quote = "";
-    let i = 0;
-    let char = "";
-    while (i < str.length) {
-        char = str.charAt(i);
-        i++;
-
-        if (char === "\"" || char === "'") {
-            if (!inquote) {
-                quote = char;
-                inquote = true;
-            } else if (quote !== char) {
-                tmp += char;
-                continue;
-            } else if (quote === char) {
-                inquote = false;
-            }
-        } else if (char === " ") {
-            if (inquote) {
-                tmp += char;
-                continue;
-            }
-        } else {
-            tmp += char;
-            continue;
-        }
-
-        if (tmp !== "") {
-            array.push(tmp);
-            tmp = "";
-        }
-    }
-
-    if (tmp !== "") {
-        array.push(tmp);
-        tmp = "";
-    }
-
-    return array;
 }
 
 class RoleCommand extends Command {

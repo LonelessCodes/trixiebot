@@ -144,3 +144,48 @@ module.exports.roll = async function roll(array, roller, end) {
         if (r.then) r.then(next);
     });
 };
+
+module.exports.findArgs = function findArgs(str) {
+    const array = new Array;
+    let tmp = "";
+    let inquote = false;
+    let quote = "";
+    let i = 0;
+    let char = "";
+    while (i < str.length) {
+        char = str.charAt(i);
+        i++;
+
+        if (char === "\"" || char === "'") {
+            if (!inquote) {
+                quote = char;
+                inquote = true;
+            } else if (quote !== char) {
+                tmp += char;
+                continue;
+            } else if (quote === char) {
+                inquote = false;
+            }
+        } else if (char === " ") {
+            if (inquote) {
+                tmp += char;
+                continue;
+            }
+        } else {
+            tmp += char;
+            continue;
+        }
+
+        if (tmp !== "") {
+            array.push(tmp);
+            tmp = "";
+        }
+    }
+
+    if (tmp !== "") {
+        array.push(tmp);
+        tmp = "";
+    }
+
+    return array;
+};

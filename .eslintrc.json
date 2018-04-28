@@ -27,6 +27,7 @@
             "always"
         ],
         "no-cond-assign": "off",
+        "no-control-regex": "off",
 
         "no-console": "off"
     }

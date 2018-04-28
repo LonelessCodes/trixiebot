@@ -154,6 +154,7 @@ class AppCommand extends Command {
                 .addField("Version", "`!version`")
                 .addBlankField()
                 .addField("Admin", this.features.get("admin/timeout").usage)
+                .addField("Blacklist words", this.features.get("admin/mute").usage)
                 .addField("Deleted Messages", this.features.get("admin/deleted-messages").usage)
                 .addField("Trixie Config", this.features.get("admin/config").usage)
                 .setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);

@@ -10,7 +10,7 @@ class MuteCommand extends Command {
     }
 
     async onmessage(message) {
-        const muted_words = await this.db.find({ guildId: message.guild.id }).toArray();
+        const muted_words = (await this.db.find({ guildId: message.guild.id }).toArray()).map(doc => doc.word);
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (muted_words.length > 0 && !permission) {
             const content = message.content;

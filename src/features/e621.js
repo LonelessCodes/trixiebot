@@ -29,16 +29,16 @@ async function get(params) {
 class E621Command extends Command {
     async onmessage(message) {
         // e621
-        if (/^!e621\b/i.test(message.content)) {
+        if (/^e621\b/i.test(message.content)) {
             const timestamp = Date.now();
 
             /**
              * @type {string}
              */
-            let msg = message.content.substr(6);
+            let msg = message.content.substr(5);
 
             if (msg === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Sent e621 help");
                 return;
             }
@@ -63,13 +63,13 @@ class E621Command extends Command {
                     try {
                         const numParse = parseInt(num);
                         if (numParse < 1 || numParse > 5) {
-                            await message.channel.send("`amount` cannot be smaller than 1 or greater than 5!\n\n" + this.usage);
+                            await message.channel.send("`amount` cannot be smaller than 1 or greater than 5!\n\n" + this.usage(message.prefix));
                             log("Gracefully aborted attempt to request e621 image. Amount out of range");
                             return;
                         }
                         num = numParse;
                     } catch (err) {
-                        message.channel.send("Invalid input\n\n" + this.usage);
+                        message.channel.send("Invalid input\n\n" + this.usage(message.prefix));
                         log("Gracefully aborted attempt to request e621 image. Invalid amount input");
                         return;
                     }
@@ -94,13 +94,13 @@ class E621Command extends Command {
             current_char = msg.charAt(i);
 
             if (!/latest|random/.test(order)) {
-                await message.channel.send("`order` must be either `latest` or `random`!\n\n" + this.usage);
+                await message.channel.send("`order` must be either `latest` or `random`!\n\n" + this.usage(message.prefix));
                 log(`Gracefully aborted attempt to request e621 image. ${order} is not a valid type of order`);
                 return;
             }
 
             if (i >= msg.length) {
-                await message.channel.send("`query` **must** be given\n\n" + this.usage);
+                await message.channel.send("`query` **must** be given\n\n" + this.usage(message.prefix));
                 log("Gracefully aborted attempt to request e621 image. No query given");
                 return;
             }
@@ -171,8 +171,8 @@ class E621Command extends Command {
             log("Found e621 images", ...ids, `[${Date.now() - timestamp}ms]`);
         }
     }
-    get usage() {
-        return `\`!e621 <?amount> <order:latest|random> <query>\`
+    usage(prefix) {
+        return `\`${prefix}e621 <?amount> <order:latest|random> <query>\`
 \`amount\` - optional - number ranging from 1 to 5 for how many results to return
 \`order\` - string of either \`latest\` or \`random\`
 \`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`;

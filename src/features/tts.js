@@ -5,11 +5,11 @@ const Command = require("../class/Command");
 
 class TTSCommand extends Command {
     async onmessage(message) {
-        if (!/^!tts\b/i.test(message.content)) return;
+        if (!/^tts\b/i.test(message.content)) return;
 
-        const src = message.content.substr(5);
+        const src = message.content.substr(4);
         if (src === "") {
-            await message.channel.send("Usage: " + this.usage);
+            await message.channel.send("Usage: " + this.usage(message.prefix));
             log("Sent tts usage");
             return;
         }
@@ -63,8 +63,8 @@ class TTSCommand extends Command {
         return;
     }
 
-    get usage() {
-        return "`!tts <message>` - joins the user's current voice channel and reads the message out aloud.";
+    usage(prefix) {
+        return `\`${prefix}tts <message>\` - joins the user's current voice channel and reads the message out aloud.`;
     }
 }
 

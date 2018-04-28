@@ -236,7 +236,7 @@ Call.new = function (...args) {
 };
 
 async function onmessage(message) {
-    if (/^!call hangup\b/i.test(message.content)) {
+    if (/^call hangup\b/i.test(message.content)) {
         if (Call.targets.has(message.guild.id)) {
             const call = Call.targets.get(message.guild.id);
             call.endTarget();
@@ -258,7 +258,7 @@ async function onmessage(message) {
         return;
     }
 
-    if (/^!call\b/i.test(message.content)) {
+    if (/^call\b/i.test(message.content)) {
         // Only try to join the sender's voice channel if they are in one themselves
         if (!message.member.voiceChannel) {
             message.channel.send("You need to join a voice channel first!");
@@ -282,8 +282,9 @@ class CallCommand extends Command {
         super(client, config);
         this.onmessage = onmessage.bind(this);
     }
-    get usage() {
-        return "`!call` - calls into a random server Trixie happens to be in as well.\n`!call hangup` - hang up on an incoming call or, in case your server started the call, end the session entirely";
+    usage(prefix) {
+        return `\`${prefix}call\` - calls into a random server Trixie happens to be in as well.
+\`${prefix}call hangup\` - hang up on an incoming call or, in case your server started the call, end the session entirely`;
     }
 }
 

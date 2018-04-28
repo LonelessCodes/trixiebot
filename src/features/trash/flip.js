@@ -4,25 +4,25 @@ const Command = require("../../class/Command");
 
 class FlipCommand extends Command {
     async onmessage(message) {
-        if (message.content.toLowerCase() === "!tableflip" || message.content.toLowerCase() === "!tf") {
+        if (message.content.toLowerCase() === "tableflip" || message.content.toLowerCase() === "tf") {
             await message.channel.send("(╯°□°）╯︵ ┻━┻");
             log("Flipped table successfully!!!");
             return;
         }
 
-        if (message.content.toLowerCase() === "!untableflip" || message.content.toLowerCase() === "!uf") {
+        if (message.content.toLowerCase() === "untableflip" || message.content.toLowerCase() === "uf") {
             await message.channel.send("┬─┬ ノ( ゜-゜ノ)");
             log("Unflipped table successfully!!!");
             return;
         }
 
-        if (/^!flip\b/i.test(message.content)) {
+        if (/^flip\b/i.test(message.content)) {
             const mention = message.mentions.members.first();
             if (!mention) {
                 const text = message.content.replace(/\s+/g, " ");
-                const tmp = text.substr(6);
+                const tmp = text.substr(5);
                 if (tmp === "") {
-                    await message.channel.send("Usage: `!flip <user|string>`");
+                    await message.channel.send(`Usage: \`${message.prefix}flip <user|string>\``);
                     log("Sent flip usage");
                     return;
                 }
@@ -35,13 +35,13 @@ class FlipCommand extends Command {
             return;
         }
 
-        if (/^!unflip\b/i.test(message.content)) {
+        if (/^unflip\b/i.test(message.content)) {
             const mention = message.mentions.members.first();
             if (!mention) {
                 const text = message.content.replace(/\s+/g, " ");
-                const tmp = text.substr(8);
+                const tmp = text.substr(7);
                 if (tmp === "") {
-                    await message.channel.send("Usage: `!unflip <user|string>`");
+                    await message.channel.send(`Usage: \`${message.prefix}unflip <user|string>\``);
                     log("Sent unflip usage");
                     return;
                 }
@@ -54,15 +54,15 @@ class FlipCommand extends Command {
             return;
         }
     }
-    get usage() {
-        return `\`!flip <user|string>\`
+    usage(prefix) {
+        return `\`${prefix}flip <user|string>\`
 \`user|string\` - user or text to flip
 
-\`!unflip <user|string>\`
+\`${prefix}unflip <user|string>\`
 \`user|string\` - user or text to unflip
 
-\`!tableflip\`
-\`!untableflip\``;
+\`${prefix}tableflip\`
+\`${prefix}untableflip\``;
     }
 }
 

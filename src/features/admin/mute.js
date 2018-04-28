@@ -24,7 +24,7 @@ class MuteCommand extends Command {
             }
         }
 
-        if (/^!mute list\b/i.test(message.content)) {
+        if (/^mute list\b/i.test(message.content)) {
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to list muted words without the required rights to do so");
@@ -44,7 +44,7 @@ class MuteCommand extends Command {
             return;
         }
 
-        if (/^!mute clear\b/i.test(message.content)) {
+        if (/^mute clear\b/i.test(message.content)) {
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to clear all muted words without the required rights to do so");
@@ -58,17 +58,17 @@ class MuteCommand extends Command {
             return;
         }
 
-        if (/^!mute remove\b/i.test(message.content)) {
+        if (/^mute remove\b/i.test(message.content)) {
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to remove muted word from user without the required rights to do so");
                 return;
             }
 
-            const word = message.content.substr(13).trim();
+            const word = message.content.substr(12).trim();
 
             if (word === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Requested usage of mute command");
                 return;
             }
@@ -81,7 +81,7 @@ class MuteCommand extends Command {
             return;
         }
 
-        if (/^!mute\b/i.test(message.content)) {
+        if (/^mute\b/i.test(message.content)) {
             if (!permission) {
                 message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to mute word without the required rights to do so");
@@ -91,10 +91,10 @@ class MuteCommand extends Command {
             /**
              * @type {string}
              */
-            const word = message.content.substr(6).trim();
+            const word = message.content.substr(5).trim();
 
             if (word === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Requested usage of mute command");
                 return;
             }
@@ -114,16 +114,16 @@ class MuteCommand extends Command {
         }
     }
 
-    get usage() {
-        return `\`!mute <phrase>\`
+    usage(prefix) {
+        return `\`${prefix}mute <phrase>\`
 \`phrase\` - Word or phrase to be blacklisted
 
-\`!mute remove <phrase>\`
+\`${prefix}mute remove <phrase>\`
 \`phrase\` - Word or phrase to be unmuted
 
-\`!mute clear\` remove all muted words
+\`${prefix}mute clear\` remove all muted words
 
-\`!mute list\` list all muted words and phrases`;
+\`${prefix}mute list\` list all muted words and phrases`;
     }
     get ignore() {
         return false;

@@ -106,16 +106,21 @@ module.exports.resolveStdout = function resolveStdout(string) {
     return string.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 };
 
-module.exports.removePrefix = async function removePrefix(message, client, config) {
+module.exports.removePrefix = async function removePrefix(message, config) {
     let content = message.content;
+    let me = message.guild.me.toString();
+    let prefix = await config.get(message.guild.id, "prefix");
     // check prefixes
-    if (new RegExp(`^${client.user.toString()}\b`).test(content)) {
-        content = content.substring(client.user.toString().length + 1);
-    } else if (new RegExp(`^${await config.get(message.guild.id, "prefix")}`)) {
-        content = content.substring((await config.get(message.guild.id, "prefix")).length);
+    if (message.channel.type === "dm") {
+        prefix = "";
+    } else if (content.startsWith(`${me} `)) {
+        content = content.substr(me.length + 1);
+    } else if (content.startsWith(prefix)) {
+        content = content.substr(prefix.length + 1);
     }
 
-    return Object.assign(message, { content, origContent: message.content });
+    const rtrn = Object.assign({}, message, { content, origContent: message.content, prefix });
+    return rtrn;
 };
 
 module.exports.roll = async function roll(array, roller, end) {

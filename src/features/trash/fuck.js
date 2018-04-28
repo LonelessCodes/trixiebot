@@ -13,10 +13,10 @@ class FuckCommand extends Command {
         this.db = db.collection("fuck");
     }
     async onmessage(message) {
-        if (/^!fuck add\b/i.test(message.content)) {
-            const text = message.content.substr(10);
+        if (/^fuck add\b/i.test(message.content)) {
+            const text = message.content.substr(9);
             if (text === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Sent fuck add usage");
                 return;
             }
@@ -26,12 +26,12 @@ class FuckCommand extends Command {
                 return;
             }
             if (text.length <= 10 || text.length > 256) {
-                await message.channel.send("Text must be longer than 10 and shorter than 256 characters.\n\n" + this.usage);
+                await message.channel.send("Text must be longer than 10 and shorter than 256 characters.\n\n" + this.usage(message.prefix));
                 log("Gracefully aborted adding fuck text. Text too long");
                 return;
             }
             if (!/\$\{name\}/g.test(text)) {
-                await message.channel.send("You must add `${name}` in the place the username should be set.\n\n" + this.usage);
+                await message.channel.send("You must add `${name}` in the place the username should be set.\n\n" + this.usage(message.prefix));
                 log("Gracefully aborted adding fuck text. Missing ${name} in text");
                 return;
             }
@@ -55,12 +55,12 @@ class FuckCommand extends Command {
             log(`Added fuck phrase: ${text}`);
             return;
         }
-        if (/^!fuck\b/i.test(message.content)) {
+        if (/^fuck\b/i.test(message.content)) {
             if (message.mentions.members.first()) {
                 const mention = message.mentions.members.first();
                 const phrases = await this.db.find({}).toArray(); // return only text and author
                 if (phrases.length === 0) {
-                    message.channel.send("I'm sorry, but... I don't have any fucks to give. Add fucks using `!fuck add`");
+                    message.channel.send(`I'm sorry, but... I don't have any fucks to give. Add fucks using \`${message.prefix}fuck add\``);
                     log("Couldn't serve fuck phrase. No fuck phrases in DB");
                     return;
                 }
@@ -77,17 +77,17 @@ class FuckCommand extends Command {
                 log("Served fuck phrase: " + text);
                 return;
             }
-            await message.channel.send(this.usage);
+            await message.channel.send(this.usage(message.prefix));
             log("Sent fuck usage");
             return;
         }
     }
-    get usage() {
-        return `\`!fuck <user>\`
+    usage(prefix) {
+        return `\`${prefix}fuck <user>\`
 \`user\` - the username of the user to fuck
 
-\`!fuck add <text>\`
-\`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set. E.g.: \`!fuck add rides \${name}'s skin bus into tuna town\``;
+\`${prefix}fuck add <text>\`
+\`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set. E.g.: \`${prefix}fuck add rides \${name}'s skin bus into tuna town\``;
     }
 }
 

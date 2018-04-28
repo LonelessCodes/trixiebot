@@ -10,10 +10,10 @@ const coin = ["heads", "tails"];
 
 class CoinCommand extends Command {
     async onmessage(message) {
-        if (/^!coin\b/i.test(message.content)) {
-            let bet = message.content.substr(6).toLowerCase();
+        if (/^coin\b/i.test(message.content)) {
+            let bet = message.content.substr(5).toLowerCase();
             if (bet === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Gracefully aborted attempt to flip coin: No bet given. Sent usage information");
                 return;
             }
@@ -38,8 +38,8 @@ class CoinCommand extends Command {
         }
     }
 
-    get usage() {
-        return `\`!coin <bet>\`
+    usage(prefix) {
+        return `\`${prefix}coin <bet>\`
 \`bet\` - your bet. Either \`heads\` or \`tails\``;
     }
 }

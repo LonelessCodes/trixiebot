@@ -5,10 +5,10 @@ class ConfigCommand extends Command {
     //     super(client, config);
     // }
 
-    get usage() {
-        return `\`!config\` view the Trixie's config in this server
-\`!config <parameter>\` view only this parameter's config
-\`!config <parameter> <value>\` set a parameter in Trixie's config. "default" for default config`;
+    usage(prefix) {
+        return `\`${prefix}config\` view the Trixie's config in this server
+\`${prefix}config <parameter>\` view only this parameter's config
+\`${prefix}config <parameter> <value>\` set a parameter in Trixie's config. "default" for default config`;
     }
 }
 

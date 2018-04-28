@@ -74,38 +74,18 @@ new class App {
     }
 
     async initializeFeatures() {
-        /** @type {Map<string, Command>} */
-        const features = new Map;
+        const features = new Command.CommandManager(this.client, this.db);
+
         for (let file of await walk(path.resolve(__dirname, "features"))) {
             if (path.extname(file) !== ".js") continue;
 
             /** @type {typeof Command} */
             const Feature = require(path.resolve("./features", file));
-            features.set(
+            features.registerCommand(
                 file.substring((__dirname + "/features/").length, file.length - path.extname(file).length).replace(/\\/g, "/"),
                 new Feature(this.client, this.config, this.db));
         }
-        features.set("app", new AppCommand(this.client, this.config, features));
-
-        this.client.addListener("message", async message => {
-            if (message.author.bot) return;
-            if (message.channel.type !== "text") return;
-            const timeouted = await this.db.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
-
-            // clean up multiple whitespaces
-            message.content = message.content.replace(/\s+/g, " ").trim();
-
-            features.forEach(async feature => {
-                if (feature.ignore && timeouted) return;
-
-                try {
-                    await feature.onmessage(message);
-                } catch (err) {
-                    log(err);
-                    message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
-                }
-            });
-        });
+        features.registerCommand("app", new AppCommand(this.client, this.config, features));
     }
 };
 
@@ -116,8 +96,8 @@ class AppCommand extends Command {
     }
     async onmessage(message) {
         // ping pong
-        if (/^!ping\b/i.test(message.content) ||
-            /^!trixie ping\b/i.test(message.content)) {
+        if (/^ping\b/i.test(message.content) ||
+            /^trixie ping\b/i.test(message.content)) {
             const m = await message.channel.send("pong! Wee hehe");
             const ping = m.createdTimestamp - message.createdTimestamp;
             await m.edit("pong! Wee hehe\n" +
@@ -126,46 +106,53 @@ class AppCommand extends Command {
             log(`Requested ping. Got ping of ${ping}ms`);
             return;
         }
-        else if (/^!trixie\b/.test(message.content)) {
+        else if (/^trixie\b/.test(message.content)
+            || /^!trixie\b/.test(message.origContent)) { // still listen for ! prefix too
             const usage = new Discord.RichEmbed()
                 .setColor(0x71B3E6)
-                .setDescription("`!trixie` to get this help message.")
-                // .addField("Invite to your server", "`!invite`")
-                .addField("Derpibooru", this.features.get("derpi").usage)
-                .addField("E621", this.features.get("e621").usage)
-                .addField("Giphy", this.features.get("gif").usage)
-                .addField("Roles", this.features.get("role").usage)
-                .addField("Polls", this.features.get("poll").usage);
+                .setDescription(this.features.get("app").usage(message.prefix))
+                // .addField("Invite to your server", `\`${message.prefix}invite\``)
+                .addField("Derpibooru", this.features.get("derpi").usage(message.prefix))
+                .addField("E621", this.features.get("e621").usage(message.prefix))
+                .addField("Giphy", this.features.get("gif").usage(message.prefix))
+                .addField("Roles", this.features.get("role").usage(message.prefix))
+                .addField("Polls", this.features.get("poll").usage(message.prefix));
             if (await this.config.get(message.guild.id, "calling")) {
-                // usage.addField("Call into other servers", this.features.get("call").usage);
+                // usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
             }
             usage
-                .addField("Uberfacts", this.features.get("trash/fact").usage)
-                .addField("TTS", this.features.get("tts").usage)
-                .addField("Flip a Coin", this.features.get("coin").usage)
-                .addField("Fuck a User", this.features.get("trash/fuck").usage)
-                .addField("Flip Things", this.features.get("trash/flip").usage)
-                .addField("Text Faces", this.features.get("trash/face").usage)
-                .addField("Mlem", this.features.get("trash/mlem").usage)
-                .addField("Hugs", this.features.get("trash/hugs").usage)
-                .addField("Smolerize", this.features.get("trash/smol").usage)
-                .addField("Larson", this.features.get("trash/larson").usage)
-                .addField("CATS", this.features.get("trash/cat").usage)
-                .addField("Version", "`!version`")
+                .addField("Uberfacts", this.features.get("trash/fact").usage(message.prefix))
+                .addField("TTS", this.features.get("tts").usage(message.prefix))
+                .addField("Flip a Coin", this.features.get("coin").usage(message.prefix))
+                .addField("Fuck a User", this.features.get("trash/fuck").usage(message.prefix))
+                .addField("Flip Things", this.features.get("trash/flip").usage(message.prefix))
+                .addField("Text Faces", this.features.get("trash/face").usage(message.prefix))
+                .addField("Mlem", this.features.get("trash/mlem").usage(message.prefix))
+                .addField("Hugs", this.features.get("trash/hugs").usage(message.prefix))
+                .addField("Smolerize", this.features.get("trash/smol").usage(message.prefix))
+                .addField("Larson", this.features.get("trash/larson").usage(message.prefix))
+                .addField("CATS", this.features.get("trash/cat").usage(message.prefix))
+                .addField("Version", `\`${message.prefix}version\``)
                 .addBlankField()
+<<<<<<< HEAD
+                .addField("Admin", this.features.get("admin/timeout").usage(message.prefix))
+                .addField("Blacklist words", this.features.get("admin/mute").usage(message.prefix))
+                .addField("Deleted Messages", this.features.get("admin/deleted-messages").usage(message.prefix))
+                .addField("Trixie Config", this.features.get("admin/config").usage(message.prefix))
+=======
                 .addField("Admin", this.features.get("admin/timeout").usage)
-                .addField("Blacklist words", this.features.get("admin/mute").usage)
                 .addField("Deleted Messages", this.features.get("admin/deleted-messages").usage)
                 .addField("Trixie Config", this.features.get("admin/config").usage)
+>>>>>>> parent of 9c485a8... Added !mute admin command
                 .setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
             await message.channel.send({ embed: usage });
             log("Requested usage");
             return;
-        } else if (/^!version\b/i.test(message.content)) {
+        } else if (/^version\b/i.test(message.content)) {
             await message.channel.send(`v${packageFile.version}`);
             log("Requested version");
             return;
-        } else if (/^!invite\b/i.test(message.content)) {
+        } else if (/^invite\b/i.test(message.content)) {
             // const FLAGS = Discord.Permissions.FLAGS;
             // const link = await this.client.generateInvite([
             //     FLAGS.MANAGE_ROLES,
@@ -183,6 +170,10 @@ class AppCommand extends Command {
             await message.channel.send("Wait for v2.x. Current version: " + packageFile.version);
             return;
         }
+    }
+
+    usage(prefix) {
+        return `\`${prefix}trixie\` to get this help message.`;
     }
 }
 

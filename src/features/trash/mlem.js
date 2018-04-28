@@ -4,7 +4,7 @@ const Discord = require("discord.js");
 
 class MlemCommand extends Command {
     async onmessage(message) {
-        if (/^!mlem\b/i.test(message.content)) {
+        if (/^mlem\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
                 .setColor(0x71B3E6)
                 .setTitle("MLEM o3o")
@@ -15,7 +15,7 @@ class MlemCommand extends Command {
             return;
         }
 
-        if (/^!blep\b/i.test(message.content)) {
+        if (/^blep\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
                 .setColor(0x71B3E6)
                 .setTitle("BLEP o3o")
@@ -26,8 +26,10 @@ class MlemCommand extends Command {
             return;
         }
     }
-    get usage() {
-        return "`!mlem` mlem the chat :3\n`!blep` blep the chat :3";
+    usage(prefix) {
+        return `
+\`${prefix}mlem\` mlem the chat :3
+\`${prefix}blep\` blep the chat :3`;
     }
 }
 

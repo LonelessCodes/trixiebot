@@ -62,7 +62,7 @@ class TimeoutCommand extends Command {
 
         timeout_notices[message.channel.id].last = false;
 
-        if (/^!timeout list\b/i.test(message.content)) {
+        if (/^timeout list\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
@@ -99,7 +99,7 @@ class TimeoutCommand extends Command {
             return;
         }
 
-        if (/^!timeout clear\b/i.test(message.content)) {
+        if (/^timeout clear\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
@@ -127,7 +127,7 @@ class TimeoutCommand extends Command {
             return;
         }
 
-        if (/^!timeout remove\b/i.test(message.content)) {
+        if (/^timeout remove\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
@@ -157,7 +157,7 @@ class TimeoutCommand extends Command {
             return;
         }
 
-        if (/^!timeout\b/i.test(message.content)) {
+        if (/^timeout\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
@@ -168,10 +168,10 @@ class TimeoutCommand extends Command {
             /**
              * @type {string}
              */
-            let msg = message.content.substr(9);
+            let msg = message.content.substr(8);
 
             if (msg === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Requested usage of timeout command");
                 return;
             }
@@ -235,17 +235,17 @@ class TimeoutCommand extends Command {
         }
     }
     
-    get usage() {
-        return `\`!timeout <time> <user mention 1> <user mention 2> ... \`
+    usage(prefix) {
+        return `\`${prefix}timeout <time> <user mention 1> <user mention 2> ... \`
 \`time\` - timeout length. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
 \`user mention\` - user to timeout. Multiple users possible
 
-\`!timeout remove <user mention 1> <user mention 2> ... \`
+\`${prefix}timeout remove <user mention 1> <user mention 2> ... \`
 \`user mention\` - user to remove timeout from. Multiple users possible
 
-\`!timeout clear\` remove all timeouts
+\`${prefix}timeout clear\` remove all timeouts
 
-\`!timeout list\` list all timeouts present at the moment`;
+\`${prefix}timeout list\` list all timeouts present at the moment`;
     }
     get ignore() {
         return false;

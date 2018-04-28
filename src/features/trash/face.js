@@ -138,22 +138,22 @@ const faces = [
 
 class FaceCommand extends Command {
     async onmessage(message) {
-        if (/^!face\b/i.test(message.content)) {
+        if (/^face\b/i.test(message.content)) {
             const face = faces.random();
             await message.channel.send(face);
             log(`Requested random face. Given ${face}`);
         }
-        else if (/^!lenny\b/i.test(message.content)) {
+        else if (/^lenny\b/i.test(message.content)) {
             await message.channel.send(faces[0]);
             log("Requested lenny emoticon");
         }
-        else if (/^!shrug\b/i.test(message.content)) {
+        else if (/^shrug\b/i.test(message.content)) {
             await message.channel.send(faces[1]);
             log("Requested shrug emoticon");
         }
     }
-    get usage() {
-        return "`!face` returns a random ASCII face";
+    usage(prefix) {
+        return `\`${prefix}face\` returns a random ASCII face`;
     }
 }
 

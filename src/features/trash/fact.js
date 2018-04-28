@@ -69,14 +69,14 @@ async function getFact() {
 
 class FactCommand extends Command {
     async onmessage(message) {
-        if (/^!fact\b/i.test(message.content)) {
+        if (/^fact\b/i.test(message.content)) {
             const fact = await getFact();
             await message.channel.send(fact);
             log("Fact requested");
         }
     }
-    get usage() {
-        return "`!fact` gets random UberFacts fact";
+    usage(prefix) {
+        return `\`${prefix}fact\` gets random UberFacts fact`;
     }
 }
 

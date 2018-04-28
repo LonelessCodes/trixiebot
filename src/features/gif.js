@@ -8,8 +8,8 @@ Array.prototype.random = function randomItem() {
 
 class GifCommand extends Command {
     async onmessage(message) {
-        if (/^!gif random\b/i.test(message.content)) {
-            const query = message.content.substr(12);
+        if (/^gif random\b/i.test(message.content)) {
+            const query = message.content.substr(11);
             let gif;
             if (query === "") {
                 gif = await giphy.random({
@@ -39,7 +39,7 @@ class GifCommand extends Command {
 
             return;
         }
-        if (/^!gif trending\b/i.test(message.content)) {
+        if (/^gif trending\b/i.test(message.content)) {
             const gif = await giphy.trending({
                 limit: 100
             });
@@ -56,10 +56,10 @@ class GifCommand extends Command {
 
             return;
         }
-        if (/^!gif\b/i.test(message.content)) {
-            const query = message.content.substr(5);
+        if (/^gif\b/i.test(message.content)) {
+            const query = message.content.substr(4);
             if (query === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Sent gif usage");
                 return;
             }
@@ -83,10 +83,10 @@ class GifCommand extends Command {
             return;
         }
     }
-    get usage() {
-        return `\`!gif <query>\` - returns the top result for the given \`query\`
-\`!gif random <query>\` - returns a random gif for the given \`query\`
-\`!gif trending\` - returns a random trending gif`;
+    usage(prefix) {
+        return `\`${prefix}gif <query>\` - returns the top result for the given \`query\`
+\`${prefix}gif random <query>\` - returns a random gif for the given \`query\`
+\`${prefix}gif trending\` - returns a random trending gif`;
     }
 }
 

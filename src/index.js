@@ -134,16 +134,10 @@ class AppCommand extends Command {
                 .addField("CATS", this.features.get("trash/cat").usage(message.prefix))
                 .addField("Version", `\`${message.prefix}version\``)
                 .addBlankField()
-<<<<<<< HEAD
                 .addField("Admin", this.features.get("admin/timeout").usage(message.prefix))
                 .addField("Blacklist words", this.features.get("admin/mute").usage(message.prefix))
                 .addField("Deleted Messages", this.features.get("admin/deleted-messages").usage(message.prefix))
                 .addField("Trixie Config", this.features.get("admin/config").usage(message.prefix))
-=======
-                .addField("Admin", this.features.get("admin/timeout").usage)
-                .addField("Deleted Messages", this.features.get("admin/deleted-messages").usage)
-                .addField("Trixie Config", this.features.get("admin/config").usage)
->>>>>>> parent of 9c485a8... Added !mute admin command
                 .setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
             await message.channel.send({ embed: usage });
             log("Requested usage");

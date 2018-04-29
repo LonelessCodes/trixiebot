@@ -102,7 +102,7 @@ class CatCommand extends Command {
             }
 
             await message.channel.send({ embed });
-            log("Fulfilled wikia query for ${query} successfully.");
+            log(`Fulfilled wikia query for ${query} successfully.`);
             return;
         }
     }

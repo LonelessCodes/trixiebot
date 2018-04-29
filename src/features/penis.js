@@ -13,6 +13,8 @@ class PenisCommand extends Command {
     async onmessage(message) {
         if (/^(penis|cock|dick)\b/i.test(message.content)) {
             const member = message.mentions.members.first() || message.member;
+            const uom = await this.config.get(message.guild.id, "uom");
+            const r = uom === "cm" ? 2.54 : 1;
 
             if (message.mentions.everyone) {
                 await message.channel.send("everyone has fucking huge diccs k. You're all beautiful");
@@ -22,7 +24,7 @@ class PenisCommand extends Command {
             if (member.user.id === this.client.user.id) {
                 const length = 20;
                 const girth = 18;
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\nLength: **${length.toFixed(1)} in**   Girth: **${girth.toFixed(1)} in**`);
+                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
                 return;
             }
 
@@ -40,11 +42,11 @@ class PenisCommand extends Command {
                     length
                 });
 
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${length.toFixed(1)} in**   Girth: **${girth.toFixed(1)} in**`);
+                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
             } else {
                 const { length, girth } = doc;
 
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${length.toFixed(1)} in**   Girth: **${girth.toFixed(1)} in**`);
+                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
             }
         }
     }

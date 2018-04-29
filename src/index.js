@@ -37,7 +37,8 @@ new class App {
             calling: false,
             lang: "en",
             explicit: false,
-            admin_role: null
+            admin_role: null,
+            uom: "in"
         });
 
         this.attachListeners();

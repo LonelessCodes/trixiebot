@@ -4,7 +4,7 @@ const cheerio = require("cheerio");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 
-class CatCommand extends Command {
+class MLPCommand extends Command {
     async onmessage(message) {
         if (/^mlp\b/i.test(message.content)) {
             const query = message.content.substr(4).trim();
@@ -116,4 +116,4 @@ class CatCommand extends Command {
     }
 }
 
-module.exports = CatCommand;
+module.exports = MLPCommand;

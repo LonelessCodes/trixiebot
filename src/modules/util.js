@@ -115,7 +115,7 @@ module.exports.removePrefix = async function removePrefix(message, config) {
         prefix = "";
     } else if (content.startsWith(`${me} `)) {
         content = content.substr(me.length + 1);
-    } else if (content.startsWith(prefix)) {
+    } else {
         content = content.substr(prefix.length);
     }
 

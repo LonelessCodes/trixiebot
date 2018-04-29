@@ -1,8 +1,8 @@
 const { promisify } = require("util");
-const { timeout } = require("../../modules/util");
-const log = require("../../modules/log");
+const { timeout } = require("../modules/util");
+const log = require("../modules/log");
 const Twit = require("twit");
-const Command = require("../../class/Command");
+const Command = require("../class/Command");
 
 Array.prototype.last = function lastItem() {
     return this[this.length - 1];
@@ -11,7 +11,7 @@ Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-const twitter = new Twit(require("../../../keys/twitter.json"));
+const twitter = new Twit(require("../../keys/twitter.json"));
 twitter.get = promisify(twitter.get);
 
 const facts = new Set();

@@ -117,12 +117,11 @@ class AppCommand extends Command {
                 .addField("Giphy", this.features.get("gif").usage(message.prefix))
                 .addField("Roles", this.features.get("role").usage(message.prefix))
                 .addField("Polls", this.features.get("poll").usage(message.prefix));
-            if (await this.config.get(message.guild.id, "calling")) {
-                // usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
-            }
+            // if (await this.config.get(message.guild.id, "calling")) 
+            //     usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
             usage
                 .addField("MLP Wikia", this.features.get("mlp").usage(message.prefix))
-                .addField("Uberfacts", this.features.get("trash/fact").usage(message.prefix))
+                .addField("Uberfacts", this.features.get("fact").usage(message.prefix))
                 .addField("TTS", this.features.get("tts").usage(message.prefix))
                 .addField("Flip a Coin", this.features.get("coin").usage(message.prefix))
                 .addField("Fuck a User", this.features.get("trash/fuck").usage(message.prefix))

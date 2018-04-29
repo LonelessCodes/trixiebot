@@ -37,9 +37,9 @@ class CatCommand extends Command {
             const pageRequest = await fetch(pageURL);
             const pageHTML = await pageRequest.text();
             const parser = cheerio.load(pageHTML);
+            parser("br").replaceWith("\n");
 
             const info = parser("table.infobox > tbody").first();
-            info.find("br").replaceWith("\n");
 
             const fields = new Array;
             let title = "";
@@ -54,18 +54,22 @@ class CatCommand extends Command {
 
                 info.find("tr").slice(3).filter(function () {
                     return parser(this).children().length > 1;
-                }).slice(0, 8).each(function () {
+                }).slice(0, 10).each(function () {
                     const found = parser(this).find("td");
+                    if (!found.toArray().length) return;
     
                     const key = found.first().text();
                     if (/other links/i.test(key)) return;
     
-                    const value = found.slice(1).text();
+                    let value = found.slice(1).text().split("\n").map(s => s.trim()).join("\n");
                     if (key.replace(/[\n\r]/g, "") === "" || value.replace(/[\n\r]/g, "") === "") return;
+                    if (value.length > 512) {
+                        value = value.slice(0, 512 - 3) + "...";
+                    }
     
                     fields.push({
                         key,
-                        value: value.split("\n").map(s => s.trim()).join("\n")
+                        value
                     });
                 });
             } else {

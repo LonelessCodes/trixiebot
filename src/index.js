@@ -121,6 +121,7 @@ class AppCommand extends Command {
                 // usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
             }
             usage
+                .addField("MLP Wikia", this.features.get("mlp").usage(message.prefix))
                 .addField("Uberfacts", this.features.get("trash/fact").usage(message.prefix))
                 .addField("TTS", this.features.get("tts").usage(message.prefix))
                 .addField("Flip a Coin", this.features.get("coin").usage(message.prefix))

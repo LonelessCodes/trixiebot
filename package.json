@@ -1,6 +1,6 @@
 {
   "name": "trixiebot",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "cat-ascii-faces": "^2.0.0",
+    "cheerio": "^1.0.0-rc.2",
     "colors": "^1.2.1",
     "discord.js": "^11.3.2",
     "dog-ascii-faces": "^2.1.3",

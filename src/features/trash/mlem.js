@@ -4,6 +4,8 @@ const Discord = require("discord.js");
 
 class MlemCommand extends Command {
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+
         if (/^mlem\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
                 .setColor(0x71B3E6)

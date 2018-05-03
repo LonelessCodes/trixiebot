@@ -8,6 +8,8 @@ Array.prototype.random = function randomItem() {
 
 class GifCommand extends Command {
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+
         if (/^gif random\b/i.test(message.content)) {
             const query = message.content.substr(11);
             let gif;
@@ -36,9 +38,9 @@ class GifCommand extends Command {
 
             await message.channel.send(url);
             log(`Requested random gif ${gif.data.id} for ${query}`);
-
             return;
         }
+
         if (/^gif trending\b/i.test(message.content)) {
             const gif = await giphy.trending({
                 limit: 100
@@ -53,9 +55,9 @@ class GifCommand extends Command {
 
             await message.channel.send(url);
             log(`Requested trending gif ${gif.data[0].id}`);
-
             return;
         }
+
         if (/^gif\b/i.test(message.content)) {
             const query = message.content.substr(4);
             if (query === "") {
@@ -79,7 +81,6 @@ class GifCommand extends Command {
 
             await message.channel.send(url);
             log(`Requested top gif ${gif.data[0].id} for ${query}`);
-
             return;
         }
     }

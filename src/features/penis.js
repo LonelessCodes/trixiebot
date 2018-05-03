@@ -1,6 +1,4 @@
 const log = require("../modules/log");
-const { timeout } = require("../modules/util");
-const Discord = require("discord.js");
 const Command = require("../class/Command");
 
 class PenisCommand extends Command {
@@ -11,43 +9,50 @@ class PenisCommand extends Command {
     }
 
     async onmessage(message) {
-        if (/^(penis|cock|dick)\b/i.test(message.content)) {
-            const member = message.mentions.members.first() || message.member;
-            const uom = await this.config.get(message.guild.id, "uom");
-            const r = uom === "cm" ? 2.54 : 1;
+        if (!message.prefixUsed) return;
+        if (!/^(penis|cock|dick)\b/i.test(message.content)) return;
 
-            if (message.mentions.everyone) {
-                await message.channel.send("everyone has fucking huge diccs k. You're all beautiful");
-                return;
-            }
+        const member = message.mentions.members.first() || message.member;
+        const uom = await this.config.get(message.guild.id, "uom");
+        const r = uom === "cm" ? 2.54 : 1;
 
-            if (member.user.id === this.client.user.id) {
-                const length = 20;
-                const girth = 18;
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
-                return;
-            }
+        if (message.mentions.everyone) {
+            await message.channel.send("everyone has fucking huge diccs k. You're all beautiful");
+            log("Requested everyobne's dicks");
+            return;
+        }
 
-            const doc = await this.db.findOne({ userId: member.user.id });
-            if (!doc) {
-                const random = Math.random() - 0.2;
-                const length = Math.pow((random > 0 ?
-                    (Math.pow(random, 1.4) + 0.2) * 15 + 3 :
-                    (random + 0.2) * 15 + 3) / 20, 1.4) * 20 + 1.5;
-                const girth = Math.pow((Math.random() + (random - 0.2)) * 0.3, 2) * 6 + 5;
+        if (member.user.id === this.client.user.id) {
+            const length = 20;
+            const girth = 18;
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
+            log("Requested Trixie's dick");
+            return;
+        }
 
-                await this.db.insertOne({
-                    userId: member.user.id,
-                    girth,
-                    length
-                });
+        const doc = await this.db.findOne({ userId: member.user.id });
+        if (!doc) {
+            const random = Math.random() - 0.2;
+            const length = Math.pow((random > 0 ?
+                (Math.pow(random, 1.4) + 0.2) * 15 + 3 :
+                (random + 0.2) * 15 + 3) / 20, 1.4) * 20 + 1.5;
+            const girth = Math.pow((Math.random() + (random - 0.2)) * 0.3, 2) * 6 + 5;
 
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
-            } else {
-                const { length, girth } = doc;
+            await this.db.insertOne({
+                userId: member.user.id,
+                girth,
+                length
+            });
 
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
-            }
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length * r).toFixed(1)} ${uom}**   Girth: **${(girth * r).toFixed(1)} ${uom}**`);
+            log(`Requested unknown dick => created new dick for user ${message.member.id} with ${girth} in girth, ${length} in length`);
+            return;
+        } else {
+            const { length, girth } = doc;
+
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
+            log(`Requested known dick of user ${message.member.id} with ${girth} in girth, ${length} in length`);
+            return;
         }
     }
 

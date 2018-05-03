@@ -41,6 +41,8 @@ class RoleCommand extends Command {
         this.db = db.collection("roles");
     }
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+
         if (/^role config\b/i.test(message.content)) {
             // ADMIN AREA
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
@@ -84,7 +86,8 @@ class RoleCommand extends Command {
                 log(`Added role ${role} to config of guild ${message.guild.name}`);
                 return;
             }
-            else if (/^remove\b/.test(msg)) {
+
+            if (/^remove\b/.test(msg)) {
                 msg = msg.substr(7);
                 const args = findArgs(msg);
                 const role = args[0];
@@ -112,7 +115,10 @@ class RoleCommand extends Command {
                 return;
             }
 
-        } else if (/^role remove\b/i.test(message.content)) {
+            return;
+        }
+        
+        if (/^role remove\b/i.test(message.content)) {
             const msg = message.content.substr(12);
             if (msg === "") {
                 await message.channel.send(this.usage(message.prefix));
@@ -203,11 +209,17 @@ class RoleCommand extends Command {
                     log(`Removed role ${role} from user ${message.member.user.username}`);
                 }
             }
-        } else if (/^role available\b/.test(message.content)) {
+
+            return;
+        }
+        
+        if (/^role available\b/.test(message.content)) {
             await message.channel.send(await rolesMessage(message.guild, this.db));
             log(`Requested available roles for guild ${message.guild.name}`);
             return;
-        } else if (/^role\b/i.test(message.content)) {
+        }
+        
+        if (/^role\b/i.test(message.content)) {
             // get the role name
             let msg;
             if (/^role add\b/i.test(message.content)) {
@@ -312,6 +324,8 @@ class RoleCommand extends Command {
                     log(`Added role ${role} to user ${message.member.user.username}`);
                 }
             }
+
+            return;
         }
     }
     usage(prefix) {

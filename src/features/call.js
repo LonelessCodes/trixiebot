@@ -236,6 +236,8 @@ Call.new = function (...args) {
 };
 
 async function onmessage(message) {
+    if (!message.prefixUsed) return;
+
     if (/^call hangup\b/i.test(message.content)) {
         if (Call.targets.has(message.guild.id)) {
             const call = Call.targets.get(message.guild.id);
@@ -254,10 +256,9 @@ async function onmessage(message) {
         }
 
         await message.channel.send("No call to hang up on");
-
         return;
     }
-
+    
     if (/^call\b/i.test(message.content)) {
         // Only try to join the sender's voice channel if they are in one themselves
         if (!message.member.voiceChannel) {

@@ -23,6 +23,8 @@ class MuteCommand extends Command {
                 return;
             }
         }
+        
+        if (!message.prefixUsed) return;
 
         if (/^mute list\b/i.test(message.content)) {
             if (!permission) {

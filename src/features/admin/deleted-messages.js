@@ -23,6 +23,8 @@ class DeletedMessagesCommand extends Command {
         });
     }
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+        
         if (/^deleted clear\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {

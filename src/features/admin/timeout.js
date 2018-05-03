@@ -62,8 +62,11 @@ class TimeoutCommand extends Command {
 
         timeout_notices[message.channel.id].last = false;
 
+        if (!message.prefixUsed) return;
+        
+        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
+
         if (/^timeout list\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to list timeouts without the required rights to do so");
@@ -100,7 +103,6 @@ class TimeoutCommand extends Command {
         }
 
         if (/^timeout clear\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to clear all timeouts without the required rights to do so");
@@ -128,7 +130,6 @@ class TimeoutCommand extends Command {
         }
 
         if (/^timeout remove\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to remove timeout from user without the required rights to do so");
@@ -158,7 +159,6 @@ class TimeoutCommand extends Command {
         }
 
         if (/^timeout\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to timeout user without the required rights to do so");

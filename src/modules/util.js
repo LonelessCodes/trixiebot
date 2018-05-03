@@ -110,16 +110,19 @@ module.exports.removePrefix = async function removePrefix(message, config) {
     let content = message.content;
     let me = message.guild.me.toString();
     let prefix = await config.get(message.guild.id, "prefix");
+    let prefixUsed = true;
     // check prefixes
     if (message.channel.type === "dm") {
         prefix = "";
     } else if (content.startsWith(`${me} `)) {
         content = content.substr(me.length + 1);
-    } else {
+    } else if (content.startsWith(prefix)) {
         content = content.substr(prefix.length);
+    } else {
+        prefixUsed = false;
     }
 
-    const rtrn = Object.assign(Object.create(message), message, { content, origContent: message.content, prefix });
+    const rtrn = Object.assign(Object.create(message), message, { content, origContent: message.content, prefix, prefixUsed });
     return rtrn;
 };
 

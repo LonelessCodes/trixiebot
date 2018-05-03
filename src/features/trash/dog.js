@@ -12,10 +12,11 @@ async function randomDog() {
 
 class CatCommand extends Command{
     async onmessage(message) {
-        if (/^dog\b/i.test(message.content)) {
-            await message.channel.send("woof " + dog() + " " + await randomDog());
-            log("Requested random dog :3 woof");
-        }
+        if (!message.prefixUsed) return;
+        if (!/^dog\b/i.test(message.content)) return;
+
+        await message.channel.send("woof " + dog() + " " + await randomDog());
+        log("Requested random dog :3 woof");
     }
     usage(prefix) {
         return `\`${prefix}dog\` returns dog image :3`;

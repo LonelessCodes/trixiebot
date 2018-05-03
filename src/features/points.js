@@ -18,6 +18,10 @@ class PointsCommand extends Command {
         this.db = db.collection("points");
     }
     async onmessage(message) {
+        if (message.prefixUsed) {
+            // commands down here
+        }
+
         if (cooldown.has(message.member)) return;
 
         cooldown.set(message.member, "1");

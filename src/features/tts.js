@@ -5,6 +5,7 @@ const Command = require("../class/Command");
 
 class TTSCommand extends Command {
     async onmessage(message) {
+        if (!message.prefixUsed) return;
         if (!/^tts\b/i.test(message.content)) return;
 
         const src = message.content.substr(4);

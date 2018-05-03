@@ -4,6 +4,8 @@ const Command = require("../../class/Command");
 
 class FlipCommand extends Command {
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+        
         if (message.content.toLowerCase() === "tableflip" || message.content.toLowerCase() === "tf") {
             await message.channel.send("(╯°□°）╯︵ ┻━┻");
             log("Flipped table successfully!!!");

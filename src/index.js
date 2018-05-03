@@ -96,6 +96,8 @@ class AppCommand extends Command {
         this.features = features;
     }
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+
         // ping pong
         if (/^ping\b/i.test(message.content) ||
             /^trixie ping\b/i.test(message.content)) {
@@ -107,7 +109,8 @@ class AppCommand extends Command {
             log(`Requested ping. Got ping of ${ping}ms`);
             return;
         }
-        else if (/^trixie\b/.test(message.content)
+        
+        if (/^trixie\b/.test(message.content)
             || /^!trixie\b/.test(message.origContent)) { // still listen for ! prefix too
             const usage = new Discord.RichEmbed()
                 .setColor(0x71B3E6)
@@ -143,11 +146,15 @@ class AppCommand extends Command {
             await message.channel.send({ embed: usage });
             log("Requested usage");
             return;
-        } else if (/^version\b/i.test(message.content)) {
+        }
+        
+        if (/^version\b/i.test(message.content)) {
             await message.channel.send(`v${packageFile.version}`);
             log("Requested version");
             return;
-        } else if (/^invite\b/i.test(message.content)) {
+        }
+        
+        if (/^invite\b/i.test(message.content)) {
             // const FLAGS = Discord.Permissions.FLAGS;
             // const link = await this.client.generateInvite([
             //     FLAGS.MANAGE_ROLES,

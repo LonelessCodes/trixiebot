@@ -4,7 +4,9 @@ const Command = require("../../class/Command");
 
 class ConfigCommand extends Command {
     async onmessage(message) {
+        if (!message.prefixUsed) return;
         if (!/^config\b/.test(message.content)) return;
+        
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.ADMINISTRATOR);
         if (!permission) return;
 

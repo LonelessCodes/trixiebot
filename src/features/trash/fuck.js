@@ -13,6 +13,8 @@ class FuckCommand extends Command {
         this.db = db.collection("fuck");
     }
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+
         if (/^fuck add\b/i.test(message.content)) {
             const text = message.content.substr(9);
             if (text === "") {
@@ -55,6 +57,7 @@ class FuckCommand extends Command {
             log(`Added fuck phrase: ${text}`);
             return;
         }
+        
         if (/^fuck\b/i.test(message.content)) {
             if (message.mentions.members.first()) {
                 const mention = message.mentions.members.first();

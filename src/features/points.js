@@ -61,6 +61,9 @@ class PointsCommand extends Command {
             log("Points Error", err);
         }
     }
+
+    get guildOnly() { return true; }
+    
     get ignore() {
         return true;
     }

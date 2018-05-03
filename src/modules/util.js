@@ -108,18 +108,21 @@ module.exports.resolveStdout = function resolveStdout(string) {
 
 module.exports.removePrefix = async function removePrefix(message, config) {
     let content = message.content;
-    let me = message.guild.me.toString();
-    let prefix = await config.get(message.guild.id, "prefix");
+    let me = "";
+    let prefix = "";
     let prefixUsed = true;
-    // check prefixes
-    if (message.channel.type === "dm") {
-        prefix = "";
-    } else if (content.startsWith(`${me} `)) {
-        content = content.substr(me.length + 1);
-    } else if (content.startsWith(prefix)) {
-        content = content.substr(prefix.length);
-    } else {
-        prefixUsed = false;
+
+    if (message.channel.type === "text") {
+        me = message.guild.me.toString();
+        prefix = await config.get(message.guild.id, "prefix");
+        // check prefixes
+        if (content.startsWith(`${me} `)) {
+            content = content.substr(me.length + 1);
+        } else if (content.startsWith(prefix)) {
+            content = content.substr(prefix.length);
+        } else {
+            prefixUsed = false;
+        }
     }
 
     const rtrn = Object.assign(Object.create(message), message, { content, origContent: message.content, prefix, prefixUsed });

@@ -252,6 +252,8 @@ class PollCommand extends Command {
         log(`Poll started. ${duration}ms. ${options.join(", ")}`);
     }
 
+    get guildOnly() { return true; }
+
     usage(prefix) {
         return `\`${prefix}poll <duration> <option 1>, <option 2>, ..., <option n>\`
 \`duration\` - Duration of the poll. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs

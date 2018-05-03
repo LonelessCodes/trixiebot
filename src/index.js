@@ -90,11 +90,40 @@ new class App {
     }
 };
 
+async function createUsage(fields, features, message) {
+    const type = message.channel.type;
+    const dm = type === "dm";
+
+    const usage = new Discord.RichEmbed;
+
+    for (let [title, command] of fields) {
+        if (!title) usage.addBlankField();
+        else {
+            const feature = features.get(command);
+            if (!feature) usage.addField(title, command);
+            else if (!(dm && feature.guildOnly)) {
+                usage.addField(title, feature.usage(message.prefix));
+            }
+        }
+    }
+
+    return usage;
+}
+
 class AppCommand extends Command {
     constructor(client, config, features) {
         super(client, config);
         this.features = features;
     }
+
+    async onbeforemessage(message) {
+        if (message.content.startsWith("!") && message.channel.type === "dm") {
+            await message.channel.send("You can use the commands without a prefix when you're in a DM channel.");
+            message.origContent = message.content;
+            message.content = message.content.substr(1);
+        }
+    }
+
     async onmessage(message) {
         if (!message.prefixUsed) return;
 
@@ -109,51 +138,54 @@ class AppCommand extends Command {
             log(`Requested ping. Got ping of ${ping}ms`);
             return;
         }
-        
+
         if (/^trixie\b/.test(message.content)
             || /^!trixie\b/.test(message.origContent)) { // still listen for ! prefix too
-            const usage = new Discord.RichEmbed()
-                .setColor(0x71B3E6)
-                .setDescription(this.features.get("app").usage(message.prefix))
-                // .addField("Invite to your server", `\`${message.prefix}invite\``)
-                .addField("Derpibooru", this.features.get("derpi").usage(message.prefix))
-                .addField("E621", this.features.get("e621").usage(message.prefix))
-                .addField("Giphy", this.features.get("gif").usage(message.prefix))
-                .addField("Roles", this.features.get("role").usage(message.prefix))
-                .addField("Polls", this.features.get("poll").usage(message.prefix));
+
+            const usage = await createUsage([
+                // ["Invite to your server", `\`${message.prefix}invite\``],
+                ["Derpibooru", "derpi"],
+                ["E621", "e621"],
+                ["Giphy", "gif"],
+                ["Roles", "role"],
+                ["Polls", "poll"],
+                ["MLP Wikia", "mlp"],
+                ["Uberfacts", "fact"],
+                ["TTS", "tts"],
+                ["Flip a Coin", "coin"],
+                ["Fuck a User", "trash/fuck"],
+                ["Flip Things", "trash/flip"],
+                ["Text Faces", "trash/face"],
+                ["Mlem", "trash/mlem"],
+                ["Hugs", "trash/hugs"],
+                ["Smolerize", "trash/smol"],
+                ["Larson", "trash/larson"],
+                ["CATS", "trash/cat"],
+                ["DOGS", "trash/dog"],
+                [],
+                ["Admin", "admin/timeout"],
+                ["Blacklist Words", "admin/mute"],
+                ["Deleted Messages", "admin/deleted-messages"],
+                ["Trixie Config", "admin/config"]
+            ], this.features, message);
+            usage.setDescription(this.features.get("app").usage(message.prefix));
+            usage.setColor(0x71B3E6);
+            usage.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
+
             // if (await this.config.get(message.guild.id, "calling")) 
             //     usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
-            usage
-                .addField("MLP Wikia", this.features.get("mlp").usage(message.prefix))
-                .addField("Uberfacts", this.features.get("fact").usage(message.prefix))
-                .addField("TTS", this.features.get("tts").usage(message.prefix))
-                .addField("Flip a Coin", this.features.get("coin").usage(message.prefix))
-                .addField("Fuck a User", this.features.get("trash/fuck").usage(message.prefix))
-                .addField("Flip Things", this.features.get("trash/flip").usage(message.prefix))
-                .addField("Text Faces", this.features.get("trash/face").usage(message.prefix))
-                .addField("Mlem", this.features.get("trash/mlem").usage(message.prefix))
-                .addField("Hugs", this.features.get("trash/hugs").usage(message.prefix))
-                .addField("Smolerize", this.features.get("trash/smol").usage(message.prefix))
-                .addField("Larson", this.features.get("trash/larson").usage(message.prefix))
-                .addField("CATS", this.features.get("trash/cat").usage(message.prefix))
-                .addField("Version", `\`${message.prefix}version\``)
-                .addBlankField()
-                .addField("Admin", this.features.get("admin/timeout").usage(message.prefix))
-                .addField("Blacklist words", this.features.get("admin/mute").usage(message.prefix))
-                .addField("Deleted Messages", this.features.get("admin/deleted-messages").usage(message.prefix))
-                .addField("Trixie Config", this.features.get("admin/config").usage(message.prefix))
-                .setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
+
             await message.channel.send({ embed: usage });
             log("Requested usage");
             return;
         }
-        
+
         if (/^version\b/i.test(message.content)) {
             await message.channel.send(`v${packageFile.version}`);
             log("Requested version");
             return;
         }
-        
+
         if (/^invite\b/i.test(message.content)) {
             // const FLAGS = Discord.Permissions.FLAGS;
             // const link = await this.client.generateInvite([

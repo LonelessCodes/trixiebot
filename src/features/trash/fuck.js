@@ -45,8 +45,8 @@ class FuckCommand extends Command {
             await this.db.insertOne({
                 text,
                 lowercase: text.toLowerCase(),
-                author: message.member.displayName,
-                authorId: message.member.id
+                author: message.author.tag,
+                authorId: message.author.id
             });
             added_recently.push(message.author.id);
             setTimeout(() => {
@@ -59,8 +59,10 @@ class FuckCommand extends Command {
         }
         
         if (/^fuck\b/i.test(message.content)) {
-            if (message.mentions.members.first()) {
-                const mention = message.mentions.members.first();
+            const mention = message.channel.type === "text" ?
+                message.mentions.members.first() :
+                message.mentions.users.first();
+            if (mention) {
                 const phrases = await this.db.find({}).toArray(); // return only text and author
                 if (phrases.length === 0) {
                     message.channel.send(`I'm sorry, but... I don't have any fucks to give. Add fucks using \`${message.prefix}fuck add\``);
@@ -70,21 +72,26 @@ class FuckCommand extends Command {
 
                 const phrase = phrases.random();
                 const author = phrase.author;
+                const username = mention.displayName || mention.username;
                 let text = phrase.text;
                 text = text.replace(/\$\{name\}'s/g,
-                    mention.displayName.toLowerCase().charAt(mention.displayName.length - 1) === "s" ?
-                        `${mention.displayName}'` :
-                        `${mention.displayName}'s`);
-                text = text.replace(/\$\{name\}/g, mention.displayName);
+                    username.toLowerCase().charAt(username.length - 1) === "s" ?
+                        `${username}'` :
+                        `${username}'s`);
+                text = text.replace(/\$\{name\}/g, username);
                 message.channel.send(`*${text}* (submitted by ${author})`);
                 log("Served fuck phrase: " + text);
                 return;
             }
+
             await message.channel.send(this.usage(message.prefix));
             log("Sent fuck usage");
             return;
         }
     }
+
+    get guildOnly() { return true; }
+
     usage(prefix) {
         return `\`${prefix}fuck <user>\`
 \`user\` - the username of the user to fuck

@@ -14,6 +14,7 @@ class Command {
     }
 
     get ignore() { return true; }
+    get guildOnly() { return false; }
     /** 
      * @param {string} prefix
      * @returns {string} 
@@ -34,15 +35,21 @@ Command.CommandManager = class CommandManager {
 
         client.addListener("message", async message => {
             if (message.author.bot) return;
+
+            const type = message.channel.type;
             // could work in dm but some commands still require the guild property
             // but that doesn't exist in a dm channel
-            // if (message.channel.type !== "text" && message.channel.type !== "dm") return;
-            if (message.channel.type !== "text") return;
+            if (message.channel.type !== "text" && message.channel.type !== "dm") return;
+            // if (type !== "text") return;
 
-            const timeouted = await db.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
+            let timeouted = false;
+            if (type === "text") {
+                timeouted = await db.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
+            }
 
             this.commands.forEach(async command => {
                 if (command.ignore && timeouted) return;
+                if (type === "dm" && command.guildOnly) return;
 
                 try {
                     const passthru = await command.onbeforemessage(message); // this function may return information
@@ -74,5 +81,9 @@ Command.CommandManager = class CommandManager {
         return this.commands.get(id);
     }
 };
+
+Command.GUILD_ONLY = 0;
+Command.GUILD_AND_GROUP = 1;
+Command.ALL = 2;
 
 module.exports = Command;

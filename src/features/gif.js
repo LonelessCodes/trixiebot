@@ -71,7 +71,7 @@ class GifCommand extends Command {
                 limit: 1,
                 rating: message.channel.nsfw ? "r" : "s"
             });
-            if (gif.data.length === 0) {
+            if (!gif.data || gif.data.length === 0) {
                 await message.channel.send("No GIFs were found matching this query.");
                 log(`No gifs found for query: ${query}`);
                 return;

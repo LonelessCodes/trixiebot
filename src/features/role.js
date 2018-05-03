@@ -328,6 +328,9 @@ class RoleCommand extends Command {
             return;
         }
     }
+
+    get guildOnly() { return true; }
+    
     usage(prefix) {
         return `\`${prefix}role <role> <?user mention 1> <?user mention 2> ...\` to add (alias \`${prefix}role add\`)
 \`role\` - The role you would like to have added

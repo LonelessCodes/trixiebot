@@ -3,11 +3,19 @@ const cat = require("cat-ascii-faces");
 const log = require("../../modules/log");
 const Command = require("../../class/Command");
 
-async function randomCat() {
-    const response = await fetch("http://aws.random.cat/meow");
-    const result = await response.json();
+async function randomCat(reconnectTries = 0) {
+    let file;
+    try {
+        const response = await fetch("http://aws.random.cat/meow");
+        const result = await response.json();
+        file = result.file;
+    } catch (err) {
+        reconnectTries++;
+        if (reconnectTries > 5) throw err;
+        file = await randomCat(reconnectTries);
+    }
 
-    return result.file;
+    return file;
 }
 
 class CatCommand extends Command{

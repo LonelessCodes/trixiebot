@@ -23,6 +23,8 @@ class AtSomeoneCommand extends Command {
         await message.channel.send(`${emoticons[Math.floor(Math.random() * emoticons.length)]} ***(${member.displayName})***`);
         log(`Requested someone. Picked ${member.displayName}`);
     }
+
+    get guildOnly() { return true; }
 }
 
 module.exports = AtSomeoneCommand;

@@ -116,6 +116,9 @@ class MuteCommand extends Command {
         }
     }
 
+    get guildOnly() { return true; }
+    get ignore() { return false; }
+
     usage(prefix) {
         return `\`${prefix}mute <phrase>\`
 \`phrase\` - Word or phrase to be blacklisted
@@ -126,9 +129,6 @@ class MuteCommand extends Command {
 \`${prefix}mute clear\` remove all muted words
 
 \`${prefix}mute list\` list all muted words and phrases`;
-    }
-    get ignore() {
-        return false;
     }
 }
 

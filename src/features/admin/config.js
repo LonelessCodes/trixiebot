@@ -50,6 +50,8 @@ class ConfigCommand extends Command {
         }
     }
 
+    get guildOnly() { return true; }
+
     usage(prefix) {
         return `\`${prefix}config\` view the Trixie's config in this server
 \`${prefix}config <parameter>\` view only this parameter's config

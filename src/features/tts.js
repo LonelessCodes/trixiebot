@@ -64,6 +64,8 @@ class TTSCommand extends Command {
         return;
     }
 
+    get guildOnly() { return true; }
+
     usage(prefix) {
         return `\`${prefix}tts <message>\` - joins the user's current voice channel and reads the message out aloud.`;
     }

@@ -56,6 +56,8 @@ class PenisCommand extends Command {
         }
     }
 
+    get guildOnly() { return true; }
+
     usage(prefix) {
         return `\`${prefix}penis <mention?>\` - check on what package your buddy is carrying~ (alias ${prefix}cock, ${prefix}dick)
 \`mention\` - optional`;

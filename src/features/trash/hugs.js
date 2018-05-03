@@ -19,9 +19,17 @@ class HugsCommand extends Command {
         if (!message.prefixUsed) return;
         if (!/^hug\b/i.test(message.content)) return;
 
-        const mention = message.mentions.members.first();
+        const mention = message.channel.type === "text" ?
+            message.mentions.members.first() :
+            message.mentions.users.first();
+        if (!mention) {
+            await message.channel.send("Hugging yourself? How about huggig someone you love!");
+            log("No user to hug given");
+            return;
+        }
+
         let text = message.content;
-        for (let user of message.mentions.members.array()) {
+        for (let user of (message.mentions.members || message.mentions.users).array()) {
             text = text.replace(user.toString(), "");
         }
         text = text.replace(/\s+/g, " ");
@@ -32,9 +40,12 @@ class HugsCommand extends Command {
         }
         const hug = hugs[number - 1];
         if (!hug) return await message.channel.send(this.usage(message.prefix));
-        await message.channel.send(hug.replace("{{name}}", mention.displayName));
+        await message.channel.send(hug.replace("{{name}}", mention.displayName || mention.username));
         log(`Requested hug. Given ${hug}`);
     }
+
+    get guildOnly() { return true; }
+
     usage(prefix) {
         return `\`${prefix}hugs <user mention> <?intensity>\` hug someone!!!!!`;
     }

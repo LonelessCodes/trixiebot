@@ -19,7 +19,9 @@ class FlipCommand extends Command {
         }
 
         if (/^flip\b/i.test(message.content)) {
-            const mention = message.mentions.members.first();
+            const mention = message.channel.type === "text" ?
+                message.mentions.members.first() :
+                message.mentions.users.first();
             if (!mention) {
                 const text = message.content.replace(/\s+/g, " ");
                 const tmp = text.substr(5);
@@ -32,13 +34,15 @@ class FlipCommand extends Command {
                 log(`Flipped ${tmp}`);
                 return;
             }
-            await message.channel.send(`(╯°□°）╯︵ ${fliptext(mention.displayName)}`);
-            log(`Flipped ${mention.user.username}`);
+            await message.channel.send(`(╯°□°）╯︵ ${fliptext(mention.displayName || mention.username)}`);
+            log(`Flipped ${(mention.user || mention).username}`);
             return;
         }
 
         if (/^unflip\b/i.test(message.content)) {
-            const mention = message.mentions.members.first();
+            const mention = message.channel.type === "text" ?
+                message.mentions.members.first() :
+                message.mentions.users.first();
             if (!mention) {
                 const text = message.content.replace(/\s+/g, " ");
                 const tmp = text.substr(7);
@@ -51,8 +55,8 @@ class FlipCommand extends Command {
                 log(`Unflipped ${tmp}`);
                 return;
             }
-            await message.channel.send(`${mention.displayName} ノ( ゜-゜ノ)`);
-            log(`Unflipped ${mention.user.username}`);
+            await message.channel.send(`${mention.displayName || mention.username} ノ( ゜-゜ノ)`);
+            log(`Unflipped ${(mention.user || mention).username}`);
             return;
         }
     }

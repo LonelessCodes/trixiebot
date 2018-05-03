@@ -115,15 +115,13 @@ class CreatorCommands extends Command {
         }
     }
 
+    get ignore() { return false; }
+
     usage() {
         return `\`!file <path>\`
 \`!exec <command>\`
 \`!eval <code>\`
 \`!broadcast <message>\``;
-    }
-
-    get ignore() {
-        return false;
     }
 }
 

@@ -7,7 +7,9 @@ class SmolCommand extends Command {
         if (!message.prefixUsed) return;
         if (!/^smol\b/i.test(message.content)) return;
 
-        const mention = message.mentions.members.first();
+        const mention = message.channel.type === "text" ?
+            message.mentions.members.first() :
+            message.mentions.users.first();
         if (!mention) {
             const text = message.content.replace(/\s+/g, " ");
             const tmp = text.substr(5);
@@ -20,8 +22,8 @@ class SmolCommand extends Command {
             log(`Smoled ${tmp}`);
             return;
         }
-        await message.channel.send(tinytext(mention.displayName));
-        log(`Smoled ${mention.user.username}`);
+        await message.channel.send(tinytext(mention.displayName || mention.username));
+        log(`Smoled ${(mention.user || mention).username}`);
         return;
     }
     usage(prefix) {

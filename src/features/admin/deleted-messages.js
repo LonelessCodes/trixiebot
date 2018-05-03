@@ -93,6 +93,8 @@ class DeletedMessagesCommand extends Command {
         }
     }
 
+    get guildOnly() { return true; }
+
     usage(prefix) {
         return `\`${prefix}deleted clear\` clears list of deleted messages
 

@@ -234,6 +234,9 @@ class TimeoutCommand extends Command {
             return;
         }
     }
+
+    get guildOnly() { return true; }
+    get ignore() { return false; }
     
     usage(prefix) {
         return `\`${prefix}timeout <time> <user mention 1> <user mention 2> ... \`
@@ -246,9 +249,6 @@ class TimeoutCommand extends Command {
 \`${prefix}timeout clear\` remove all timeouts
 
 \`${prefix}timeout list\` list all timeouts present at the moment`;
-    }
-    get ignore() {
-        return false;
     }
 }
 

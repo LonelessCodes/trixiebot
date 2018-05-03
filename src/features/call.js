@@ -283,6 +283,9 @@ class CallCommand extends Command {
         super(client, config);
         this.onmessage = onmessage.bind(this);
     }
+
+    get guildOnly() { return true; }
+    
     usage(prefix) {
         return `\`${prefix}call\` - calls into a random server Trixie happens to be in as well.
 \`${prefix}call hangup\` - hang up on an incoming call or, in case your server started the call, end the session entirely`;

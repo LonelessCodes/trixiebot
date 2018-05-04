@@ -6,6 +6,7 @@ msgstr ""
 "X-Generator: POEditor.com\n"
 "Project-Id-Version: TrixieBot\n"
 "Language: hu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: loco:5acdf530a39ff3732b8b4567
 msgctxt "A request failed to resolve"
@@ -44,9 +45,12 @@ msgid "Role added! /)"
 msgstr "Role hozzáadva /)"
 
 #: loco:5acdfd3ca39ff372358b456f
+#, fuzzy
 msgctxt "Timeouted user %s for the time %s"
-msgid "%s is now timeouted for the next %s!"
-msgstr "%s büntibe került az elkövetkezendő %s időtartamra!"
+msgid "{{users}} is now timeouted for the next {{timeLeft}}"
+msgid_plural "{{users}} are now timeouted for the next {{timeLeft}}"
+msgstr[0] "%s büntibe került az elkövetkezendő %s időtartamra!"
+msgstr[1] "{{users}} büntibe kerültek az elkövetkezendő {{timeLeft}} időíg"
 
 #: loco:5acf7d50c430fe480a8b4567
 msgctxt "Missing permission"
@@ -57,11 +61,6 @@ msgstr "nem"
 msgctxt "Requested path is not a file"
 msgid "Not a file. Sorry :("
 msgstr "Nem egy fájl. Bocsi :("
-
-#: loco:5acf7e5cc430febc0a8b4567
-msgctxt "Requested file is too big"
-msgid "File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: %d kb"
-msgstr "A fájl túl nagy. 15kb-nál kisebbnek kéne lennie de ez HATALMAS: %d kb"
 
 #: loco:5acf7efec430febf0a8b4567
 msgctxt "A broadcast from the developer is sent to a server"
@@ -74,8 +73,9 @@ msgid "No boi, git gud"
 msgstr "Nope ne haragudj haver nem engedem"
 
 #: loco:5acf8338c430fe2d0b8b4567
+#, fuzzy
 msgctxt "Message sent when timeouted user tries to write"
-msgid "You've been timeouted from writing in this server. Your timeout is over in %s"
+msgid "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}"
 msgstr "Ezen a szerveren büntetésbe kerültél. A büntetésednek %s múlva vége lesz"
 
 #: loco:5acf8577c430feda0b8b4567
@@ -88,8 +88,9 @@ msgid "Removed all timeouts successfully."
 msgstr "Minden büntetés sikeresen eltávolításra került."
 
 #: loco:5acf8839c430fe910c8b4567
+#, fuzzy
 msgctxt "Admin removed timeout from a users (%s = list)"
-msgid "Removed timeouts for %s successfully. Get dirty~"
+msgid "Removed timeouts for {{user}} successfully. Get dirty~"
 msgstr "Minden büntetést sikeresen kikapcsolva az elkövetkezendő %s időre. Hajrá~"
 
 #: loco:5acf8959c430fe8d0c8b4567
@@ -111,25 +112,28 @@ msgstr "A bünti hossza legalább 10 másodperc legyen de nem lehet hosszabb há
 
 #: 
 msgctxt "Sent cat image"
-msgid "meow :3"
-msgstr "Mew~ :3"
+msgid "meow"
+msgstr "Mew~"
 
 #: 
 msgctxt "Sent dog image"
-msgid "woof 🐶"
-msgstr "woof 🐶"
+msgid "woof"
+msgstr "woof"
 
 #: 
+#, fuzzy
 msgctxt "MLEM"
-msgid "The chat got mlem'd by %s | Art by n0nnny"
+msgid "The chat got mlem'd by {{user}} | Art by n0nnny"
 msgstr "A chat lakosait %s megnyalta. | A rajzot n0nnny készítette"
 
 #: 
+#, fuzzy
 msgctxt "BLEP"
-msgid "The chat got blep'd by %s | Art by n0nnny"
+msgid "The chat got blep'd by {{user}} | Art by n0nnny"
 msgstr "A chat lakosait %s megnyelvkidugásozta | A rajzot n0nnny készítette"
 
 #: 
+#, fuzzy
 msgctxt "Called !cider"
 msgid "A round of cider is distributed in the chat!"
 msgstr "Egy kör sört kiosztottunk a chatben!"
@@ -181,8 +185,9 @@ msgid "New member joined our Guild, guys!"
 msgstr "Egy új taggal gazdagodott a szerverünk!"
 
 #: 
+#, fuzzy
 msgctxt "A new member joined a server. first %s = user tag, second %s = rules channel tag"
-msgid "Hey, %s welcome to the baloney server! How 'bout throwing a quick look into %s?"
+msgid "Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?"
 msgstr "Helló %s Üdvözöllek a szerverünkön! Légy oly kedves és pillants bele a/az %s csatornába!"
 
 #: 
@@ -191,12 +196,14 @@ msgid "A soldier has left us"
 msgstr "Elvesztettünk egy elvtársat."
 
 #: 
+#, fuzzy
 msgctxt "%s is the user tag"
-msgid "*%s* left the server. Bye bye"
+msgid "*{{user}}* left the server. Bye bye"
 msgstr "*%s* elhagyta a szerverünket. Viszlát!"
 
 #: 
-msgid "Poll ended!"
+#, fuzzy
+msgid "{{user}} Poll ended!"
 msgstr "A szavazásnak vége!"
 
 #: 
@@ -219,17 +226,14 @@ msgid "To create a poll you must give at least two options to choose from."
 msgstr "Ahhoz hogy szavazást indíts legalább kettő opciót kell megadnod."
 
 #: 
-msgid "Poll is starting!"
+#, fuzzy
+msgid "@here Poll is starting! {{timeLeft}} left to vote"
 msgstr "Egy új szavazás kezdődik!"
 
 #: 
-msgctxt "%s is the time in hours, minutes and seconds"
-msgid "**%s** left to vote"
-msgstr "**%s** maradt a választásra!"
-
-#: 
+#, fuzzy
 msgctxt "%s is each an option to vote for"
-msgid "You vote by simply posting `%s` or `%s` in this channel"
+msgid "You vote by simply posting {{options}} in this channel"
 msgstr "Ahhoz hogy szavazatod leadd csak egyszerűen írj `%s`-t vagy `%s`-t a ebbe a csatornába"
 
 #: 
@@ -307,4 +311,112 @@ msgstr "Már rendelkezel ezzel a role-al! Yay!"
 msgctxt "The requested role is not part of the publicly available roles"
 msgid "Hmm... I couldn't really find your role."
 msgstr "Hmm... nem tudtam megtalálni a role-odat"
+
+#: 
+msgctxt "!call got called and Trixie is about to attempt making a call to another server"
+msgid "Alright!"
+msgstr "Rendben!"
+
+#: 
+msgctxt "Pinged Trixie"
+msgid "pong! Wee hee"
+msgstr "ping! Ehehe..!"
+
+#: 
+msgid "Hugging yourself? How about huggig someone you love!"
+msgstr "Magadat ölelgeted? És mi lenne hogyha valaki olyant ölelgetnél akit szeretsz!"
+
+#: 
+msgid "IDK what you're doing here. To use the mute command you must have permissions to manage messages."
+msgstr "Nem tudom mit szeretnél. Ahhoz hogy a \"mute\" parancsot használd, rendelkezned kell a \"manage messages\" engedéllyel."
+
+#: 
+msgctxt "a list of blacklisted words follows"
+msgid "Currently muted are:"
+msgstr "Jelenleg muteolva:"
+
+#: 
+msgctxt "no words blacklisted yet"
+msgid "Nothing yet muted"
+msgstr "Semmi sincs muteolva."
+
+#: 
+msgid "Removed all muted words successfully"
+msgstr "minden muteolt kifejezés sikeresen törölve lett."
+
+#: 
+msgid "Removed muted word \"{{word}}\" successfully"
+msgstr "A \"{{word}}\" sikeresen el lett távolítva a muteolt szavak közül"
+
+#: 
+msgctxt "a word was already blacklisted"
+msgid "Already got this muted"
+msgstr "ezt már lemuteoltad."
+
+#: 
+msgid "Got it! Blacklisted use of \"{{word}}\""
+msgstr "Rendben! feketelistázom a/az \"{{word}}\" szó használatát"
+
+#: 
+msgctxt "tried to view unknown server config"
+msgid "No such parameter. *shrugs*"
+msgstr "Nincs ilyen megszabott paraméter *vállat von*"
+
+#: 
+msgctxt "a list category"
+msgid "Other"
+msgstr "Másik"
+
+#: 
+msgid "But no one voted :c"
+msgstr "De senki sem szavazott :c"
+
+#: 
+msgctxt "how many votes on a poll"
+msgid "{{votesCount}} vote"
+msgid_plural "{{votesCount}} votes"
+msgstr[0] "{{votesCount}} szavazat"
+msgstr[1] "{{votesCount}} szavazatok"
+
+#: 
+msgid "{{user}} You've leveled up! **{{level}}**! Ain't that dandy? (This is completely useless right now)"
+msgstr "{{user}} Szintet léptél! **{{level}}**! Hát nem király? (Ez jelenleg teljesen haszontalan)"
+
+#: 
+msgid "everyone has fucking huge diccs k. You're all beautiful"
+msgstr "Mindenkinek hatalmas fasza van k. Gyönyörűek vagytok"
+
+#: 
+msgctxt "length of the penis"
+msgid "Length:"
+msgstr "Hossz"
+
+#: 
+msgctxt "girth of the penis"
+msgid "Girth:"
+msgstr "Körméret"
+
+#: 
+msgid "`amount` cannot be smaller than 1 or greater than 5!"
+msgstr "`amount` nem lehet kisebb 1-nél de 5-nél kevesebbnek kell lennie."
+
+#: 
+msgid "Invalid input"
+msgstr "Érvénytelen parancs"
+
+#: 
+msgid "`order` must be either `latest` or `random`!"
+msgstr "`order` legalább `latest`vagy `random`!"
+
+#: 
+msgid "`query` **must** be given"
+msgstr " `query` **meg kell** adni"
+
+#: 
+msgid "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it..."
+msgstr "A **Nagy és Hatalmas Trixie** s-... semm... *semmit sem talált*. Tessék kimondtam!"
+
+#: 
+msgid "`order` must be either `first`, `latest`, `top` or `random`!"
+msgstr "`order` legalább `first`, `latest`, `top` vagy `random`!"
 

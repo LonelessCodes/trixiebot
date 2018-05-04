@@ -6,6 +6,7 @@ msgstr ""
 "X-Generator: POEditor.com\n"
 "Project-Id-Version: TrixieBot\n"
 "Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: loco:5acdf530a39ff3732b8b4567
 msgctxt "A request failed to resolve"
@@ -45,8 +46,10 @@ msgstr "Role added! /)"
 
 #: loco:5acdfd3ca39ff372358b456f
 msgctxt "Timeouted user %s for the time %s"
-msgid "%s is now timeouted for the next %s!"
-msgstr "%s is now timeouted for the next %s!"
+msgid "{{users}} is now timeouted for the next {{timeLeft}}"
+msgid_plural "{{users}} are now timeouted for the next {{timeLeft}}"
+msgstr[0] "{{users}} is now timeouted for the next {{timeLeft}}"
+msgstr[1] "{{users}} are now timeouted for the next {{timeLeft}}"
 
 #: loco:5acf7d50c430fe480a8b4567
 msgctxt "Missing permission"
@@ -57,11 +60,6 @@ msgstr "no"
 msgctxt "Requested path is not a file"
 msgid "Not a file. Sorry :("
 msgstr "Not a file. Sorry :("
-
-#: loco:5acf7e5cc430febc0a8b4567
-msgctxt "Requested file is too big"
-msgid "File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: %d kb"
-msgstr "File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: %d kb"
 
 #: loco:5acf7efec430febf0a8b4567
 msgctxt "A broadcast from the developer is sent to a server"
@@ -75,8 +73,8 @@ msgstr "No boi, git gud"
 
 #: loco:5acf8338c430fe2d0b8b4567
 msgctxt "Message sent when timeouted user tries to write"
-msgid "You've been timeouted from writing in this server. Your timeout is over in %s"
-msgstr "You've been timeouted from writing in this server. Your timeout is over in %s"
+msgid "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}"
+msgstr "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}"
 
 #: loco:5acf8577c430feda0b8b4567
 msgctxt "User tried to use !timeout without permissions"
@@ -89,8 +87,8 @@ msgstr "Removed all timeouts successfully."
 
 #: loco:5acf8839c430fe910c8b4567
 msgctxt "Admin removed timeout from a users (%s = list)"
-msgid "Removed timeouts for %s successfully. Get dirty~"
-msgstr "Removed timeouts for %s successfully. Get dirty~"
+msgid "Removed timeouts for {{user}} successfully. Get dirty~"
+msgstr "Removed timeouts for {{user}} successfully. Get dirty~"
 
 #: loco:5acf8959c430fe8d0c8b4567
 msgid "You cannot timeout yourself, dummy!"
@@ -111,23 +109,23 @@ msgstr "Timeout length should be at least 10 seconds long and shorter than 3 day
 
 #: 
 msgctxt "Sent cat image"
-msgid "meow :3"
-msgstr "meow :3"
+msgid "meow"
+msgstr "meow"
 
 #: 
 msgctxt "Sent dog image"
-msgid "woof 🐶"
-msgstr "woof 🐶"
+msgid "woof"
+msgstr "woof"
 
 #: 
 msgctxt "MLEM"
-msgid "The chat got mlem'd by %s | Art by n0nnny"
-msgstr "The chat got mlem'd by %s | Art by n0nnny"
+msgid "The chat got mlem'd by {{user}} | Art by n0nnny"
+msgstr "The chat got mlem'd by {{user}} | Art by n0nnny"
 
 #: 
 msgctxt "BLEP"
-msgid "The chat got blep'd by %s | Art by n0nnny"
-msgstr "The chat got blep'd by %s | Art by n0nnny"
+msgid "The chat got blep'd by {{user}} | Art by n0nnny"
+msgstr "The chat got blep'd by {{user}} | Art by n0nnny"
 
 #: 
 msgctxt "Called !cider"
@@ -182,8 +180,8 @@ msgstr "New member joined our Guild, guys!"
 
 #: 
 msgctxt "A new member joined a server. first %s = user tag, second %s = rules channel tag"
-msgid "Hey, %s welcome to the baloney server! How 'bout throwing a quick look into %s?"
-msgstr "Hey, %s welcome to the baloney server! How 'bout throwing a quick look into %s?"
+msgid "Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?"
+msgstr "Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?"
 
 #: 
 msgctxt "A user left the server"
@@ -192,12 +190,12 @@ msgstr "A soldier has left us"
 
 #: 
 msgctxt "%s is the user tag"
-msgid "*%s* left the server. Bye bye"
-msgstr "*%s* left the server. Bye bye"
+msgid "*{{user}}* left the server. Bye bye"
+msgstr "*{{user}}* left the server. Bye bye"
 
 #: 
-msgid "Poll ended!"
-msgstr "Poll ended!"
+msgid "{{user}} Poll ended!"
+msgstr "{{user}} Poll ended!"
 
 #: 
 msgid "Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed"
@@ -219,18 +217,13 @@ msgid "To create a poll you must give at least two options to choose from."
 msgstr "To create a poll you must give at least two options to choose from."
 
 #: 
-msgid "Poll is starting!"
-msgstr "Poll is starting!"
-
-#: 
-msgctxt "%s is the time in hours, minutes and seconds"
-msgid "**%s** left to vote"
-msgstr "**%s** left to vote"
+msgid "@here Poll is starting! {{timeLeft}} left to vote"
+msgstr "@here Poll is starting! {{timeLeft}} left to vote"
 
 #: 
 msgctxt "%s is each an option to vote for"
-msgid "You vote by simply posting `%s` or `%s` in this channel"
-msgstr "You vote by simply posting `%s` or `%s` in this channel"
+msgid "You vote by simply posting {{options}} in this channel"
+msgstr "You vote by simply posting {{options}} in this channel"
 
 #: 
 msgid "This server doesn't have any publicly available roles :/"
@@ -262,7 +255,6 @@ msgid "Sorry, you can't remove a role from the config that is more powerful than
 msgstr "Sorry, you can't remove a role from the config that is more powerful than your owns."
 
 #: 
-#, fuzzy
 msgid "Removed the role from the config. Ouchie wouchie ;~;"
 msgstr "Removed the role from the config. Ouchie wouchie ;~;"
 
@@ -308,4 +300,112 @@ msgstr "You already have this role! Yay?"
 msgctxt "The requested role is not part of the publicly available roles"
 msgid "Hmm... I couldn't really find your role."
 msgstr "Hmm... I couldn't really find your role."
+
+#: 
+msgctxt "!call got called and Trixie is about to attempt making a call to another server"
+msgid "Alright!"
+msgstr "Alright!"
+
+#: 
+msgctxt "Pinged Trixie"
+msgid "pong! Wee hee"
+msgstr "pong! Wee hee"
+
+#: 
+msgid "Hugging yourself? How about huggig someone you love!"
+msgstr "Hugging yourself? How about huggig someone you love!"
+
+#: 
+msgid "IDK what you're doing here. To use the mute command you must have permissions to manage messages."
+msgstr "IDK what you're doing here. To use the mute command you must have permissions to manage messages."
+
+#: 
+msgctxt "a list of blacklisted words follows"
+msgid "Currently muted are:"
+msgstr "Currently muted are:"
+
+#: 
+msgctxt "no words blacklisted yet"
+msgid "Nothing yet muted"
+msgstr "Nothing yet muted"
+
+#: 
+msgid "Removed all muted words successfully"
+msgstr "Removed all muted words successfully"
+
+#: 
+msgid "Removed muted word \"{{word}}\" successfully"
+msgstr "Removed muted word \"{{word}}\" successfully"
+
+#: 
+msgctxt "a word was already blacklisted"
+msgid "Already got this muted"
+msgstr "Already got this muted"
+
+#: 
+msgid "Got it! Blacklisted use of \"{{word}}\""
+msgstr "Got it! Blacklisted use of \"{{word}}\""
+
+#: 
+msgctxt "tried to view unknown server config"
+msgid "No such parameter. *shrugs*"
+msgstr "No such parameter. *shrugs*"
+
+#: 
+msgctxt "a list category"
+msgid "Other"
+msgstr "Other"
+
+#: 
+msgid "But no one voted :c"
+msgstr "But no one voted :c"
+
+#: 
+msgctxt "how many votes on a poll"
+msgid "{{votesCount}} vote"
+msgid_plural "{{votesCount}} votes"
+msgstr[0] "{{votesCount}} vote"
+msgstr[1] "{{votesCount}} votes"
+
+#: 
+msgid "{{user}} You've leveled up! **{{level}}**! Ain't that dandy? (This is completely useless right now)"
+msgstr "{{user}} You've leveled up! **{{level}}**! Ain't that dandy? (This is completely useless right now)"
+
+#: 
+msgid "everyone has fucking huge diccs k. You're all beautiful"
+msgstr "everyone has fucking huge diccs k. You're all beautiful"
+
+#: 
+msgctxt "length of the penis"
+msgid "Length:"
+msgstr "Length:"
+
+#: 
+msgctxt "girth of the penis"
+msgid "Girth:"
+msgstr "Girth:"
+
+#: 
+msgid "`amount` cannot be smaller than 1 or greater than 5!"
+msgstr "`amount` cannot be smaller than 1 or greater than 5!"
+
+#: 
+msgid "Invalid input"
+msgstr "Invalid input"
+
+#: 
+msgid "`order` must be either `latest` or `random`!"
+msgstr "`order` must be either `latest` or `random`!"
+
+#: 
+msgid "`query` **must** be given"
+msgstr "`query` **must** be given"
+
+#: 
+msgid "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it..."
+msgstr "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it..."
+
+#: 
+msgid "`order` must be either `first`, `latest`, `top` or `random`!"
+msgstr "`order` must be either `first`, `latest`, `top` or `random`!"
 

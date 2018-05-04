@@ -62,8 +62,11 @@ class TimeoutCommand extends Command {
 
         timeout_notices[message.channel.id].last = false;
 
-        if (/^!timeout list\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
+        if (!message.prefixUsed) return;
+        
+        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
+
+        if (/^timeout list\b/i.test(message.content)) {
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to list timeouts without the required rights to do so");
@@ -99,8 +102,7 @@ class TimeoutCommand extends Command {
             return;
         }
 
-        if (/^!timeout clear\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
+        if (/^timeout clear\b/i.test(message.content)) {
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to clear all timeouts without the required rights to do so");
@@ -127,8 +129,7 @@ class TimeoutCommand extends Command {
             return;
         }
 
-        if (/^!timeout remove\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
+        if (/^timeout remove\b/i.test(message.content)) {
             if (!permission) {
                 await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to remove timeout from user without the required rights to do so");
@@ -157,8 +158,7 @@ class TimeoutCommand extends Command {
             return;
         }
 
-        if (/^!timeout\b/i.test(message.content)) {
-            const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
+        if (/^timeout\b/i.test(message.content)) {
             if (!permission) {
                 message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to timeout user without the required rights to do so");
@@ -168,10 +168,10 @@ class TimeoutCommand extends Command {
             /**
              * @type {string}
              */
-            let msg = message.content.substr(9);
+            let msg = message.content.substr(8);
 
             if (msg === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Requested usage of timeout command");
                 return;
             }
@@ -234,21 +234,21 @@ class TimeoutCommand extends Command {
             return;
         }
     }
+
+    get guildOnly() { return true; }
+    get ignore() { return false; }
     
-    get usage() {
-        return `\`!timeout <time> <user mention 1> <user mention 2> ... \`
+    usage(prefix) {
+        return `\`${prefix}timeout <time> <user mention 1> <user mention 2> ... \`
 \`time\` - timeout length. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
 \`user mention\` - user to timeout. Multiple users possible
 
-\`!timeout remove <user mention 1> <user mention 2> ... \`
+\`${prefix}timeout remove <user mention 1> <user mention 2> ... \`
 \`user mention\` - user to remove timeout from. Multiple users possible
 
-\`!timeout clear\` remove all timeouts
+\`${prefix}timeout clear\` remove all timeouts
 
-\`!timeout list\` list all timeouts present at the moment`;
-    }
-    get ignore() {
-        return false;
+\`${prefix}timeout list\` list all timeouts present at the moment`;
     }
 }
 

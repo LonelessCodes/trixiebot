@@ -4,27 +4,30 @@ const Command = require("../../class/Command");
 
 class SmolCommand extends Command {
     async onmessage(message) {
-        if (/^!smol\b/i.test(message.content)) {
-            const mention = message.mentions.members.first();
-            if (!mention) {
-                const text = message.content.replace(/\s+/g, " ");
-                const tmp = text.substr(6);
-                if (tmp === "") {
-                    await message.channel.send("Usage: `!smol <string|user>`");
-                    log("Sent smol usage");
-                    return;
-                }
-                await message.channel.send(tinytext(tmp));
-                log(`Smoled ${tmp}`);
+        if (!message.prefixUsed) return;
+        if (!/^smol\b/i.test(message.content)) return;
+
+        const mention = message.channel.type === "text" ?
+            message.mentions.members.first() :
+            message.mentions.users.first();
+        if (!mention) {
+            const text = message.content.replace(/\s+/g, " ");
+            const tmp = text.substr(5);
+            if (tmp === "") {
+                await message.channel.send(`Usage: \`${message.prefix}smol <string|user>\``);
+                log("Sent smol usage");
                 return;
             }
-            await message.channel.send(tinytext(mention.displayName));
-            log(`Smoled ${mention.user.username}`);
+            await message.channel.send(tinytext(tmp));
+            log(`Smoled ${tmp}`);
             return;
         }
+        await message.channel.send(tinytext(mention.displayName || mention.username));
+        log(`Smoled ${(mention.user || mention).username}`);
+        return;
     }
-    get usage() {
-        return `\`!smol <string|user>\`
+    usage(prefix) {
+        return `\`${prefix}smol <string|user>\`
 \`string|user\` - text or user to smollerize uwu`;
     }
 }

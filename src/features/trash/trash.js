@@ -1,14 +1,14 @@
 const SimpleCommand = require("../../class/SimpleCommand");
 
-class TrashCommand extends SimpleCommand{
+class TrashCommand extends SimpleCommand {
     get commands() {
         return {
-            "!cider": "**🍺 A round of cider is distributed in the chat!**",
-            "!donate": "👍 https://www.paypal.me/Loneless"
+            "cider": "**🍺 A round of cider is distributed in the chat!**",
+            "donate": "👍 https://www.paypal.me/Loneless"
         };
     }
-    get usage() {
-        return "`!cider` serve cider the chat cider";
+    usage(prefix) {
+        return `\`${prefix}cider\` serve cider the chat cider`;
     }
 }
 

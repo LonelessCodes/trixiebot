@@ -4,7 +4,6 @@ const { walk } = require("./modules/util");
 const log = require("./modules/log");
 const path = require("path");
 const statistics = require("./logic/statistics");
-const gt = require("./logic/locale");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
@@ -36,7 +35,10 @@ new class App {
         this.config = new ConfigManager(this.client, this.db, {
             prefix: "!",
             calling: false,
-            locale: "en"
+            locale: "en",
+            explicit: false,
+            admin_role: null,
+            uom: "in"
         });
 
         this.attachListeners();
@@ -73,53 +75,61 @@ new class App {
     }
 
     async initializeFeatures() {
-        /** @type {Map<string, Command>} */
-        const features = new Map;
+        const features = new Command.CommandManager(this.client, this.db);
+
         for (let file of await walk(path.resolve(__dirname, "features"))) {
             if (path.extname(file) !== ".js") continue;
 
             /** @type {typeof Command} */
             const Feature = require(path.resolve("./features", file));
-            features.set(
+            features.registerCommand(
                 file.substring((__dirname + "/features/").length, file.length - path.extname(file).length).replace(/\\/g, "/"),
                 new Feature(this.client, this.config, this.db));
         }
-        features.set("app", new AppCommand(this.client, this.config, features));
-
-        this.client.addListener("message", async message => {
-            if (message.author.bot) return;
-            if (message.channel.type !== "text") return;
-
-            gt.setLocale(await this.config.get(message.guild.id, "locale"));
-
-            const timeouted = await this.db.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
-
-            // clean up multiple whitespaces
-            message.content = message.content.replace(/\s+/g, " ").trim();
-
-            features.forEach(async feature => {
-                if (feature.ignore && timeouted) return;
-
-                try {
-                    await feature.onmessage(message);
-                } catch (err) {
-                    log(err);
-                    message.channel.send(gt.gettext("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...") + `\n\`${err.name}: ${err.message}\``);
-                }
-            });
-        });
+        features.registerCommand("app", new AppCommand(this.client, this.config, features));
     }
 };
+
+async function createUsage(fields, features, message) {
+    const type = message.channel.type;
+    const dm = type === "dm";
+
+    const usage = new Discord.RichEmbed;
+
+    for (let [title, command] of fields) {
+        if (!title) usage.addBlankField();
+        else {
+            const feature = features.get(command);
+            if (!feature) usage.addField(title, command);
+            else if (!(dm && feature.guildOnly)) {
+                usage.addField(title, feature.usage(message.prefix));
+            }
+        }
+    }
+
+    return usage;
+}
 
 class AppCommand extends Command {
     constructor(client, config, features) {
         super(client, config);
         this.features = features;
     }
+
+    async onbeforemessage(message) {
+        if (message.content.startsWith("!") && message.channel.type === "dm") {
+            await message.channel.send("You can use the commands without a prefix when you're in a DM channel.");
+            message.origContent = message.content;
+            message.content = message.content.substr(1);
+        }
+    }
+
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+
         // ping pong
-        if (/^!ping\b/i.test(message.content) ||
-            /^!trixie ping\b/i.test(message.content)) {
+        if (/^ping\b/i.test(message.content) ||
+            /^trixie ping\b/i.test(message.content)) {
             const m = await message.channel.send("pong! Wee hehe");
             const ping = m.createdTimestamp - message.createdTimestamp;
             await m.edit("pong! Wee hehe\n" +
@@ -128,40 +138,55 @@ class AppCommand extends Command {
             log(`Requested ping. Got ping of ${ping}ms`);
             return;
         }
-        else if (/^!trixie\b/.test(message.content)) {
-            const usage = new Discord.RichEmbed()
-                .setColor(0x71B3E6)
-                .setDescription("`!trixie` to get this help message.")
-                // .addField("Invite to your server", "`!invite`")
-                .addField("Derpibooru", this.features.get("derpi").usage)
-                .addField("E621", this.features.get("e621").usage)
-                .addField("Giphy", this.features.get("gif").usage)
-                .addField("Roles", this.features.get("role").usage)
-                .addField("Polls", this.features.get("poll").usage)
-                // .addField("Call into other servers", this.features.get("call").usage)
-                .addField("Uberfacts", this.features.get("trash/fact").usage)
-                .addField("TTS", this.features.get("tts").usage)
-                .addField("Flip a Coin", this.features.get("coin").usage)
-                .addField("Fuck a User", this.features.get("trash/fuck").usage)
-                .addField("Flip Things", this.features.get("trash/flip").usage)
-                .addField("Text Faces", this.features.get("trash/face").usage)
-                .addField("Mlem", this.features.get("trash/mlem").usage)
-                .addField("Hugs", this.features.get("trash/hugs").usage)
-                .addField("Smolerize", this.features.get("trash/smol").usage)
-                .addField("Larson", this.features.get("trash/larson").usage)
-                .addField("CATS", this.features.get("trash/cat").usage)
-                .addField("Version", "`!version`")
-                .addBlankField()
-                .addField("Admin", this.features.get("admin/timeout").usage)
-                .setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
+
+        if (/^trixie\b/.test(message.content)
+            || /^!trixie\b/.test(message.origContent)) { // still listen for ! prefix too
+
+            const usage = await createUsage([
+                // ["Invite to your server", `\`${message.prefix}invite\``],
+                ["Derpibooru", "derpi"],
+                ["E621", "e621"],
+                ["Giphy", "gif"],
+                ["Roles", "role"],
+                ["Polls", "poll"],
+                ["MLP Wikia", "mlp"],
+                ["Uberfacts", "fact"],
+                ["TTS", "tts"],
+                ["Flip a Coin", "coin"],
+                ["Fuck a User", "trash/fuck"],
+                ["Flip Things", "trash/flip"],
+                ["Text Faces", "trash/face"],
+                ["Mlem", "trash/mlem"],
+                ["Hugs", "trash/hugs"],
+                ["Smolerize", "trash/smol"],
+                ["Larson", "trash/larson"],
+                ["CATS", "trash/cat"],
+                ["DOGS", "trash/dog"],
+                [],
+                ["Admin", "admin/timeout"],
+                ["Blacklist Words", "admin/mute"],
+                ["Deleted Messages", "admin/deleted-messages"],
+                ["Trixie Config", "admin/config"]
+            ], this.features, message);
+            usage.setDescription(this.features.get("app").usage(message.prefix));
+            usage.setColor(0x71B3E6);
+            usage.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
+
+            // if (await this.config.get(message.guild.id, "calling")) 
+            //     usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
+
             await message.channel.send({ embed: usage });
             log("Requested usage");
             return;
-        } else if (/^!version\b/i.test(message.content)) {
+        }
+
+        if (/^version\b/i.test(message.content)) {
             await message.channel.send(`v${packageFile.version}`);
             log("Requested version");
             return;
-        } else if (/^!invite\b/i.test(message.content)) {
+        }
+
+        if (/^invite\b/i.test(message.content)) {
             // const FLAGS = Discord.Permissions.FLAGS;
             // const link = await this.client.generateInvite([
             //     FLAGS.MANAGE_ROLES,
@@ -181,9 +206,11 @@ class AppCommand extends Command {
         } else if (/^!donate\b/i.test(message.content)) {
             await message.channel.send("https://ko-fi.com/loneless");
             return;
-        } else if (/^!locale\b/i.test(message.content)) {
-            this.config.set(message.guild.id, { locale: message.content.substring(8) });
         }
+    }
+
+    usage(prefix) {
+        return `\`${prefix}trixie\` to get this help message.`;
     }
 }
 

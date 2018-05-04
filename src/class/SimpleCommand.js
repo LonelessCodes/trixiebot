@@ -8,6 +8,8 @@ class SimpleCommand extends Command {
     }
 
     async onmessage(message) {
+        if (!message.prefixUsed) return;
+        
         for (const command in this.commands) {
             if ((new RegExp(`^${command}\\b`, "i")).test(message.content)) {
                 if (typeof this.commands[command] === "string") {

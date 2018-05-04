@@ -8,8 +8,10 @@ Array.prototype.random = function randomItem() {
 
 class GifCommand extends Command {
     async onmessage(message) {
-        if (/^!gif random\b/i.test(message.content)) {
-            const query = message.content.substr(12);
+        if (!message.prefixUsed) return;
+
+        if (/^gif random\b/i.test(message.content)) {
+            const query = message.content.substr(11);
             let gif;
             if (query === "") {
                 gif = await giphy.random({
@@ -36,10 +38,10 @@ class GifCommand extends Command {
 
             await message.channel.send(url);
             log(`Requested random gif ${gif.data.id} for ${query}`);
-
             return;
         }
-        if (/^!gif trending\b/i.test(message.content)) {
+
+        if (/^gif trending\b/i.test(message.content)) {
             const gif = await giphy.trending({
                 limit: 100
             });
@@ -53,13 +55,13 @@ class GifCommand extends Command {
 
             await message.channel.send(url);
             log(`Requested trending gif ${gif.data[0].id}`);
-
             return;
         }
-        if (/^!gif\b/i.test(message.content)) {
-            const query = message.content.substr(5);
+
+        if (/^gif\b/i.test(message.content)) {
+            const query = message.content.substr(4);
             if (query === "") {
-                await message.channel.send(this.usage);
+                await message.channel.send(this.usage(message.prefix));
                 log("Sent gif usage");
                 return;
             }
@@ -69,7 +71,7 @@ class GifCommand extends Command {
                 limit: 1,
                 rating: message.channel.nsfw ? "r" : "s"
             });
-            if (gif.data.length === 0) {
+            if (!gif.data || gif.data.length === 0) {
                 await message.channel.send("No GIFs were found matching this query.");
                 log(`No gifs found for query: ${query}`);
                 return;
@@ -79,14 +81,13 @@ class GifCommand extends Command {
 
             await message.channel.send(url);
             log(`Requested top gif ${gif.data[0].id} for ${query}`);
-
             return;
         }
     }
-    get usage() {
-        return `\`!gif <query>\` - returns the top result for the given \`query\`
-\`!gif random <query>\` - returns a random gif for the given \`query\`
-\`!gif trending\` - returns a random trending gif`;
+    usage(prefix) {
+        return `\`${prefix}gif <query>\` - returns the top result for the given \`query\`
+\`${prefix}gif random <query>\` - returns a random gif for the given \`query\`
+\`${prefix}gif trending\` - returns a random trending gif`;
     }
 }
 

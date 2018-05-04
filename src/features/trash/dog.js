@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const dog = require("dog-ascii-faces");
 const log = require("../../modules/log");
 const Command = require("../../class/Command");
 
@@ -11,13 +12,14 @@ async function randomDog() {
 
 class CatCommand extends Command{
     async onmessage(message) {
-        if (/^!dog\b/i.test(message.content)) {
-            await message.channel.send("woof 🐶 " + await randomDog());
-            log("Requested random dog :3 woof");
-        }
+        if (!message.prefixUsed) return;
+        if (!/^dog\b/i.test(message.content)) return;
+
+        await message.channel.send("woof " + dog() + " " + await randomDog());
+        log("Requested random dog :3 woof");
     }
-    get usage() {
-        return "`!dog` returns dog image :3";
+    usage(prefix) {
+        return `\`${prefix}dog\` returns dog image :3`;
     }
 }
 

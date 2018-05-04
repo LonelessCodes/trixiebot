@@ -1,8 +1,8 @@
 const { promisify } = require("util");
-const { timeout } = require("../../modules/util");
-const log = require("../../modules/log");
+const { timeout } = require("../modules/util");
+const log = require("../modules/log");
 const Twit = require("twit");
-const Command = require("../../class/Command");
+const Command = require("../class/Command");
 
 Array.prototype.last = function lastItem() {
     return this[this.length - 1];
@@ -11,7 +11,7 @@ Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-const twitter = new Twit(require("../../../keys/twitter.json"));
+const twitter = new Twit(require("../../keys/twitter.json"));
 twitter.get = promisify(twitter.get);
 
 const facts = new Set();
@@ -69,14 +69,15 @@ async function getFact() {
 
 class FactCommand extends Command {
     async onmessage(message) {
-        if (/^!fact\b/i.test(message.content)) {
-            const fact = await getFact();
-            await message.channel.send(fact);
-            log("Fact requested");
-        }
+        if (!message.prefixUsed) return;
+        if (!/^fact\b/i.test(message.content)) return;
+
+        const fact = await getFact();
+        await message.channel.send(fact);
+        log("Fact requested");
     }
-    get usage() {
-        return "`!fact` gets random UberFacts fact";
+    usage(prefix) {
+        return `\`${prefix}fact\` gets random UberFacts fact`;
     }
 }
 

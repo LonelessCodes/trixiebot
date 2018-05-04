@@ -17,7 +17,7 @@ const extnames = {
 };
 
 class CreatorCommands extends Command {
-    async onmessage(message) {
+    async onbeforemessage(message) {
         const permission = message.author.id === "108391799185285120"; // this id is the bot's creator id
 
         if (/^!file\b/i.test(message.content)) {
@@ -115,14 +115,14 @@ class CreatorCommands extends Command {
             return;
         }
     }
-    get usage() {
+
+    get ignore() { return false; }
+
+    usage() {
         return `\`!file <path>\`
 \`!exec <command>\`
 \`!eval <code>\`
 \`!broadcast <message>\``;
-    }
-    get ignore() {
-        return false;
     }
 }
 

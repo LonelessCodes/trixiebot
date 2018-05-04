@@ -135,55 +135,66 @@ Poll.add = function add(poll) {
     if (poll instanceof Poll) Poll.polls.push(poll);
 };
 
-async function init() {
-    const polls = await this.db.find({}).toArray();
-    for (let poll of polls) {
-        const guild = this.client.guilds.get(poll.guildId);
-        if (!guild) {
-            await this.db.deleteOne({ _id: poll._id });
-            continue;
-        }
+class PollCommand extends Command {
+    constructor(client, config, db) {
+        super(client, config);
 
-        const channel = guild.channels.get(poll.channelId);
-        if (!channel) {
-            await this.db.deleteOne({ _id: poll._id });
-            continue;
-        }
+        this.db = db.collection("poll");
 
-        const creator = guild.members.get(poll.creatorId) || {
-            id: poll.creatorId,
-            toString() { return `<@${poll.creatorId}>`; }
-        };
-
-        const endDate = poll.endDate;
-
-        const votes = poll.votes;
-
-        const users = new Discord.Collection(poll.users.map(userId => {
-            return [userId, guild.members.get(userId)];
-        }));
-
-        const poll_object = new Poll(
-            this.db,
-            guild,
-            channel,
-            creator,
-            endDate,
-            votes,
-            users
-        );
-        Poll.add(poll_object);
+        this.init();
     }
-}
 
-async function onmessage(message) {
-    if (/^!poll\b/i.test(message.content)) {
+    async init() {
+        const polls = await this.db.find({}).toArray();
+        for (let poll of polls) {
+            const guild = this.client.guilds.get(poll.guildId);
+            if (!guild) {
+                await this.db.deleteOne({ _id: poll._id });
+                continue;
+            }
+    
+            const channel = guild.channels.get(poll.channelId);
+            if (!channel) {
+                await this.db.deleteOne({ _id: poll._id });
+                continue;
+            }
+    
+            const creator = guild.members.get(poll.creatorId) || {
+                id: poll.creatorId,
+                toString() { return `<@${poll.creatorId}>`; }
+            };
+    
+            const endDate = poll.endDate;
+    
+            const votes = poll.votes;
+    
+            const users = new Discord.Collection(poll.users.map(userId => {
+                return [userId, guild.members.get(userId)];
+            }));
+    
+            const poll_object = new Poll(
+                this.db,
+                guild,
+                channel,
+                creator,
+                endDate,
+                votes,
+                users
+            );
+            Poll.add(poll_object);
+        }
+    }
+    
+    async onmessage(message) {
+        if (!message.prefixUsed) return;
+        if (!/^poll\b/i.test(message.content)) return;
+
         /**
          * @type {string}
          */
-        let msg = message.content.substr(6).trim();
+        let msg = message.content.substr(5).trim();
         if (msg === "") {
-            await message.channel.send(this.usage);
+            await message.channel.send(this.usage(message.prefix));
             log("Sent poll usage");
             return;
         }
@@ -196,28 +207,28 @@ async function onmessage(message) {
 
         const duration_string = msg.match(/([\d.]+(d|h|m|s|ms)\s*)+/g)[0];
         if (!duration_string) {
-            await message.channel.send("`duration` must be formated as in the example.\n\n" + this.usage);
+            await message.channel.send("`duration` must be formated as in the example.\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Duration parsing error");
             return;
         }
 
         const duration = parseHumanTime(duration_string);
         if (duration < 60000 || duration > 1000 * 3600 * 24 * 3) {
-            await message.channel.send("`duration` should be at least 1m and max 3d\n\n" + this.usage);
+            await message.channel.send("`duration` should be at least 1m and max 3d\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Duration out of range");
             return;
         }
 
         msg = msg.substr(duration_string.length);
         if (msg === "") {
-            await message.channel.send("To create a poll you must give at least two options to choose from.\n\n" + this.usage);
+            await message.channel.send("To create a poll you must give at least two options to choose from.\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Options missing");
             return;
         }
 
         const options = msg.split(/,\s*/g).sort((a, b) => b.length - a.length); // longest to shortest
         if (options.length < 2) {
-            await message.channel.send("To create a poll you must give at least two options to choose from.\n\n" + this.usage);
+            await message.channel.send("To create a poll you must give at least two options to choose from.\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Too little options");
             return;
         }
@@ -240,20 +251,11 @@ async function onmessage(message) {
         await message.channel.send(`@here Poll is starting! **${toHumanTime(duration)}** left to vote\nYou vote by simply posting \`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\` in this channel`);
         log(`Poll started. ${duration}ms. ${options.join(", ")}`);
     }
-}
 
-class PollCommand extends Command {
-    constructor(client, config, db) {
-        super(client, config);
+    get guildOnly() { return true; }
 
-        this.db = db.collection("poll");
-
-        this.init = init.bind(this);
-        this.onmessage = onmessage.bind(this);
-        this.init();
-    }
-    get usage() {
-        return `\`!poll <duration> <option 1>, <option 2>, ..., <option n>\`
+    usage(prefix) {
+        return `\`${prefix}poll <duration> <option 1>, <option 2>, ..., <option n>\`
 \`duration\` - Duration of the poll. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
 \`option\` - a comma seperated list of options to vote for`;
     }

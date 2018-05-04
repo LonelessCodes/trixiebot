@@ -23,7 +23,9 @@ class DeletedMessagesCommand extends Command {
         });
     }
     async onmessage(message) {
-        if (/^!deleted clear\b/i.test(message.content)) {
+        if (!message.prefixUsed) return;
+        
+        if (/^deleted clear\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("No boi, git gud");
@@ -38,7 +40,7 @@ class DeletedMessagesCommand extends Command {
             return;
         }
 
-        if (/^!deleted\b/i.test(message.content)) {
+        if (/^deleted\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
                 await message.channel.send("No boi, git gud");
@@ -91,10 +93,12 @@ class DeletedMessagesCommand extends Command {
         }
     }
 
-    get usage() {
-        return `\`!deleted clear\` clears list of deleted messages
+    get guildOnly() { return true; }
 
-\`!deleted\` list all deleted messages from the last 7 days`;
+    usage(prefix) {
+        return `\`${prefix}deleted clear\` clears list of deleted messages
+
+\`${prefix}deleted\` list all deleted messages from the last 7 days`;
     }
 }
 

@@ -34,7 +34,8 @@ class ConfigManager {
         this.initial_load = new Promise((resolve, reject) => {
             const stream = this.db.find({});
             stream.addListener("data", config => {
-                this._configs.set(config.guildId, new Config(Object.assign(this.default_config, config)));
+                delete config._id;
+                this._configs.set(config.guildId, new Config(Object.assign({}, this.default_config, config)));
             });
             stream.once("end", () => resolve());
             stream.once("error", err => reject(err));
@@ -61,25 +62,30 @@ class ConfigManager {
         // till all configurations are initially loaded into memory
         await this.initial_load;
         let config;
-        if (this._configs.has(guildId)) config =this._configs.get(guildId);
-        else config = new Config(Object.assign(this.default_config, { guildId }, { default: true }));
-        
+        if (this._configs.has(guildId)) config = this._configs.get(guildId);
+        else config = new Config(Object.assign({}, this.default_config, { guildId }, { default: true }));
+
+        delete config.guildId;
+
         if (parameter) return config[parameter];
-        else config;
+        else return config;
     }
 
     async set(guildId, values = {}) {
         if (!isPlainObject(values)) throw new Error("Values is not of type Object");
 
+        delete values._id;
+
         await this.initial_load;
         if (!this._configs.has(guildId)) {
-            const config = new Config(Object.assign(this.default_config, { guildId }, values));
-            this._configs.set(guildId, config);
-            await this.db.insertOne(config);
+            const newconfig = new Config(Object.assign({}, this.default_config, values, { guildId }));
+            this._configs.set(guildId, newconfig);
+            await this.db.insertOne(newconfig);
         } else {
             const config = this._configs.get(guildId);
-            this._configs.set(guildId, new Config(Object.assign(config, { guildId }, values)));
-            await this.db.updateOne({ guildId }, config);
+            const newconfig = new Config(Object.assign({}, config, values, { guildId }));
+            this._configs.set(guildId, newconfig);
+            await this.db.updateOne({ guildId }, { $set: newconfig });
         }
     }
 }

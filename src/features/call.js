@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
-const { timeout } = require("../modules/util");
+const { timeout, roll } = require("../modules/util");
 const fetch = require("node-fetch");
 const EventEmitter = require("events");
 const Discord = require("discord.js");
@@ -16,22 +16,13 @@ async function disconnect(connection) {
 }
 
 function dialing(connection) {
-    function getDialer() {
-        const tmp = connection.playFile("./resources/call/dialing.ogg");
-        tmp.once("end", () => {
-            sound = getDialer();
-        });
-        return tmp;
-    }
-
-    let sound = getDialer();
+    const sound = connection.playFile("./resources/call/dialing.ogg");
 
     return {
         get destroyed() {
             return sound.destroyed;
         },
         end() {
-            sound.removeAllListeners("end");
             sound.end();
         },
         pause() {
@@ -65,8 +56,9 @@ class Call extends EventEmitter {
 
     async getRandomVoiceChannel() {
         const channels = new Discord.Collection;
-        this.client.guilds.forEach(guild => {
+        await roll(this.client.guilds.array(), async guild => {
             if (guild.id === this.message.guild.id) return;
+            if (!(await this.config.get(guild.id, "calling"))) return;
             guild.members.forEach(member => {
                 if (member.voiceChannelID &&
                     member.voiceChannel.permissionsFor(member.voiceChannel.guild.me).has(Discord.Permissions.FLAGS.SPEAK) &&
@@ -244,7 +236,9 @@ Call.new = function (...args) {
 };
 
 async function onmessage(message) {
-    if (/^!call hangup\b/i.test(message.content)) {
+    if (!message.prefixUsed) return;
+
+    if (/^call hangup\b/i.test(message.content)) {
         if (Call.targets.has(message.guild.id)) {
             const call = Call.targets.get(message.guild.id);
             call.endTarget();
@@ -262,11 +256,10 @@ async function onmessage(message) {
         }
 
         await message.channel.send("No call to hang up on");
-
         return;
     }
-
-    if (/^!call\b/i.test(message.content)) {
+    
+    if (/^call\b/i.test(message.content)) {
         // Only try to join the sender's voice channel if they are in one themselves
         if (!message.member.voiceChannel) {
             message.channel.send("You need to join a voice channel first!");
@@ -290,8 +283,12 @@ class CallCommand extends Command {
         super(client, config);
         this.onmessage = onmessage.bind(this);
     }
-    get usage() {
-        return "`!call` - calls into a random server Trixie happens to be in as well.\n`!call hangup` - hang up on an incoming call or, in case your server started the call, end the session entirely";
+
+    get guildOnly() { return true; }
+    
+    usage(prefix) {
+        return `\`${prefix}call\` - calls into a random server Trixie happens to be in as well.
+\`${prefix}call hangup\` - hang up on an incoming call or, in case your server started the call, end the session entirely`;
     }
 }
 

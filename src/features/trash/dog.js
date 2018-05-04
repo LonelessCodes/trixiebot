@@ -15,7 +15,7 @@ class CatCommand extends Command{
         if (!message.prefixUsed) return;
         if (!/^dog\b/i.test(message.content)) return;
 
-        await message.channel.send("woof " + dog() + " " + await randomDog());
+        await message.channel.send(message.translate("woof") + " " + dog() + " " + await randomDog());
         log("Requested random dog :3 woof");
     }
     usage(prefix) {

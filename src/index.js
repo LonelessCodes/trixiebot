@@ -130,9 +130,10 @@ class AppCommand extends Command {
         // ping pong
         if (/^ping\b/i.test(message.content) ||
             /^trixie ping\b/i.test(message.content)) {
-            const m = await message.channel.send("pong! Wee hehe");
+            const pongText = message.translate("pong! Wee hee");
+            const m = await message.channel.send(pongText);
             const ping = m.createdTimestamp - message.createdTimestamp;
-            await m.edit("pong! Wee hehe\n" +
+            await m.edit(pongText + "\n" +
                 `:stopwatch: \`Latency is ${ping}ms\`\n` +
                 `:heartbeat: \`API Latency is ${Math.round(this.client.ping)}ms\``);
             log(`Requested ping. Got ping of ${ping}ms`);
@@ -142,7 +143,7 @@ class AppCommand extends Command {
         if (/^trixie\b/.test(message.content)
             || /^!trixie\b/.test(message.origContent)) { // still listen for ! prefix too
 
-            const usage = await createUsage([
+            const embed = await createUsage([
                 // ["Invite to your server", `\`${message.prefix}invite\``],
                 ["Derpibooru", "derpi"],
                 ["E621", "e621"],
@@ -152,6 +153,7 @@ class AppCommand extends Command {
                 ["MLP Wikia", "mlp"],
                 ["Uberfacts", "fact"],
                 ["TTS", "tts"],
+                ["Call into other servers", "call"],
                 ["Flip a Coin", "coin"],
                 ["Fuck a User", "trash/fuck"],
                 ["Flip Things", "trash/flip"],
@@ -168,14 +170,14 @@ class AppCommand extends Command {
                 ["Deleted Messages", "admin/deleted-messages"],
                 ["Trixie Config", "admin/config"]
             ], this.features, message);
-            usage.setDescription(this.features.get("app").usage(message.prefix));
-            usage.setColor(0x71B3E6);
-            usage.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
+            embed.setDescription(this.features.get("app").usage(message.prefix));
+            embed.setColor(0x71B3E6);
+            embed.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
 
             // if (await this.config.get(message.guild.id, "calling")) 
             //     usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
 
-            await message.channel.send({ embed: usage });
+            await message.channel.send({ embed });
             log("Requested usage");
             return;
         }

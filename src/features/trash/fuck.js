@@ -57,7 +57,7 @@ class FuckCommand extends Command {
             log(`Added fuck phrase: ${text}`);
             return;
         }
-        
+
         if (/^fuck\b/i.test(message.content)) {
             const mention = message.channel.type === "text" ?
                 message.mentions.members.first() :

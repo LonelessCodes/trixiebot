@@ -4,18 +4,19 @@ const Command = require("../class/Command");
 
 class SimpleCommand extends Command {
     get commands() {
-        return { };
+        return {};
     }
 
     async onmessage(message) {
         if (!message.prefixUsed) return;
-        
+
         for (const command in this.commands) {
             if (new RegExp(`^${command}\\b`, "i").test(message.content)) {
                 if (typeof this.commands[command] === "string") {
                     await message.channel.send(this.commands[command]);
                 } else if (typeof this.commands[command] === "function") {
-                    await this.commands[command].apply(this, message);
+                    const rtrn = await this.commands[command].apply(this, message);
+                    if (typeof rtrn === "string") message.channel.send(rtrn);
                 } else if (this.commands[command] instanceof Discord.RichEmbed) {
                     await message.channel.send({ embed: this.commands[command] });
                 }

@@ -23,7 +23,7 @@ class HugsCommand extends Command {
             message.mentions.members.first() :
             message.mentions.users.first();
         if (!mention) {
-            await message.channel.send("Hugging yourself? How about huggig someone you love!");
+            await message.channel.sendTranslated("Hugging yourself? How about huggig someone you love!");
             log("No user to hug given");
             return;
         }

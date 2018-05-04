@@ -28,17 +28,17 @@ class MuteCommand extends Command {
 
         if (/^mute list\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
+                await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to list muted words without the required rights to do so");
                 return;
             }
 
             let str = "";
             if(muted_words.length > 0) {
-                str = "Currently muted are:" + "\n";
+                str = message.translate("Currently muted are:") + "\n";
                 str += "`" + muted_words.join("`, `") + "`";
             } else {
-                str = "Nothing yet muted"; 
+                str = message.translate("Nothing yet muted");
             }
 
             await message.channel.send(str);
@@ -48,21 +48,21 @@ class MuteCommand extends Command {
 
         if (/^mute clear\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
+                await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to clear all muted words without the required rights to do so");
                 return;
             }
 
             await this.db.deleteMany({ guildId: message.guild.id });
 
-            await message.channel.send("Removed all muted words successfully");
+            await message.channel.sendTranslated("Removed all muted words successfully");
             log(`Removed all muted words in guild ${message.guild.name}`);
             return;
         }
 
         if (/^mute remove\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
+                await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to remove muted word from user without the required rights to do so");
                 return;
             }
@@ -77,7 +77,9 @@ class MuteCommand extends Command {
 
             await this.db.deleteOne({ guildId: message.guild.id, word });
 
-            await message.channel.send(`Removed muted word "${word}" successfully`);
+            await message.channel.sendTranslated("Removed muted word \"{{word}}\" successfully", {
+                word
+            });
 
             log(`Removed muted word "${word}" in guild ${message.guild.name}`);
             return;
@@ -85,7 +87,7 @@ class MuteCommand extends Command {
 
         if (/^mute\b/i.test(message.content)) {
             if (!permission) {
-                message.channel.send("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
+                message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to mute word without the required rights to do so");
                 return;
             }
@@ -102,14 +104,16 @@ class MuteCommand extends Command {
             }
 
             if (muted_words.includes(word)) {
-                await message.channel.send("Already got this muted");
+                await message.channel.sendTranslated("Already got this muted");
                 log("Word already muted");
                 return;
             }
 
             await this.db.insertOne({ guildId: message.guild.id, word });
 
-            await message.channel.send(`Got it! Blacklisted use of "${word}"`);
+            await message.channel.sendTranslated("Got it! Blacklisted use of \"{{word}}\"", {
+                word
+            });
 
             log(`Muted word "${word}" in ${message.guild.id}`);
             return;

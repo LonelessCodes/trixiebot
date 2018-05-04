@@ -17,7 +17,7 @@ class PenisCommand extends Command {
         const r = uom === "cm" ? 2.54 : 1;
 
         if (message.mentions.everyone) {
-            await message.channel.send("everyone has fucking huge diccs k. You're all beautiful");
+            await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
             log("Requested everyobne's dicks");
             return;
         }
@@ -25,7 +25,7 @@ class PenisCommand extends Command {
         if (member.user.id === this.client.user.id) {
             const length = 20;
             const girth = 18;
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\n${message.translate("Length:")} **${(length*r).toFixed(1)} ${uom}**   ${message.translate("Girth:")} **${(girth*r).toFixed(1)} ${uom}**`);
             log("Requested Trixie's dick");
             return;
         }
@@ -44,13 +44,13 @@ class PenisCommand extends Command {
                 length
             });
 
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length * r).toFixed(1)} ${uom}**   Girth: **${(girth * r).toFixed(1)} ${uom}**`);
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${message.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${message.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
             log(`Requested unknown dick => created new dick for user ${message.member.id} with ${girth} in girth, ${length} in length`);
             return;
         } else {
             const { length, girth } = doc;
 
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\nLength: **${(length*r).toFixed(1)} ${uom}**   Girth: **${(girth*r).toFixed(1)} ${uom}**`);
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${message.translate("Length:")} **${(length*r).toFixed(1)} ${uom}**   ${message.translate("Girth:")} **${(girth*r).toFixed(1)} ${uom}**`);
             log(`Requested known dick of user ${message.member.id} with ${girth} in girth, ${length} in length`);
             return;
         }

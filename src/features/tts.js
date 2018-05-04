@@ -18,21 +18,21 @@ class TTSCommand extends Command {
         // Only try to join the sender's voice channel if they are in one themselves
         if (!message.member.voiceChannel) {
             message.react("❌");
-            message.channel.send("You need to join a voice channel first!");
+            message.channel.sendTranslated("You need to join a voice channel first!");
             log("Gracefully aborted attempt to call tts. User in no voice channel");
             return;
         }
 
         if (message.client.voiceConnections.get(message.channel.guild.id)) {
             message.react("❌");
-            message.channel.send("I only have one muzzle, you know!");
+            message.channel.sendTranslated("I only have one muzzle, you know!");
             log("Gracefully aborted attempt to call tts. Already present in a voice chat");
             return;
         }
 
         if (src.length > 100) {
             message.react("❌");
-            message.channel.send("I'm sorry to disappoint you, but I may only use up to 100 character :/");
+            message.channel.sendTranslated("I'm sorry to disappoint you, but I may only use up to 100 character :/");
             log("Gracefully aborted attempt to call tts. Text longer than 100 characters");
             return;
         }

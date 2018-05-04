@@ -29,7 +29,7 @@ class ConfigCommand extends Command {
             const embed = new Discord.RichEmbed;
             const value = await this.config.get(message.guild.id, args[0]);
 
-            if (!value) embed.setDescription("No such parameter. *shrugs*");
+            if (!value) embed.setDescription(message.translate("No such parameter. *shrugs*"));
             else embed.addField(args[0], value, true);
 
             await message.channel.send({ embed });

@@ -44,7 +44,10 @@ class PointsCommand extends Command {
                 let curLevel = get_level(row.points);
                 if (curLevel > row.level) {
                     row.level = curLevel;
-                    // await message.channel.send(`${message.author.toString()} You've leveled up to level **${curLevel}**! Ain't that dandy? (This is completely useless right now)`);
+                    // await message.channel.sendTranslated("{{user}} You've leveled up! **{{level}}**! Ain't that dandy? (This is completely useless right now)", {
+                    //     user: message.author.toString(),
+                    //     level: `${curLevel-1} => ${curLevel}`
+                    // });
                     log(`Level-up ${message.author.username} ${curLevel - 1} => ${curLevel}`);
                 }
                 await this.db.updateOne({

@@ -64,7 +64,7 @@ Command.CommandManager = class CommandManager {
                     await command.onmessage(cleanMessage, passthru);
                 } catch (err) {
                     log(err);
-                    message.channel.send(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
+                    message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
                 }
             });
         });

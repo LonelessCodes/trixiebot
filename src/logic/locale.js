@@ -39,21 +39,29 @@ class Cursor {
         this.opts.format = opts;
     }
 
+    locale(locale = "en") {
+        this.opts.locale = locale;
+    }
+
     fetch(num) {
         let str = "";
+        if (this.opts.locale) gt.setLocale(this.opts.locale);
         if (num && this.opts.plural) {
             str = gt.ngettext(this.opts.translate, this.opts.plural, num);
         } else {
             str = gt.gettext(this.opts.translate);
         }
 
-        if (this.opts.format)
-            for (const f in this.opts.format)
-                str = str.replace(new RegExp(`{{${f}}}`, "g"), this.opts.format[f]);
-
-        return str;
+        return module.exports.format(str, this.opts.format);
     }
 }
+
+module.exports.format = function format(message, format = {}) {
+    for (const f in format)
+        message = message.replace(new RegExp(`{{${f}}}`, "g"), format[f]);
+
+    return message;
+};
 
 module.exports.translate = function translate(message) {
     return new Cursor({ translate: message });
@@ -62,11 +70,11 @@ module.exports.translate = function translate(message) {
 module.exports.setLocale = gt.setLocale.bind(gt);
 
 function translate(message, format) {
-    module.exports.setLocale(this.guild.config.locale);
+    module.exports.setLocale(this.guild.config.locale || "en");
     return module.exports.translate(message).format(format).fetch();
 }
 
-module.exports.sendTranslated = async function (message, embed, format) {
+module.exports.sendTranslated = async function (message, format, embed) {
     return await this.send(translate.bind(this)(message, format), embed);
 };
 

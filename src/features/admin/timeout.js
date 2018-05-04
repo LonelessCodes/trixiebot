@@ -1,4 +1,5 @@
 const log = require("../../modules/log");
+const locale = require("../../logic/locale");
 const { toHumanTime, parseHumanTime } = require("../../modules/util");
 const Discord = require("discord.js");
 const Command = require("../../class/Command");
@@ -9,7 +10,7 @@ const timeout_notices = new Object;
 class TimeoutCommand extends Command {
     constructor(client, config, db) {
         super(client, config);
-        
+
         this.db = db.collection("timeout");
         this.db.createIndex("expiresAt", { expireAfterSeconds: 0 });
         this.db_messages = db.collection("timeout_messages");
@@ -18,7 +19,7 @@ class TimeoutCommand extends Command {
     async onmessage(message) {
         if (!timeout_notices[message.channel.id])
             timeout_notices[message.channel.id] = {};
-    
+
         const timeout_entry = await this.db.findOne({ guildId: message.guild.id, memberId: message.member.id });
         if (timeout_entry) {
             const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
@@ -28,16 +29,24 @@ class TimeoutCommand extends Command {
 
                 const expiresIn = toHumanTime(timeleft);
 
+                const timeoutNotice = message.translate("{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}", {
+                    userMention: message.member.toString(),
+                    timeLeft: `__**${expiresIn}**__`
+                });
+
                 if (timeout_notices[message.channel.id].time &&
                     (timeout_notices[message.channel.id].last ||
                         timeout_notices[message.channel.id].time.getTime() + 60000 * 10 > Date.now())) {
-            
-                    timeout_notices[message.channel.id].message.edit(`${message.member.toString()} You've been timeouted from writing in this server. Your timeout is over in __**${expiresIn}**__`);
+
+                    timeout_notices[message.channel.id].time = new Date;
+                    timeout_notices[message.channel.id].message.delete();
+                    timeout_notices[message.channel.id].message =
+                        await message.channel.send(timeoutNotice);
                     return;
                 }
 
-                const notice = await message.channel.send(`${message.member.toString()} You've been timeouted from writing in this server. Your timeout is over in __**${expiresIn}**__`);
-        
+                const notice = await message.channel.send(timeoutNotice);
+
                 await this.db_messages.insertOne({
                     guildId: message.guild.id,
                     memberId: message.member.id,
@@ -63,12 +72,12 @@ class TimeoutCommand extends Command {
         timeout_notices[message.channel.id].last = false;
 
         if (!message.prefixUsed) return;
-        
+
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
 
         if (/^timeout list\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
+                await message.channel.sendTranslated("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to list timeouts without the required rights to do so");
                 return;
             }
@@ -104,7 +113,7 @@ class TimeoutCommand extends Command {
 
         if (/^timeout clear\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
+                await message.channel.sendTranslated("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to clear all timeouts without the required rights to do so");
                 return;
             }
@@ -124,20 +133,20 @@ class TimeoutCommand extends Command {
 
             await this.db.deleteMany({ guildId: message.guild.id });
 
-            await message.channel.send("Removed all timeouts successfully");
+            await message.channel.sendTranslated("Removed all timeouts successfully");
             log(`Removed all timeouts in guild ${message.guild.name}`);
             return;
         }
 
         if (/^timeout remove\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
+                await message.channel.sendTranslated("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to remove timeout from user without the required rights to do so");
                 return;
             }
 
             const members = message.mentions.members.array();
-        
+
             for (const member of members) {
                 await this.db_messages.updateMany({
                     guildId: message.guild.id,
@@ -151,7 +160,9 @@ class TimeoutCommand extends Command {
 
             const promises = members.map(member => this.db.deleteOne({ guildId: member.guild.id, memberId: member.id }));
 
-            await message.channel.send(`Removed timeouts for ${members.map(member => member.displayName).join(" ")} successfully`);
+            await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
+                users: members.map(member => member.displayName).join(" ")
+            });
 
             await Promise.all(promises);
             log(`Removed timeout from users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name}`);
@@ -160,7 +171,7 @@ class TimeoutCommand extends Command {
 
         if (/^timeout\b/i.test(message.content)) {
             if (!permission) {
-                message.channel.send("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
+                message.channel.sendTranslated("IDK what you're doing here. To use the timeout command you must have permissions to manage messages.");
                 log("Gracefully aborted attempt to timeout user without the required rights to do so");
                 return;
             }
@@ -177,13 +188,13 @@ class TimeoutCommand extends Command {
             }
 
             if (message.mentions.members.has(message.member.id)) {
-                await message.channel.send("You cannot timeout yourself, dummy!");
+                await message.channel.sendTranslated("You cannot timeout yourself, dummy!");
                 log("Gracefully aborted attempt to timeout themselves");
                 return;
             }
 
             if (message.mentions.members.has(message.client.user.id)) {
-                await message.channel.send("You cannot timeout TrixieBot! I own you.");
+                await message.channel.sendTranslated("You cannot timeout TrixieBot! I own you.");
                 log("Gracefully aborted attempt to timeout TrixieBot");
                 return;
             }
@@ -192,7 +203,7 @@ class TimeoutCommand extends Command {
 
             for (const member of members) {
                 if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {
-                    await message.channel.send("You cannot timeout other moderators or admins. That's just rood");
+                    await message.channel.sendTranslated("You cannot timeout other moderators or admins. That's just rood");
                     log("Gracefully aborted attempt to timeout other user with permissions to manage messages");
                     return;
                 }
@@ -206,7 +217,7 @@ class TimeoutCommand extends Command {
 
             const ms = parseHumanTime(msg);
             if (ms < 10000 || ms > 1000 * 3600 * 24 * 3) {
-                await message.channel.send("Timeout length should be at least 10 seconds long and shorter than 3 days");
+                await message.channel.sendTranslated("Timeout length should be at least 10 seconds long and shorter than 3 days");
                 log(`Gracefully aborted attempt to timeout for longer or shorter than allowed. Value: ${msg}`);
                 return;
             }
@@ -227,8 +238,15 @@ class TimeoutCommand extends Command {
 
             const promises = members.map(member => this.db.updateOne({ guildId: member.guild.id, memberId: member.id }, { $set: { expiresAt } }, { upsert: true }));
 
-            await message.channel.send(`Timeouted ${members.map(member => member.displayName).join(" ")} for ${msg} successfully`);
-        
+            await message.channel.send(locale.format(locale
+                .locale(message.guild.config.locale)
+                .translate("{{users}} is now timeouted for the next {{timeLeft}}")
+                .ifPlural("{{users}} are now timeouted for the next {{timeLeft}}")
+                .fetch(members.size), {
+                users: members.map(member => member.displayName).join(" "),
+                timeLeft: msg
+            }));
+
             await Promise.all(promises);
             log(`Timeouted users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name} with ${msg}`);
             return;
@@ -237,7 +255,7 @@ class TimeoutCommand extends Command {
 
     get guildOnly() { return true; }
     get ignore() { return false; }
-    
+
     usage(prefix) {
         return `\`${prefix}timeout <time> <user mention 1> <user mention 2> ... \`
 \`time\` - timeout length. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs

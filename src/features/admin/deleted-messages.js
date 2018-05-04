@@ -28,14 +28,14 @@ class DeletedMessagesCommand extends Command {
         if (/^deleted clear\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
-                await message.channel.send("No boi, git gud");
+                await message.channel.sendTranslated("No boi, git gud");
                 log("Gracefully aborted attempt to clear all deleted messages without the required rights to do so");
                 return;
             }
 
             await this.db.deleteMany({ guildId: message.guild.id });
 
-            await message.channel.send("Removed all deleted messages successfully");
+            await message.channel.sendTranslated("Removed all deleted messages successfully");
             log(`Removed all deleted messages in guild ${message.guild.name}`);
             return;
         }
@@ -43,7 +43,7 @@ class DeletedMessagesCommand extends Command {
         if (/^deleted\b/i.test(message.content)) {
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
             if (!permission) {
-                await message.channel.send("No boi, git gud");
+                await message.channel.sendTranslated("No boi, git gud");
                 log("Gracefully aborted attempt to list deleted messages without the required rights to do so");
                 return;
             }
@@ -53,7 +53,7 @@ class DeletedMessagesCommand extends Command {
             }).toArray();
 
             if (messages.length === 0) {
-                await message.channel.send("Yeeeeah, nothing found");
+                await message.channel.sendTranslated("Yeeeeah, nothing found");
                 log("Sent deleted messages. None exist");
                 return;
             }

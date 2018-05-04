@@ -1,4 +1,5 @@
 const log = require("../modules/log");
+const locale = require("../logic/locale");
 const { parseHumanTime, toHumanTime } = require("../modules/util");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
@@ -74,8 +75,10 @@ class Poll {
         if (total < 1) {
             const embed = new Discord.RichEmbed;
             embed.setColor(0x71B3E6);
-            embed.setDescription("But no one voted :c");
-            await this.channel.send(this.creator.toString() + " Poll ended!", { embed });
+            embed.setDescription(locale.translate("But no one voted :c").locale(this.guild.config.locale).fetch());
+            await this.channel.sendTranslated("{{user}} Poll ended!", {
+                user: this.creator.toString()
+            }, { embed });
             log("Poll ended. No one voted");
             return;
         }
@@ -91,9 +94,11 @@ class Poll {
         embed.setColor(0x71B3E6);
         for (const vote of result)
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
-        embed.setFooter(`${total} ${total === 1 ? "vote" : "votes"}`);
+        embed.setFooter(locale.locale(this.guild.config.locale).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));
 
-        await this.channel.send(this.creator.toString() + " Poll ended!", { embed });
+        await this.channel.sendTranslated("{{user}} Poll ended!", {
+            user: this.creator.toString()
+        }, { embed });
         log(`Poll ended. ${result[0].text} won with ${result[0].votes / total * 100}% votes`);
     }
 
@@ -102,17 +107,15 @@ class Poll {
             this.users.set(member.id, member);
             this.votes[option]++;
 
-            const update = {};
-            update["votes." + option] = this.votes[option];
             this.db.updateOne({
                 guildId: this.guild.id,
                 channelId: this.channel.id
             }, {
-                    $set: {
-                        votes: this.votes,
-                        users: [...this.users.keys()]
-                    }
-                });
+                $set: {
+                    votes: this.votes,
+                    users: [...this.users.keys()]
+                }
+            });
 
             log(`User voted for ${option}`);
             return true;
@@ -198,35 +201,35 @@ class PollCommand extends Command {
         }
 
         if (await this.db.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
-            await message.channel.send("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
+            await message.channel.sendTranslated("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
             log("Gracefully aborted attempt to create poll. Poll already exists in this channel");
             return;
         }
 
         const duration_string = msg.match(/([\d.]+(d|h|m|s|ms)\s*)+/g)[0];
         if (!duration_string) {
-            await message.channel.send("`duration` must be formated as in the example.\n\n" + this.usage(message.prefix));
+            await message.channel.send(message.translate("`duration` must be formated as in the example.") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Duration parsing error");
             return;
         }
 
         const duration = parseHumanTime(duration_string);
         if (duration < 60000 || duration > 1000 * 3600 * 24 * 3) {
-            await message.channel.send("`duration` should be at least 1m and max 3d\n\n" + this.usage(message.prefix));
+            await message.channel.send(message.translate("`duration` should be at least 1m and max 3d") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Duration out of range");
             return;
         }
 
         msg = msg.substr(duration_string.length);
         if (msg === "") {
-            await message.channel.send("To create a poll you must give at least two options to choose from.\n\n" + this.usage(message.prefix));
+            await message.channel.send(message.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Options missing");
             return;
         }
 
         const options = msg.split(/,\s*/g).sort((a, b) => b.length - a.length); // longest to shortest
         if (options.length < 2) {
-            await message.channel.send("To create a poll you must give at least two options to choose from.\n\n" + this.usage(message.prefix));
+            await message.channel.send(message.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Too little options");
             return;
         }
@@ -246,7 +249,11 @@ class PollCommand extends Command {
         );
         Poll.add(poll);
 
-        await message.channel.send(`@here Poll is starting! **${toHumanTime(duration)}** left to vote\nYou vote by simply posting \`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\` in this channel`);
+        await message.channel.send(message.translate("@here Poll is starting! {{timeLeft}} left to vote", {
+            timeLeft: `**${toHumanTime(duration)}**`,
+        }) + "\n" + message.translate("You vote by simply posting {{options}} in this channel", {
+            options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``
+        }));
         log(`Poll started. ${duration}ms. ${options.join(", ")}`);
     }
 

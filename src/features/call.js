@@ -75,7 +75,7 @@ class Call extends EventEmitter {
 
     async init() {
         this.connOrigin = await this.voiceChannelOrigin.join();
-        this.message.channel.send("Alright!");
+        this.message.channel.sendTranslated("Alright!");
 
         this.receiverOrigin = this.connOrigin.createReceiver();
         this.connOrigin.addListener("speaking", (user, speaking) => {
@@ -242,7 +242,7 @@ async function onmessage(message) {
         if (Call.targets.has(message.guild.id)) {
             const call = Call.targets.get(message.guild.id);
             call.endTarget();
-            await message.channel.send("Hung up on them");
+            await message.channel.sendTranslated("Hung up on them");
             log(`Hung up on incoming call ${call.id} from ${call.message.guild.name}`);
             return;
         }
@@ -250,25 +250,25 @@ async function onmessage(message) {
         if (Call.origins.has(message.guild.id)) {
             const call = Call.origins.get(message.guild.id);
             call.end();
-            await message.channel.send("Hung up and cleared the session");
+            await message.channel.sendTranslated("Hung up and cleared the session");
             log(`Hung up the call ${call.id}`);
             return;
         }
 
-        await message.channel.send("No call to hang up on");
+        await message.channel.sendTranslated("No call to hang up on");
         return;
     }
     
     if (/^call\b/i.test(message.content)) {
         // Only try to join the sender's voice channel if they are in one themselves
         if (!message.member.voiceChannel) {
-            message.channel.send("You need to join a voice channel first!");
+            message.channel.sendTranslated("You need to join a voice channel first!");
             log("Gracefully aborted attempt to call. User in no voice channel");
             return;
         }
     
         if (message.client.voiceConnections.get(message.channel.guild.id)) {
-            message.channel.send("I only have one muzzle, you know!");
+            message.channel.sendTranslated("I only have one muzzle, you know!");
             log("Gracefully aborted attempt to call. Already present in a voice chat");
             return;
         }

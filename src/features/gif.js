@@ -28,7 +28,7 @@ class GifCommand extends Command {
                     rating: message.channel.nsfw ? "r" : "s"
                 });
                 if (!gif.data.image_original_url) {
-                    await message.channel.send("No GIFs were found matching this query.");
+                    await message.channel.sendTranslated("No GIFs were found matching this query.");
                     log(`No random gifs found for query: ${query}`);
                     return;
                 }
@@ -46,7 +46,7 @@ class GifCommand extends Command {
                 limit: 100
             });
             if (gif.data.length === 0) {
-                await message.channel.send("Apparently nothing is trending right now.");
+                await message.channel.sendTranslated("Apparently nothing is trending right now.");
                 log("No gifs trending right now");
                 return;
             }
@@ -72,7 +72,7 @@ class GifCommand extends Command {
                 rating: message.channel.nsfw ? "r" : "s"
             });
             if (!gif.data || gif.data.length === 0) {
-                await message.channel.send("No GIFs were found matching this query.");
+                await message.channel.sendTranslated("No GIFs were found matching this query.");
                 log(`No gifs found for query: ${query}`);
                 return;
             }

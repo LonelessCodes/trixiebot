@@ -11,7 +11,7 @@ class SimpleCommand extends Command {
         if (!message.prefixUsed) return;
         
         for (const command in this.commands) {
-            if ((new RegExp(`^${command}\\b`, "i")).test(message.content)) {
+            if (new RegExp(`^${command}\\b`, "i").test(message.content)) {
                 if (typeof this.commands[command] === "string") {
                     await message.channel.send(this.commands[command]);
                 } else if (typeof this.commands[command] === "function") {

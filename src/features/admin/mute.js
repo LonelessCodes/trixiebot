@@ -14,7 +14,7 @@ class MuteCommand extends Command {
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (muted_words.length > 0 && !permission) {
             const content = message.content;
-            for (let word of muted_words) {
+            for (const word of muted_words) {
                 if (content.indexOf(word) === -1) continue;
 
                 await message.delete();
@@ -35,7 +35,7 @@ class MuteCommand extends Command {
 
             let str = "";
             if(muted_words.length > 0) {
-                str = "Currently muted are:\n";
+                str = "Currently muted are:" + "\n";
                 str += "`" + muted_words.join("`, `") + "`";
             } else {
                 str = "Nothing yet muted"; 

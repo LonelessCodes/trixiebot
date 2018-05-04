@@ -103,9 +103,8 @@ class MLPCommand extends Command {
             }
         }
 
-        for (let field of fields) {
+        for (const field of fields) 
             embed.addField(field.key, field.value, true);
-        }
 
         await message.channel.send({ embed });
         log(`Fulfilled wikia query for ${query} successfully.`);

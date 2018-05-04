@@ -13,7 +13,7 @@ class PenisCommand extends Command {
         if (!/^(penis|cock|dick)\b/i.test(message.content)) return;
 
         const member = message.mentions.members.first() || message.member;
-        const uom = await this.config.get(message.guild.id, "uom");
+        const uom = message.guild.config.uom;
         const r = uom === "cm" ? 2.54 : 1;
 
         if (message.mentions.everyone) {

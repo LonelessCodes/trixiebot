@@ -4,7 +4,6 @@ const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
 const { resolveStdout } = require("../../modules/util");
-const { gettext } = require("../../logic/locale");
 const Command = require("../../class/Command");
 const Discord = require("discord.js");
 
@@ -22,7 +21,7 @@ class CreatorCommands extends Command {
 
         if (/^!file\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send(gettext("no"));
+                await message.channel.send("no");
                 log("Gracefully aborted attempt to access creator functions");
                 return;
             }
@@ -32,13 +31,13 @@ class CreatorCommands extends Command {
             const stat = await fs.stat(file);
             
             if (!stat.isFile()) {
-                await message.channel.send(gettext("Not a file. Sorry :("));
+                await message.channel.send("Not a file. Sorry :(");
                 log("Gracefully aborted attempt to read file. Not a file");
                 return;
             }
 
             if (stat.size > 1024 * 15) {
-                await message.channel.send(gettext(`File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: ${stat.size / 1024}kb`));
+                await message.channel.send(`File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: ${stat.size / 1024}kb`);
                 log("Gracefully aborted attempt to read file. Not a file");
                 return;
             }
@@ -72,7 +71,7 @@ class CreatorCommands extends Command {
 
         if (/^!exec\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send(gettext("no"));
+                await message.channel.send("no");
                 log("Gracefully aborted attempt to access creator functions");
                 return;
             }
@@ -86,7 +85,7 @@ class CreatorCommands extends Command {
 
         if (/^!eval\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send(gettext("no"));
+                await message.channel.send("no");
                 log("Gracefully aborted attempt to access creator functions");
                 return;
             }
@@ -100,7 +99,7 @@ class CreatorCommands extends Command {
 
         if (/^!broadcast\b/i.test(message.content)) {
             if (!permission) {
-                await message.channel.send(gettext("no"));
+                await message.channel.send("no");
                 log("Gracefully aborted attempt to access creator functions");
                 return;
             }
@@ -109,7 +108,7 @@ class CreatorCommands extends Command {
             this.client.guilds.forEach(guild => {
                 if (!guild.available) return;
                 const defaultChannel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
-                defaultChannel.send(gettext("@here Broadcast from creator"), { embed: new Discord.RichEmded().setDescription(msg) });
+                defaultChannel.send("@here Broadcast from creator", { embed: new Discord.RichEmded().setDescription(msg) });
             });
             log(`Sent stdout for command ${msg}`);
             return;

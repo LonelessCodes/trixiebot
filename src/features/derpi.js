@@ -8,9 +8,8 @@ async function get(params) {
     delete params.scope;
 
     let string = [];
-    for (let key in params) {
+    for (const key in params)
         string.push(key + "=" + params[key]);
-    }
     string = string.join("&");
 
     const result = await fetch(`https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`, {
@@ -184,7 +183,7 @@ class DerpiCommand extends Command {
         }
 
         let output = "";
-        for (let image of images) {
+        for (const image of images) {
             output += "\n";
             output += image;
         }

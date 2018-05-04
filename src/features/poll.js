@@ -55,11 +55,10 @@ class Poll {
         const timeLeft = this.endDate.getTime() - Date.now();
         if (timeLeft > 0) {
             await this.channel.awaitMessages(message => {
-                for (let option of this.options) {
-                    if (new RegExp(`^${option}`, "i").test(message.content)) {
+                for (const option of this.options)
+                    if (new RegExp(`^${option}`, "i").test(message.content))
                         return this.vote(message.member, option);
-                    }
-                }
+
                 return false;
             }, { time: timeLeft });
         }
@@ -90,16 +89,15 @@ class Poll {
 
         const embed = new Discord.RichEmbed;
         embed.setColor(0x71B3E6);
-        for (let vote of result) {
+        for (const vote of result)
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
-        }
         embed.setFooter(`${total} ${total === 1 ? "vote" : "votes"}`);
 
         await this.channel.send(this.creator.toString() + " Poll ended!", { embed });
         log(`Poll ended. ${result[0].text} won with ${result[0].votes / total * 100}% votes`);
     }
 
-    vote(member, option) {   
+    vote(member, option) {
         if (!this.users.has(member.id)) {
             this.users.set(member.id, member);
             this.votes[option]++;
@@ -110,12 +108,12 @@ class Poll {
                 guildId: this.guild.id,
                 channelId: this.channel.id
             }, {
-                $set: {
-                    votes: this.votes,
-                    users: [...this.users.keys()]
-                }    
-            });
-            
+                    $set: {
+                        votes: this.votes,
+                        users: [...this.users.keys()]
+                    }
+                });
+
             log(`User voted for ${option}`);
             return true;
         }
@@ -146,32 +144,32 @@ class PollCommand extends Command {
 
     async init() {
         const polls = await this.db.find({}).toArray();
-        for (let poll of polls) {
+        for (const poll of polls) {
             const guild = this.client.guilds.get(poll.guildId);
             if (!guild) {
                 await this.db.deleteOne({ _id: poll._id });
                 continue;
             }
-    
+
             const channel = guild.channels.get(poll.channelId);
             if (!channel) {
                 await this.db.deleteOne({ _id: poll._id });
                 continue;
             }
-    
+
             const creator = guild.members.get(poll.creatorId) || {
                 id: poll.creatorId,
                 toString() { return `<@${poll.creatorId}>`; }
             };
-    
+
             const endDate = poll.endDate;
-    
+
             const votes = poll.votes;
-    
+
             const users = new Discord.Collection(poll.users.map(userId => {
                 return [userId, guild.members.get(userId)];
             }));
-    
+
             const poll_object = new Poll(
                 this.db,
                 guild,
@@ -184,7 +182,7 @@ class PollCommand extends Command {
             Poll.add(poll_object);
         }
     }
-    
+
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^poll\b/i.test(message.content)) return;
@@ -235,7 +233,7 @@ class PollCommand extends Command {
 
         const users = new Discord.Collection;
         const votes = {};
-        for (let option of options) votes[option] = 0;
+        for (const option of options) votes[option] = 0;
 
         const poll = new Poll(
             this.db,

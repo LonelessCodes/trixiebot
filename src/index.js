@@ -75,9 +75,9 @@ new class App {
     }
 
     async initializeFeatures() {
-        const features = new Command.CommandManager(this.client, this.db);
+        const features = new Command.CommandManager(this.client, this.config, this.db);
 
-        for (let file of await walk(path.resolve(__dirname, "features"))) {
+        for (const file of await walk(path.resolve(__dirname, "features"))) {
             if (path.extname(file) !== ".js") continue;
 
             /** @type {typeof Command} */
@@ -96,7 +96,7 @@ async function createUsage(fields, features, message) {
 
     const usage = new Discord.RichEmbed;
 
-    for (let [title, command] of fields) {
+    for (const [title, command] of fields) {
         if (!title) usage.addBlankField();
         else {
             const feature = features.get(command);

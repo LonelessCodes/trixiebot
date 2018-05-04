@@ -29,7 +29,7 @@ class HugsCommand extends Command {
         }
 
         let text = message.content;
-        for (let user of (message.mentions.members || message.mentions.users).array()) {
+        for (const user of (message.mentions.members || message.mentions.users).array()) {
             text = text.replace(user.toString(), "");
         }
         text = text.replace(/\s+/g, " ");

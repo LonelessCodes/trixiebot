@@ -15,7 +15,7 @@ module.exports.walk =
                 let pending = files.length;
                 if (!pending) return resolve(results);
 
-                files.forEach(file => {
+                for(let file of files) {
                     file = path.resolve(dir, file);
 
                     fs.stat(file, (err, stat) => {
@@ -30,7 +30,7 @@ module.exports.walk =
                             if (!--pending) resolve(results);
                         }
                     });
-                });
+                }
             });
         });
     };
@@ -86,7 +86,7 @@ module.exports.parseHumanTime = function parseHumanTime(string) {
     let number = "0";
 
     const matches = string.match(/[0-9.]+|\w+/g);
-    for (let match of matches) {
+    for (const match of matches) {
         if (/[0-9.]+/.test(match)) {
             number += match;
         } else if (/\w+/.test(match)) {
@@ -106,7 +106,7 @@ module.exports.resolveStdout = function resolveStdout(string) {
     return string.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 };
 
-module.exports.removePrefix = async function removePrefix(message, config) {
+module.exports.removePrefix = function removePrefix(message) {
     let content = message.content;
     let me = "";
     let prefix = "";
@@ -114,7 +114,7 @@ module.exports.removePrefix = async function removePrefix(message, config) {
 
     if (message.channel.type === "text") {
         me = message.guild.me.toString();
-        prefix = await config.get(message.guild.id, "prefix");
+        prefix = message.guild.config.prefix;
         // check prefixes
         if (content.startsWith(`${me} `)) {
             content = content.substr(me.length + 1);
@@ -125,8 +125,7 @@ module.exports.removePrefix = async function removePrefix(message, config) {
         }
     }
 
-    const rtrn = Object.assign(Object.create(message), message, { content, origContent: message.content, prefix, prefixUsed });
-    return rtrn;
+    return Object.assign(Object.create(message), message, { content, origContent: message.content, prefix, prefixUsed });
 };
 
 module.exports.roll = async function roll(array, roller, end) {

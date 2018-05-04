@@ -1,7 +1,11 @@
 const log = require("../modules/log");
+const locale = require("../logic/locale");
 const { removePrefix } = require("../modules/util");
-const { Message, Client } = require("discord.js");
+const { Message, Client, Channel } = require("discord.js");
 const ConfigManager = require("../logic/Config");
+
+Message.prototype.translate = locale.translate;
+Channel.prototype.sendTranslated = locale.sendTranslated;
 
 class Command {
     /**
@@ -29,7 +33,7 @@ class Command {
 }
 
 Command.CommandManager = class CommandManager {
-    constructor(client, db) {
+    constructor(client, config, db) {
         /** @type {Map<string, Command>} */
         this.commands = new Map;
 
@@ -37,14 +41,14 @@ Command.CommandManager = class CommandManager {
             if (message.author.bot) return;
 
             const type = message.channel.type;
-            // could work in dm but some commands still require the guild property
-            // but that doesn't exist in a dm channel
-            if (message.channel.type !== "text" && message.channel.type !== "dm") return;
-            // if (type !== "text") return;
+            if (type !== "text" &&
+                type !== "dm") return;
 
+            message.guild.config = {};
             let timeouted = false;
             if (type === "text") {
                 timeouted = await db.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
+                message.guild.config = await config.get(message.guild.id);
             }
 
             this.commands.forEach(async command => {
@@ -54,7 +58,7 @@ Command.CommandManager = class CommandManager {
                 try {
                     const passthru = await command.onbeforemessage(message); // this function may return information
                     // remove prefix for prefix independant commands
-                    const cleanMessage = await removePrefix(message, command.config);
+                    const cleanMessage = await removePrefix(message);
                     // clean up multiple whitespaces
                     cleanMessage.content = cleanMessage.content.replace(/\s+/g, " ").trim();
                     await command.onmessage(cleanMessage, passthru);

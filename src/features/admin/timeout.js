@@ -89,7 +89,7 @@ class TimeoutCommand extends Command {
                 return doc;
             }).filter(doc => !!doc.member);
             let str = "```";
-            for (let doc of docs) {
+            for (const doc of docs) {
                 str += "\n";
                 str += doc.member.displayName;
                 str += new Array(longestName - doc.member.displayName.length).fill(" ").join("");
@@ -111,7 +111,7 @@ class TimeoutCommand extends Command {
 
             const timeouts = await this.db.find({ guildId: message.guild.id }).toArray();
 
-            for (let timeout of timeouts) {
+            for (const timeout of timeouts) {
                 await this.db_messages.updateMany({
                     guildId: message.guild.id,
                     memberId: timeout.memberId
@@ -138,7 +138,7 @@ class TimeoutCommand extends Command {
 
             const members = message.mentions.members.array();
         
-            for (let member of members) {
+            for (const member of members) {
                 await this.db_messages.updateMany({
                     guildId: message.guild.id,
                     memberId: member.id
@@ -214,7 +214,7 @@ class TimeoutCommand extends Command {
             const expiresAt = new Date(Date.now() + ms);
 
             // update message deletion if there
-            for (let member of members) {
+            for (const member of members) {
                 await this.db_messages.update({
                     guildId: message.guild.id,
                     memberId: member.id

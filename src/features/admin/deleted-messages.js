@@ -67,12 +67,12 @@ class DeletedMessagesCommand extends Command {
 
             const embed = new Discord.RichEmbed;
 
-            for (let channelId in channels) {
+            for (const channelId in channels) {
                 const messages = channels[channelId].sort((a, b) => b.timestamp - a.timestamp);
 
                 let str = "";
 
-                for (let deletedMessage of messages) {
+                for (const deletedMessage of messages) {
                     const timestamp = new Date(deletedMessage.timestamp).toLocaleString().slice(0, -3);
                     str += `\`${timestamp}\` `;
 

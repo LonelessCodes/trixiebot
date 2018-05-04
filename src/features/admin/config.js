@@ -6,7 +6,7 @@ class ConfigCommand extends Command {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^config\b/.test(message.content)) return;
-        
+
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.ADMINISTRATOR);
         if (!permission) return;
 
@@ -20,9 +20,8 @@ class ConfigCommand extends Command {
             embed.setThumbnail(message.guild.iconURL);
 
             const config = await this.config.get(message.guild.id);
-            for (let parameter in config) {
+            for (const parameter in config)
                 embed.addField(parameter, config[parameter], true);
-            }
 
             await message.channel.send({ embed });
             return;
@@ -36,10 +35,10 @@ class ConfigCommand extends Command {
             await message.channel.send({ embed });
             return;
         } else if (args.length === 2) {
-            if(args[1] === "default") {
+            if (args[1] === "default") {
                 await this.config.set(message.guild.id, { [args[0]]: this.config.default_config[args[0]] });
             } else {
-                await this.config.set(message.guild.id, { [args[0]]: args[1] });                
+                await this.config.set(message.guild.id, { [args[0]]: args[1] });
             }
             const embed = new Discord.RichEmbed;
 

@@ -12,9 +12,8 @@ async function get(params) {
     delete params.scope;
 
     let string = [];
-    for (let key in params) {
+    for (const key in params) 
         string.push(key + "=" + params[key]);
-    }
     string = string.join("&");
 
     const result = await fetch(`https://e621.net/post/${scope}.json?${string}`, {

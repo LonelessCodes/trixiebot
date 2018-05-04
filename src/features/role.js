@@ -9,7 +9,7 @@ async function rolesMessage(guild, db) {
     }).toArray();
 
     const available_roles = {};
-    for (let role of roles) {
+    for (const role of roles) {
         let role_obj = guild.roles.get(role.roleId);
         if (!role_obj) continue;
 
@@ -20,10 +20,10 @@ async function rolesMessage(guild, db) {
     }
 
     let roles_message = "";
-    for (let category in available_roles) {
+    for (const category in available_roles) {
         roles_message += `__**${category}**__\n`;
         roles_message += "```\n";
-        for (let role of available_roles[category])
+        for (const role of available_roles[category])
             roles_message += `${role.name}\n`;
         roles_message += "```\n";
     }

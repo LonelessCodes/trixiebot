@@ -147,8 +147,8 @@ class AppCommand extends Command {
             return;
         }
 
-        if (/^trixie\b/.test(message.content)
-            || /^!trixie\b/.test(message.origContent)) { // still listen for ! prefix too
+        if (/^trixie\b/i.test(message.content)
+            || /^!trixie\b/i.test(message.origContent)) { // still listen for ! prefix too
 
             const embed = await createUsage([
                 // ["Invite to your server", `\`${message.prefix}invite\``],
@@ -159,6 +159,7 @@ class AppCommand extends Command {
                 ["Polls", "poll"],
                 ["MLP Wikia", "mlp"],
                 ["Uberfacts", "fact"],
+                ["Get to know your server", "serverinfo"],
                 ["TTS", "tts"],
                 ["Call into other servers", "call"],
                 ["Flip a Coin", "coin"],

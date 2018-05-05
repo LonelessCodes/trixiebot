@@ -1,16 +1,10 @@
 const Discord = require("discord.js");
 const Command = require("../../class/Command");
 
-class LocaleCommand extends Command {
-    constructor(client, config, db) {
-        super(client, config);
-
-        this.db = db.collection("Locale");
-    }
-    
+class LocaleCommand extends Command {    
     async onmessage(message) {
         if (!message.prefixUsed) return;
-        if (!/^locale\b/.test(message.content)) return;
+        if (!/^locale\b/i.test(message.content)) return;
 
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.ADMINISTRATOR);
         if (!permission) return;
@@ -43,6 +37,8 @@ class LocaleCommand extends Command {
                     locale: await this.client.locale.get(message.guild.id, channel.id)
                 });
             }
+        } else {
+            await message.channel.send(this.usage(message.prefix));
         }
     }
 

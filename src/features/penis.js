@@ -17,7 +17,7 @@ class PenisCommand extends Command {
         const r = uom === "cm" ? 2.54 : 1;
 
         const msg = message.content.substr(message.content.split(/\b/g)[0].length + 1).trim();
-        if (/^leaderboard\b/.test(msg)) {
+        if (/^leaderboard\b/i.test(msg)) {
             const embed = new Discord.RichEmbed;
 
             const penises = await this.db.find({ $or: message.guild.members.array().map(member => ({ userId: member.user.id })) }).toArray();

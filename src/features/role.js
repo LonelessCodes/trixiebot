@@ -55,7 +55,7 @@ class RoleCommand extends Command {
 
             let msg = message.content.substr(12);
 
-            if (/^add\b/.test(msg)) {
+            if (/^add\b/i.test(msg)) {
                 msg = msg.substr(4);
                 const args = findArgs(msg);
                 const role = args[0];
@@ -88,7 +88,7 @@ class RoleCommand extends Command {
                 return;
             }
 
-            if (/^remove\b/.test(msg)) {
+            if (/^remove\b/i.test(msg)) {
                 msg = msg.substr(7);
                 const args = findArgs(msg);
                 const role = args[0];
@@ -214,7 +214,7 @@ class RoleCommand extends Command {
             return;
         }
         
-        if (/^role available\b/.test(message.content)) {
+        if (/^role available\b/i.test(message.content)) {
             await message.channel.send(await rolesMessage(message.guild, message.channel, this.db));
             log(`Requested available roles for guild ${message.guild.name}`);
             return;

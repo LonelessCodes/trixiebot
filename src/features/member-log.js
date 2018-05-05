@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const locale = require("../logic/locale");
+const locale = require("../logic/Locale");
 const statistics = require("../logic/statistics");
 const Command = require("../class/Command");
 
@@ -17,9 +17,9 @@ class MemberLog extends Command {
         updateGuildStatistics();
 
         this.client.addListener("guildCreate", async guild => {
-            const defaultChannel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            const channel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
 
-            defaultChannel.sendTranslated("Hi! I'm new here. Let me introduce myself: I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
+            channel.sendTranslated("Hi! I'm new here. Let me introduce myself: I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
             log(`Trixie got invited and joined new guild ${guild.name}`);
             updateGuildStatistics();
         });
@@ -27,34 +27,28 @@ class MemberLog extends Command {
             log(`Trixie got removed from guild ${guild.name}`);
             updateGuildStatistics();
         });
-        this.client.addListener("guildMemberAdd", member => {
+        this.client.addListener("guildMemberAdd", async member => {
             const guild = member.guild;
 
-            const defaultChannel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
-            const l = locale.locale(this.config.get(member.guild.id, "locale"));
-            defaultChannel.send(this.config.get(member.guild.id, "new_user_message") || 
-                "**" + l.translate("New member joined our Guild, guys!").fetch() + "**\n" + 
-                l.translate("Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?")
-                    .format({
-                        user: member.user.toString(),
-                        rulesChannel: guild.channels.find("name", "welcome").toString()
-                    })
-                    .fetch());
+            const channel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            channel.send(this.config.get(member.guild.id, "new_user_message") || 
+                "**" + await channel.translate("New member joined our Guild, guys!") + "**\n" + 
+                await channel.translate("Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?", {
+                    user: member.user.toString(),
+                    rulesChannel: guild.channels.find("name", "welcome").toString()
+                }));
             log(`New member ${member.user.username} joined guild ${guild.name}`);
             updateGuildStatistics();
         });
-        this.client.addListener("guildMemberRemove", member => {
+        this.client.addListener("guildMemberRemove", async member => {
             const guild = member.guild;
 
-            const defaultChannel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
-            const l = locale.locale(this.config.get(member.guild.id, "locale"));
-            defaultChannel.send(this.config.get(member.guild.id, "user_left_message") || 
-                "**" + l.translate("A soldier has left us").fetch() + "**\n" + 
-                l.translate("*{{user}}* left the server. Bye bye")
-                    .format({
-                        user: member.displayName
-                    })
-                    .fetch());
+            const channel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            channel.send(this.config.get(member.guild.id, "user_left_message") || 
+                "**" + await channel.translate("A soldier has left us") + "**\n" + 
+                await channel.translate("*{{user}}* left the server. Bye bye", {
+                    user: member.displayName
+                }));
             log(`Member ${member.user.username} left guild ${guild.name}`);
             updateGuildStatistics();
         });

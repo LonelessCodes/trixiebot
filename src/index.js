@@ -8,6 +8,7 @@ const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
 const ConfigManager = require("./logic/Config");
+const LocaleManager = require("./logic/Locale");
 
 new class App {
     constructor() {
@@ -29,17 +30,23 @@ new class App {
         this.db = await MongoClient
             .connect("mongodb://localhost:27017/", { autoReconnect: true })
             .then(client => client.db("trixiebot"));
+        this.client.db = this.db;
 
         statistics.get(statistics.STATS.SHARDS).set(1); // Sharding not implemented, so only one process of Trixie running
 
         this.config = new ConfigManager(this.client, this.db, {
             prefix: "!",
             calling: false,
-            locale: "en",
             explicit: false,
             admin_role: null,
             uom: "in"
         });
+        this.client.config = this.config;
+
+        this.locale = new LocaleManager(this.client, this.db, [
+            "en", "de", "hu"
+        ]);
+        this.client.locale = this.locale;
 
         this.attachListeners();
 
@@ -130,7 +137,7 @@ class AppCommand extends Command {
         // ping pong
         if (/^ping\b/i.test(message.content) ||
             /^trixie ping\b/i.test(message.content)) {
-            const pongText = message.translate("pong! Wee hee");
+            const pongText = await message.channel.translate("pong! Wee hee");
             const m = await message.channel.send(pongText);
             const ping = m.createdTimestamp - message.createdTimestamp;
             await m.edit(pongText + "\n" +

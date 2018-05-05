@@ -1,5 +1,6 @@
 const log = require("../modules/log");
 const Command = require("../class/Command");
+const Discord = require("discord.js");
 
 class PenisCommand extends Command {
     constructor(client, config, db) {
@@ -11,10 +12,33 @@ class PenisCommand extends Command {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^(penis|cock|dick)\b/i.test(message.content)) return;
-
-        const member = message.mentions.members.first() || message.member;
+        
         const uom = message.guild.config.uom;
         const r = uom === "cm" ? 2.54 : 1;
+
+        const msg = message.content.substr(message.content.split(/\b/g)[0].length + 1).trim();
+        if (/^leaderboard\b/.test(msg)) {
+            const embed = new Discord.RichEmbed;
+
+            const penises = await this.db.find({ $or: message.guild.members.array().map(member => ({ userId: member.user.id })) }).toArray();
+            const sorted = penises.sort((a, b) => b.length - a.length);
+
+            embed.setTitle(`${message.guild.name} Penis Leaderboard`);
+            for (const penis of sorted) {
+                const member = message.guild.members.find(member => member.user.id === penis.userId);
+                if (!member) continue;
+                embed.addField(
+                    `8${new Array(Math.round(penis.length)).fill("=").join("")}D   ${member.user.tag}`,
+                    `${await message.channel.translate("Length:")} **${(penis.length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(penis.girth * r).toFixed(1)} ${uom}**`
+                );
+            }
+
+            await message.channel.send({ embed });
+            log(`Served penis leaderboard for guild ${message.guild.id}`);
+            return;
+        }
+
+        const member = message.mentions.members.first() || message.member;
 
         if (message.mentions.everyone) {
             await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
@@ -25,7 +49,7 @@ class PenisCommand extends Command {
         if (member.user.id === this.client.user.id) {
             const length = 20;
             const girth = 18;
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\n${message.translate("Length:")} **${(length*r).toFixed(1)} ${uom}**   ${message.translate("Girth:")} **${(girth*r).toFixed(1)} ${uom}**`);
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
             log("Requested Trixie's dick");
             return;
         }
@@ -44,13 +68,13 @@ class PenisCommand extends Command {
                 length
             });
 
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${message.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${message.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
             log(`Requested unknown dick => created new dick for user ${message.member.id} with ${girth} in girth, ${length} in length`);
             return;
         } else {
             const { length, girth } = doc;
 
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${message.translate("Length:")} **${(length*r).toFixed(1)} ${uom}**   ${message.translate("Girth:")} **${(girth*r).toFixed(1)} ${uom}**`);
+            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
             log(`Requested known dick of user ${message.member.id} with ${girth} in girth, ${length} in length`);
             return;
         }

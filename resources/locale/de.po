@@ -409,3 +409,11 @@ msgstr "Tja, dumm gelaufen. Ich hab da nicht so wirklich was gefunden? Tut mir a
 msgid "`order` must be either `first`, `latest`, `top` or `random`!"
 msgstr "`order` muss entweder `first`, `latest`, `top` oder `random` sein!"
 
+#: 
+msgid "Changed locale for the server to {{locale}}"
+msgstr "Sprache des Servers geändert zu {{locale}}"
+
+#: 
+msgid "Changed locale for {{channel}} to {{locale}}"
+msgstr "Sprache von {{channel}} in {{locale}} geändert"
+

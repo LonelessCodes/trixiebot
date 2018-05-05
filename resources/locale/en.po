@@ -409,3 +409,11 @@ msgstr "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything
 msgid "`order` must be either `first`, `latest`, `top` or `random`!"
 msgstr "`order` must be either `first`, `latest`, `top` or `random`!"
 
+#: 
+msgid "Changed locale for the server to {{locale}}"
+msgstr "Changed locale for the server to {{locale}}"
+
+#: 
+msgid "Changed locale for {{channel}} to {{locale}}"
+msgstr "Changed locale for {{channel}} to {{locale}}"
+

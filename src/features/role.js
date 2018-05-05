@@ -1,10 +1,10 @@
 const log = require("../modules/log");
-const locale = require("../logic/locale");
+const locale = require("../logic/Locale");
 const { findArgs } = require("../modules/util");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 
-async function rolesMessage(guild, db) {
+async function rolesMessage(guild, channel, db) {
     const roles = await db.find({
         guildId: guild.id
     }).toArray();
@@ -14,7 +14,7 @@ async function rolesMessage(guild, db) {
         let role_obj = guild.roles.get(role.roleId);
         if (!role_obj) continue;
 
-        role.category = role.category || locale.locale(guild.config.locale).translate("Other").fetch();
+        role.category = role.category || await channel.translate("Other");
         if (!available_roles[role.category])
             available_roles[role.category] = [];
         available_roles[role.category].push(role_obj);
@@ -30,9 +30,9 @@ async function rolesMessage(guild, db) {
     }
     
     if (roles_message === "") {
-        return locale.locale(guild.config.locale).translate("This server doesn't have any publicly available roles :/").fetch();
+        return await channel.translate("This server doesn't have any publicly available roles :/");
     } else {
-        return locale.locale(guild.config.locale).translate("Here's a list of available roles:").fetch() + "\n" + roles_message;
+        return await channel.translate("Here's a list of available roles:") + "\n" + roles_message;
     }
 }
 
@@ -183,7 +183,7 @@ class RoleCommand extends Command {
                 } else {
                     const role_obj = message.guild.roles.find("name", role);
                     if (!role_obj) {
-                        await message.channel.send(message.translate("This role doesn't exist so you can't have it.") + " " + await rolesMessage(message.guild, this.db));
+                        await message.channel.send(await message.channel.translate("This role doesn't exist so you can't have it.") + " " + await rolesMessage(message.guild, message.channel, this.db));
                         log(`Couldn't find role ${role} in server ${message.guild.name}`);
                         return;
                     }
@@ -194,7 +194,7 @@ class RoleCommand extends Command {
                     });
 
                     if (!role_query) {
-                        await message.channel.send(message.translate("You don't have permission to remove this role.") + " " + await rolesMessage(message.guild, this.db));
+                        await message.channel.send(await message.channel.translate("You don't have permission to remove this role.") + " " + await rolesMessage(message.guild, message.channel, this.db));
                         log(`Couldn't remove role ${role}. Not in presets, aka no permission`);
                         return;
                     }
@@ -215,7 +215,7 @@ class RoleCommand extends Command {
         }
         
         if (/^role available\b/.test(message.content)) {
-            await message.channel.send(await rolesMessage(message.guild, this.db));
+            await message.channel.send(await rolesMessage(message.guild, message.channel, this.db));
             log(`Requested available roles for guild ${message.guild.name}`);
             return;
         }
@@ -298,7 +298,7 @@ class RoleCommand extends Command {
                 } else {
                     const role_obj = message.guild.roles.find("name", role);
                     if (!role_obj) {
-                        await message.channel.send(message.translate("Uh apparently this server doesn't have this role available right now.") + " " + await rolesMessage(message.guild, this.db));
+                        await message.channel.send(await message.channel.translate("Uh apparently this server doesn't have this role available right now.") + " " + await rolesMessage(message.guild, message.channel, this.db));
                         log(`Couldn't find role ${role} in server ${message.guild.name}`);
                         return;
                     }
@@ -309,7 +309,7 @@ class RoleCommand extends Command {
                     });
 
                     if (!role_query) {
-                        await message.channel.send(message.translate("Hmm... I couldn't really find your role.") + " " + await rolesMessage(message.guild, this.db));
+                        await message.channel.send(await message.channel.translate("Hmm... I couldn't really find your role.") + " " + await rolesMessage(message.guild, message.channel, this.db));
                         log(`Couldn't find role ${role} in presets`);
                         return;
                     }

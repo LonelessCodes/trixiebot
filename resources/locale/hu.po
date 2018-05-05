@@ -420,3 +420,11 @@ msgstr "A **Nagy és Hatalmas Trixie** s-... semm... *semmit sem talált*. Tess�
 msgid "`order` must be either `first`, `latest`, `top` or `random`!"
 msgstr "`order` legalább `first`, `latest`, `top` vagy `random`!"
 
+#: 
+msgid "Changed locale for the server to {{locale}}"
+msgstr "Changed locale for the server to {{locale}}"
+
+#: 
+msgid "Changed locale for {{channel}} to {{locale}}"
+msgstr "Changed locale for {{channel}} to {{locale}}"
+

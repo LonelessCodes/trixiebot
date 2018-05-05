@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const locale = require("../../logic/locale");
+const locale = require("../../logic/Locale");
 const { toHumanTime, parseHumanTime } = require("../../modules/util");
 const Discord = require("discord.js");
 const Command = require("../../class/Command");
@@ -29,7 +29,7 @@ class TimeoutCommand extends Command {
 
                 const expiresIn = toHumanTime(timeleft);
 
-                const timeoutNotice = message.translate("{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}", {
+                const timeoutNotice = await message.channel.translate("{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}", {
                     userMention: message.member.toString(),
                     timeLeft: `__**${expiresIn}**__`
                 });
@@ -239,7 +239,7 @@ class TimeoutCommand extends Command {
             const promises = members.map(member => this.db.updateOne({ guildId: member.guild.id, memberId: member.id }, { $set: { expiresAt } }, { upsert: true }));
 
             await message.channel.send(locale.format(locale
-                .locale(message.guild.config.locale)
+                .locale(await message.channel.locale())
                 .translate("{{users}} is now timeouted for the next {{timeLeft}}")
                 .ifPlural("{{users}} are now timeouted for the next {{timeLeft}}")
                 .fetch(members.size), {

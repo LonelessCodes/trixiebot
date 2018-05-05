@@ -23,7 +23,7 @@ class MuteCommand extends Command {
                 return;
             }
         }
-        
+
         if (!message.prefixUsed) return;
 
         if (/^mute list\b/i.test(message.content)) {
@@ -34,11 +34,11 @@ class MuteCommand extends Command {
             }
 
             let str = "";
-            if(muted_words.length > 0) {
-                str = message.translate("Currently muted are:") + "\n";
+            if (muted_words.length > 0) {
+                str = await message.channel.translate("Currently muted are:") + "\n";
                 str += "`" + muted_words.join("`, `") + "`";
             } else {
-                str = message.translate("Nothing yet muted");
+                str = await message.channel.translate("Nothing yet muted");
             }
 
             await message.channel.send(str);

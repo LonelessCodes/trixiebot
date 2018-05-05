@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const locale = require("../logic/locale");
+const locale = require("../logic/Locale");
 const { parseHumanTime, toHumanTime } = require("../modules/util");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
@@ -75,7 +75,7 @@ class Poll {
         if (total < 1) {
             const embed = new Discord.RichEmbed;
             embed.setColor(0x71B3E6);
-            embed.setDescription(locale.translate("But no one voted :c").locale(this.guild.config.locale).fetch());
+            embed.setDescription(await this.channel.translate("But no one voted :c"));
             await this.channel.sendTranslated("{{user}} Poll ended!", {
                 user: this.creator.toString()
             }, { embed });
@@ -94,7 +94,7 @@ class Poll {
         embed.setColor(0x71B3E6);
         for (const vote of result)
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
-        embed.setFooter(locale.locale(this.guild.config.locale).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));
+        embed.setFooter(locale.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));
 
         await this.channel.sendTranslated("{{user}} Poll ended!", {
             user: this.creator.toString()
@@ -208,28 +208,28 @@ class PollCommand extends Command {
 
         const duration_string = msg.match(/([\d.]+(d|h|m|s|ms)\s*)+/g)[0];
         if (!duration_string) {
-            await message.channel.send(message.translate("`duration` must be formated as in the example.") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("`duration` must be formated as in the example.") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Duration parsing error");
             return;
         }
 
         const duration = parseHumanTime(duration_string);
         if (duration < 60000 || duration > 1000 * 3600 * 24 * 3) {
-            await message.channel.send(message.translate("`duration` should be at least 1m and max 3d") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("`duration` should be at least 1m and max 3d") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Duration out of range");
             return;
         }
 
         msg = msg.substr(duration_string.length);
         if (msg === "") {
-            await message.channel.send(message.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Options missing");
             return;
         }
 
         const options = msg.split(/,\s*/g).sort((a, b) => b.length - a.length); // longest to shortest
         if (options.length < 2) {
-            await message.channel.send(message.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to create poll. Too little options");
             return;
         }
@@ -249,9 +249,9 @@ class PollCommand extends Command {
         );
         Poll.add(poll);
 
-        await message.channel.send(message.translate("@here Poll is starting! {{timeLeft}} left to vote", {
+        await message.channel.send(await message.channel.translate("@here Poll is starting! {{timeLeft}} left to vote", {
             timeLeft: `**${toHumanTime(duration)}**`,
-        }) + "\n" + message.translate("You vote by simply posting {{options}} in this channel", {
+        }) + "\n" + await message.channel.translate("You vote by simply posting {{options}} in this channel", {
             options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``
         }));
         log(`Poll started. ${duration}ms. ${options.join(", ")}`);

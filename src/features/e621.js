@@ -64,13 +64,13 @@ class E621Command extends Command {
                 try {
                     const numParse = parseInt(num);
                     if (numParse < 1 || numParse > 5) {
-                        await message.channel.send(message.translate("`amount` cannot be smaller than 1 or greater than 5!") + "\n\n" + this.usage(message.prefix));
+                        await message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!") + "\n\n" + this.usage(message.prefix));
                         log("Gracefully aborted attempt to request e621 image. Amount out of range");
                         return;
                     }
                     num = numParse;
                 } catch (err) {
-                    message.channel.send(message.translate("Invalid input") + "\n\n" + this.usage(message.prefix));
+                    message.channel.send(await message.channel.translate("Invalid input") + "\n\n" + this.usage(message.prefix));
                     log("Gracefully aborted attempt to request e621 image. Invalid amount input");
                     return;
                 }
@@ -95,13 +95,13 @@ class E621Command extends Command {
         current_char = msg.charAt(i);
 
         if (!/latest|random/.test(order)) {
-            await message.channel.send(message.translate("`order` must be either `latest` or `random`!") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("`order` must be either `latest` or `random`!") + "\n\n" + this.usage(message.prefix));
             log(`Gracefully aborted attempt to request e621 image. ${order} is not a valid type of order`);
             return;
         }
 
         if (i >= msg.length) {
-            await message.channel.send(message.translate("`query` **must** be given") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("`query` **must** be given") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to request e621 image. No query given");
             return;
         }

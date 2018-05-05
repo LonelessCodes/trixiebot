@@ -1,11 +1,18 @@
 const log = require("../modules/log");
-const locale = require("../logic/locale");
 const { removePrefix } = require("../modules/util");
-const { Message, Client, Channel } = require("discord.js");
+const { Message, Client, Channel, Guild } = require("discord.js");
 const ConfigManager = require("../logic/Config");
+const LocaleManager = require("../logic/Locale");
 
-Message.prototype.translate = locale.translate;
-Channel.prototype.sendTranslated = locale.sendTranslated;
+// give each Channel and Guild class a locale function, which returns the locale config for this
+// specific namespace, and on a Message class give the whole locale config
+Message.prototype.locale = function () { return this.client.locale.get(this.guild ? this.guild.id : ""); };
+Channel.prototype.locale = function () { return this.client.locale.get(this.guild ? this.guild.id : "", this.id || ""); };
+Guild.prototype.locale = async function () { return (await this.client.locale.get(this.id)).global; };
+
+Message.prototype.translate = LocaleManager.autoTranslate;
+Channel.prototype.translate = LocaleManager.autoTranslateChannel;
+Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
 
 class Command {
     /**

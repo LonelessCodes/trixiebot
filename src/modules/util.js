@@ -194,3 +194,7 @@ module.exports.findArgs = function findArgs(str) {
 
     return array;
 };
+
+module.exports.isPlainObject = function isPlainObject(input) {
+    return input && !Array.isArray(input) && typeof input === "object";
+};

@@ -57,13 +57,13 @@ class DerpiCommand extends Command {
                 try {
                     const amountParse = parseInt(amount);
                     if (amountParse < 1 || amountParse > 5) {
-                        await message.channel.send(message.translate("`amount` cannot be smaller than 1 or greater than 5!") + "\n\n" + this.usage(message.prefix));
+                        await message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!") + "\n\n" + this.usage(message.prefix));
                         log("Gracefully aborted attempt to request derpi image. Amount out of range");
                         return;
                     }
                     amount = amountParse;
                 } catch (err) {
-                    await message.channel.send(message.translate("Invalid input") + "\n\n" + this.usage(message.prefix));
+                    await message.channel.send(await message.channel.translate("Invalid input") + "\n\n" + this.usage(message.prefix));
                     log("Gracefully aborted attempt to request derpi image. Invalid amount input");
                     return;
                 }
@@ -88,13 +88,13 @@ class DerpiCommand extends Command {
         current_char = msg.charAt(i);
 
         if (!/first|latest|top|random/.test(order)) {
-            await message.channel.send(message.translate("`order` must be either `first`, `latest`, `top` or `random`!") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("`order` must be either `first`, `latest`, `top` or `random`!") + "\n\n" + this.usage(message.prefix));
             log(`Gracefully aborted attempt to request derpi image. ${order} is not a valid type of order`);
             return;
         }
 
         if (i >= msg.length) {
-            await message.channel.send(message.translate("`query` **must** be given") + "\n\n" + this.usage(message.prefix));
+            await message.channel.send(await message.channel.translate("`query` **must** be given") + "\n\n" + this.usage(message.prefix));
             log("Gracefully aborted attempt to request derpi image. No query given");
             return;
         }

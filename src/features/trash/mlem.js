@@ -11,7 +11,7 @@ class MlemCommand extends Command {
                 .setColor(0x71B3E6)
                 .setTitle("MLEM o3o")
                 .setImage("https://d.equestriadev.de/i/_mlem.gif")
-                .setFooter(message.translate("The chat got mlem'd by {{user}} | Art by n0nnny", {
+                .setFooter(await message.channel.translate("The chat got mlem'd by {{user}} | Art by n0nnny", {
                     user: message.member ? message.member.displayName : message.author.tag
                 }));
             await message.channel.send({ embed });
@@ -24,7 +24,7 @@ class MlemCommand extends Command {
                 .setColor(0x71B3E6)
                 .setTitle("BLEP o3o")
                 .setImage("https://d.equestriadev.de/i/_blep.gif")
-                .setFooter(message.translate("The chat got blep'd by {{user}} | Art by n0nnny", {
+                .setFooter(await message.channel.translate("The chat got blep'd by {{user}} | Art by n0nnny", {
                     user: message.member ? message.member.displayName : message.author.tag
                 }));
             await message.channel.send({ embed });

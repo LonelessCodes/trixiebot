@@ -1,7 +1,9 @@
 const fs = require("fs-extra");
 const path = require("path");
-const Gettext = require("node-gettext");
+const { isPlainObject } = require("../modules/util");
 const { po } = require("gettext-parser");
+const Gettext = require("node-gettext");
+const DocumentCache = require("./DocumentCache");
 
 const gt = new Gettext;
 
@@ -12,9 +14,16 @@ const domain = "messages";
 for (const locale of locales) {
     const filename = `${locale}.po`;
     const translationsFilePath = path.join(__dirname, translationsDir, filename);
-    const translationsContent = fs.readFileSync(translationsFilePath);
+    const translationsContent = fs.readFileSync(translationsFilePath, "utf8")
+        // we do this because I don't want to make a translation to be dependent of the context
+        .split("\n").
+        filter(line => {
+            if (line.startsWith("msgctxt")) return false;
+            return true;
+        })
+        .join("\n");
 
-    const parsedTranslations = po.parse(translationsContent);
+    const parsedTranslations = po.parse(translationsContent, "utf8");
     gt.addTranslations(locale, domain, parsedTranslations);
 }
 
@@ -37,10 +46,12 @@ class Cursor {
 
     format(opts = {}) {
         this.opts.format = opts;
+        return this;
     }
 
     locale(locale = "en") {
         this.opts.locale = locale;
+        return this;
     }
 
     fetch(num) {
@@ -56,26 +67,95 @@ class Cursor {
     }
 }
 
-module.exports.format = function format(message, format = {}) {
+module.exports = class Locale {
+    constructor(client, db, locales) {
+        this.client = client;
+        this.db = db.collection("locale");
+        this._cache = new DocumentCache(this.db, "guildId", {
+            "guildId": { unique: true },
+            "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
+        });
+        this.locales = locales;
+
+        this.addListeners();
+    }
+
+    addListeners() {
+        this.client.addListener("guildCreate", async guild => {
+            const config = await this._cache.get(guild.id);
+            if (config && config.removedFrom instanceof Date)
+                await this._cache.set(guild.id, Object.assign({}, config, { removedFrom: undefined }));
+        });
+
+        this.client.addListener("guildDelete", async guild => {
+            const config = await this._cache.get(guild.id);
+            if (config) await this._cache.set(guild.id, Object.assign({}, config, { removedFrom: new Date }));
+        });
+    }
+
+    async get(guildId, channelid) {
+        let config = await this._cache.get(guildId);
+        if (!config) config = { global: "en", channels: {} };
+        if (typeof config.global !== "string" || !isPlainObject(config.channels)) {
+            config.global = config.global || "en";
+            config.channels = config.channels || {};
+            await this._cache.set(guildId, config);
+        }
+
+        if (channelid) {
+            return config.channels[channelid] || config.global;
+        } else {
+            return config;
+        }
+    }
+
+    async set(guildId, channelId, locale) {
+        if (!locale) {
+            locale = channelId;
+            channelId = null;
+        }
+        if (!["global", "default", ...this.locales].includes(locale)) {
+            throw new Error("Not a known locale");
+        }
+        let config = await this.get(guildId);
+        if (channelId) {
+            if (/(global|default)/i.test(locale)) delete config.channels[channelId];
+            else config.channels[channelId] = locale;
+        } else {
+            config.global = locale;
+        }
+        await this._cache.set(guildId, config);
+    }
+};
+
+// expose the function for formating a string
+function format(message, format = {}) {
     for (const f in format)
         message = message.replace(new RegExp(`{{${f}}}`, "g"), format[f]);
 
     return message;
-};
-
-module.exports.translate = function translate(message) {
-    return new Cursor({ translate: message });
-};
-
-module.exports.setLocale = gt.setLocale.bind(gt);
-
-function translate(message, format) {
-    module.exports.setLocale(this.guild.config.locale || "en");
-    return module.exports.translate(message).format(format).fetch();
 }
+module.exports.format = format;
 
-module.exports.sendTranslated = async function (message, format, embed) {
-    return await this.send(translate.bind(this)(message, format), embed);
+function translate(message) {
+    return new Cursor({ translate: message });
+}
+module.exports.translate = translate;
+
+module.exports.locales = locales;
+module.exports.setLocale = gt.setLocale.bind(gt);
+module.exports.locale = function locale(code) {
+    return new Cursor({ locale: code });
 };
 
-module.exports.translate = translate;
+module.exports.autoTranslate = async function (channel, str, format) {
+    return translate(str).locale(await channel.locale()).format(format).fetch();
+};
+
+module.exports.autoTranslateChannel = async function (str, format) {
+    return translate(str).locale(await this.locale()).format(format).fetch();
+};
+
+module.exports.sendTranslated = async function (str, format, embed) {
+    return await this.send(await module.exports.autoTranslateChannel.apply(this, [str, format]), embed);
+};

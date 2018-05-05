@@ -1,5 +1,4 @@
 const log = require("../modules/log");
-const locale = require("../logic/Locale");
 const statistics = require("../logic/statistics");
 const Command = require("../class/Command");
 

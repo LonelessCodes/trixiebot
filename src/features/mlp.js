@@ -1,6 +1,7 @@
 const fetch = require("node-fetch");
 const log = require("../modules/log");
 const cheerio = require("cheerio");
+const CONST = require("../modules/const");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 
@@ -79,6 +80,7 @@ class MLPCommand extends Command {
         }
 
         const embed = new Discord.RichEmbed()
+            .setColor(CONST.COLOUR)
             .setTitle(title)
             .setDescription(abstract.abstract
                 .replace(new RegExp(query, "gi"), substring => `**${substring}**`)

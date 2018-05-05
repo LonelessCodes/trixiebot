@@ -3,12 +3,15 @@ const packageFile = require("../package.json");
 const { walk } = require("./modules/util");
 const log = require("./modules/log");
 const path = require("path");
+const CONST = require("./modules/const");
 const statistics = require("./logic/statistics");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
 const ConfigManager = require("./logic/Config");
 const LocaleManager = require("./logic/Locale");
+
+const { Message, Collector, Client }= Discord;
 
 new class App {
     constructor() {
@@ -37,7 +40,7 @@ new class App {
         this.config = new ConfigManager(this.client, this.db, {
             prefix: "!",
             calling: false,
-            explicit: false,
+            explicit: true,
             admin_role: null,
             uom: "in"
         });
@@ -93,7 +96,7 @@ new class App {
                 file.substring((__dirname + "/features/").length, file.length - path.extname(file).length).replace(/\\/g, "/"),
                 new Feature(this.client, this.config, this.db));
         }
-        features.registerCommand("app", new AppCommand(this.client, this.config, features));
+        features.registerCommand("app", new AppCommand(this.client, this.config, this.db, features));
     }
 };
 
@@ -118,9 +121,59 @@ async function createUsage(fields, features, message) {
 }
 
 class AppCommand extends Command {
-    constructor(client, config, features) {
+    /**
+     * 
+     * @param {Client} client 
+     * @param {ConfigManager} config 
+     * @param {Map<string, Command>} features 
+     */
+    constructor(client, config, db, features) {
         super(client, config);
         this.features = features;
+
+        this.db = db.collection("stats");
+
+        this.initCommandStats();
+    }
+
+    async initCommandStats() {
+        const commandStat = statistics.get(statistics.STATS.COMMANDS_EXECUTED);
+
+        commandStat.set((await this.db.findOne({ name: statistics.STATS.COMMANDS_EXECUTED }) || { value: 0 }).value);
+
+        commandStat.on("change", value => this.db.updateOne({ name: statistics.STATS.COMMANDS_EXECUTED }, { $set: { value } }, { upsert: true }));
+
+        /** @type {Map<string, Collector>} */
+        this.collectors = new Map;
+
+        // command statistics
+        this.client.addListener("message", async message => {
+            if (!message.content.startsWith(await this.config.get(message.guild.id, "prefix"))) return;
+
+            if (typeof message.channel.awaitMessages !== "function") return;
+            if (this.collectors.has(message.channel.id)) {
+                this.collectors.get(message.channel.id).stop();
+            }
+
+            const collector = message.channel.createCollector(message => message.member.id === message.guild.me.id, {
+                max: 1, 
+                maxMatches: 1,
+                time: 60 * 1000
+            });
+            this.collectors.set(message.channel.id, collector);
+
+            collector.once("end", (collected, reason) => {
+                if (reason === "time") {
+                    if (this.collectors.has(message.channel.id))
+                        this.collectors.delete(message.channel.id);
+                } else {
+                    if (this.collectors.has(message.channel.id))
+                        this.collectors.delete(message.channel.id);
+                    if (!collected.size) return;
+                    commandStat.inc(1);
+                }
+            });
+        });
     }
 
     async onbeforemessage(message) {
@@ -131,6 +184,9 @@ class AppCommand extends Command {
         }
     }
 
+    /**
+     * @param {Message} message 
+     */
     async onmessage(message) {
         if (!message.prefixUsed) return;
 
@@ -179,7 +235,7 @@ class AppCommand extends Command {
                 ["Trixie Config", "admin/config"]
             ], this.features, message);
             embed.setDescription(this.features.get("app").usage(message.prefix));
-            embed.setColor(0x71B3E6);
+            embed.setColor(CONST.COLOUR);
             embed.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
 
             // if (await this.config.get(message.guild.id, "calling")) 

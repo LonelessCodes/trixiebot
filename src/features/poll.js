@@ -1,6 +1,7 @@
 const log = require("../modules/log");
 const locale = require("../logic/Locale");
 const { parseHumanTime, toHumanTime } = require("../modules/util");
+const CONST = require("../modules/const");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
 
@@ -73,8 +74,7 @@ class Poll {
         const total = this.users.size; // get num of votes
 
         if (total < 1) {
-            const embed = new Discord.RichEmbed;
-            embed.setColor(0x71B3E6);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
             embed.setDescription(await this.channel.translate("But no one voted :c"));
             await this.channel.sendTranslated("{{user}} Poll ended!", {
                 user: this.creator.toString()
@@ -90,8 +90,7 @@ class Poll {
             }))
             .sort((a, b) => b.votes - a.votes);
 
-        const embed = new Discord.RichEmbed;
-        embed.setColor(0x71B3E6);
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
         for (const vote of result)
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
         embed.setFooter(locale.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));

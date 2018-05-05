@@ -1,6 +1,7 @@
 const fetch = require("node-fetch");
 const log = require("../modules/log");
 const querystring = require("querystring");
+const CONST = require("../modules/const");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 
@@ -24,6 +25,7 @@ class TellMeCommand extends Command {
         }
 
         const embed = new Discord.RichEmbed()
+            .setColor(CONST.COLOUR)
             .setTitle(`${magic.answer} :crystal_ball:`)
             .setImage("https://derpicdn.net/img/view/2017/7/20/1490419.png")
             .setFooter("Edited screenshot by xhazxmatx");

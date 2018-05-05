@@ -1,4 +1,5 @@
 const { findArgs } = require("../../modules/util");
+const CONST = require("../../modules/const");
 const Discord = require("discord.js");
 const Command = require("../../class/Command");
 
@@ -15,7 +16,7 @@ class ConfigCommand extends Command {
         const args = findArgs(msg);
 
         if (args.length === 0) {
-            const embed = new Discord.RichEmbed;
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
             embed.setTitle(message.guild.name);
             embed.setThumbnail(message.guild.iconURL);
 
@@ -26,7 +27,7 @@ class ConfigCommand extends Command {
             await message.channel.send({ embed });
             return;
         } else if (args.length === 1) {
-            const embed = new Discord.RichEmbed;
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
             const value = await this.config.get(message.guild.id, args[0]);
 
             if (!value) embed.setDescription(await message.channel.translate("No such parameter. *shrugs*"));
@@ -42,7 +43,7 @@ class ConfigCommand extends Command {
             } else {
                 await this.config.set(message.guild.id, { [args[0]]: args[1] });
             }
-            const embed = new Discord.RichEmbed;
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
 
             embed.addField(args[0], await this.config.get(message.guild.id, args[0]), true);
 

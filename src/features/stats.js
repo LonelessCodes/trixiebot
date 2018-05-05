@@ -1,5 +1,6 @@
 const log = require("../modules/log");
 const statistics = require("../logic/statistics");
+const CONST = require("../modules/const");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 
@@ -13,7 +14,7 @@ class StatCommand extends Command {
         if (!/^stats\b/i.test(message.content)) return;
 
         const embed = new Discord.RichEmbed()
-            .setColor(0x71B3E6)
+            .setColor(CONST.COLOUR)
             .addField("Server Count", statistics.get(statistics.STATS.SERVER_COUNT).get().toLocaleString("en"), true)
             .addField("Large Servers", statistics.get(statistics.STATS.LARGE_SERVERS).get().toLocaleString("en"), true)
             .addField("Total Members", statistics.get(statistics.STATS.TOTAL_MEMBERS).get().toLocaleString("en"), true)

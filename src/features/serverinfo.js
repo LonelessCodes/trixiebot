@@ -1,4 +1,5 @@
 const log = require("../modules/log");
+const CONST = require("../modules/const");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
 
@@ -7,7 +8,7 @@ class ServerInfoCommand extends Command {
         if (!message.prefixUsed) return;
         if (!/^serverinfo\b/i.test(message.content)) return;
 
-        const embed = new Discord.RichEmbed;
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
         embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
         embed.setThumbnail(message.guild.iconURL);
 

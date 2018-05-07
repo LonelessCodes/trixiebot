@@ -131,7 +131,7 @@ module.exports = class Locale {
 // expose the function for formating a string
 function format(message, format = {}) {
     for (const f in format)
-        message = message.replace(new RegExp(`{{${f}}}`, "g"), format[f]);
+        message = message.replace(new RegExp(`{{\s*${f}\s*}}`, "g"), format[f]);
 
     return message;
 }

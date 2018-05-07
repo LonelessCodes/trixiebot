@@ -105,12 +105,12 @@ class AlertCommand extends Command {
                 .setAuthor(channelPage.name)
                 .setTitle(channelPage.title)
                 .addField("Followers", channelPage.followers, true)
-                .addField("Viewers", channelPage.viewers, true)
+                .addField("Total Viewers", channelPage.viewers_total, true)
                 .setThumbnail(channelPage.avatar)
-                .setImage(channelPage.thumbnails.web_large)
-                .setFooter(`${channelPage.adult ? "NSFW" : "SFW"} | Category: ${channelPage.category} | Tags: ${channelPage.tags.join(", ")}`);
+                .setImage(`${channelPage.thumbnails.web_large}?${Date.now()}`)
+                .setFooter(`${channelPage.adult ? "NSFW | " : ""} Category: ${channelPage.category} | Tags: ${channelPage.tags.join(", ")}`);
 
-            const onlineMessage = await guildChannel.sendTranslated("{{ user }} is live!", {
+            const onlineMessage = await guildChannel.sendTranslated("{{user}} is live!", {
                 user: channelPage.name
             }, { embed });
 

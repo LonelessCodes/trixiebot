@@ -141,7 +141,7 @@ class AlertCommand extends Command {
         if (!message.prefixUsed) return;
         if (!/^alert\b/i.test(message.content)) return;
 
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.ADMINISTRATOR);
+        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (!permission) return;
 
         let msg = message.content.substr(6).trim();
@@ -225,6 +225,40 @@ class AlertCommand extends Command {
             return;
         }
 
+        if (/^list\b/i.test(msg)) {
+            const streams = await this.db.find({
+                guildId: message.guild.id
+            }).toArray();
+
+            if (streams.length === 0) {
+                await message.channel.sendTranslated("Hehe, nothing here lol. Time to add some.");
+                log("Sent alerts messages. None exist");
+                return;
+            }
+
+            const sorted_by_channels = new Object;
+            for (const stream of streams) {
+                sorted_by_channels[stream.channelId] = [...(sorted_by_channels[stream.channelId] || []), stream];
+            }
+
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            for (const channelId in sorted_by_channels) {
+                const channel = message.guild.channels.get(channelId);
+                if (!channel) continue;
+
+                let str = "";
+                for (const stream of sorted_by_channels[channelId]) {
+                    str += `${stream.service}  ${stream.name}` + "\n";
+                }
+
+                embed.addField("#" + channel.name, str);
+            }
+
+            message.channel.send({ embed });
+
+            return;
+        }
+
         const channel = message.mentions.channels.first();
         if (!channel) {
             await message.channel.sendTranslated("You need to also tell me a channel where to put alerts!");
@@ -299,7 +333,9 @@ class AlertCommand extends Command {
 \`channel\` - the channel to post the alert to later
 
 \`${prefix}alert remove <page url>\` - unsubscribe Trixie from a Picarto channel
-\`page url\` - copy the url of the stream page and paste it in here`;
+\`page url\` - copy the url of the stream page and paste it in here
+
+\`${prefix}alert list\` - list all active alerts`;
     }
 }
 

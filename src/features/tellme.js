@@ -8,7 +8,7 @@ const Command = require("../class/Command");
 class TellMeCommand extends Command {
     async onmessage(message) {
         if (!message.prefixUsed) return;
-        if (!/^(tellme|8)\b/i.test(message.content)) return;
+        if (!/^tellme\b/i.test(message.content)) return;
 
         const question = message.content.substr(7).trim();
         if (question === "") {

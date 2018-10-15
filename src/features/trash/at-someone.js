@@ -16,7 +16,7 @@ const emoticons = [
 
 class AtSomeoneCommand extends Command {
     async onbeforemessage(message) {
-        if (!/^@someone\b/i.test(message.content)) return;
+        if (!/@someone\b/i.test(message.content)) return;
 
         const array = message.guild.members.array();
         const member = array[Math.floor(Math.random() * array.length)];

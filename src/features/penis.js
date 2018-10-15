@@ -61,7 +61,7 @@ class PenisCommand extends Command {
             const length = Math.pow((random > 0 ?
                 (Math.pow(random, 1.4) + 0.2) * 15 + 3 :
                 (random + 0.2) * 15 + 3) / 20, 1.4) * 20 + 1.5;
-            const girth = Math.pow((Math.random() + (random - 0.1) * 1.5) * 0.3, 2) * 8 + 7;
+            const girth = Math.pow((Math.random() + (random - 0.1) * 2) * 0.3, 2) * 8 + 6;
 
             await this.db.insertOne({
                 userId: member.user.id,

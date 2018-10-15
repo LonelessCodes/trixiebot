@@ -16,7 +16,11 @@ class MemberLog extends Command {
         updateGuildStatistics();
 
         this.client.addListener("guildCreate", async guild => {
-            const channel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            const channel = guild.channels.find(c => c.name = "general") ||
+                guild.channels
+                    .filter(c => c.type === "text")
+                    .sort((a, b) => a.position - b.position)
+                    .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
 
             channel.sendTranslated("Hi! I'm new here. Let me introduce myself: I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
             log(`Trixie got invited and joined new guild ${guild.name}`);
@@ -29,12 +33,16 @@ class MemberLog extends Command {
         this.client.addListener("guildMemberAdd", async member => {
             const guild = member.guild;
 
-            const channel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            const channel = guild.channels.find(c => c.name = "general") ||
+                guild.channels
+                    .filter(c => c.type === "text")
+                    .sort((a, b) => a.position - b.position)
+                    .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
             channel.send(this.config.get(member.guild.id, "new_user_message") || 
                 "**" + await channel.translate("New member joined our Guild, guys!") + "**\n" + 
                 await channel.translate("Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?", {
                     user: member.user.toString(),
-                    rulesChannel: guild.channels.find("name", "welcome").toString()
+                    rulesChannel: guild.channels.find(c => c.name = "welcome").toString()
                 }));
             log(`New member ${member.user.username} joined guild ${guild.name}`);
             updateGuildStatistics();
@@ -42,7 +50,11 @@ class MemberLog extends Command {
         this.client.addListener("guildMemberRemove", async member => {
             const guild = member.guild;
 
-            const channel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            const channel = guild.channels.find(c => c.name = "general") ||
+                guild.channels
+                    .filter(c => c.type === "text")
+                    .sort((a, b) => a.position - b.position)
+                    .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
             channel.send(this.config.get(member.guild.id, "user_left_message") || 
                 "**" + await channel.translate("A soldier has left us") + "**\n" + 
                 await channel.translate("*{{user}}* left the server. Bye bye", {

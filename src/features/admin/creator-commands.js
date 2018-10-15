@@ -107,10 +107,14 @@ class CreatorCommands extends Command {
             const msg = message.content.substr(11);
             this.client.guilds.forEach(guild => {
                 if (!guild.available) return;
-                const defaultChannel = guild.channels.find(c => c.type === "text" && c.permissionsFor(guild.me).has("SEND_MESSAGES"));
-                defaultChannel.send("@here Broadcast from creator", { embed: new Discord.RichEmded().setDescription(msg) });
+                const defaultChannel = guild.channels.find(c => c.name = "general") ||
+                    guild.channels
+                        .filter(c => c.type === "text")
+                        .sort((a, b) => a.position - b.position)
+                        .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+                defaultChannel.send("Broadcast from creator", { embed: new Discord.RichEmbed().setDescription(msg) });
             });
-            log(`Sent stdout for command ${msg}`);
+            log(`Broadcasted message ${msg}`);
             return;
         }
     }

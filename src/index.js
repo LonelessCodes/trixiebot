@@ -31,7 +31,10 @@ new class App {
 
     async initialize() {
         this.db = await MongoClient
-            .connect("mongodb://localhost:27017/", { autoReconnect: true })
+            .connect("mongodb://localhost:27017/", {
+                autoReconnect: true,
+                useNewUrlParser: true
+            })
             .then(client => client.db("trixiebot"));
         this.client.db = this.db;
 

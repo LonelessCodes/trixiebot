@@ -8,9 +8,9 @@ class MemberLog extends Command {
 
         const updateGuildStatistics = () => {
             statistics.get(statistics.STATS.SERVER_COUNT).set(this.client.guilds.size);
-            statistics.get(statistics.STATS.LARGE_SERVERS).set(this.client.guilds.findAll("large", true).length);
+            statistics.get(statistics.STATS.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).length);
             statistics.get(statistics.STATS.TOTAL_MEMBERS).set(this.client.guilds.array().map(g => g.members.size).reduce((pv, cv) => pv + cv, 0));
-            statistics.get(statistics.STATS.TEXT_CHANNELS).set(this.client.channels.findAll("type", "text").length);
+            statistics.get(statistics.STATS.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").length);
         };
 
         updateGuildStatistics();

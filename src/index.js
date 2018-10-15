@@ -256,23 +256,19 @@ class AppCommand extends Command {
         }
 
         if (/^invite\b/i.test(message.content)) {
-            // const FLAGS = Discord.Permissions.FLAGS;
-            // const link = await this.client.generateInvite([
-            //     FLAGS.MANAGE_ROLES,
-            //     FLAGS.MANAGE_CHANNELS,
-            //     FLAGS.MANAGE_NICKNAMES,
-            //     FLAGS.VIEW_CHANNEL,
-            //     FLAGS.MANAGE_MESSAGES,
-            //     FLAGS.EMBED_LINKS,
-            //     FLAGS.READ_MESSAGE_HISTORY,
-            //     FLAGS.MENTION_EVERYONE,
-            //     FLAGS.ADD_REACTIONS
-            // ]);
-            // await message.channel.send(link);
-            // return;
-            await message.channel.send("Wait for v2.x. Current version: " + packageFile.version);
+            const FLAGS = Discord.Permissions.FLAGS;
+            const link = await this.client.generateInvite([
+                FLAGS.MANAGE_ROLES,
+                FLAGS.MANAGE_CHANNELS,
+                FLAGS.VIEW_CHANNEL,
+                FLAGS.MANAGE_MESSAGES,
+                FLAGS.EMBED_LINKS,
+                FLAGS.MENTION_EVERYONE,
+                FLAGS.ADD_REACTIONS
+            ]);
+            await message.channel.send(link);
             return;
-        } else if (/^!donate\b/i.test(message.content)) {
+        } else if (/^donate\b/i.test(message.content)) {
             await message.channel.send("https://ko-fi.com/loneless");
             return;
         }

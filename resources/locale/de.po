@@ -167,8 +167,10 @@ msgid "Apparently nothing is trending right now."
 msgstr "Irgendwie trendet gerade nichts ¯\_(ツ)_/¯"
 
 #: 
+#, fuzzy
 msgctxt "Trixie introduces herself when joining a new server"
-msgid "Hi! I'm new here. Let me introduce myself: I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system :3\n"
+msgid "Hi! I'm new here. Let me introduce myself:\n"
+"I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system :3\n"
 "Just call `!trixie` if you need help"
 msgstr "Hey! Ich bin neu hier. Wer mich nicht kennt, ich bin TrixieBot! Ein Discord Bot vollgepackt mit Features für Ponyliebhaber, inklusive Derpibooru-, e621-, Giphy- und so weiter Integration. Außerdem hab ich auch eine Handvoll nicen anderen Scheiß für Admins, wie z.B. Timeouts oder gelöschte Nachrichten ansehen. Ich kann dein kleiner Spaßbot sein oder ein erwachsenes Servermanagement Tool :3\n"
 "Schreib einfach `!trixie` und ich bin sofort zur Stelle"
@@ -416,4 +418,12 @@ msgstr "Sprache des Servers geändert zu {{locale}}"
 #: 
 msgid "Changed locale for {{channel}} to {{locale}}"
 msgstr "Sprache von {{channel}} in {{locale}} geändert"
+
+#: 
+msgid "@here {{user}} is live!"
+msgstr "@here {{user}} ist live!"
+
+#: 
+msgid "Hehe, nothing here lol. Time to add some."
+msgstr "Hehe, nichts hier lül. Zeit Alerts hinzuzufügen."
 

@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
-const { resolveStdout } = require("../../modules/util");
+const { resolveStdout, findDefaultChannel } = require("../../modules/util");
 const Command = require("../../class/Command");
 const Discord = require("discord.js");
 
@@ -107,11 +107,7 @@ class CreatorCommands extends Command {
             const msg = message.content.substr(11);
             this.client.guilds.forEach(guild => {
                 if (!guild.available) return;
-                const defaultChannel = guild.channels.find(c => c.name = "general") ||
-                    guild.channels
-                        .filter(c => c.type === "text")
-                        .sort((a, b) => a.position - b.position)
-                        .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+                const defaultChannel = findDefaultChannel(guild);
                 defaultChannel.send("Broadcast from creator", { embed: new Discord.RichEmbed().setDescription(msg) });
             });
             log(`Broadcasted message ${msg}`);

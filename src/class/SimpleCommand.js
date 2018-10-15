@@ -15,7 +15,7 @@ class SimpleCommand extends Command {
                 if (typeof this.commands[command] === "string") {
                     await message.channel.send(this.commands[command]);
                 } else if (typeof this.commands[command] === "function") {
-                    const rtrn = await this.commands[command].apply(this, message);
+                    const rtrn = await this.commands[command].apply(this, [message]);
                     if (typeof rtrn === "string") message.channel.send(rtrn);
                 } else if (this.commands[command] instanceof Discord.RichEmbed) {
                     await message.channel.send({ embed: this.commands[command] });

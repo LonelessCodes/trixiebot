@@ -1,5 +1,6 @@
 const log = require("../modules/log");
 const statistics = require("../logic/statistics");
+const { findDefaultChannel } = require("../modules/util");
 const Command = require("../class/Command");
 
 class MemberLog extends Command {
@@ -8,36 +9,35 @@ class MemberLog extends Command {
 
         const updateGuildStatistics = () => {
             statistics.get(statistics.STATS.SERVER_COUNT).set(this.client.guilds.size);
-            statistics.get(statistics.STATS.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).length);
+            statistics.get(statistics.STATS.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).size);
             statistics.get(statistics.STATS.TOTAL_MEMBERS).set(this.client.guilds.array().map(g => g.members.size).reduce((pv, cv) => pv + cv, 0));
-            statistics.get(statistics.STATS.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").length);
+            statistics.get(statistics.STATS.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").size);
         };
 
         updateGuildStatistics();
 
         this.client.addListener("guildCreate", async guild => {
-            const channel = guild.channels.find(c => c.name = "general") ||
-                guild.channels
-                    .filter(c => c.type === "text")
-                    .sort((a, b) => a.position - b.position)
-                    .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            setImmediate(() => {
+                const channel = findDefaultChannel(guild);
+                if (!channel) return;
 
-            channel.sendTranslated("Hi! I'm new here. Let me introduce myself: I'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
-            log(`Trixie got invited and joined new guild ${guild.name}`);
-            updateGuildStatistics();
+                channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\nI'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
+                log(`Trixie got invited and joined new guild ${guild.name}`);
+                updateGuildStatistics();
+            });
         });
+
         this.client.addListener("guildDelete", guild => {
             log(`Trixie got removed from guild ${guild.name}`);
             updateGuildStatistics();
         });
+
         this.client.addListener("guildMemberAdd", async member => {
             const guild = member.guild;
 
-            const channel = guild.channels.find(c => c.name = "general") ||
-                guild.channels
-                    .filter(c => c.type === "text")
-                    .sort((a, b) => a.position - b.position)
-                    .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            const channel = findDefaultChannel(guild);
+            if (!channel) return;
+
             channel.send(this.config.get(member.guild.id, "new_user_message") || 
                 "**" + await channel.translate("New member joined our Guild, guys!") + "**\n" + 
                 await channel.translate("Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?", {
@@ -47,14 +47,13 @@ class MemberLog extends Command {
             log(`New member ${member.user.username} joined guild ${guild.name}`);
             updateGuildStatistics();
         });
+
         this.client.addListener("guildMemberRemove", async member => {
             const guild = member.guild;
 
-            const channel = guild.channels.find(c => c.name = "general") ||
-                guild.channels
-                    .filter(c => c.type === "text")
-                    .sort((a, b) => a.position - b.position)
-                    .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+            const channel = findDefaultChannel(guild);
+            if (!channel) return;
+
             channel.send(this.config.get(member.guild.id, "user_left_message") || 
                 "**" + await channel.translate("A soldier has left us") + "**\n" + 
                 await channel.translate("*{{user}}* left the server. Bye bye", {

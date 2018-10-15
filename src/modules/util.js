@@ -198,3 +198,11 @@ module.exports.findArgs = function findArgs(str) {
 module.exports.isPlainObject = function isPlainObject(input) {
     return input && !Array.isArray(input) && typeof input === "object";
 };
+
+module.exports.findDefaultChannel = function findDefaultChannel(guild) {
+    return guild.channels.find(c => c.name === "general") ||
+        guild.channels
+            .filter(c => c.type === "text" && c.send && {}.toString.call(c.send) === "[object Function]")
+            .sort((a, b) => a.position - b.position)
+            .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
+};

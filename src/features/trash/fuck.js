@@ -71,7 +71,7 @@ class FuckCommand extends Command {
                 }
 
                 const phrase = phrases.random();
-                const author = phrase.author;
+                // const author = phrase.author;
                 const username = mention.displayName || mention.username;
                 let text = phrase.text;
                 text = text.replace(/\$\{name\}'s/g,
@@ -79,7 +79,8 @@ class FuckCommand extends Command {
                         `${username}'` :
                         `${username}'s`);
                 text = text.replace(/\$\{name\}/g, username);
-                message.channel.send(`*${text}* (submitted by ${author})`);
+                // message.channel.send(`${text} (submitted by ${author})`);
+                message.channel.send(text);
                 log("Served fuck phrase: " + text);
                 return;
             }

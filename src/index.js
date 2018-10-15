@@ -11,7 +11,7 @@ const Command = require("./class/Command");
 const ConfigManager = require("./logic/Config");
 const LocaleManager = require("./logic/Locale");
 
-const { Message, Collector, Client }= Discord;
+const { Message, Collector, Client } = Discord;
 
 new class App {
     constructor() {
@@ -156,7 +156,7 @@ class AppCommand extends Command {
             }
 
             const collector = message.channel.createCollector(message => message.member.id === message.guild.me.id, {
-                max: 1, 
+                max: 1,
                 maxMatches: 1,
                 time: 60 * 1000
             });

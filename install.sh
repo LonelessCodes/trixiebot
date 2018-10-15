@@ -7,6 +7,9 @@ sudo apt-get update
 sudo ufw allow 80/tcp # HTTP
 sudo ufw allow 443/tcp # HTTPS
 
+# install build-essentials
+sudo apt-get install build-essential
+
 # prepare nodejs installation
 curl -sL https://deb.nodesource.com/setup_9.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh

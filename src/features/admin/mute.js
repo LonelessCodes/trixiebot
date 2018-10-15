@@ -13,7 +13,7 @@ class MuteCommand extends Command {
         const muted_words = (await this.db.find({ guildId: message.guild.id }).toArray()).map(doc => doc.word);
         const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
         if (muted_words.length > 0 && !permission) {
-            const content = message.content;
+            const content = message.content.toLowerCase();
             for (const word of muted_words) {
                 if (content.indexOf(word) === -1) continue;
 
@@ -67,7 +67,7 @@ class MuteCommand extends Command {
                 return;
             }
 
-            const word = message.content.substr(12).trim();
+            const word = message.content.substr(12).trim().toLowerCase();
 
             if (word === "") {
                 await message.channel.send(this.usage(message.prefix));
@@ -95,7 +95,7 @@ class MuteCommand extends Command {
             /**
              * @type {string}
              */
-            const word = message.content.substr(5).trim();
+            const word = message.content.substr(5).trim().toLowerCase();
 
             if (word === "") {
                 await message.channel.send(this.usage(message.prefix));

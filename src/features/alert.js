@@ -154,6 +154,7 @@ class AlertCommand extends Command {
             let url = msg.substr(7).trim();
             if (url === "") {
                 await message.channel.send(this.usage(message.prefix));
+                log("Served alert usage");
                 return;
             }
 
@@ -161,6 +162,7 @@ class AlertCommand extends Command {
                 await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
                     url
                 });
+                log("Page url given is not valid. - alert");
                 return;
             }
 
@@ -171,10 +173,12 @@ class AlertCommand extends Command {
                 await message.channel.sendTranslated("MMMMMMMMMMMMHHHHHHHH I don't know this... {{service}} or whatever", {
                     service: host
                 });
+                log("Service not supported - alert");
                 return;
             }
             if (!name) {
                 await message.channel.sendTranslated("You should also give me your channel page in the url instead of just the site!");
+                log("User page name not given - alert");
                 return;
             }
 

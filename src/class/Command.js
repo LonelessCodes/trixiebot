@@ -26,6 +26,7 @@ class Command {
 
     get ignore() { return true; }
     get guildOnly() { return false; }
+    get category() { return "Other"; }
     /** 
      * @param {string} prefix
      * @returns {string} 

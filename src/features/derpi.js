@@ -22,14 +22,14 @@ class DerpiCommand extends Command {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         // derpibooru
-        if (!/^db\b/i.test(message.content)) return;
+        if (!/^derpi\b/i.test(message.content)) return;
 
         const timestamp = Date.now();
 
         /**
          * @type {string}
          */
-        let msg = message.content.substr(3);
+        let msg = message.content.substr(6);
 
         if (msg === "") {
             await message.channel.send(this.usage(message.prefix));

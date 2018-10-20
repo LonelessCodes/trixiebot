@@ -13,6 +13,10 @@ const LocaleManager = require("./logic/Locale");
 
 const { Message, Collector, Client } = Discord;
 
+Array.prototype.last = function () {
+    return this[this.length - 1];
+};
+
 new class App {
     constructor() {
         // we're never removing and later adding listeners, so Infinity in .setMaxListeners() is ok
@@ -103,26 +107,6 @@ new class App {
     }
 };
 
-async function createUsage(fields, features, message) {
-    const type = message.channel.type;
-    const dm = type === "dm";
-
-    const usage = new Discord.RichEmbed;
-
-    for (const [title, command] of fields) {
-        if (!title) usage.addBlankField();
-        else {
-            const feature = features.get(command);
-            if (!feature) usage.addField(title, command);
-            else if (!(dm && feature.guildOnly)) {
-                usage.addField(title, feature.usage(message.prefix));
-            }
-        }
-    }
-
-    return usage;
-}
-
 class AppCommand extends Command {
     /**
      * 
@@ -206,43 +190,44 @@ class AppCommand extends Command {
             return;
         }
 
+        if (/^help\b/.test(message.content)) {
+            /**
+             * @type {string}
+             */
+            let msg = message.content.substr(5).trim();
+            if (msg === "") return;
+
+            /** @type {Command} */
+            const command = new Map(Array.from(this.features.commands.entries()).map(entry => {
+                return [entry[0].split("/").last().toLowerCase(), entry[1]];
+            })).get(msg.toLowerCase());
+            if (!command) return;
+
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            embed.setTitle(`Help for \`${msg.toLowerCase()}\``);
+            embed.setDescription(command.usage(message.prefix));
+
+            await message.channel.send({ embed });
+            log(`Send help for ${msg.toLowerCase()}`);
+            return;
+        }
+
         if (/^trixie\b/i.test(message.content)
             || /^!trixie\b/i.test(message.origContent)) { // still listen for ! prefix too
+            
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
 
-            const embed = await createUsage([
-                // ["Invite to your server", `\`${message.prefix}invite\``],
-                ["Derpibooru", "derpi"],
-                ["E621", "e621"],
-                ["Giphy", "gif"],
-                ["Roles", "role"],
-                ["Polls", "poll"],
-                ["MLP Wikia", "mlp"],
-                ["Uberfacts", "fact"],
-                ["Get to know your server", "serverinfo"],
-                ["TTS", "tts"],
-                ["Call into other servers", "call"],
-                ["Flip a Coin", "coin"],
-                ["Fuck a User", "trash/fuck"],
-                ["Flip Things", "trash/flip"],
-                ["Text Faces", "trash/face"],
-                ["Mlem", "trash/mlem"],
-                ["Hugs", "trash/hugs"],
-                ["Smolerize", "trash/smol"],
-                ["Larson", "trash/larson"],
-                ["CATS", "trash/cat"],
-                ["DOGS", "trash/dog"],
-                [],
-                ["Admin", "admin/timeout"],
-                ["Blacklist Words", "admin/mute"],
-                ["Deleted Messages", "admin/deleted-messages"],
-                ["Trixie Config", "admin/config"]
-            ], this.features, message);
-            embed.setDescription(this.features.get("app").usage(message.prefix));
-            embed.setColor(CONST.COLOUR);
+            embed.addField("Images Commands", ["derpi", "e621", "gif", "larson", "cat", "dog"].sort().map(s => `\`${s}\``).join(", "));
+            embed.addField("Action Commands", ["fuck", "flip", "mlem", "hug"].sort().map(s => `\`${s}\``).join(", "));
+            embed.addField("Audio Commands", ["tts", "call"].sort().map(s => `\`${s}\``).join(", "));
+            embed.addField("Mod Commands", ["config", "deleted", "locale", "mute", "timeout", "alert"].sort().map(s => `\`${s}\``).join(", "));
+            embed.addField("Info Commands", ["trixie", "serverinfo", "stats", "version", "donate"].sort().map(s => `\`${s}\``).join(", "));
+            embed.addField("Utility Commands", ["fact", "mlp", "stats"].sort().map(s => `\`${s}\``).join(", "));
+            embed.addField("Misc Commands", ["coin", "face", "smol", "expand dong", "penis", "cider", "invite", "poll", "role", "tellme"].sort().map(s => `\`${s}\``).join(", "));
+            
+            embed.setAuthor("TrixieBot Help", this.client.user.avatarURL);
+            embed.setDescription(`Command list\nTo check command usage, type !trixie help <command> // -> Commands: ${this.features.commands.size}`);
             embed.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
-
-            // if (await this.config.get(message.guild.id, "calling")) 
-            //     usage.addField("Call into other servers", this.features.get("call").usage(message.prefix));
 
             await message.channel.send({ embed });
             log("Requested usage");
@@ -268,7 +253,9 @@ class AppCommand extends Command {
             ]);
             await message.channel.send(link);
             return;
-        } else if (/^donate\b/i.test(message.content)) {
+        }
+        
+        if (/^donate\b/i.test(message.content)) {
             await message.channel.send("https://ko-fi.com/loneless");
             return;
         }

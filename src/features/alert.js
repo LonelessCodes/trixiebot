@@ -320,7 +320,7 @@ class AlertCommand extends Command {
                 name: channelPage.name,
                 messageId: null
             });
-            await message.channel.sendTranslated("Will be alerting you when {{name}} goes online!", {
+            await message.channel.sendTranslated("Will be alerting y'all there when {{name}} goes online!", {
                 name: channelPage.name
             });
             return;

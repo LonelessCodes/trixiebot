@@ -16,12 +16,12 @@ class MemberLog extends Command {
 
         updateGuildStatistics();
 
-        this.client.addListener("guildCreate", async guild => {
-            setImmediate(() => {
+        this.client.addListener("guildCreate", guild => {
+            setImmediate(async () => {
                 const channel = findDefaultChannel(guild);
                 if (!channel) return;
 
-                channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\nI'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
+                await channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\nI'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
                 log(`Trixie got invited and joined new guild ${guild.name}`);
                 updateGuildStatistics();
             });
@@ -38,7 +38,7 @@ class MemberLog extends Command {
             const channel = findDefaultChannel(guild);
             if (!channel) return;
 
-            channel.send(this.config.get(member.guild.id, "new_user_message") || 
+            await channel.send(this.config.get(guild.id, "new_user_message") || 
                 "**" + await channel.translate("New member joined our Guild, guys!") + "**\n" + 
                 await channel.translate("Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?", {
                     user: member.user.toString(),
@@ -54,7 +54,7 @@ class MemberLog extends Command {
             const channel = findDefaultChannel(guild);
             if (!channel) return;
 
-            channel.send(this.config.get(member.guild.id, "user_left_message") || 
+            await channel.send(this.config.get(guild.id, "user_left_message") || 
                 "**" + await channel.translate("A soldier has left us") + "**\n" + 
                 await channel.translate("*{{user}}* left the server. Bye bye", {
                     user: member.displayName

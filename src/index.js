@@ -11,6 +11,8 @@ const Command = require("./class/Command");
 const ConfigManager = require("./logic/Config");
 const LocaleManager = require("./logic/Locale");
 
+const ipc = require("./logic/ipc");
+
 const { Message, Collector, Client } = Discord;
 
 Array.prototype.last = function () {
@@ -47,9 +49,21 @@ new class App {
         this.config = new ConfigManager(this.client, this.db, {
             prefix: "!",
             calling: false,
-            explicit: true,
             admin_role: null,
-            uom: "in"
+            uom: "cm",
+            time: "24h",
+
+            leaveWelcomeChannel: null,
+            leaveWelcomeIgnBots: true,
+
+            welcomeMessage: {
+                enabled: false,
+                text: ""
+            },
+            leaveMessage: {
+                enabled: false,
+                text: ""
+            }
         });
         this.client.config = this.config;
 
@@ -118,9 +132,46 @@ class AppCommand extends Command {
         super(client, config);
         this.features = features;
 
-        this.db = db.collection("stats");
+        this.db = db.collection("bot_stats");
 
+        this.initializeIPC();
         this.initCommandStats();
+    }
+
+    async initializeIPC() {
+        await ipc.promiseStart;
+
+        ipc.answer("checkGuilds", async guildIds => {
+            return guildIds.filter(guildId => this.client.guilds.has(guildId));
+        });
+
+        ipc.answer("commands", async guildId => {
+            const commands = new Array;
+            const prefix = await this.config.get(guildId, "prefix");
+            this.features.commands.forEach(feature => {
+                const usage = feature.usage(prefix);
+                if (!usage) return;
+
+                const match = usage.match(new RegExp(`^\\\`${prefix}\\w+\\b`, "gi"));
+                if (!match || !match[0]) return;
+
+                const name = match[0].substr(2);
+                if (name === "") return;
+
+                commands.push({
+                    name,
+                    description: usage,
+                    enabled: true
+                });
+            });
+            return commands;
+        });
+
+        ipc.answer("settings", async guildId => {
+            const config = await this.config.get(guildId);
+
+            return config;
+        });
     }
 
     async initCommandStats() {

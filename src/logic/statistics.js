@@ -78,10 +78,7 @@ const stat = new StatisticsManager([
     "ACTIVE_WEB_USERS",
     "TOTAL_WEB_USERS",
     "SHARDS",
-    "COMMANDS_EXECUTED",
-
-    // histogram
-    "API_LATENCY"
+    "COMMANDS_EXECUTED"
 ]);
 
 module.exports = stat;

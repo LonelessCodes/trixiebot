@@ -32,6 +32,7 @@
     "mongodb": "^3.1.8",
     "node-fetch": "^1.7.3",
     "node-gettext": "^2.0.0",
+    "node-ipc": "^9.1.1",
     "node-opus": "^0.2.9",
     "tiny-text": "^1.0.1",
     "twit": "^2.2.11"

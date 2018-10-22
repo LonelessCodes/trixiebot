@@ -48,7 +48,14 @@ class ConfigManager {
         delete config.guildId;
         delete config._id;
 
-        if (parameter) return config[parameter];
+        if (parameter) {
+            parameter = parameter.split(".");
+            let path = config;
+            for (let param of parameter) {
+                path = path[param];
+            }
+            return path;
+        }
         else return config;
     }
 

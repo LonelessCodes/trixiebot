@@ -1,0 +1,102 @@
+const log = require("../modules/log");
+const uuid = require("uuid");
+const ipc = require("node-ipc");
+
+ipc.config.id = "trixiebot";
+ipc.config.retry = 1000;
+ipc.config.logger = log.bind(log);
+
+ipc.serve();
+
+const server = ipc.server;
+
+server.connected = false;
+server.started = false;
+
+server.promiseStart = new Promise(resolve => {
+
+    server.on("start", () => {
+        server.started = true;
+
+        server.on("connect", socket => {
+            server.connected = true;
+            ipc.log(`## connected to ${socket.id} ##`, ipc.config.delay);
+        });
+
+        server.on("socket.disconnect", (socket, socketId) => {
+            if (server.sockets.length !== 0) return;
+
+            server.connected = false;
+            ipc.log(`## disconnected from ${socketId} ##`);
+        });
+        
+        resolve();
+    });
+    
+});
+
+server.start();
+
+server.on(
+    "app.message",
+    function (data, socket) {
+        server.emit(
+            socket,
+            "app.message",
+            {
+                id: ipc.config.id,
+                message: data.message + " world!"
+            }
+        );
+    }
+);
+
+function getSocket() {
+    return server.sockets[server.sockets.length - 1]; // getting the newest connected socket
+}
+
+const oldEmit = server.emit.bind(server);
+function emit(message_bus, ...data) {
+    oldEmit(getSocket(), message_bus, ...data);
+}
+server.emit = emit.bind(server);
+
+server.answer = function answer(message_bus, callback) {
+    server.on(message_bus, (message, socket) => {
+        const { id, data } = message;
+
+        callback(data).then(response => {
+            oldEmit(socket, message_bus, {
+                id,
+                data: response
+            });
+        }).catch(err => ipc.log(err));
+    });
+};
+
+server.awaitAnswer = function awaitAnswer(message_bus, data) {
+    return new Promise((resolve, reject) => {
+        if (!server.started) reject();
+        if (!server.connected) reject();
+
+        const id = uuid.v1();
+
+        const socket = getSocket();
+
+        const handler = (message, s) => {
+            if (message.id !== id) return;
+            if (s !== socket) return;
+
+            server.off(message_bus, handler);
+            resolve(message.data);
+        };
+        server.on(message_bus, handler);
+
+        server.emit(socket, message_bus, {
+            id,
+            data
+        });
+    });
+};
+
+module.exports = server;

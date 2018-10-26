@@ -4,8 +4,13 @@
 sudo apt-get update
 
 # open ports for HTTP and HTTPS server
-sudo ufw allow 80/tcp # HTTP
-sudo ufw allow 443/tcp # HTTPS
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow http # HTTP
+sudo ufw allow https # HTTPS
+sudo ufw allow ssh # SSH
+sudo ufw allow 8080 # Dev Port
+sudo ufw enable # Run firewall
 
 # install build-essentials
 sudo apt-get install build-essential

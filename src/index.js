@@ -9,6 +9,7 @@ const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
 const ConfigManager = require("./logic/Config");
+const Parameter = ConfigManager.Parameter;
 const LocaleManager = require("./logic/Locale");
 
 const ipc = require("./logic/ipc");
@@ -46,25 +47,29 @@ new class App {
 
         statistics.get(statistics.STATS.SHARDS).set(1); // Sharding not implemented, so only one process of Trixie running
 
-        this.config = new ConfigManager(this.client, this.db, {
-            prefix: "!",
-            calling: false,
-            admin_role: null,
-            uom: "cm",
-            time: "24h",
+        this.config = new ConfigManager(this.client, this.db, [
+            new Parameter("prefix", "❗ Prefix", "!", String),
 
-            leaveWelcomeChannel: null,
-            leaveWelcomeIgnBots: true,
+            // new Parameter("calling", "📞 Accept calls servers", false, Boolean),
+            // new Parameter("admin_role", "👮 Set role for admin commands", null, String, true),
+            new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
+            // new Parameter("time", "🕑 Time display preference", "24h", ["24h", "12h"]),
 
-            welcomeMessage: {
-                enabled: false,
-                text: ""
-            },
-            leaveMessage: {
-                enabled: false,
-                text: ""
-            }
-        });
+            // new Parameter([
+            //     new Parameter("announce.channel", "Channel. 'none' annoucements disabled", null, String, true),
+            //     new Parameter("announce.bots", "Ignore Bots", true, Boolean)
+            // ], "🚪 Announce new/leaving users"),
+
+            // new Parameter([
+            //     new Parameter("welcome.enabled", "true/false", true, Boolean),
+            //     new Parameter("welcome.text", "Custom Text ('$user' as user)", null, String, true)
+            // ], "👋 Announce new users"),
+
+            // new Parameter([
+            //     new Parameter("leave.enabled", "true/false", true, Boolean),
+            //     new Parameter("leave.text", "Custom Text ('$user' as user)", null, String, true)
+            // ], "🚶 Announce leaving users")
+        ]);
         this.client.config = this.config;
 
         this.locale = new LocaleManager(this.client, this.db, [
@@ -169,8 +174,19 @@ class AppCommand extends Command {
 
         ipc.answer("settings", async guildId => {
             const config = await this.config.get(guildId);
+            const locale = await this.client.locale.get(guildId);
 
-            return config;
+            return Object({}, config, { locale });
+        });
+
+        ipc.answer("resetSettings", async guildId => {
+            await this.config.set(guildId, this.config.default_config);
+            await this.client.locale.set(guildId, "en");
+
+            const config = await this.config.get(guildId);
+            const locale = await this.client.locale.get(guildId);
+
+            return Object({}, config, { locale });
         });
     }
 
@@ -265,7 +281,7 @@ class AppCommand extends Command {
 
         if (/^trixie\b/i.test(message.content)
             || /^!trixie\b/i.test(message.origContent)) { // still listen for ! prefix too
-            
+
             const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
 
             embed.addField("Images Commands", ["derpi", "e621", "gif", "larson", "cat", "dog"].sort().map(s => `\`${s}\``).join(", "));
@@ -275,7 +291,7 @@ class AppCommand extends Command {
             embed.addField("Info Commands", ["trixie", "serverinfo", "stats", "version", "donate"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Utility Commands", ["fact", "mlp", "stats"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Misc Commands", ["coin", "face", "smol", "expand dong", "penis", "cider", "invite", "poll", "role", "tellme"].sort().map(s => `\`${s}\``).join(", "));
-            
+
             embed.setAuthor("TrixieBot Help", this.client.user.avatarURL);
             embed.setDescription(`Command list\nTo check command usage, type !trixie help <command> // -> Commands: ${this.features.commands.size}`);
             embed.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
@@ -305,7 +321,7 @@ class AppCommand extends Command {
             await message.channel.send(link);
             return;
         }
-        
+
         if (/^donate\b/i.test(message.content)) {
             await message.channel.send("https://ko-fi.com/loneless");
             return;

@@ -285,7 +285,7 @@ class AppCommand extends Command {
             const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
 
             embed.addField("Images Commands", ["derpi", "e621", "gif", "larson", "cat", "dog"].sort().map(s => `\`${s}\``).join(", "));
-            embed.addField("Action Commands", ["fuck", "flip", "mlem", "hug"].sort().map(s => `\`${s}\``).join(", "));
+            embed.addField("Action Commands", ["fuck", "flip", "mlem", "hug", "waifu"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Audio Commands", ["tts", "call"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Mod Commands", ["config", "deleted", "locale", "mute", "timeout", "alert"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Info Commands", ["trixie", "serverinfo", "stats", "version", "donate"].sort().map(s => `\`${s}\``).join(", "));

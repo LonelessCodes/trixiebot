@@ -108,16 +108,32 @@ class WaifuCommand extends Command {
                 cooldown.splice(cooldown.indexOf(message.guild.id), 1);
             }, 60 * 1000);
 
-            const allWaifus = await this.db.find({ guildId: message.guild.id }).toArray();
+            if (message.author.id === member.user.id) {
+                await message.channel.send("hahahahahahahahahahahaha that's cute, but no");
+                return;
+            }
 
             let waifu;
-            let pending = 100;
-            while (!waifu && pending--) {
-                const random = await randomNumber(0, allWaifus.length - 1);
-                if (allWaifus[random].waifuId !== message.author.id &&
-                    allWaifus[random].ownerId !== message.author.id &&
-                    message.guild.members.has(allWaifus[random].waifuId))
-                    waifu = allWaifus[random];
+            if (!member) {
+                const allWaifus = await this.db.find({ guildId: message.guild.id }).toArray();
+
+                let pending = 100;
+                while (!waifu && pending--) {
+                    const random = await randomNumber(0, allWaifus.length - 1);
+                    if (allWaifus[random].waifuId !== message.author.id &&
+                        allWaifus[random].ownerId !== message.author.id &&
+                        message.guild.members.has(allWaifus[random].waifuId))
+                        waifu = allWaifus[random];
+                }
+            } else {
+                const w = await this.db.findOne({ waifuId: member.user.id, guildId: message.guild.id });
+
+                if (w) {
+                    waifu = w;
+                } else {
+                    await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${member.displyaName}\` to call them your own!`);
+                    return;
+                }
             }
 
             if (!waifu) {
@@ -125,10 +141,10 @@ class WaifuCommand extends Command {
                 return;
             }
 
-            const owner = message.guild.members.get(waifu.ownerId);
-            const member = message.guild.members.get(waifu.waifuId);
+            const ownerUser = message.guild.members.get(waifu.ownerId);
+            const waifuUser = message.guild.members.get(waifu.waifuId);
 
-            await message.channel.send(`**${owner.displayName}**'s waifu **${member.displayName}** just seemed to have appeared nearby. You are quietly approaching them...`);
+            await message.channel.send(`**${ownerUser.displayName}**'s waifu **${waifuUser.displayName}** just seemed to have appeared nearby. You are quietly approaching them...`);
             await timeout(1000);
             const m = await message.channel.send(".");
             await timeout(500);
@@ -145,7 +161,7 @@ class WaifuCommand extends Command {
 
                 await this.db.updateOne({
                     guildId: message.guild.id,
-                    waifuId: member.user.id
+                    waifuId: waifuUser.user.id
                 }, {
                     $set: {
                         ownerId: message.author.id
@@ -154,11 +170,11 @@ class WaifuCommand extends Command {
                 await message.channel.send({
                     embed: new Discord.RichEmbed()
                         .setColor(CONST.COLOUR)
-                        .setAuthor(`Successful steal!!! ${member.displayName} now belongs to you!`, member.user.avatarURL)
+                        .setAuthor(`Successful steal!!! ${waifuUser.displayName} now belongs to you!`, waifuUser.user.avatarURL)
                 });
                 return;
             } else {
-                await message.channel.send(`**${member.displayName}** had got wind of your plans and dashed off at the next chance :c`);
+                await message.channel.send(`**${waifuUser.displayName}** had got wind of your plans and dashed off at the next chance :c`);
                 return;
             }
         }

@@ -149,11 +149,11 @@ module.exports.locale = function locale(code) {
 };
 
 module.exports.autoTranslate = async function (channel, str, format) {
-    return translate(str).locale(await channel.locale()).format(format).fetch();
+    return translate(str).locale(await channel.locale()).format(format).fetch() || str;
 };
 
 module.exports.autoTranslateChannel = async function (str, format) {
-    return translate(str).locale(await this.locale()).format(format).fetch();
+    return translate(str).locale(await this.locale()).format(format).fetch() || str;
 };
 
 module.exports.sendTranslated = async function (str, format, embed) {

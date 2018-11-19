@@ -55,20 +55,20 @@ new class App {
             new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
             // new Parameter("time", "🕑 Time display preference", "24h", ["24h", "12h"]),
 
-            // new Parameter([
-            //     new Parameter("announce.channel", "Channel. 'none' annoucements disabled", null, String, true),
-            //     new Parameter("announce.bots", "Ignore Bots", true, Boolean)
-            // ], "🚪 Announce new/leaving users"),
+            new Parameter([
+                // new Parameter("announce.channel", "Channel. 'none' annoucements disabled", null, String, true),
+                new Parameter("announce.bots", "Announce Bots", true, Boolean)
+            ], "🚪 Announce new/leaving users"),
 
-            // new Parameter([
-            //     new Parameter("welcome.enabled", "true/false", true, Boolean),
-            //     new Parameter("welcome.text", "Custom Text ('$user' as user)", null, String, true)
-            // ], "👋 Announce new users"),
+            new Parameter([
+                new Parameter("welcome.enabled", "true/false", false, Boolean),
+                new Parameter("welcome.text", "Custom Text ('$user' as user)", null, String, true)
+            ], "👋 Announce new users"),
 
-            // new Parameter([
-            //     new Parameter("leave.enabled", "true/false", true, Boolean),
-            //     new Parameter("leave.text", "Custom Text ('$user' as user)", null, String, true)
-            // ], "🚶 Announce leaving users")
+            new Parameter([
+                new Parameter("leave.enabled", "true/false", false, Boolean),
+                new Parameter("leave.text", "Custom Text ('$user' as user)", null, String, true)
+            ], "🚶 Announce leaving users")
         ]);
         this.client.config = this.config;
 
@@ -257,32 +257,32 @@ class AppCommand extends Command {
             return;
         }
 
-        if (/^help\b/.test(message.content)) {
+        if (/^help\b/i.test(message.content)) {
             /**
              * @type {string}
              */
             let msg = message.content.substr(5).trim();
-            if (msg === "") return;
+            if (msg !== "") {
+                /** @type {Command} */
+                const command = new Map(Array.from(this.features.commands.entries()).map(entry => {
+                    return [entry[0].split("/").last().toLowerCase(), entry[1]];
+                })).get(msg.toLowerCase());
+                if (!command) return;
 
-            /** @type {Command} */
-            const command = new Map(Array.from(this.features.commands.entries()).map(entry => {
-                return [entry[0].split("/").last().toLowerCase(), entry[1]];
-            })).get(msg.toLowerCase());
-            if (!command) return;
+                const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+                embed.setTitle(`Help for \`${msg.toLowerCase()}\``);
+                embed.setDescription(command.usage(message.prefix));
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
-            embed.setTitle(`Help for \`${msg.toLowerCase()}\``);
-            embed.setDescription(command.usage(message.prefix));
-
-            await message.channel.send({ embed });
-            log(`Send help for ${msg.toLowerCase()}`);
-            return;
+                await message.channel.send({ embed });
+                log(`Send help for ${msg.toLowerCase()}`);
+                return;
+            }
         }
 
         if (/^trixie\b/i.test(message.content)
             || /^!trixie\b/i.test(message.origContent)) { // still listen for ! prefix too
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
             embed.addField("Images Commands", ["derpi", "e621", "gif", "larson", "cat", "dog"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Action Commands", ["fuck", "flip", "mlem", "hug", "waifu"].sort().map(s => `\`${s}\``).join(", "));
@@ -293,7 +293,7 @@ class AppCommand extends Command {
             embed.addField("Misc Commands", ["coin", "face", "smol", "expand dong", "penis", "cider", "invite", "poll", "role", "tellme"].sort().map(s => `\`${s}\``).join(", "));
 
             embed.setAuthor("TrixieBot Help", this.client.user.avatarURL);
-            embed.setDescription(`Command list\nTo check command usage, type !trixie help <command> // -> Commands: ${this.features.commands.size}`);
+            embed.setDescription(`Command list\nTo check command usage, type \`!trixie help <command>\` // -> Commands: ${this.features.commands.size}`);
             embed.setFooter(`TrixieBot v${packageFile.version}`, this.client.user.avatarURL);
 
             await message.channel.send({ embed });

@@ -14,7 +14,7 @@ class StatCommand extends Command {
         if (!/^stats\b/i.test(message.content)) return;
 
         const embed = new Discord.RichEmbed()
-            .setColor(CONST.COLOUR)
+            .setColor(CONST.COLOR.PRIMARY)
             .addField("Server Count", statistics.get(statistics.STATS.SERVER_COUNT).get().toLocaleString("en"), true)
             .addField("Large Servers", statistics.get(statistics.STATS.LARGE_SERVERS).get().toLocaleString("en"), true)
             .addField("Total Members", statistics.get(statistics.STATS.TOTAL_MEMBERS).get().toLocaleString("en"), true)

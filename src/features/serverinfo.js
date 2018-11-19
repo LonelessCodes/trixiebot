@@ -8,7 +8,7 @@ class ServerInfoCommand extends Command {
         if (!message.prefixUsed) return;
         if (!/^serverinfo\b/i.test(message.content)) return;
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
         embed.setThumbnail(message.guild.iconURL);
 

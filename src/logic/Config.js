@@ -142,7 +142,11 @@ class ConfigManager {
         delete values._id;
 
         const config = await this._cache.get(guildId) || {};
-        this._cache.set(guildId, Object.assign({}, this.default_config, config, values, { guildId }));
+        for (const key in values) {
+            index(config, key, values[key]);
+        }
+        
+        this._cache.set(guildId, Object.assign({}, this.default_config, config, { guildId }));
     }
 }
 

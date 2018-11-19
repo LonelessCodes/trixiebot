@@ -40,26 +40,6 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
     }
 
     log("Loaded all uberfacts:", facts.size);
-
-    async function loadMoreTweets() {
-        const data = await twitter.get("statuses/user_timeline", {
-            screen_name: "UberFacts",
-            count: 200,
-            include_rts: false,
-            exclude_replies: true,
-            trim_user: true,
-            since_id: newest_id || void 0
-        });
-        return data;
-    }
-    setInterval(async function loadMoreTweetsInterval() {
-        const data = await loadMoreTweets();
-        if (data.length !== 0) {
-            newest_id = data[0].id_str;
-            data.filter(tweet => !tweet.entities.urls[0]).map(tweet => facts.add(tweet.text));
-        }
-        log(`Loaded ${data.length} more uberfacts`);
-    }, 3600000);
 }).catch(log);
 
 async function getFact() {

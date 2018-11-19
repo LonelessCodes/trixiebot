@@ -38,7 +38,7 @@ class HugsCommand extends Command {
         if (tmp !== "") {
             number = parseInt(tmp);
         }
-        const hug = hugs[number - 1];
+        const hug = hugs[number % 10 - 1];
         if (!hug) return await message.channel.send(this.usage(message.prefix));
         await message.channel.send(hug.replace("{{name}}", mention.displayName || mention.username));
         log(`Requested hug. Given ${hug}`);

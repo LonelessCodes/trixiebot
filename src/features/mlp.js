@@ -80,7 +80,7 @@ class MLPCommand extends Command {
         }
 
         const embed = new Discord.RichEmbed()
-            .setColor(CONST.COLOUR)
+            .setColor(CONST.COLOR.PRIMARY)
             .setTitle(title)
             .setDescription(abstract.abstract
                 .replace(new RegExp(query, "gi"), substring => `**${substring}**`)

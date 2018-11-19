@@ -19,7 +19,7 @@ class PenisCommand extends Command {
 
         const msg = message.content.substr(message.content.split(/\b/g)[0].length + 1).trim();
         if (/^leaderboard\b/i.test(msg)) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
             const penises = await this.db.find({ $or: message.guild.members.array().map(member => ({ userId: member.user.id })) }).toArray();
             const sorted = penises.sort((a, b) => b.length - a.length);

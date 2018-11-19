@@ -16,7 +16,7 @@ class ConfigCommand extends Command {
         const args = findArgs(msg);
 
         if (args.length === 0) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setTitle(message.guild.name);
             embed.setThumbnail(message.guild.iconURL);
 
@@ -44,7 +44,7 @@ class ConfigCommand extends Command {
             await message.channel.send({ embed });
             return;
         } else if (args.length === 1) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setThumbnail(message.guild.iconURL);
 
             const find = () => {
@@ -72,7 +72,7 @@ class ConfigCommand extends Command {
             await message.channel.send({ embed });
             return;
         } else if (args.length === 2) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
             const find = () => {
                 let rtn;

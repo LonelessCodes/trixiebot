@@ -1,11 +1,11 @@
 const { timeout } = require("../modules/util");
-const log = require("../modules/log");
 const randomNumber = require("random-number-csprng");
 const CONST = require("../modules/const");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
 
-const cooldown = new Array;
+const cooldown_guild = new Array;
+const cooldown_user = new Array;
 
 class WaifuCommand extends Command {
     constructor(client, config, db) {
@@ -19,66 +19,88 @@ class WaifuCommand extends Command {
         if (!/^waifu\b/i.test(message.content)) return;
 
         const msg = message.content.substr(6).trim();
-        const member = message.mentions.members.first();
+        const mentioned_member = message.mentions.members.first();
 
         // { ownerId,
         //   waifuId,
         //   guildId }
 
-        const ownerWaifus = await this.db.find({ ownerId: message.author.id, guildId: message.guild.id }).toArray();
+        const all_waifus = await this.db.find({ guildId: message.guild.id }).toArray();
+        for (const row of all_waifus) {
+            if (!message.guild.members.has(row.ownerId)) {
+                await this.db.deleteMany({ guildId: message.guild.id, ownerId: row.ownerId });
+            }
+
+            if (!message.guild.members.has(row.waifuId)) {
+                await this.db.deleteOne({ guildId: message.guild.id, waifuId: row.waifuId });
+            }
+        }
+
+        const owner_waifus = await this.db.find({
+            ownerId: message.author.id,
+            guildId: message.guild.id
+        }).toArray();
+
+        const owner_of_me = await this.db.findOne({
+            waifuId: message.author.id,
+            guildId: message.guild.id
+        });
 
         if (/^claim\b/i.test(msg)) {
-            // if (member.user.bot) {
-            //     await message.channel.send("As perfect as some bots are, I'm afraid this is not possible :c");
-            //     return;
-            // }
-
-            if (!member) {
+            if (!mentioned_member) {
                 await message.channel.send("must give @ mention your dream waifu!");
                 return;
             }
 
-            if (message.author.id === member.user.id) {
+            if (message.author.id === mentioned_member.user.id) {
                 await message.channel.send("hahahahahahahahahahahaha that's cute, but no");
                 return;
             }
 
-            if (3 - ownerWaifus.length === 0) {
+            if (3 - owner_waifus.length === 0) {
                 await message.channel.send("Stop it. Get some help. You have filled all your waifu slots already!");
                 return;
             }
 
-            if (ownerWaifus.find(row => row.waifuId === member.user.id)) {
+            if (owner_waifus.some(row => row.waifuId === mentioned_member.user.id)) {
                 await message.channel.send("Bruh. You already have this lad owo");
                 return;
             }
 
-            const otherOwner = await this.db.findOne({ guildId: message.guild.id, waifuId: member.user.id });
-            if (otherOwner) {
-                await message.channel.send(`Oh nu. ${message.guild.members.get(otherOwner.ownerId).toString()} already claimed this beautiful user!`);
-                return;
+            const owner = await this.db.findOne({
+                guildId: message.guild.id,
+                waifuId: mentioned_member.user.id
+            });
+            if (owner) {
+                const owner_member = message.guild.members.get(owner.ownerId);
+                if (owner_member) {
+                    await message.channel.send(`Oh nu. ${owner_member.toString()} already claimed this beautiful user!`);
+                    return;
+                }
+                
+                await this.db.deleteMany({ guildId: message.guild.id, ownerId: owner.ownerId });
             }
 
             await this.db.insertOne({
                 guildId: message.guild.id,
                 ownerId: message.author.id,
-                waifuId: member.user.id
+                waifuId: mentioned_member.user.id
             });
             await message.channel.send({
                 embed: new Discord.RichEmbed()
-                    .setColor(CONST.COLOUR)
-                    .setAuthor(`Successful claim!!! Have luck with ${member.displayName}!`, member.user.avatarURL)
+                    .setColor(CONST.COLOR.PRIMARY)
+                    .setAuthor(`Successful claim!!! Deep snug with ${mentioned_member.displayName} incoming!`, mentioned_member.user.avatarURL)
             });
             return;
         }
 
         if (/^unclaim\b/i.test(msg)) {
-            if (!member) {
+            if (!mentioned_member) {
                 await message.channel.send("must give @ mention!");
                 return;
             }
 
-            if (!ownerWaifus.find(row => row.waifuId === member.user.id)) {
+            if (!owner_waifus.find(row => row.waifuId === mentioned_member.user.id)) {
                 await message.channel.send("Never had this hun to begin with :v");
                 return;
             }
@@ -86,35 +108,38 @@ class WaifuCommand extends Command {
             await this.db.deleteOne({
                 guildId: message.guild.id,
                 ownerId: message.author.id,
-                waifuId: member.user.id
+                waifuId: mentioned_member.user.id
             });
             await message.channel.send("Good bye bb :C");
             return;
         }
 
         if (/^steal\b/i.test(msg)) {
-            if (3 - ownerWaifus.length === 0) {
+            if (3 - owner_waifus.length === 0) {
                 await message.channel.send("Stop it. Get some help. You have filled all your waifu slots already!");
                 return;
             }
 
-            if (cooldown.includes(message.guild.id)) {
+            if (cooldown_guild.includes(message.guild.id)) {
                 await message.channel.send("Not so hastily!");
                 return;
             }
-
-            cooldown.push(message.guild.id);
+            cooldown_guild.push(message.guild.id);
             setTimeout(() => {
-                cooldown.splice(cooldown.indexOf(message.guild.id), 1);
-            }, 60 * 1000);
+                cooldown_guild.splice(cooldown_guild.indexOf(message.guild.id), 1);
+            }, 10 * 1000);
 
-            if (message.author.id === member.user.id) {
-                await message.channel.send("hahahahahahahahahahahaha that's cute, but no");
+            if (cooldown_user.includes(message.guild.id)) {
+                await message.channel.send("Not so hastily!");
                 return;
             }
+            cooldown_user.push(message.guild.id);
+            setTimeout(() => {
+                cooldown_user.splice(cooldown_user.indexOf(message.guild.id), 1);
+            }, 60 * 1000);
 
             let waifu;
-            if (!member) {
+            if (!mentioned_member) {
                 const allWaifus = await this.db.find({ guildId: message.guild.id }).toArray();
 
                 let pending = 100;
@@ -126,12 +151,24 @@ class WaifuCommand extends Command {
                         waifu = allWaifus[random];
                 }
             } else {
-                const w = await this.db.findOne({ waifuId: member.user.id, guildId: message.guild.id });
+                if (message.author.id === mentioned_member.user.id) {
+                    await message.channel.send("hahahahahahahahahahahaha that's cute, but no");
+                    return;
+                }
+
+                const w = await this.db.findOne({ waifuId: mentioned_member.user.id, guildId: message.guild.id });
 
                 if (w) {
-                    waifu = w;
+                    const owner_member = message.guild.members.get(w.ownerId);
+                    if (owner_member) {
+                        waifu = w;
+                    } else {
+                        await this.db.deleteMany({ guildId: message.guild.id, ownerId: w.ownerId });
+                        await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displyaName}\` to call them your own!`);
+                        return;
+                    }
                 } else {
-                    await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${member.displyaName}\` to call them your own!`);
+                    await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displyaName}\` to call them your own!`);
                     return;
                 }
             }
@@ -169,7 +206,7 @@ class WaifuCommand extends Command {
                 });
                 await message.channel.send({
                     embed: new Discord.RichEmbed()
-                        .setColor(CONST.COLOUR)
+                        .setColor(CONST.COLOR.PRIMARY)
                         .setAuthor(`Successful steal!!! ${waifuUser.displayName} now belongs to you!`, waifuUser.user.avatarURL)
                 });
                 return;
@@ -179,19 +216,98 @@ class WaifuCommand extends Command {
             }
         }
 
+        if (/^trade\b/i.test(msg)) {
+            if (message.mentions.members.size !== 2) {
+                await message.channel.send("Specify waifu you want to trade, and the waifu you want to have.");
+                return;
+            }
+
+            const matched = message.content.match(/<@!?(1|\d{17,19})>/g);
+
+            let has_ex = matched[0].indexOf("!") > -1;
+            const my_waifu = message.guild.members.get(
+                matched[0].substr(has_ex ? 3 : 2, matched[0].length - (has_ex ? 4 : 3)));
+            
+            has_ex = matched[1].indexOf("!") > -1;
+            const other_waifu = message.guild.members.get(
+                matched[1].substr(has_ex ? 3 : 2, matched[1].length - (has_ex ? 4 : 3)));
+
+            if (message.author.id === my_waifu.user.id ||
+                message.author.id === other_waifu.user.id) {
+                await message.channel.send("hahahahahahahahahahahaha that's cute, but no");
+                return;
+            }
+
+            const waifu = owner_waifus.find(w => w.waifuId === my_waifu.user.id);
+            if (!waifu) {
+                await message.channel.send(`**${my_waifu.displayName}** can't be traded, because they don't belong to you!`);
+                return;
+            }
+
+            const trade_waifu = await this.db.findOne({
+                waifuId: other_waifu.user.id,
+                guildId: message.guild.id
+            });
+            if (trade_waifu.ownerId === message.author.id) {
+                await message.channel.send(`**${other_waifu.displayName}** belongs to you. But second @mention should be someone else's waifu.`);
+                return;
+            }
+
+            const other_owner = message.guild.members.get(trade_waifu.ownerId);
+            if (!trade_waifu || !other_owner) {
+                await message.channel.send(`**${my_waifu.displayName}** can't be traded, because they don't belong to anyone!`);
+                return;
+            }
+
+            await message.channel.send(`**${other_owner.displayName}**, do you agree to trade your **${other_waifu.displayName}** with **${my_waifu.displayName}**? \`yes\`, \`no\`?`);
+
+            const messages = await message.channel.awaitMessages((message) => {
+                if (message.author.id !== other_owner.user.id) return false;
+                if (!/^(yes|no)\b/i.test(message.content)) return false;
+                return true;
+            }, {
+                maxMatches: 1,
+                time: 2 * 60 * 1000
+            });
+            
+            if (messages.size === 0) {
+                await message.channel.send("Timeout :v guess they don't wanna");
+                return;
+            }
+
+            const msg = messages.first().content;
+
+            if (/^no\b/i.test(msg)) {
+                await message.channel.send(`N'aww :c poor **${message.member.displayName}**`);
+                return;
+            }
+
+            await this.db.updateOne({ waifuId: my_waifu.user.id, guildId: message.guild.id }, { $set: { ownerId: other_owner.user.id } });
+            await this.db.updateOne({ waifuId: other_waifu.user.id, guildId: message.guild.id }, { $set: { ownerId: message.author.id } });
+
+            await message.channel.send({
+                embed: new Discord.RichEmbed()
+                    .setColor(CONST.COLOR.PRIMARY)
+                    .setTitle("Trading")
+                    .setDescription(`**${my_waifu.displayName}** :arrow_right: **${other_owner.displayName}**
+**${message.member.displayName}** :arrow_left: **${other_waifu.displayName}**`)
+            });
+            return;
+        }
+
         if (/^buyslot\b/i.test(msg)) {
             return;
         }
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         embed.setThumbnail(message.author.avatarURL);
         embed.setTitle("Your Waifus");
 
-        if (!ownerWaifus) {
-            embed.setDescription(`No waifus to see here, just dust :(\nYou can get waifus by claiming someone! Use ${message.prefix}waifu claim to get started.`);
+        if (!owner_waifus.length) {
+            embed.setDescription(`No waifus to see here, just dust :(\nYou can get waifus by claiming someone! Use \`${message.prefix}waifu claim\` to get started.`);
         } else {
             let str = "";
-            for (const waifu of ownerWaifus) {
+            for (const waifu of owner_waifus) {
                 const member = message.guild.members.get(waifu.waifuId);
                 if (!member) continue;
                 str += `**${member.user.username}** #${member.user.discriminator}\n`;
@@ -199,7 +315,13 @@ class WaifuCommand extends Command {
             embed.setDescription(str);
         }
 
-        embed.setFooter(`Total Waifus: ${ownerWaifus.length} - Available Slots: ${3 - ownerWaifus.length}`);
+        if (owner_of_me) {
+            const owner = message.guild.members.get(owner_of_me.ownerId);
+            if (owner)
+                embed.addField("Owned by", `**${owner.user.username}** #${owner.user.discriminator}\n`);
+        }
+
+        embed.setFooter(`Total Waifus: ${owner_waifus.length} - Available Slots: ${3 - owner_waifus.length}`);
         await message.channel.send({ embed });
     }
 
@@ -209,7 +331,8 @@ class WaifuCommand extends Command {
         return `\`${prefix}waifu\` - Show all waifus you have claimed.
 \`${prefix}waifu claim <@mention>\` - Claim the person you mentioned if not already claimed.
 \`${prefix}waifu unclaim <@mention>\` - Unclaim the person you mentioned if already claimed.
-\`${prefix}waifu steal\` - Steals a random waifu with a chance of 5%`;
+\`${prefix}waifu steal <@mention>\` - Steals a random waifu with a chance of 5%.
+\`${prefix}waifu trade <@your waifu> with <@other waifu> - Trade waifus with other senpais.`;
     }
 }
 

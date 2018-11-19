@@ -74,7 +74,7 @@ class Poll {
         const total = this.users.size; // get num of votes
 
         if (total < 1) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setDescription(await this.channel.translate("But no one voted :c"));
             await this.channel.sendTranslated("{{user}} Poll ended!", {
                 user: this.creator.toString()
@@ -90,7 +90,7 @@ class Poll {
             }))
             .sort((a, b) => b.votes - a.votes);
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         for (const vote of result)
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
         embed.setFooter(locale.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));

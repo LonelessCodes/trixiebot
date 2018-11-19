@@ -13,7 +13,7 @@ class LocaleCommand extends Command {
         let msg = message.content.substr(7).trim();
 
         if (msg === "") {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             const locale = await message.locale();
             embed.addField("global", locale.global);
             const channels = locale.channels || {};

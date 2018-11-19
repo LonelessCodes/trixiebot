@@ -1,4 +1,4 @@
-const colors = require("colors");
+const chalk = require("chalk");
 
 /**
  * Fits the length of the input string to the specified length.
@@ -23,7 +23,7 @@ function getTimeString() {
         toString(d.getSeconds(), 2) + "." +
         toString(d.getMilliseconds(), 3);
 
-    return colors.cyan.bold(time) + ">";
+    return chalk.cyan.bold(time) + ">";
 }
 
 
@@ -47,15 +47,15 @@ class Logger extends Function {
     }
 
     warn(...messages) {
-        console.warn(getTimeString(), colors.yellow("warn"), ...messages);
+        console.warn(getTimeString(), chalk.yellow("warn"), ...messages);
     }
 
     error(...messages) {
-        console.error(getTimeString(), colors.bgRed.white.bold("error"), ...messages);
+        console.error(getTimeString(), chalk.bgRed.white.bold("error"), ...messages);
     }
 
     debug(file, ...messages) {
-        console.debug(getTimeString(), colors.cyan.bold(file), ...messages);
+        console.debug(getTimeString(), chalk.cyan.bold(file), ...messages);
     }
 }
 

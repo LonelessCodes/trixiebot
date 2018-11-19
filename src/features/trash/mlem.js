@@ -9,7 +9,7 @@ class MlemCommand extends Command {
 
         if (/^mlem\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOUR)
+                .setColor(CONST.COLOR.PRIMARY)
                 .setTitle("MLEM o3o")
                 .setImage("https://d.equestriadev.de/i/_mlem.gif")
                 .setFooter(await message.channel.translate("The chat got mlem'd by {{user}} | Art by n0nnny", {
@@ -22,7 +22,7 @@ class MlemCommand extends Command {
 
         if (/^blep\b/i.test(message.content)) {
             const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOUR)
+                .setColor(CONST.COLOR.PRIMARY)
                 .setTitle("BLEP o3o")
                 .setImage("https://d.equestriadev.de/i/_blep.gif")
                 .setFooter(await message.channel.translate("The chat got blep'd by {{user}} | Art by n0nnny", {

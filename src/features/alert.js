@@ -2,12 +2,22 @@ const fetch = require("node-fetch");
 const log = require("../modules/log");
 const CONST = require("../modules/const");
 const Command = require("../class/Command");
+// const twitch = require("twitch");
 const Discord = require("discord.js");
+
+// const keys = {
+//     twitch: require("../../keys/twitch.json")
+// };
 
 const base = "https://api.picarto.tv/v1/";
 
 const services = {
-    "picarto.tv": "picarto"
+    "picarto.tv": "picarto",
+    // "twitch.tv": "twitch"
+};
+const services_reversed = {
+    "picarto": "picarto.tv",
+    // "twitch": "twitch.tv"
 };
 
 async function request(api) {
@@ -82,10 +92,10 @@ class AlertCommand extends Command {
                     guildId: savedConfig.guildId,
                     userId: savedConfig.userId
                 }, {
-                    $set: {
-                        messageId: null
-                    }
-                });
+                        $set: {
+                            messageId: null
+                        }
+                    });
 
                 // also delete the online message
                 const onlineMessage = await guildChannel.fetchMessage((oldChannel || savedConfig).messageId);
@@ -100,7 +110,7 @@ class AlertCommand extends Command {
             channelPage = await request("channel/id/" + channelPage.user_id);
 
             const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOUR)
+                .setColor(CONST.COLOR.PRIMARY)
                 .setURL("https://www.picarto.tv/" + channelPage.name)
                 .setAuthor(channelPage.name)
                 .setTitle(channelPage.title)
@@ -129,11 +139,11 @@ class AlertCommand extends Command {
                 guildId: savedConfig.guildId,
                 userId: savedConfig.userId
             }, {
-                $set: {
-                    name: channelPage.name,
-                    messageId: onlineMessage.id
-                }
-            });
+                    $set: {
+                        name: channelPage.name,
+                        messageId: onlineMessage.id
+                    }
+                });
         }
     }
 
@@ -151,6 +161,7 @@ class AlertCommand extends Command {
         }
 
         if (/^remove\b/i.test(msg)) {
+
             let url = msg.substr(7).trim();
             if (url === "") {
                 await message.channel.send(this.usage(message.prefix));
@@ -216,7 +227,10 @@ class AlertCommand extends Command {
                 const guildChannel = message.guild.channels.get(savedConfig.channelId);
                 if (!guildChannel) return;
 
-                const onlineMessage = await guildChannel.fetchMessage((oldChannel || savedConfig).messageId);
+                const channel = oldChannel || savedConfig;
+                if (!channel.messageId) return;
+
+                const onlineMessage = await guildChannel.fetchMessage(channel.messageId);
                 if (!onlineMessage) return;
 
                 await onlineMessage.delete();
@@ -241,14 +255,14 @@ class AlertCommand extends Command {
                 sorted_by_channels[stream.channelId] = [...(sorted_by_channels[stream.channelId] || []), stream];
             }
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             for (const channelId in sorted_by_channels) {
                 const channel = message.guild.channels.get(channelId);
                 if (!channel) continue;
 
                 let str = "";
                 for (const stream of sorted_by_channels[channelId]) {
-                    str += `${stream.service}  ${stream.name}` + "\n";
+                    str += `${services_reversed[stream.service]}/**${stream.name}**\n`;
                 }
 
                 embed.addField("#" + channel.name, str);
@@ -259,11 +273,7 @@ class AlertCommand extends Command {
             return;
         }
 
-        const channel = message.mentions.channels.first();
-        if (!channel) {
-            await message.channel.sendTranslated("You need to also tell me a channel where to put alerts!");
-            return;
-        }
+        const channel = message.mentions.channels.first() || message.channel;
 
         const url = msg.replace(new RegExp(channel.toString(), "g"), "").trim();
         if (url === "") {
@@ -328,7 +338,7 @@ class AlertCommand extends Command {
     }
 
     usage(prefix) {
-        return `\`${prefix}alert <page url> <channel>\` - subscribe Trixie to a Picarto channel
+        return `\`${prefix}alert <page url> <?channel>\` - subscribe Trixie to a Picarto channel
 \`page url\` - copy the url of the stream page and paste it in here
 \`channel\` - the channel to post the alert to later
 

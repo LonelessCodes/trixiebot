@@ -35,15 +35,20 @@ class MemberLog extends Command {
         this.client.addListener("guildMemberAdd", async member => {
             const guild = member.guild;
 
+            if (!(await this.config.get(guild.id, "welcome.enabled"))) return;
+            if (member.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
+
             const channel = findDefaultChannel(guild);
             if (!channel) return;
 
-            await channel.send(this.config.get(guild.id, "new_user_message") || 
-                "**" + await channel.translate("New member joined our Guild, guys!") + "**\n" + 
+            const str = await this.config.get(guild.id, "welcome.text") ||
+                "**" + await channel.translate("New member joined our Guild, guys!") + "**\n" +
                 await channel.translate("Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?", {
                     user: member.user.toString(),
-                    rulesChannel: guild.channels.find(c => c.name = "welcome").toString()
-                }));
+                    rulesChannel: "#welcome"
+                });
+
+            await channel.send(str);
             log(`New member ${member.user.username} joined guild ${guild.name}`);
             updateGuildStatistics();
         });
@@ -51,14 +56,19 @@ class MemberLog extends Command {
         this.client.addListener("guildMemberRemove", async member => {
             const guild = member.guild;
 
+            if (!(await this.config.get(guild.id, "leave.enabled"))) return;
+            if (member.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
+
             const channel = findDefaultChannel(guild);
             if (!channel) return;
 
-            await channel.send(this.config.get(guild.id, "user_left_message") || 
-                "**" + await channel.translate("A soldier has left us") + "**\n" + 
+            const str = await this.config.get(guild.id, "leave.text") ||
+                "**" + await channel.translate("A soldier has left us") + "**\n" +
                 await channel.translate("*{{user}}* left the server. Bye bye", {
                     user: member.displayName
-                }));
+                });
+
+            await channel.send(str);
             log(`Member ${member.user.username} left guild ${guild.name}`);
             updateGuildStatistics();
         });

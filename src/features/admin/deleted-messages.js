@@ -66,7 +66,7 @@ class DeletedMessagesCommand extends Command {
                     channels[deletedMessage.channelId].push(deletedMessage) :
                     channels[deletedMessage.channelId] = [deletedMessage]);
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOUR);
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
             for (const channelId in channels) {
                 const messages = channels[channelId].sort((a, b) => b.timestamp - a.timestamp);

@@ -25,7 +25,7 @@ class TellMeCommand extends Command {
         }
 
         const embed = new Discord.RichEmbed()
-            .setColor(CONST.COLOUR)
+            .setColor(CONST.COLOR.PRIMARY)
             .setTitle(`${magic.answer} :crystal_ball:`)
             .setImage("https://derpicdn.net/img/view/2017/7/20/1490419.png")
             .setFooter("Edited screenshot by xhazxmatx");

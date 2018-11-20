@@ -72,6 +72,23 @@ class MemberLog extends Command {
             log(`Member ${member.user.username} left guild ${guild.name}`);
             updateGuildStatistics();
         });
+
+        this.client.addListener("guildBanAdd", async (guild, user) => {
+            if (!(await this.config.get(guild.id, "ban.enabled"))) return;
+            if (user.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
+
+            const channel = guild.channels.get(await this.config.get(guild.id, "announce.channel"));
+            if (!channel) return;
+
+            const str = format(await this.config.get(guild.id, "ban.text") ||
+                "{{user}} has been banned from the server. Don't let the door hit your ass on the way out!", {
+                user: `**${user.username}** #${user.descriminator}`
+            });
+
+            await channel.send(str);
+            log(`User ${user.username} has been banned from guild ${guild.name}`);
+            updateGuildStatistics();
+        });
     }
 }
 

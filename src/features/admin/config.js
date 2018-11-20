@@ -17,7 +17,8 @@ class ConfigCommand extends Command {
         if (!message.prefixUsed) return;
         if (!/^config\b/i.test(message.content)) return;
 
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.ADMINISTRATOR);
+        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.ADMINISTRATOR) ||
+            message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_GUILD);
         if (!permission) return;
 
         let msg = message.content.substr(7).trim();

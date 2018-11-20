@@ -58,7 +58,7 @@ new class App {
             new Parameter([
                 new Parameter("announce.channel", "Channel. 'none' disables announcements", null, Discord.TextChannel, true),
                 new Parameter("announce.bots", "Announce Bots", true, Boolean)
-            ], "🚪 Announce new/leaving users"),
+            ], "🚪 Announce new/leaving/banned users"),
 
             new Parameter([
                 new Parameter("welcome.enabled", "true/false", false, Boolean),
@@ -68,7 +68,12 @@ new class App {
             new Parameter([
                 new Parameter("leave.enabled", "true/false", false, Boolean),
                 new Parameter("leave.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true)
-            ], "🚶 Announce leaving users")
+            ], "🚶 Announce leaving users"),
+
+            new Parameter([
+                new Parameter("ban.enabled", "true/false", false, Boolean),
+                new Parameter("ban.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true)
+            ], "🚶 Announce banned users")
         ]);
         this.client.config = this.config;
 
@@ -317,7 +322,9 @@ class AppCommand extends Command {
                 FLAGS.MANAGE_MESSAGES,
                 FLAGS.EMBED_LINKS,
                 FLAGS.MENTION_EVERYONE,
-                FLAGS.ADD_REACTIONS
+                FLAGS.ADD_REACTIONS,
+                FLAGS.BAN_MEMBERS,
+                FLAGS.KICK_MEMBERS
             ]);
             await message.channel.send(link);
             return;

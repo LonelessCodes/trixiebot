@@ -92,10 +92,10 @@ class AlertCommand extends Command {
                     guildId: savedConfig.guildId,
                     userId: savedConfig.userId
                 }, {
-                        $set: {
-                            messageId: null
-                        }
-                    });
+                    $set: {
+                        messageId: null
+                    }
+                });
 
                 // also delete the online message
                 const onlineMessage = await guildChannel.fetchMessage((oldChannel || savedConfig).messageId);
@@ -117,8 +117,8 @@ class AlertCommand extends Command {
                 .addField("Followers", channelPage.followers, true)
                 .addField("Total Viewers", channelPage.viewers_total, true)
                 .setThumbnail(channelPage.avatar)
-                .setImage(`${channelPage.thumbnails.web_large}?${Date.now()}`)
-                .setFooter(`${channelPage.adult ? "NSFW | " : ""} Category: ${channelPage.category} | Tags: ${channelPage.tags.join(", ")}`);
+                .setImage(!(channelPage.adult && guildChannel.nsfw) ? `${channelPage.thumbnails.web_large}?${Date.now()}` : "https://66.media.tumblr.com/6c2c27a36111b356b65cf21746b72698/tumblr_p4tu9xcuEv1v9xi8y_og_500.jpg")
+                .setFooter(`${channelPage.adult ? "NSFW | " : ""}Category: ${channelPage.category} | Tags: ${channelPage.tags.join(", ")}`);
 
             const onlineMessage = await guildChannel.sendTranslated("{{user}} is live!", {
                 user: channelPage.name

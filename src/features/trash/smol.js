@@ -11,7 +11,7 @@ class SmolCommand extends Command {
             message.mentions.members.first() :
             message.mentions.users.first();
         if (!mention) {
-            const text = message.content.replace(/\s+/g, " ");
+            const text = message.content.replace(/[^\S\x0a\x0d]+/g, " ");
             const tmp = text.substr(5);
             if (tmp === "") {
                 await message.channel.send(`Usage: \`${message.prefix}smol <string|user>\``);

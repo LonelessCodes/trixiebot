@@ -1,6 +1,6 @@
 const { isPlainObject } = require("../modules/util");
 const { Db } = require("mongodb");
-const { Client } = require("discord.js");
+const { Client, TextChannel } = require("discord.js");
 const DocumentCache = require("./DocumentCache");
 
 function index(obj, is, value) {
@@ -25,6 +25,12 @@ class Parameter {
         if (type instanceof Array) this.types = type;
         else this.types = [type];
         this.allowEmpty = allowEmpty;
+        /** @type {Client} */
+        this.client = null;
+    }
+
+    setClient(client) {
+        this.client = client;
     }
 
     format(value) {
@@ -39,13 +45,27 @@ class Parameter {
         if (this.types.includes(Boolean) && /true|false|yes|no/i.test(value)) return /true|yes/i.test(value) ? true : false;
         if (this.types.includes(Number) && !Number.isNaN(parseFloat(value))) return parseFloat(value);
         if (this.types.includes(String)) return value;
+
+        if (this.types.includes(TextChannel)) return value.substr(2, value.length - 3);
         
+        return value;
+    }
+
+    human(value) {
+        if (this.allowEmpty && !value) return "none";
+        if (this.types.includes(TextChannel)) {
+            return "#" + (this.client.channels.get(value) || { name: "deleted-channel" }).name;
+        }
+
         return value;
     }
 
     check(value) {
         if (!this.allowEmpty && (/empty|none/i.test(value) || value === "" || value === null)) return false;
+        else if (this.allowEmpty && (/empty|none/i.test(value) || value === "" || value === null)) return true;
         if (value === "default") return true;
+
+        if (this.types.includes(TextChannel) && /^<(#\d{12,})>/.test(value)) return true;
 
         if (this.types.includes(String)) return true;
         if (this.types.includes(Number) && !Number.isNaN(parseFloat(value))) return true;
@@ -81,11 +101,13 @@ class ConfigManager {
         for (let i = 0; i < parameters.length; i++) {
             let parameter = parameters[i];
             parameter.position = i;
+            parameter.setClient(this.client);
 
             if (parameter.name instanceof Array) {
                 for (let j = 0; j < parameter.name.length; j++) {
                     let sub = parameter.name[j];
                     sub.position = j;
+                    sub.setClient(this.client);
 
                     index(values, sub.name, sub.defaultValue);
                 }

@@ -68,7 +68,7 @@ Command.CommandManager = class CommandManager {
                     // remove prefix for prefix independant commands
                     const cleanMessage = await removePrefix(message);
                     // clean up multiple whitespaces
-                    cleanMessage.content = cleanMessage.content.replace(/\s+/g, " ").trim();
+                    cleanMessage.content = cleanMessage.content.replace(/[^\S\x0a\x0d]+/g, " ").trim();
                     await command.onmessage(cleanMessage, passthru);
                 } catch (err) {
                     log(err);

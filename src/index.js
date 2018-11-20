@@ -51,23 +51,23 @@ new class App {
             new Parameter("prefix", "❗ Prefix", "!", String),
 
             // new Parameter("calling", "📞 Accept calls servers", false, Boolean),
-            // new Parameter("admin_role", "👮 Set role for admin commands", null, String, true),
+            // new Parameter("admin_role", "👮 Set role for admin commands", null, Discord.Role, true),
             new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
             // new Parameter("time", "🕑 Time display preference", "24h", ["24h", "12h"]),
 
             new Parameter([
-                // new Parameter("announce.channel", "Channel. 'none' annoucements disabled", null, String, true),
+                new Parameter("announce.channel", "Channel. 'none' disables announcements", null, Discord.TextChannel, true),
                 new Parameter("announce.bots", "Announce Bots", true, Boolean)
             ], "🚪 Announce new/leaving users"),
 
             new Parameter([
                 new Parameter("welcome.enabled", "true/false", false, Boolean),
-                new Parameter("welcome.text", "Custom Text ('$user' as user)", null, String, true)
+                new Parameter("welcome.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true)
             ], "👋 Announce new users"),
 
             new Parameter([
                 new Parameter("leave.enabled", "true/false", false, Boolean),
-                new Parameter("leave.text", "Custom Text ('$user' as user)", null, String, true)
+                new Parameter("leave.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true)
             ], "🚶 Announce leaving users")
         ]);
         this.client.config = this.config;
@@ -113,6 +113,8 @@ new class App {
     async initializeFeatures() {
         const features = new Command.CommandManager(this.client, this.config, this.db);
 
+        features.registerCommand("app", new AppCommand(this.client, this.config, this.db, features));
+
         for (const file of await walk(path.resolve(__dirname, "features"))) {
             if (path.extname(file) !== ".js") continue;
 
@@ -122,7 +124,6 @@ new class App {
                 file.substring((__dirname + "/features/").length, file.length - path.extname(file).length).replace(/\\/g, "/"),
                 new Feature(this.client, this.config, this.db));
         }
-        features.registerCommand("app", new AppCommand(this.client, this.config, this.db, features));
     }
 };
 
@@ -251,7 +252,7 @@ class AppCommand extends Command {
             const m = await message.channel.send(pongText);
             const ping = m.createdTimestamp - message.createdTimestamp;
             await m.edit(pongText + "\n" +
-                `:stopwatch: \`Latency is ${ping}ms\`\n` +
+                `:stopwatch: \`Latency is     ${ping}ms\`\n` +
                 `:heartbeat: \`API Latency is ${Math.round(this.client.ping)}ms\``);
             log(`Requested ping. Got ping of ${ping}ms`);
             return;

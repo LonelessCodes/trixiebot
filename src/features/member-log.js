@@ -1,6 +1,7 @@
 const log = require("../modules/log");
 const statistics = require("../logic/statistics");
 const { findDefaultChannel } = require("../modules/util");
+const { format } = require("../logic/Locale");
 const Command = require("../class/Command");
 
 class MemberLog extends Command {
@@ -38,15 +39,14 @@ class MemberLog extends Command {
             if (!(await this.config.get(guild.id, "welcome.enabled"))) return;
             if (member.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
 
-            const channel = findDefaultChannel(guild);
+            const channel = guild.channels.get(await this.config.get(guild.id, "announce.channel"));
             if (!channel) return;
 
-            const str = await this.config.get(guild.id, "welcome.text") ||
-                "**" + await channel.translate("New member joined our Guild, guys!") + "**\n" +
-                await channel.translate("Hey, {{user}} welcome to the baloney server! How 'bout throwing a quick look into {{rulesChannel}}?", {
-                    user: member.user.toString(),
-                    rulesChannel: "#welcome"
-                });
+            const str = format(await this.config.get(guild.id, "welcome.text") ||
+                ("**" + await channel.translate("New member joined our Guild, guys!") + "**\n" +
+                await channel.translate("Hey, {{user}} welcome to the server!")), {
+                user: member.toString()
+            });
 
             await channel.send(str);
             log(`New member ${member.user.username} joined guild ${guild.name}`);
@@ -59,14 +59,14 @@ class MemberLog extends Command {
             if (!(await this.config.get(guild.id, "leave.enabled"))) return;
             if (member.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
 
-            const channel = findDefaultChannel(guild);
+            const channel = guild.channels.get(await this.config.get(guild.id, "announce.channel"));
             if (!channel) return;
 
-            const str = await this.config.get(guild.id, "leave.text") ||
-                "**" + await channel.translate("A soldier has left us") + "**\n" +
-                await channel.translate("*{{user}}* left the server. Bye bye", {
-                    user: member.displayName
-                });
+            const str = format(await this.config.get(guild.id, "leave.text") ||
+                ("**" + await channel.translate("A soldier has left us") + "**\n" +
+                await channel.translate("{{user}} left the server. Bye bye")), {
+                user: `**${member.user.username}** #${member.user.descriminator}`
+            });
 
             await channel.send(str);
             log(`Member ${member.user.username} left guild ${guild.name}`);

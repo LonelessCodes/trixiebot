@@ -11,7 +11,7 @@ class MlemCommand extends Command {
             const embed = new Discord.RichEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
                 .setTitle("MLEM o3o")
-                .setImage("https://d.equestriadev.de/i/_mlem.gif")
+                .setImage("https://derpicdn.net/img/view/2017/11/7/1580177.gif")
                 .setFooter(await message.channel.translate("The chat got mlem'd by {{user}} | Art by n0nnny", {
                     user: message.member ? message.member.displayName : message.author.tag
                 }));

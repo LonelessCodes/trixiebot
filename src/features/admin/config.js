@@ -3,6 +3,15 @@ const CONST = require("../../modules/const");
 const Discord = require("discord.js");
 const Command = require("../../class/Command");
 
+const types_human = new Map([
+    [String, "Text"],
+    [Number, "Number"],
+    [Boolean, "true or false"],
+    [Discord.TextChannel, "\\#Channel"],
+    [Discord.Role, "Role Name"],
+    [Discord.GuildMember, "\\@User"]
+]);
+
 class ConfigCommand extends Command {
     async onmessage(message) {
         if (!message.prefixUsed) return;
@@ -44,8 +53,7 @@ class ConfigCommand extends Command {
             await message.channel.send({ embed });
             return;
         } else if (args.length === 1) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setThumbnail(message.guild.iconURL);
+            const embed = new Discord.RichEmbed;
 
             const find = () => {
                 let rtn;
@@ -58,21 +66,27 @@ class ConfigCommand extends Command {
             };
             const parameter = find();
 
-            if (!parameter) embed.setDescription(await message.channel.translate("No such parameter. *shrugs*"));
-            else {
+            if (!parameter) {
+                embed.setColor(CONST.COLOR.ERROR);
+                embed.setDescription(await message.channel.translate("No such parameter. *shrugs*"));
+            } else {
+                embed.setColor(CONST.COLOR.PRIMARY);
+                embed.setThumbnail(message.guild.iconURL);
                 embed.setTitle(parameter.humanName);
 
-                console.log(parameter);
-
                 const value = await this.config.get(message.guild.id, args[0]);
-                embed.addField("Currently:", `\`${value}\``);
+                const human_readable = parameter.human(value);
+                embed.addField("Currently:", `\`${human_readable}\``);
                 embed.addField("Update:", `\`${message.prefix}config ${parameter.name} <new value>\``);
+                embed.addField("Allowed Types:", parameter.types.map(t => {
+                    return types_human.get(t) || `\`${t}\``;
+                }).join(", ") + (parameter.allowEmpty ? " or `none`" : ""));
             }
 
             await message.channel.send({ embed });
             return;
         } else if (args.length === 2) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+            const embed = new Discord.RichEmbed;
 
             const find = () => {
                 let rtn;
@@ -85,13 +99,22 @@ class ConfigCommand extends Command {
             };
             const parameter = find();
 
-            if (!parameter) embed.setDescription(await message.channel.translate("No such parameter. *shrugs*"));
-            else if (!parameter.check(args[1])) embed.setDescription(await message.channel.translate("New value has a wrong format"));
-            else {
+            if (!parameter) {
+                embed.setColor(CONST.COLOR.ERROR);
+                embed.setDescription(await message.channel.translate("No such parameter. *shrugs*"));
+            } else if (!parameter.check(args[1])) {
+                embed.setColor(CONST.COLOR.ERROR);
+                embed.setDescription(await message.channel.translate("New value has a wrong format. Should be {{format}}", {
+                    format: parameter.types.map(t => types_human.get(t) || `\`${t}\``).join(", ") + parameter.allowEmpty ? " or `none`" : ""
+                }));
+            } else {
+                embed.setColor(CONST.COLOR.PRIMARY);
+
                 const new_value = parameter.format(args[1]);
+                const human_readable = parameter.human(new_value);
                 await this.config.set(message.guild.id, { [parameter.name]: new_value });
 
-                embed.setDescription(`:ok_hand: Set to \`${new_value}\``);
+                embed.setDescription(`:ok_hand: Set to \`${human_readable}\``);
             }
 
             await message.channel.send({ embed });

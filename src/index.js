@@ -58,7 +58,7 @@ new class App {
             new Parameter([
                 new Parameter("announce.channel", "Channel. 'none' disables announcements", null, Discord.TextChannel, true),
                 new Parameter("announce.bots", "Announce Bots", true, Boolean)
-            ], "🚪 Announce new/leaving/banned users"),
+            ], "🔔 Announce new/leaving/banned users"),
 
             new Parameter([
                 new Parameter("welcome.enabled", "true/false", false, Boolean),
@@ -73,7 +73,7 @@ new class App {
             new Parameter([
                 new Parameter("ban.enabled", "true/false", false, Boolean),
                 new Parameter("ban.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true)
-            ], "🚶 Announce banned users")
+            ], "🔨 Announce banned users")
         ]);
         this.client.config = this.config;
 
@@ -290,6 +290,7 @@ class AppCommand extends Command {
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
+            embed.addField("Analysis Commands", ["naughty"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Images Commands", ["derpi", "e621", "gif", "larson", "cat", "dog"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Action Commands", ["fuck", "flip", "mlem", "hug", "waifu"].sort().map(s => `\`${s}\``).join(", "));
             embed.addField("Audio Commands", ["tts", "call"].sort().map(s => `\`${s}\``).join(", "));

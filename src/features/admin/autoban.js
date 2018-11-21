@@ -21,7 +21,7 @@ class AutoBan extends Command {
 
             for (const regexp of regexps) {
                 if (regexp.test(username)) {
-                    await member.ban();
+                    await member.ban("Banned because of autoban pattern");
                     return;
                 }
             }

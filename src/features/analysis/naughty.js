@@ -5,7 +5,7 @@ const path = require("path");
 const { promisify } = require("util");
 const figlet = promisify(require("figlet"));
 const Discord = require("discord.js");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 figlet.parseFont("univers", fs.readFileSync(path.join(__dirname, "..", "..", "..", "resources", "figlet", "univers.flf"), "utf8"));
 
@@ -27,7 +27,7 @@ function progressBar(v, a, b) {
 
 const queue = new Queue;
 
-class NaughtyCommand extends Command {
+class NaughtyCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

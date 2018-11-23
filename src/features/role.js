@@ -1,7 +1,7 @@
 const log = require("../modules/log");
 const { findArgs } = require("../modules/util");
 const Discord = require("discord.js");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 function findRoleInServer(guild, role) {
     const role_lower_case = role.toLowerCase();
@@ -40,7 +40,7 @@ async function rolesMessage(guild, channel, db) {
     }
 }
 
-class RoleCommand extends Command {
+class RoleCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
         this.db = db.collection("roles");

@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 const emoticons = [
     "¯(°_o)/¯",
@@ -14,7 +14,7 @@ const emoticons = [
     "(⁄ ⁄•⁄ω⁄•⁄ ⁄)"
 ];
 
-class AtSomeoneCommand extends Command {
+class AtSomeoneCommand extends BaseCommand {
     async onbeforemessage(message) {
         if (!/@someone\b/i.test(message.content)) return;
 

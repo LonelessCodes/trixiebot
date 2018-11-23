@@ -7,7 +7,7 @@ const CONST = require("./modules/CONST");
 const stats = require("./logic/stats");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
-const Command = require("./class/Command");
+const BaseCommand = require("./class/BaseCommand");
 const ConfigManager = require("./logic/ConfigManager");
 const Parameter = ConfigManager.Parameter;
 const LocaleManager = require("./logic/LocaleManager");
@@ -116,14 +116,14 @@ new class App {
     }
 
     async initializeFeatures() {
-        const features = new Command.CommandManager(this.client, this.config, this.db);
+        const features = new BaseCommand.CommandManager(this.client, this.config, this.db);
 
         features.registerCommand("app", new AppCommand(this.client, this.config, this.db, features));
 
         for (const file of await walk(path.resolve(__dirname, "features"))) {
             if (path.extname(file) !== ".js") continue;
 
-            /** @type {typeof Command} */
+            /** @type {typeof BaseCommand} */
             const Feature = require(path.resolve("./features", file));
             features.registerCommand(
                 file.substring((__dirname + "/features/").length, file.length - path.extname(file).length).replace(/\\/g, "/"),
@@ -132,12 +132,12 @@ new class App {
     }
 };
 
-class AppCommand extends Command {
+class AppCommand extends BaseCommand {
     /**
      * 
      * @param {Client} client 
      * @param {ConfigManager} config 
-     * @param {Map<string, Command>} features 
+     * @param {Map<string, BaseCommand>} features 
      */
     constructor(client, config, db, features) {
         super(client, config);
@@ -269,7 +269,7 @@ class AppCommand extends Command {
              */
             let msg = message.content.substr(5).trim();
             if (msg !== "") {
-                /** @type {Command} */
+                /** @type {BaseCommand} */
                 const command = new Map(Array.from(this.features.commands.entries()).map(entry => {
                     return [entry[0].split("/").last().toLowerCase(), entry[1]];
                 })).get(msg.toLowerCase());

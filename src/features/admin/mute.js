@@ -1,8 +1,8 @@
 const log = require("../../modules/log");
 const Discord = require("discord.js");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
-class MuteCommand extends Command {
+class MuteCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

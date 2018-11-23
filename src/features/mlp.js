@@ -3,9 +3,9 @@ const log = require("../modules/log");
 const cheerio = require("cheerio");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
-class MLPCommand extends Command {
+class MLPCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^mlp\b/i.test(message.content)) return;

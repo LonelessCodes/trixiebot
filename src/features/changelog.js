@@ -1,6 +1,6 @@
 // const path = require("path");
 // const git = require("simple-git")(path.resolve(path.join(__dirname, "..", "..")));
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 // git.log((err, log) => {
 //     if (err) return;
@@ -19,7 +19,7 @@ const Command = require("../class/Command");
 //     console.log(changelog);
 // });
 
-class ChangelogCommand extends Command {
+class ChangelogCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^changelog\b/i.test(message.content)) return;

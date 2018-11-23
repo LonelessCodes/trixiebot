@@ -2,9 +2,9 @@ const log = require("../modules/log");
 const stats = require("../logic/stats");
 const { findDefaultChannel } = require("../modules/util");
 const { format } = require("../logic/LocaleManager");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
-class MemberLog extends Command {
+class MemberLog extends BaseCommand {
     constructor() {
         super(...arguments);
 

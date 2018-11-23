@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 function get_level(points) {
     return Math.floor(0.1 * Math.sqrt(points));
@@ -12,7 +12,7 @@ function random_point() {
 const cooldown = new Map;
 const cooldowntime = 60 * 1000;
 
-class PointsCommand extends Command {
+class PointsCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
         this.db = db.collection("points");

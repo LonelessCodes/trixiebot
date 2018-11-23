@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const cat = require("cat-ascii-faces");
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 async function randomCat(reconnectTries = 0) {
     let file;
@@ -18,7 +18,7 @@ async function randomCat(reconnectTries = 0) {
     return file;
 }
 
-class CatCommand extends Command{
+class CatCommand extends BaseCommand{
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^cat\b/i.test(message.content)) return;

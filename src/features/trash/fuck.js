@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
@@ -7,7 +7,7 @@ Array.prototype.random = function randomItem() {
 
 const added_recently = new Array();
 
-class FuckCommand extends Command {
+class FuckCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
         this.db = db.collection("fuck");

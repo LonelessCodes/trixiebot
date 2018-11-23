@@ -1,7 +1,7 @@
 const { findArgs } = require("../../modules/util");
 const CONST = require("../../modules/CONST");
 const Discord = require("discord.js");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 const types_human = new Map([
     [String, "Text"],
@@ -12,7 +12,7 @@ const types_human = new Map([
     [Discord.GuildMember, "\\@User"]
 ]);
 
-class ConfigCommand extends Command {
+class ConfigCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^config\b/i.test(message.content)) return;

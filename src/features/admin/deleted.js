@@ -2,7 +2,7 @@ const log = require("../../modules/log");
 const CONST = require("../../modules/CONST");
 const Events = require("events");
 const Discord = require("discord.js");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 class Pagination extends Events {
     constructor(page_limit, count, authorId, awaitMessages) {
@@ -31,7 +31,7 @@ class Pagination extends Events {
     }
 }
 
-class DeletedMessagesCommand extends Command {
+class DeletedMessagesCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

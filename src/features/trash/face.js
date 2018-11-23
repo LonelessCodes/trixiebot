@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
@@ -135,7 +135,7 @@ const faces = [
     "(･.◤)"
 ];
 
-class FaceCommand extends Command {
+class FaceCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
 

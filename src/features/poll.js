@@ -2,7 +2,7 @@ const log = require("../modules/log");
 const LocaleManager = require("../logic/LocaleManager");
 const { parseHumanTime, toHumanTime } = require("../modules/util");
 const CONST = require("../modules/CONST");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 const Discord = require("discord.js");
 
 function progressBar(v, a, b) {
@@ -135,7 +135,7 @@ Poll.add = function add(poll) {
     if (poll instanceof Poll) Poll.polls.push(poll);
 };
 
-class PollCommand extends Command {
+class PollCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

@@ -1,7 +1,7 @@
 const derpibooruKey = require("../../keys/derpibooru.json");
 const log = require("../modules/log");
 const fetch = require("node-fetch");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 async function get(params) {
     const scope = params.scope || "search";
@@ -18,7 +18,7 @@ async function get(params) {
     return await result.json();
 }
 
-class DerpiCommand extends Command {
+class DerpiCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         // derpibooru

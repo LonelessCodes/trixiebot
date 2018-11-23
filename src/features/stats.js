@@ -2,9 +2,9 @@ const log = require("../modules/log");
 const stats = require("../logic/stats");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
-class StatCommand extends Command {
+class StatCommand extends BaseCommand {
     constructor(client, config) {
         super(client, config);
     }

@@ -1,8 +1,8 @@
 const CONST = require("../../modules/CONST");
 const Discord = require("discord.js");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
-class LocaleCommand extends Command {    
+class LocaleCommand extends BaseCommand {    
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^locale\b/i.test(message.content)) return;

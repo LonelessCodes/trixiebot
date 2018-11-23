@@ -1,8 +1,8 @@
 const log = require("../../modules/log");
 const tinytext = require("tiny-text");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
-class SmolCommand extends Command {
+class SmolCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^smol\b/i.test(message.content)) return;

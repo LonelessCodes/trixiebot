@@ -14,7 +14,7 @@ Message.prototype.translate = LocaleManager.autoTranslate;
 Channel.prototype.translate = LocaleManager.autoTranslateChannel;
 Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
 
-class Command {
+class BaseCommand {
     /**
      * @param {Client} client 
      * @param {ConfigManager} config 
@@ -40,9 +40,9 @@ class Command {
     async onmessage() { }
 }
 
-Command.CommandManager = class CommandManager {
+BaseCommand.CommandManager = class CommandManager {
     constructor(client, config, db) {
-        /** @type {Map<string, Command>} */
+        /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;
 
         client.addListener("message", async message => {
@@ -80,7 +80,7 @@ Command.CommandManager = class CommandManager {
 
     /**
      * @param {string} id
-     * @param {Command} command
+     * @param {BaseCommand} command
      */
     registerCommand(id, command) {
         this.commands.set(id, command);
@@ -94,8 +94,8 @@ Command.CommandManager = class CommandManager {
     }
 };
 
-Command.GUILD_ONLY = 0;
-Command.GUILD_AND_GROUP = 1;
-Command.ALL = 2;
+BaseCommand.GUILD_ONLY = 0;
+BaseCommand.GUILD_AND_GROUP = 1;
+BaseCommand.ALL = 2;
 
-module.exports = Command;
+module.exports = BaseCommand;

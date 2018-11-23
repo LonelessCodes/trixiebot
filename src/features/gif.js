@@ -1,12 +1,12 @@
 const giphy = require("giphy-api")(require("../../keys/giphy.json").key);
 const log = require("../modules/log");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-class GifCommand extends Command {
+class GifCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
 

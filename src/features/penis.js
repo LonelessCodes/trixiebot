@@ -1,9 +1,9 @@
 const log = require("../modules/log");
 const CONST = require("../modules/CONST");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 const Discord = require("discord.js");
 
-class PenisCommand extends Command {
+class PenisCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

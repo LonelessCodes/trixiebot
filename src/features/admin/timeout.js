@@ -2,12 +2,12 @@ const log = require("../../modules/log");
 const LocaleManager = require("../../logic/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../modules/util");
 const Discord = require("discord.js");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 /** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
 const timeout_notices = new Object;
 
-class TimeoutCommand extends Command {
+class TimeoutCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

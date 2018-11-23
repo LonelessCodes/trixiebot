@@ -1,9 +1,9 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
 const fetch = require("node-fetch");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
-class TTSCommand extends Command {
+class TTSCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^tts\b/i.test(message.content)) return;

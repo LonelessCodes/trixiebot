@@ -1,13 +1,13 @@
 const { timeout } = require("../modules/util");
 const randomNumber = require("random-number-csprng");
 const CONST = require("../modules/CONST");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 const Discord = require("discord.js");
 
 const cooldown_guild = new Array;
 const cooldown_user = new Array;
 
-class WaifuCommand extends Command {
+class WaifuCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

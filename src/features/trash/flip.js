@@ -1,8 +1,8 @@
 const log = require("../../modules/log");
 const fliptext = require("flip-text");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
-class FlipCommand extends Command {
+class FlipCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         

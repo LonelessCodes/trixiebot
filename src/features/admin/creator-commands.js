@@ -4,7 +4,7 @@ const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
 const { resolveStdout, findDefaultChannel } = require("../../modules/util");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 const Discord = require("discord.js");
 
 const extnames = {
@@ -15,7 +15,7 @@ const extnames = {
     ".json": "json"
 };
 
-class CreatorCommands extends Command {
+class CreatorCommands extends BaseCommand {
     async onbeforemessage(message) {
         const permission = message.author.id === "108391799185285120"; // this id is the bot's creator id
 

@@ -2,7 +2,7 @@ const { promisify } = require("util");
 const { timeout } = require("../modules/util");
 const log = require("../modules/log");
 const Twit = require("twit");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 Array.prototype.last = function lastItem() {
     return this[this.length - 1];
@@ -47,7 +47,7 @@ async function getFact() {
     return [...facts].random();
 }
 
-class FactCommand extends Command {
+class FactCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^fact\b/i.test(message.content)) return;

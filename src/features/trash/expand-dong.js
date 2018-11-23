@@ -1,8 +1,8 @@
 const { timeout } = require("../../modules/util");
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
-class ExpandCommand extends Command{
+class ExpandCommand extends BaseCommand{
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^expand dong\b/i.test(message.content)) return;

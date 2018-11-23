@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const log = require("../modules/log");
 const CONST = require("../modules/CONST");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 // const twitch = require("twitch");
 const Discord = require("discord.js");
 
@@ -32,7 +32,7 @@ class Channel {
     }
 }
 
-class AlertCommand extends Command {
+class AlertCommand extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

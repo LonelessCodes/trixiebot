@@ -1,7 +1,7 @@
 const log = require("../modules/log");
 const fetch = require("node-fetch");
 const packageFile = require("../../package.json");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
@@ -25,7 +25,7 @@ async function get(params) {
     return await result.json();
 }
 
-class E621Command extends Command {
+class E621Command extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         // e621

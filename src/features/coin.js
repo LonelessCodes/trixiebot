@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const { timeout } = require("../modules/util");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
@@ -8,7 +8,7 @@ Array.prototype.random = function randomItem() {
 
 const coin = ["heads", "tails"];
 
-class CoinCommand extends Command {
+class CoinCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^coin\b/i.test(message.content)) return;

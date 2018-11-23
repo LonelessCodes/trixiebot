@@ -1,9 +1,9 @@
 const log = require("../modules/log");
 const CONST = require("../modules/CONST");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 const Discord = require("discord.js");
 
-class ServerInfoCommand extends Command {
+class ServerInfoCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^serverinfo\b/i.test(message.content)) return;

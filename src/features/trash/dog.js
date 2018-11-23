@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const dog = require("dog-ascii-faces");
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 async function randomDog() {
     const response = await fetch("https://random.dog/woof.json");
@@ -10,7 +10,7 @@ async function randomDog() {
     return result.url;
 }
 
-class CatCommand extends Command{
+class CatCommand extends BaseCommand{
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^dog\b/i.test(message.content)) return;

@@ -1,9 +1,9 @@
 const CONST = require("../../modules/CONST");
 const globToRegExp = require("glob-to-regexp");
 const Discord = require("discord.js");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
-class AutoBan extends Command {
+class AutoBan extends BaseCommand {
     constructor(client, config, db) {
         super(client, config);
 

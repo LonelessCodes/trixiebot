@@ -4,7 +4,7 @@ const { timeout, roll } = require("../modules/util");
 const fetch = require("node-fetch");
 const EventEmitter = require("events");
 const Discord = require("discord.js");
-const Command = require("../class/Command");
+const BaseCommand = require("../class/BaseCommand");
 
 async function disconnect(connection) {
     await connection.disconnect();
@@ -278,7 +278,7 @@ async function onmessage(message) {
     }
 }
 
-class CallCommand extends Command {
+class CallCommand extends BaseCommand {
     constructor(client, config) {
         super(client, config);
         this.onmessage = onmessage.bind(this);

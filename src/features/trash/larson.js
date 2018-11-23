@@ -1,7 +1,7 @@
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
-class LarsonCommand extends Command {
+class LarsonCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^larson\b/i.test(message.content)) return;

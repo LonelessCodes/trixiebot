@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const Command = require("../../class/Command");
+const BaseCommand = require("../../class/BaseCommand");
 
 const hugs = [
     "(っ´▽｀)っ{{name}}",
@@ -14,7 +14,7 @@ const hugs = [
     "(づ￣ ³￣)づ{{name}} ⊂(´・ω・｀⊂)"
 ];
 
-class HugsCommand extends Command {
+class HugsCommand extends BaseCommand {
     async onmessage(message) {
         if (!message.prefixUsed) return;
         if (!/^hug\b/i.test(message.content)) return;

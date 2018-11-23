@@ -1,7 +1,7 @@
 const log = require("../modules/log");
-const statistics = require("../logic/statistics");
+const stats = require("../logic/stats");
 const { findDefaultChannel } = require("../modules/util");
-const { format } = require("../logic/Locale");
+const { format } = require("../logic/LocaleManager");
 const Command = require("../class/Command");
 
 class MemberLog extends Command {
@@ -9,10 +9,10 @@ class MemberLog extends Command {
         super(...arguments);
 
         const updateGuildStatistics = () => {
-            statistics.get(statistics.STATS.SERVER_COUNT).set(this.client.guilds.size);
-            statistics.get(statistics.STATS.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).size);
-            statistics.get(statistics.STATS.TOTAL_MEMBERS).set(this.client.guilds.array().map(g => g.members.size).reduce((pv, cv) => pv + cv, 0));
-            statistics.get(statistics.STATS.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").size);
+            stats.get(stats.STATS.SERVER_COUNT).set(this.client.guilds.size);
+            stats.get(stats.STATS.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).size);
+            stats.get(stats.STATS.TOTAL_MEMBERS).set(this.client.guilds.array().map(g => g.members.size).reduce((pv, cv) => pv + cv, 0));
+            stats.get(stats.STATS.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").size);
         };
 
         updateGuildStatistics();
@@ -65,7 +65,7 @@ class MemberLog extends Command {
             const str = format(await this.config.get(guild.id, "leave.text") ||
                 ("**" + await channel.translate("A soldier has left us") + "**\n" +
                 await channel.translate("{{user}} left the server. Bye bye")), {
-                user: `**${member.user.username}** #${member.user.descriminator}`
+                user: `**${member.user.username}** #${member.user.discriminator}`
             });
 
             await channel.send(str);
@@ -82,7 +82,7 @@ class MemberLog extends Command {
 
             const str = format(await this.config.get(guild.id, "ban.text") ||
                 "{{user}} has been banned from the server. Don't let the door hit your ass on the way out!", {
-                user: `**${user.username}** #${user.descriminator}`
+                user: `**${user.username}** #${user.discriminator}`
             });
 
             await channel.send(str);

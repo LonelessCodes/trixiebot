@@ -1,6 +1,6 @@
 const { timeout } = require("../modules/util");
 const randomNumber = require("random-number-csprng");
-const CONST = require("../modules/const");
+const CONST = require("../modules/CONST");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
 

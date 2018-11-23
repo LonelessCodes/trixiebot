@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const CONST = require("../../modules/const");
+const CONST = require("../../modules/CONST");
 const Command = require("../../class/Command");
 const Discord = require("discord.js");
 

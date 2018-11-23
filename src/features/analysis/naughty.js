@@ -1,5 +1,5 @@
-const CONST = require("../../modules/const");
-const Queue = require("../../modules/queue");
+const CONST = require("../../modules/CONST");
+const Queue = require("../../logic/Queue");
 const fs = require("fs-extra");
 const path = require("path");
 const { promisify } = require("util");
@@ -39,7 +39,7 @@ class NaughtyCommand extends Command {
         
         const progress = await message.channel.send(`${progressBar(0.0, "█", "░")} | Waiting in queue...`);
 
-        queue.push(async next => {
+        queue.push(async () => {
             const user = message.author;
 
             const channels = message.guild.channels.array().filter(c => c.type === "text" &&
@@ -129,8 +129,6 @@ class NaughtyCommand extends Command {
             await message.channel.send({ embed });
 
             await this.db.updateOne({ guildId: message.guild.id, userId: user.id }, { $set: { naughtyLevel: naughty_percent, badWords: bad_words, total, totalMessages: total_messages } }, { upsert: true });
-
-            next();
         });
     }
     usage(prefix) {

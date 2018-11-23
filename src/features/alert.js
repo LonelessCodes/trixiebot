@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 const log = require("../modules/log");
-const CONST = require("../modules/const");
+const CONST = require("../modules/CONST");
 const Command = require("../class/Command");
 // const twitch = require("twitch");
 const Discord = require("discord.js");
@@ -141,11 +141,11 @@ class AlertCommand extends Command {
                 guildId: savedConfig.guildId,
                 userId: savedConfig.userId
             }, {
-                    $set: {
-                        name: channelPage.name,
-                        messageId: onlineMessage.id
-                    }
-                });
+                $set: {
+                    name: channelPage.name,
+                    messageId: onlineMessage.id
+                }
+            });
         }
     }
 

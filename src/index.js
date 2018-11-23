@@ -3,14 +3,14 @@ const packageFile = require("../package.json");
 const { walk } = require("./modules/util");
 const log = require("./modules/log");
 const path = require("path");
-const CONST = require("./modules/const");
-const statistics = require("./logic/statistics");
+const CONST = require("./modules/CONST");
+const stats = require("./logic/stats");
 const Discord = require("discord.js");
 const { MongoClient } = require("mongodb");
 const Command = require("./class/Command");
-const ConfigManager = require("./logic/Config");
+const ConfigManager = require("./logic/ConfigManager");
 const Parameter = ConfigManager.Parameter;
-const LocaleManager = require("./logic/Locale");
+const LocaleManager = require("./logic/LocaleManager");
 
 const ipc = require("./logic/ipc");
 
@@ -45,7 +45,7 @@ new class App {
             .then(client => client.db("trixiebot"));
         this.client.db = this.db;
 
-        statistics.get(statistics.STATS.SHARDS).set(1); // Sharding not implemented, so only one process of Trixie running
+        stats.get(stats.STATS.SHARDS).set(1); // Sharding not implemented, so only one process of Trixie running
 
         this.config = new ConfigManager(this.client, this.db, [
             new Parameter("prefix", "❗ Prefix", "!", String),
@@ -197,11 +197,11 @@ class AppCommand extends Command {
     }
 
     async initCommandStats() {
-        const commandStat = statistics.get(statistics.STATS.COMMANDS_EXECUTED);
+        const commandStat = stats.get(stats.STATS.COMMANDS_EXECUTED);
 
-        commandStat.set((await this.db.findOne({ name: statistics.STATS.COMMANDS_EXECUTED }) || { value: 0 }).value);
+        commandStat.set((await this.db.findOne({ name: stats.STATS.COMMANDS_EXECUTED }) || { value: 0 }).value);
 
-        commandStat.on("change", value => this.db.updateOne({ name: statistics.STATS.COMMANDS_EXECUTED }, { $set: { value } }, { upsert: true }));
+        commandStat.on("change", value => this.db.updateOne({ name: stats.STATS.COMMANDS_EXECUTED }, { $set: { value } }, { upsert: true }));
 
         /** @type {Map<string, Collector>} */
         this.collectors = new Map;

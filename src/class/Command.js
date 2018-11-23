@@ -1,8 +1,8 @@
 const log = require("../modules/log");
 const { removePrefix } = require("../modules/util");
 const { Message, Client, Channel, Guild } = require("discord.js");
-const ConfigManager = require("../logic/Config");
-const LocaleManager = require("../logic/Locale");
+const ConfigManager = require("../logic/ConfigManager");
+const LocaleManager = require("../logic/LocaleManager");
 
 // give each Channel and Guild class a locale function, which returns the locale config for this
 // specific namespace, and on a Message class give the whole locale config

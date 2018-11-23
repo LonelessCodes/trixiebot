@@ -1,4 +1,4 @@
-const CONST = require("../../modules/const");
+const CONST = require("../../modules/CONST");
 const globToRegExp = require("glob-to-regexp");
 const Discord = require("discord.js");
 const Command = require("../../class/Command");

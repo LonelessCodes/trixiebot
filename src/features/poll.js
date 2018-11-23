@@ -1,7 +1,7 @@
 const log = require("../modules/log");
-const locale = require("../logic/Locale");
+const LocaleManager = require("../logic/LocaleManager");
 const { parseHumanTime, toHumanTime } = require("../modules/util");
-const CONST = require("../modules/const");
+const CONST = require("../modules/CONST");
 const Command = require("../class/Command");
 const Discord = require("discord.js");
 
@@ -93,7 +93,7 @@ class Poll {
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         for (const vote of result)
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
-        embed.setFooter(locale.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));
+        embed.setFooter(LocaleManager.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));
 
         await this.channel.sendTranslated("{{user}} Poll ended!", {
             user: this.creator.toString()

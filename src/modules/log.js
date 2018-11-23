@@ -26,7 +26,6 @@ function getTimeString() {
     return chalk.cyan.bold(time) + ">";
 }
 
-
 /**
  * Logger
  */

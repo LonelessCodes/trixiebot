@@ -48,15 +48,15 @@ class StatisticsManager extends EventEmitter {
         this._map = new Map;
 
         /** @type {{ [stat: string]: string; }} */
-        this.STATS = new Object;
+        this.NAME = new Object;
         for (const name of statistics_names) {
-            this.STATS[name] = name;
+            this.NAME[name] = name;
 
             const stat = new Stat(name);
             stat.addListener("change", value => this.emit("change", { name, value }));
             this._map.set(name, stat);
         }
-        this.STATS = Object.freeze(this.STATS);
+        this.NAME = Object.freeze(this.NAME);
     }
 
     /** @param {string} stat */

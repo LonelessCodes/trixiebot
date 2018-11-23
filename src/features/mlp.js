@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const log = require("../modules/log");
 const cheerio = require("cheerio");
-const CONST = require("../modules/const");
+const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 const Command = require("../class/Command");
 

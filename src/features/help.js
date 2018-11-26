@@ -63,7 +63,7 @@ module.exports = async function install(cr, client, config, database) {
             embed.addField("Misc Commands", sortCommands(categories.get(Category.MISC)));
 
             embed.setAuthor("TrixieBot Help", client.user.avatarURL);
-            embed.setDescription(`**Command list**\nTo check command usage, type \`${message.guild.config.prefix}trixie help <command>\``);
+            embed.setDescription(`**Command list**\nTo check command usage, type \`${message.guild.config.prefix}help <command>\``);
             embed.setFooter(`TrixieBot v${packageFile.version} | Commands: ${cr.commands.size}`, client.user.avatarURL);
 
             await message.channel.send({ embed });

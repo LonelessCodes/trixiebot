@@ -1,29 +1,17 @@
-const log = require("../modules/log");
-const Discord = require("discord.js");
-const BaseCommand = require("../class/BaseCommand");
+const BaseCommand = require("./BaseCommand");
 
 class SimpleCommand extends BaseCommand {
-    get commands() {
-        return {};
+    constructor(func = async () => {}, permissions) {
+        super(permissions);
+
+        this.func = func;
     }
 
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
+    async run(message, command_name, content, pass_through) {
+        const result = await this.func(message, content, pass_through);
+        if (!result) return;
 
-        for (const command in this.commands) {
-            if (new RegExp(`^${command}\\b`, "i").test(message.content)) {
-                if (typeof this.commands[command] === "string") {
-                    await message.channel.send(this.commands[command]);
-                } else if (typeof this.commands[command] === "function") {
-                    const rtrn = await this.commands[command].apply(this, [message]);
-                    if (typeof rtrn === "string") message.channel.send(rtrn);
-                } else if (this.commands[command] instanceof Discord.RichEmbed) {
-                    await message.channel.send({ embed: this.commands[command] });
-                }
-                log(`${command} executed`);
-                return;
-            }
-        }
+        await message.channel.send(result);
     }
 }
 

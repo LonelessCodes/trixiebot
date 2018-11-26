@@ -1,7 +1,9 @@
 const fetch = require("node-fetch");
-const cat = require("cat-ascii-faces");
-const log = require("../../modules/log");
-const BaseCommand = require("../../class/BaseCommand");
+const catFace = require("cat-ascii-faces");
+
+const SimpleCommand = require("../../class/SimpleCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
+const Category = require("../../logic/commands/Category");
 
 async function randomCat(reconnectTries = 0) {
     let file;
@@ -18,17 +20,11 @@ async function randomCat(reconnectTries = 0) {
     return file;
 }
 
-class CatCommand extends BaseCommand{
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^cat\b/i.test(message.content)) return;
-
-        await message.channel.send(await message.channel.translate("meow") + " " + cat() + " " + await randomCat());
-        log("Requested random cat :3 meow");
-    }
-    usage(prefix) {
-        return `\`${prefix}cat\` returns cat image :3`;
-    }
-}
-
-module.exports = CatCommand;
+module.exports = async function install(cr) {
+    cr.register("cat", new SimpleCommand(async message => {
+        return await message.channel.translate("meow") + " " + catFace() + " " + await randomCat();
+    }))
+        .setHelp(new HelpContent().setUsage("`{{prefix}}cat` returns cat image :3"))
+        .setCategory(Category.IMAGE);
+    cr.registerAlias("cat", "kitty");
+};

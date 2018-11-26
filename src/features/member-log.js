@@ -1,95 +1,94 @@
 const log = require("../modules/log");
 const stats = require("../logic/stats");
-const { findDefaultChannel } = require("../modules/util");
-const { format } = require("../logic/LocaleManager");
-const BaseCommand = require("../class/BaseCommand");
+const { findDefaultChannel } = require("../modules/utils");
+const { format } = require("../logic/managers/LocaleManager");
 
-class MemberLog extends BaseCommand {
-    constructor() {
-        super(...arguments);
+module.exports = async function install(cr, client, config) {
+    const updateGuildStatistics = () => {
+        stats.get(stats.NAME.SERVER_COUNT).set(client.guilds.size);
+        stats.get(stats.NAME.LARGE_SERVERS).set(client.guilds.filter(guild => !!guild.large).size);
+        stats.get(stats.NAME.TOTAL_MEMBERS).set(client.guilds.array().map(g => g.members.size).reduce((pv, cv) => pv + cv, 0));
+        stats.get(stats.NAME.TEXT_CHANNELS).set(client.channels.filter(guild => guild.type === "text").size);
+    };
 
-        const updateGuildStatistics = () => {
-            stats.get(stats.STATS.SERVER_COUNT).set(this.client.guilds.size);
-            stats.get(stats.STATS.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).size);
-            stats.get(stats.STATS.TOTAL_MEMBERS).set(this.client.guilds.array().map(g => g.members.size).reduce((pv, cv) => pv + cv, 0));
-            stats.get(stats.STATS.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").size);
-        };
+    updateGuildStatistics();
 
+    client.addListener("guildCreate", guild => {
+        setImmediate(async () => {
+            const channel = findDefaultChannel(guild);
+            if (!channel) return;
+
+            await channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\nI'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
+            log(`Trixie got invited and joined new guild ${guild.name}`);
+            updateGuildStatistics();
+        });
+    });
+
+    client.addListener("guildDelete", guild => {
+        log(`Trixie got removed from guild ${guild.name}`);
         updateGuildStatistics();
+    });
 
-        this.client.addListener("guildCreate", guild => {
-            setImmediate(async () => {
-                const channel = findDefaultChannel(guild);
-                if (!channel) return;
+    client.addListener("guildMemberAdd", async member => {
+        const guild = member.guild;
 
-                await channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\nI'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
-                log(`Trixie got invited and joined new guild ${guild.name}`);
-                updateGuildStatistics();
-            });
-        });
+        const guild_config = await config.get(guild.id);
 
-        this.client.addListener("guildDelete", guild => {
-            log(`Trixie got removed from guild ${guild.name}`);
-            updateGuildStatistics();
-        });
+        if (!guild_config.welcome.enabled) return;
+        if (member.bot && !guild_config.announce.bots) return;
 
-        this.client.addListener("guildMemberAdd", async member => {
-            const guild = member.guild;
+        const channel = guild.channels.get(guild_config.announce.channel);
+        if (!channel) return;
 
-            if (!(await this.config.get(guild.id, "welcome.enabled"))) return;
-            if (member.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
-
-            const channel = guild.channels.get(await this.config.get(guild.id, "announce.channel"));
-            if (!channel) return;
-
-            const str = format(await this.config.get(guild.id, "welcome.text") ||
-                ("**" + await channel.translate("New member joined our Guild, guys!") + "**\n" +
+        const str = format(guild_config.welcome.text ||
+            ("**" + await channel.translate("New member joined our Guild, guys!") + "**\n" +
                 await channel.translate("Hey, {{user}} welcome to the server!")), {
-                user: member.toString()
-            });
-
-            await channel.send(str);
-            log(`New member ${member.user.username} joined guild ${guild.name}`);
-            updateGuildStatistics();
+            user: member.toString()
         });
 
-        this.client.addListener("guildMemberRemove", async member => {
-            const guild = member.guild;
+        await channel.send(str);
+        log(`New member ${member.user.username} joined guild ${guild.name}`);
+        updateGuildStatistics();
+    });
 
-            if (!(await this.config.get(guild.id, "leave.enabled"))) return;
-            if (member.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
+    client.addListener("guildMemberRemove", async member => {
+        const guild = member.guild;
 
-            const channel = guild.channels.get(await this.config.get(guild.id, "announce.channel"));
-            if (!channel) return;
+        const guild_config = await config.get(guild.id);
 
-            const str = format(await this.config.get(guild.id, "leave.text") ||
-                ("**" + await channel.translate("A soldier has left us") + "**\n" +
+        if (!guild_config.leave.enabled) return;
+        if (member.bot && !guild_config.announce.bots) return;
+
+        const channel = guild.channels.get(guild_config.announce.channel);
+        if (!channel) return;
+
+        const str = format(guild_config.leave.text ||
+            ("**" + await channel.translate("A soldier has left us") + "**\n" +
                 await channel.translate("{{user}} left the server. Bye bye")), {
-                user: `**${member.user.username}** #${member.user.discriminator}`
-            });
-
-            await channel.send(str);
-            log(`Member ${member.user.username} left guild ${guild.name}`);
-            updateGuildStatistics();
+            user: `**${member.user.username}** #${member.user.discriminator}`
         });
 
-        this.client.addListener("guildBanAdd", async (guild, user) => {
-            if (!(await this.config.get(guild.id, "ban.enabled"))) return;
-            if (user.bot && !(await this.config.get(guild.id, "announce.bots"))) return;
+        await channel.send(str);
+        log(`Member ${member.user.username} left guild ${guild.name}`);
+        updateGuildStatistics();
+    });
 
-            const channel = guild.channels.get(await this.config.get(guild.id, "announce.channel"));
-            if (!channel) return;
+    client.addListener("guildBanAdd", async (guild, user) => {
+        const guild_config = await config.get(guild.id);
 
-            const str = format(await this.config.get(guild.id, "ban.text") ||
-                "{{user}} has been banned from the server. Don't let the door hit your ass on the way out!", {
-                user: `**${user.username}** #${user.discriminator}`
-            });
+        if (!guild_config.ban.enabled) return;
+        if (user.bot && !guild_config.announce.bots) return;
 
-            await channel.send(str);
-            log(`User ${user.username} has been banned from guild ${guild.name}`);
-            updateGuildStatistics();
+        const channel = guild.channels.get(guild_config.announce.channel);
+        if (!channel) return;
+
+        const str = format(guild_config.ban.text ||
+            "{{user}} has been banned from the server. Don't let the door hit your ass on the way out!", {
+            user: `**${user.username}** #${user.discriminator}`
         });
-    }
-}
 
-module.exports = MemberLog;
+        await channel.send(str);
+        log(`User ${user.username} has been banned from guild ${guild.name}`);
+        updateGuildStatistics();
+    });
+};

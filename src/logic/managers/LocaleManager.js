@@ -1,13 +1,13 @@
 const fs = require("fs-extra");
 const path = require("path");
-const { isPlainObject } = require("../modules/util");
+const { isPlainObject } = require("../../modules/utils");
 const { po } = require("gettext-parser");
 const Gettext = require("node-gettext");
-const DocumentCache = require("./DocumentCache");
+const DocumentCache = require("../DocumentCache");
 
 const gt = new Gettext;
 
-const translationsDir = "../../resources/locale";
+const translationsDir = "../../../resources/locale";
 const locales = ["en", "de", "hu"];
 const domain = "messages";
 
@@ -67,7 +67,7 @@ class Cursor {
     }
 }
 
-module.exports = class Locale {
+module.exports = class LocaleManager {
     constructor(client, db, locales) {
         this.client = client;
         this.db = db.collection("locale");

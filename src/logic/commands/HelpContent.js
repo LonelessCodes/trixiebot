@@ -1,18 +1,10 @@
 class HelpContent {
-    constructor(description = null, parameters = new Map, usage = () => { }, related = new Array) {
+    constructor(description = null, parameters = new Map, options = null, usage = null, related = new Array) {
         this.description = description;
         this.parameters = parameters;
+        this.options = options;
         this.usage = usage;
         this.related = related;
-    }
-}
-
-HelpContent.Builder = class Builder {
-    constructor() {
-        this.description = null;
-        this.parameters = new Map;
-        this.usage = () => { };
-        this.related = new Array;
     }
 
     setDescription(description) {
@@ -36,7 +28,8 @@ HelpContent.Builder = class Builder {
         return this;
     }
 
-    setUsage(usage) {
+    setUsage(options, usage) {
+        this.options = options;
         this.usage = usage;
         return this;
     }
@@ -45,10 +38,6 @@ HelpContent.Builder = class Builder {
         this.related = related;
         return this;
     }
-
-    build() {
-        return new HelpContent(this.description, this.parameters, this.usage, this.related);
-    }
-};
+}
 
 module.exports = HelpContent;

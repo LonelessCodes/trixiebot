@@ -1,9 +1,12 @@
 const log = require("../modules/log");
-const LocaleManager = require("../logic/LocaleManager");
-const { parseHumanTime, toHumanTime } = require("../modules/util");
+const LocaleManager = require("../logic/managers/LocaleManager");
+const { parseHumanTime, toHumanTime } = require("../modules/time_utils");
 const CONST = require("../modules/CONST");
-const BaseCommand = require("../class/BaseCommand");
 const Discord = require("discord.js");
+
+const BaseCommand = require("../class/BaseCommand");
+const HelpContent = require("../logic/commands/HelpContent");
+const Category = require("../logic/commands/Category");
 
 function progressBar(v, a, b) {
     const length = 20;
@@ -135,134 +138,120 @@ Poll.add = function add(poll) {
     if (poll instanceof Poll) Poll.polls.push(poll);
 };
 
-class PollCommand extends BaseCommand {
-    constructor(client, config, db) {
-        super(client, config);
+module.exports = async function install(cr, client, config, db) {
+    const database = db.collection("poll");
 
-        this.db = db.collection("poll");
-
-        this.init();
-    }
-
-    async init() {
-        const polls = await this.db.find({}).toArray();
-        for (const poll of polls) {
-            const guild = this.client.guilds.get(poll.guildId);
-            if (!guild) {
-                await this.db.deleteOne({ _id: poll._id });
-                continue;
-            }
-
-            const channel = guild.channels.get(poll.channelId);
-            if (!channel) {
-                await this.db.deleteOne({ _id: poll._id });
-                continue;
-            }
-
-            const creator = guild.members.get(poll.creatorId) || {
-                id: poll.creatorId,
-                toString() { return `<@${poll.creatorId}>`; }
-            };
-
-            const endDate = poll.endDate;
-
-            const votes = poll.votes;
-
-            const users = new Discord.Collection(poll.users.map(userId => {
-                return [userId, guild.members.get(userId)];
-            }));
-
-            const poll_object = new Poll(
-                this.db,
-                guild,
-                channel,
-                creator,
-                endDate,
-                votes,
-                users
-            );
-            Poll.add(poll_object);
-        }
-    }
-
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^poll\b/i.test(message.content)) return;
-
-        /**
-         * @type {string}
-         */
-        let msg = message.content.substr(5).trim();
-        if (msg === "") {
-            await message.channel.send(this.usage(message.prefix));
-            log("Sent poll usage");
-            return;
+    const polls = await database.find({}).toArray();
+    for (const poll of polls) {
+        const guild = client.guilds.get(poll.guildId);
+        if (!guild) {
+            await database.deleteOne({ _id: poll._id });
+            continue;
         }
 
-        if (await this.db.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
-            await message.channel.sendTranslated("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
-            log("Gracefully aborted attempt to create poll. Poll already exists in this channel");
-            return;
+        const channel = guild.channels.get(poll.channelId);
+        if (!channel) {
+            await database.deleteOne({ _id: poll._id });
+            continue;
         }
 
-        const duration_string = msg.match(/([\d.]+(d|h|m|s|ms)\s*)+/g)[0];
-        if (!duration_string) {
-            await message.channel.send(await message.channel.translate("`duration` must be formated as in the example.") + "\n\n" + this.usage(message.prefix));
-            log("Gracefully aborted attempt to create poll. Duration parsing error");
-            return;
-        }
+        const creator = guild.members.get(poll.creatorId) || {
+            id: poll.creatorId,
+            toString() { return `<@${poll.creatorId}>`; }
+        };
 
-        const duration = parseHumanTime(duration_string);
-        if (duration < 60000 || duration > 1000 * 3600 * 24 * 3) {
-            await message.channel.send(await message.channel.translate("`duration` should be at least 1m and max 3d") + "\n\n" + this.usage(message.prefix));
-            log("Gracefully aborted attempt to create poll. Duration out of range");
-            return;
-        }
+        const endDate = poll.endDate;
 
-        msg = msg.substr(duration_string.length);
-        if (msg === "") {
-            await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
-            log("Gracefully aborted attempt to create poll. Options missing");
-            return;
-        }
+        const votes = poll.votes;
 
-        const options = msg.split(/,\s*/g).sort((a, b) => b.length - a.length); // longest to shortest
-        if (options.length < 2) {
-            await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from.") + "\n\n" + this.usage(message.prefix));
-            log("Gracefully aborted attempt to create poll. Too little options");
-            return;
-        }
+        const users = new Discord.Collection(poll.users.map(userId => {
+            return [userId, guild.members.get(userId)];
+        }));
 
-        const users = new Discord.Collection;
-        const votes = {};
-        for (const option of options) votes[option] = 0;
-
-        const poll = new Poll(
-            this.db,
-            message.guild,
-            message.channel,
-            message.member,
-            new Date(Date.now() + duration),
+        const poll_object = new Poll(
+            database,
+            guild,
+            channel,
+            creator,
+            endDate,
             votes,
             users
         );
-        Poll.add(poll);
-
-        await message.channel.send(await message.channel.translate("@here Poll is starting! {{timeLeft}} left to vote", {
-            timeLeft: `**${toHumanTime(duration)}**`,
-        }) + "\n" + await message.channel.translate("You vote by simply posting {{options}} in this channel", {
-            options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``
-        }));
-        log(`Poll started. ${duration}ms. ${options.join(", ")}`);
+        Poll.add(poll_object);
     }
 
-    get guildOnly() { return true; }
+    cr.register("poll", new class extends BaseCommand {
+        async call(message, content) {
+            /**
+             * @type {string}
+             */
+            if (content === "") {
+                return;
+            }
 
-    usage(prefix) {
-        return `\`${prefix}poll <duration> <option 1>, <option 2>, ..., <option n>\`
+            if (await database.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
+                await message.channel.sendTranslated("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
+                log("Gracefully aborted attempt to create poll. Poll already exists in this channel");
+                return;
+            }
+
+            const duration_string = content.match(/([\d.]+(d|h|m|s|ms)\s*)+/g)[0];
+            if (!duration_string) {
+                await message.channel.send(await message.channel.translate("`duration` must be formated as in the example."));
+                log("Gracefully aborted attempt to create poll. Duration parsing error");
+                return;
+            }
+
+            const duration = parseHumanTime(duration_string);
+            if (duration < 60000 || duration > 1000 * 3600 * 24 * 3) {
+                await message.channel.send(await message.channel.translate("`duration` should be at least 1m and max 3d"));
+                log("Gracefully aborted attempt to create poll. Duration out of range");
+                return;
+            }
+
+            content = content.substr(duration_string.length);
+            if (content === "") {
+                await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from."));
+                log("Gracefully aborted attempt to create poll. Options missing");
+                return;
+            }
+
+            const options = content.split(/,\s*/g).sort((a, b) => b.length - a.length); // longest to shortest
+            if (options.length < 2) {
+                await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from."));
+                log("Gracefully aborted attempt to create poll. Too little options");
+                return;
+            }
+
+            const users = new Discord.Collection;
+            const votes = {};
+            for (const option of options) votes[option] = 0;
+
+            const poll = new Poll(
+                database,
+                message.guild,
+                message.channel,
+                message.member,
+                new Date(Date.now() + duration),
+                votes,
+                users
+            );
+            Poll.add(poll);
+
+            await message.channel.send(await message.channel.translate("@here Poll is starting! {{timeLeft}} left to vote", {
+                timeLeft: `**${toHumanTime(duration)}**`,
+            }) + "\n" + await message.channel.translate("You vote by simply posting {{options}} in this channel", {
+                options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``
+            }));
+            log(`Poll started. ${duration}ms. ${options.join(", ")}`);
+        }
+
+        get help() {
+            return new HelpContent()
+                // .setDescription("Keep track of all your waifus")
+                .setUsage(`\`{{prefix}}poll <duration> <option 1>, <option 2>, ..., <option n>\`
 \`duration\` - Duration of the poll. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
-\`option\` - a comma seperated list of options to vote for`;
-    }
-}
-
-module.exports = PollCommand;
+\`option\` - a comma seperated list of options to vote for`);
+        }
+    }).setCategory(Category.MISC);
+};

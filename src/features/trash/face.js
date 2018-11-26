@@ -1,9 +1,14 @@
-const log = require("../../modules/log");
-const BaseCommand = require("../../class/BaseCommand");
+const SimpleCommand = require("../../class/SimpleCommand");
+const TextCommand = require("../../class/TextCommand");
+const Category = require("../../logic/commands/Category");
 
-Array.prototype.random = function randomItem() {
-    return this[Math.floor(Math.random() * this.length)];
-};
+/**
+ * Get random entry of an Array
+ * @param {Array} arr 
+ */
+function randomItem(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
 
 const faces = [
     "( ͡° ͜ʖ ͡°)",
@@ -120,47 +125,22 @@ const faces = [
     "٩◔̯◔۶",
     "≧☉_☉≦",
     "☼.☼",
-    "^̮^",
     "(>人<)",
     "〆(・∀・＠)",
     "(~_^)",
-    "^̮^",
-    "^̮^",
     ">_>",
-    "(^̮^)",
     "(/) (°,,°) (/)",
     "^̮^",
-    "^̮^",
     "=U",
-    "(･.◤)"
 ];
 
-class FaceCommand extends BaseCommand {
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
+module.exports = async function install(cr) {
+    cr.register("face", new SimpleCommand(() => randomItem(faces))).setCategory(Category.MISC);
+    cr.register("lenny", new TextCommand(faces[0])).setCategory(Category.MISC);
+    cr.register("shrug", new TextCommand(faces[0])).setCategory(Category.MISC);
 
-        if (/^face\b/i.test(message.content)) {
-            const face = faces.random();
-            await message.channel.send(face);
-            log(`Requested random face. Given ${face}`);
-            return;
-        }
-        
-        if (/^lenny\b/i.test(message.content)) {
-            await message.channel.send(faces[0]);
-            log("Requested lenny emoticon");
-            return;
-        }
-        
-        if (/^shrug\b/i.test(message.content)) {
-            await message.channel.send(faces[1]);
-            log("Requested shrug emoticon");
-            return;
-        }
-    }
-    usage(prefix) {
-        return `\`${prefix}face\` returns a random ASCII face`;
-    }
-}
-
-module.exports = FaceCommand;
+    cr.register("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻")).setCategory(Category.ACTION);
+    cr.registerAlias("tableflip", "tf");
+    cr.register("untableflip", new TextCommand("┬─┬ ノ( ゜-゜ノ)")).setCategory(Category.ACTION);
+    cr.registerAlias("untableflip", "utf");
+};

@@ -1,7 +1,7 @@
-const { isPlainObject } = require("../modules/util");
+const { isPlainObject } = require("../../modules/utils");
 const { Db } = require("mongodb");
 const { Client, TextChannel } = require("discord.js");
-const DocumentCache = require("./DocumentCache");
+const DocumentCache = require("../DocumentCache");
 
 function index(obj, is, value) {
     if (typeof is == "string")

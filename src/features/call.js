@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
-const { timeout, roll } = require("../modules/util");
+const { timeout, roll } = require("../modules/utils");
 const fetch = require("node-fetch");
 const EventEmitter = require("events");
 const Discord = require("discord.js");
@@ -287,9 +287,11 @@ class CallCommand extends BaseCommand {
     get guildOnly() { return true; }
     
     usage(prefix) {
-        return `\`${prefix}call\` - calls into a random server Trixie happens to be in as well.
-\`${prefix}call hangup\` - hang up on an incoming call or, in case your server started the call, end the session entirely`;
+        return `\`{{prefix}}call\` - calls into a random server Trixie happens to be in as well.
+\`{{prefix}}call hangup\` - hang up on an incoming call or, in case your server started the call, end the session entirely`;
     }
 }
 
-module.exports = CallCommand;
+module.exports = async function install(cr) {
+    cr;
+};

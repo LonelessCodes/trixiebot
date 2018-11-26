@@ -1,55 +1,54 @@
 const CONST = require("../../modules/CONST");
 const Discord = require("discord.js");
+
 const BaseCommand = require("../../class/BaseCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
+const CommandPermission = require("../../logic/commands/CommandPermission");
+const Category = require("../../logic/commands/Category");
 
-class LocaleCommand extends BaseCommand {    
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^locale\b/i.test(message.content)) return;
+module.exports = async function install(cr, client) {
+    cr.register("locale", new class extends BaseCommand {
+        async call(message, content) {
+            if (content === "") {
+                const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+                const locale = await message.locale();
+                embed.addField("global", locale.global);
+                const channels = locale.channels || {};
+                for (const channelId in channels) {
+                    if (message.guild.channels.has(channelId)) {
+                        embed.addField("#" + message.guild.channels.get(channelId).name, channels[channelId], true);
+                    }
+                }
+                await message.channel.send({ embed });
+            } else if (/^(((\w){2})|global|default)\b/i.test(content)) {
+                if (!/^(global|default)$/i.test() && !client.locale.locales.includes(content.toLowerCase())) {
+                    await message.channel.sendTranslated("Locale '{{locale}}' is not supported :c Try {{locales}}", {
+                        locale: content,
+                        locales: client.locale.locales.map(v => `\`${v}\``).join(", ")
+                    });
+                    return;
+                }
 
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.ADMINISTRATOR);
-        if (!permission) return;
-
-        let msg = message.content.substr(7).trim();
-
-        if (msg === "") {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            const locale = await message.locale();
-            embed.addField("global", locale.global);
-            const channels = locale.channels || {};
-            for (const channelId in channels) {
-                if (message.guild.channels.has(channelId)) {
-                    embed.addField("#" + message.guild.channels.get(channelId).name, channels[channelId], true);
+                const channel = message.mentions.channels.first();
+                if (!channel) {
+                    await client.locale.set(message.guild.id, content.toLowerCase());
+                    await message.channel.sendTranslated("Changed locale for the server to {{locale}}", {
+                        locale: await client.locale.get(message.guild.id)
+                    });
+                } else {
+                    const locale = content.split(" ")[0];
+                    await client.locale.set(message.guild.id, channel.id, locale.toLowerCase());
+                    await message.channel.sendTranslated("Changed locale for {{channel}} to {{locale}}", {
+                        channel: channel.toString(),
+                        locale: await client.locale.get(message.guild.id, channel.id)
+                    });
                 }
             }
-            await message.channel.send({ embed });
-        } else if (/^(((\w){2})|global|default)\b/i.test(msg)) {
-            const channel = message.mentions.channels.first();
-            if (!channel) {
-                await this.client.locale.set(message.guild.id, msg);
-                await message.channel.sendTranslated("Changed locale for the server to {{locale}}", {
-                    locale: msg
-                });
-            } else {
-                const locale = msg.split(" ")[0];
-                await this.client.locale.set(message.guild.id, channel.id, locale);
-                await message.channel.sendTranslated("Changed locale for {{channel}} to {{locale}}", {
-                    channel: channel.toString(),
-                    locale: await this.client.locale.get(message.guild.id, channel.id)
-                });
-            }
-        } else {
-            await message.channel.send(this.usage(message.prefix));
-        }
-    }
-
-    get guildOnly() { return true; }
-
-    usage(prefix) {
-        return `\`${prefix}locale\` view the Trixie's locales in this server
-\`${prefix}locale <locale>\` set a global locale
-\`${prefix}locale <locale> <channel>\` set a channel to be a unique locale`;
-    }
-}
-
-module.exports = LocaleCommand;
+        } 
+    })
+        .setHelp(new HelpContent().setUsage(`\`{{prefix}}locale\` view the Trixie's locales in this server
+\`{{prefix}}locale <locale>\` set a global locale
+\`{{prefix}}locale <locale> <channel>\` set a channel to be a unique locale`))
+        .setCategory(Category.MODERATION)
+        .setPermissions(CommandPermission.ADMIN);
+};

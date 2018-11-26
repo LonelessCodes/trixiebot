@@ -1,7 +1,9 @@
 const fetch = require("node-fetch");
-const dog = require("dog-ascii-faces");
-const log = require("../../modules/log");
-const BaseCommand = require("../../class/BaseCommand");
+const dogFace = require("dog-ascii-faces");
+
+const SimpleCommand = require("../../class/SimpleCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
+const Category = require("../../logic/commands/Category");
 
 async function randomDog() {
     const response = await fetch("https://random.dog/woof.json");
@@ -10,17 +12,12 @@ async function randomDog() {
     return result.url;
 }
 
-class CatCommand extends BaseCommand{
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^dog\b/i.test(message.content)) return;
-
-        await message.channel.send(await message.channel.translate("woof") + " " + dog() + " " + await randomDog());
-        log("Requested random dog :3 woof");
-    }
-    usage(prefix) {
-        return `\`${prefix}dog\` returns dog image :3`;
-    }
-}
-
-module.exports = CatCommand;
+module.exports = async function install(cr) {
+    cr.register("dog", new SimpleCommand(async message => {
+        return await message.channel.translate("woof") + " " + dogFace() + " " + await randomDog();
+    }))
+        .setHelp(new HelpContent().setUsage("`{{prefix}}dog` returns dog image :3"))
+        .setCategory(Category.IMAGE);
+    cr.registerAlias("dog", "doggo");
+    cr.registerAlias("dog", "puppy");
+};

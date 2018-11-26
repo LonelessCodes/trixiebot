@@ -1,8 +1,8 @@
-const log = require("../modules/log");
-const { removePrefix } = require("../modules/util");
-const { Message, Client, Channel, Guild } = require("discord.js");
-const ConfigManager = require("../logic/ConfigManager");
-const LocaleManager = require("../logic/LocaleManager");
+const { Message, Channel, Guild } = require("discord.js");
+const LocaleManager = require("../logic/managers/LocaleManager");
+const CommandPermission = require("../logic/commands/CommandPermission");
+const RateLimiter = require("../logic/RateLimiter");
+const TimeUnit = require("../modules/TimeUnit");
 
 // give each Channel and Guild class a locale function, which returns the locale config for this
 // specific namespace, and on a Message class give the whole locale config
@@ -16,86 +16,97 @@ Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
 
 class BaseCommand {
     /**
-     * @param {Client} client 
-     * @param {ConfigManager} config 
+     * @param {CommandPermission.CommandPermission} permissions 
      */
-    constructor(client, config) {
-        this.client = client;
-        this.config = config;
+    constructor(permissions) {
+        this.setPermissions(permissions || CommandPermission.USER);
+        this._rateLimitMessageRateLimiter = null;
+        this.rateLimiter = null;
+        this.ignore = true;
+        this.level = 0;
+        this.list = true;
+        this._category = null;
+        this._help = null;
+        this.aliases = [];
+        this.name = null;
     }
 
-    get ignore() { return true; }
-    get guildOnly() { return false; }
-    get category() { return "Other"; }
-    /** 
-     * @param {string} prefix
-     * @returns {string} 
-     */
-    usage() { return null; }
+    setRateLimiter(rateLimiter) {
+        if (rateLimiter) {
+            this._rateLimitMessageRateLimiter = this._rateLimitMessageRateLimiter || new RateLimiter(TimeUnit.MINUTE, 1);
+            this.rateLimiter = rateLimiter;
+        } else {
+            this._rateLimitMessageRateLimiter = null;
+            this.rateLimiter = null;
+        }
+    }
+    
+    async rateLimit(message, commandName) {
+        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(`${commandName}:${message.guild.id}:${message.channel.id}`))) return;
+        await this.rateLimitMessage(message);
+    }
+
+    async rateLimitMessage(message) {
+        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area");
+    }
+    
+    setPermissions(permissions) {
+        this.permissions =
+            permissions ?
+                permissions instanceof CommandPermission.CommandPermission ?
+                    permissions :
+                    new CommandPermission.CommandPermission(permissions instanceof Array ? permissions : [permissions]) :
+                CommandPermission.USER;
+        return this;
+    }
+
+    async noPermission(message) {
+        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area");
+    }
+
+    setIgnore(v) {
+        this.ignore = v;
+        return this;
+    }
+
+    setLevel(v) {
+        this.level = v;
+        return this;
+    }
+
+    setCategory(v) {
+        this._category = v;
+        this.setPermissions(v.permissions);
+        return this;
+    }
+
+    get category() {
+        return this._category;
+    }
+
+    setHelp(v) {
+        this._help = v;
+        return this;
+    }
+
+    dontList() {
+        this.list = false;
+        return this;
+    }
+
+    get help() {
+        return this._help;
+    }
 
     async init() { return this; }
 
-    async onbeforemessage() { }
+    async beforeProcessCall() { }
 
-    async onmessage() { }
+    async run(message, commandName, content, pass_through) {
+        await this.call(message, content, pass_through);
+    }
+
+    async call() { }
 }
-
-BaseCommand.CommandManager = class CommandManager {
-    constructor(client, config, db) {
-        /** @type {Map<string, BaseCommand>} */
-        this.commands = new Map;
-
-        client.addListener("message", async message => {
-            if (message.author.bot) return;
-
-            const type = message.channel.type;
-            if (type !== "text" &&
-                type !== "dm") return;
-
-            message.guild.config = {};
-            let timeouted = false;
-            if (type === "text") {
-                timeouted = await db.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
-                message.guild.config = await config.get(message.guild.id);
-            }
-
-            this.commands.forEach(async command => {
-                if (command.ignore && timeouted) return;
-                if (type === "dm" && command.guildOnly) return;
-
-                try {
-                    const passthru = await command.onbeforemessage(message); // this function may return information
-                    // remove prefix for prefix independant commands
-                    const cleanMessage = await removePrefix(message);
-                    // clean up multiple whitespaces
-                    cleanMessage.content = cleanMessage.content.replace(/[^\S\x0a\x0d]+/g, " ").trim();
-                    await command.onmessage(cleanMessage, passthru);
-                } catch (err) {
-                    log(err);
-                    message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
-                }
-            });
-        });
-    }
-
-    /**
-     * @param {string} id
-     * @param {BaseCommand} command
-     */
-    registerCommand(id, command) {
-        this.commands.set(id, command);
-    }
-
-    /**
-     * @param {string} id
-     */
-    get(id) {
-        return this.commands.get(id);
-    }
-};
-
-BaseCommand.GUILD_ONLY = 0;
-BaseCommand.GUILD_AND_GROUP = 1;
-BaseCommand.ALL = 2;
 
 module.exports = BaseCommand;

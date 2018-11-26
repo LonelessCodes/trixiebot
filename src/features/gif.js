@@ -1,17 +1,27 @@
 const giphy = require("giphy-api")(require("../../keys/giphy.json").key);
 const log = require("../modules/log");
+
 const BaseCommand = require("../class/BaseCommand");
+const TreeCommand = require("../class/TreeCommand");
+const HelpContent = require("../logic/commands/HelpContent");
+const Category = require("../logic/commands/Category");
 
 Array.prototype.random = function randomItem() {
     return this[Math.floor(Math.random() * this.length)];
 };
 
-class GifCommand extends BaseCommand {
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-
-        if (/^gif random\b/i.test(message.content)) {
-            const query = message.content.substr(11);
+module.exports = async function install(cr) {
+    const gifCommand = cr.register("gif", new class extends TreeCommand {
+        get help() {
+            return new HelpContent()
+                .setUsage(`\`{{prefix}}gif <query>\` - returns the top result for the given \`query\`
+\`{{prefix}}gif random <query>\` - returns a random gif for the given \`query\`
+\`{{prefix}}gif trending\` - returns a random trending gif`);
+        }
+    }).setCategory(Category.IMAGE);
+    
+    gifCommand.registerSubCommand("random", new class extends BaseCommand {
+        async call(message, query) {
             let gif;
             if (query === "") {
                 gif = await giphy.random({
@@ -38,10 +48,10 @@ class GifCommand extends BaseCommand {
 
             await message.channel.send(url);
             log(`Requested random gif ${gif.data.id} for ${query}`);
-            return;
         }
-
-        if (/^gif trending\b/i.test(message.content)) {
+    });
+    gifCommand.registerSubCommand("trending", new class extends BaseCommand {
+        async call(message) {
             const gif = await giphy.trending({
                 limit: 100
             });
@@ -55,14 +65,11 @@ class GifCommand extends BaseCommand {
 
             await message.channel.send(url);
             log(`Requested trending gif ${gif.data[0].id}`);
-            return;
         }
-
-        if (/^gif\b/i.test(message.content)) {
-            const query = message.content.substr(4);
+    });
+    gifCommand.registerDefaultCommand(new class extends BaseCommand {
+        async call(message, query) {
             if (query === "") {
-                await message.channel.send(this.usage(message.prefix));
-                log("Sent gif usage");
                 return;
             }
 
@@ -81,14 +88,6 @@ class GifCommand extends BaseCommand {
 
             await message.channel.send(url);
             log(`Requested top gif ${gif.data[0].id} for ${query}`);
-            return;
         }
-    }
-    usage(prefix) {
-        return `\`${prefix}gif <query>\` - returns the top result for the given \`query\`
-\`${prefix}gif random <query>\` - returns a random gif for the given \`query\`
-\`${prefix}gif trending\` - returns a random trending gif`;
-    }
-}
-
-module.exports = GifCommand;
+    });
+};

@@ -72,4 +72,4 @@ class PointsCommand extends BaseCommand {
     }
 }
 
-module.exports = PointsCommand;
+module.exports = async () => {};

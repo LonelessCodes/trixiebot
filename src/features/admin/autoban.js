@@ -1,56 +1,55 @@
 const CONST = require("../../modules/CONST");
 const globToRegExp = require("glob-to-regexp");
 const Discord = require("discord.js");
+
 const BaseCommand = require("../../class/BaseCommand");
+const TreeCommand = require("../../class/TreeCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
+const CommandPermission = require("../../logic/commands/CommandPermission");
+const Category = require("../../logic/commands/Category");
 
-class AutoBan extends BaseCommand {
-    constructor(client, config, db) {
-        super(client, config);
+module.exports = async function install(cr, client, config, db) {
+    const database = db.collection("autoban");
 
-        this.db = db.collection("autoban");
+    client.on("guildMemberAdd", async member => {
+        if (!member.bannable) return;
 
-        this.client.on("guildMemberAdd", async member => {
-            if (!member.bannable) return;
+        const guild = member.guild;
 
-            const guild = member.guild;
+        const conditions = await database.find({ guildId: guild.id }).toArray();
+        const regexps = conditions.map(c => globToRegExp(c.pattern, { flags: "gi", extended: true }));
 
-            const conditions = await this.db.find({ guildId: guild.id }).toArray();
-            const regexps = conditions.map(c => globToRegExp(c.pattern, { flags: "gi", extended: true }));
+        const username = member.user.username;
 
-            const username = member.user.username;
-
-            for (const regexp of regexps) {
-                if (regexp.test(username)) {
-                    await member.ban("Banned because of autoban pattern");
-                    return;
-                }
+        for (const regexp of regexps) {
+            if (regexp.test(username)) {
+                await member.ban("Banned because of autoban pattern");
+                return;
             }
-        });
-    }
+        }
+    });
 
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^autoban\b/i.test(message.content)) return;
+    const autobanCommand = cr.register("autoban", new TreeCommand)
+        .setHelp(new HelpContent().setUsage(`\`{{prefix}}autoban\` view the autoban expressions of this server
+\`{{prefix}}autoban add <expression>\` add an expression banning joining users if they match it
+\`{{prefix}}autoban remove <expression>\` remove an expression again`))
+        .setCategory(Category.MODERATION)
+        .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.BAN_MEMBERS]));
 
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.BAN_MEMBERS);
-        if (!permission) return;
-
-        if (/^autoban add\b/i.test(message.content)) {
-            const msg = message.content.substr(12);
-
-            await this.db.insertOne({ guildId: message.guild.id, action: "ban", pattern: msg });
+    autobanCommand.registerSubCommand("add", new class extends BaseCommand {
+        async call(message, content) {
+            await database.insertOne({ guildId: message.guild.id, action: "ban", pattern: content });
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setDescription(`:police_car: Added \`${msg}\` as a pattern`);
+            embed.setDescription(`:police_car: Added \`${content}\` as a pattern`);
 
             await message.channel.send({ embed });
-            return;
         }
+    });
 
-        if (/^autoban remove\b/i.test(message.content)) {
-            const msg = message.content.substr(15);
-
-            const deleted = await this.db.deleteOne({ guildId: message.guild.id, pattern: msg });
+    autobanCommand.registerSubCommand("remove", new class extends BaseCommand {
+        async call(message, content) {
+            const deleted = await database.deleteOne({ guildId: message.guild.id, pattern: content });
 
             const embed = new Discord.RichEmbed();
             if (deleted.result.n === 0) {
@@ -58,33 +57,25 @@ class AutoBan extends BaseCommand {
                 embed.setDescription("No such pattern configured");
             } else {
                 embed.setColor(CONST.COLOR.PRIMARY);
-                embed.setDescription(`Deleted \`${msg}\` as a pattern`);
+                embed.setDescription(`Deleted \`${content}\` as a pattern`);
             }
 
             await message.channel.send({ embed });
-            return;
         }
+    });
 
-        const conditions = await this.db.find({ guildId: message.guild.id }).toArray();
+    autobanCommand.registerDefaultCommand(new class extends BaseCommand {
+        async call(message) {
+            const conditions = await database.find({ guildId: message.guild.id }).toArray();
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        embed.setTitle("Current AutoBan Patterns");
-        embed.setDescription((conditions.length ?
-            conditions.map(c => "`" + c.pattern + "`").join("\n") :
-            "No autoban patterns yet. Add some by using `!autoban add <pattern>`") + 
-            "\n\n Patterns use the glob pattern documentation. It is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.");
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+            embed.setTitle("Current AutoBan Patterns");
+            embed.setDescription((conditions.length ?
+                conditions.map(c => "`" + c.pattern + "`").join("\n") :
+                "No autoban patterns yet. Add some by using `!autoban add <pattern>`") +
+                "\n\n Patterns use the glob pattern documentation. It is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.");
 
-        await message.channel.send({ embed });
-        return;
-    }
-
-    get guildOnly() { return true; }
-
-    usage(prefix) {
-        return `\`${prefix}autoban\` view the autoban expressions of this server
-\`${prefix}autoban add <expression>\` add an expression banning joining users if they match it
-\`${prefix}autoban remove <expression>\` remove an expression again`;
-    }
-}
-
-module.exports = AutoBan;
+            await message.channel.send({ embed });
+        }
+    });
+};

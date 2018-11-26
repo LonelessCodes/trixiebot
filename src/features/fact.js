@@ -1,8 +1,11 @@
 const { promisify } = require("util");
-const { timeout } = require("../modules/util");
+const { timeout } = require("../modules/utils");
 const log = require("../modules/log");
 const Twit = require("twit");
+
 const BaseCommand = require("../class/BaseCommand");
+const HelpContent = require("../logic/commands/HelpContent");
+const Category = require("../logic/commands/Category");
 
 Array.prototype.last = function lastItem() {
     return this[this.length - 1];
@@ -42,23 +45,23 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
     log("Loaded all uberfacts:", facts.size);
 }).catch(log);
 
-async function getFact() {
-    const facts = await firstSetLoaded;
+function getFact() {
     return [...facts].random();
 }
 
-class FactCommand extends BaseCommand {
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^fact\b/i.test(message.content)) return;
+module.exports = async function install(cr) {
+    cr.register("fact", new class extends BaseCommand {
+        async call(message) {
+            await firstSetLoaded;
+            const fact = getFact();
+            await message.channel.send(fact);
+            log("Fact requested");
+        }
 
-        const fact = await getFact();
-        await message.channel.send(fact);
-        log("Fact requested");
-    }
-    usage(prefix) {
-        return `\`${prefix}fact\` gets random UberFacts fact`;
-    }
-}
-
-module.exports = FactCommand;
+        get help() {
+            return new HelpContent()
+                .setUsage("`{{prefix}}fact` gets random UberFacts fact");
+        }
+    }).setCategory(Category.UTILS);
+    cr.registerAlias("fact", "uberfacts");
+};

@@ -1,10 +1,15 @@
 const fetch = require("node-fetch");
 const log = require("../modules/log");
 const CONST = require("../modules/CONST");
-const BaseCommand = require("../class/BaseCommand");
-// const twitch = require("twitch");
 const Discord = require("discord.js");
 
+const BaseCommand = require("../class/BaseCommand");
+const TreeCommand = require("../class/TreeCommand");
+const HelpContent = require("../logic/commands/HelpContent");
+const CommandPermission = require("../logic/commands/CommandPermission");
+const Category = require("../logic/commands/Category");
+
+// const twitch = require("twitch");
 // const keys = {
 //     twitch: require("../../keys/twitch.json")
 // };
@@ -32,37 +37,31 @@ class Channel {
     }
 }
 
-class AlertCommand extends BaseCommand {
-    constructor(client, config, db) {
-        super(client, config);
+module.exports = async function install(cr, client, config, db) {
+    const database = db.collection("alert");
 
-        this.db = db.collection("alert");
-        /** @type {Channel[]} */
-        this.online = new Array;
+    /** @type {Channel[]} */
+    const online = new Array;
 
-        setInterval(() => this.checkChanges(), 60 * 1000);
-        this.checkChanges();
-    }
-
-    async checkChanges() {
+    async function checkChanges() {
         // get all online channels
         /** @type {any[]} */
         const picartoOnline = await request("online?adult=true");
 
-        const stream = this.db.find({});
-        stream.addListener("data", config => this.checkChange(picartoOnline, config));
+        const stream = database.find({});
+        stream.addListener("data", config => checkChange(picartoOnline, config));
         stream.once("end", () => { });
         stream.once("error", err => { log(err); });
     }
 
-    async checkChange(picartoOnline, savedConfig) {
-        const guild = this.client.guilds.get(savedConfig.guildId);
+    async function checkChange(picartoOnline, savedConfig) {
+        const guild = client.guilds.get(savedConfig.guildId);
         if (!guild) return;
         if (!guild.available) return;
 
         if (savedConfig.service !== "picarto") return;
 
-        const oldChannel = this.online.find(channel => {
+        const oldChannel = online.find(channel => {
             return savedConfig.service === channel.service &&
                 savedConfig.userId === channel.userId &&
                 savedConfig.guildId === channel.guildId;
@@ -70,9 +69,9 @@ class AlertCommand extends BaseCommand {
 
         const guildChannel = guild.channels.get(savedConfig.channelId);
         if (!guildChannel) {
-            if (oldChannel) this.online.splice(this.online.indexOf(oldChannel), 1);
+            if (oldChannel) online.splice(online.indexOf(oldChannel), 1);
 
-            await this.db.deleteOne({
+            await database.deleteOne({
                 service: savedConfig.service,
                 guildId: savedConfig.guildId,
                 userId: savedConfig.userId
@@ -85,9 +84,9 @@ class AlertCommand extends BaseCommand {
             // remove the channel from the recently online list                
             if (savedConfig.messageId || oldChannel) {
                 if (oldChannel)
-                    this.online.splice(this.online.indexOf(oldChannel), 1);
+                    online.splice(online.indexOf(oldChannel), 1);
 
-                await this.db.updateOne({
+                await database.updateOne({
                     service: savedConfig.service,
                     guildId: savedConfig.guildId,
                     userId: savedConfig.userId
@@ -134,9 +133,9 @@ class AlertCommand extends BaseCommand {
                 name: channelPage.name,
                 messageId: onlineMessage.id
             });
-            this.online.push(newchannel);
+            online.push(newchannel);
 
-            await this.db.updateOne({
+            await database.updateOne({
                 service: savedConfig.service,
                 guildId: savedConfig.guildId,
                 userId: savedConfig.userId
@@ -149,25 +148,32 @@ class AlertCommand extends BaseCommand {
         }
     }
 
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^alert\b/i.test(message.content)) return;
+    setInterval(() => checkChanges(), 60 * 1000);
+    checkChanges();
 
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
-        if (!permission) return;
+    const alertCommand = cr.register("alert", new class extends TreeCommand {
+        get help() {
+            return new HelpContent()
+                .setUsage(`\`{{prefix}}alert <page url> <?channel>\` - subscribe Trixie to a Picarto channel
+\`page url\` - copy the url of the stream page and paste it in here
+\`channel\` - the channel to post the alert to later
 
-        let msg = message.content.substr(6).trim();
-        if (msg === "") {
-            await message.channel.send(this.usage(message.prefix));
-            return;
+\`{{prefix}}alert remove <page url>\` - unsubscribe Trixie from a Picarto channel
+\`page url\` - copy the url of the stream page and paste it in here
+
+\`{{prefix}}alert list\` - list all active alerts`);
         }
+    })
+        .setCategory(Category.MODERATION) // IMPORTANT PUT THIS BEFORE SETPERMISSIONS
+        .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]));
 
-        if (/^remove\b/i.test(msg)) {
+    /**
+     * SUB COMMANDS
+     */
 
-            let url = msg.substr(7).trim();
+    alertCommand.registerSubCommand("remove", new class extends BaseCommand {
+        async call(message, url) {
             if (url === "") {
-                await message.channel.send(this.usage(message.prefix));
-                log("Served alert usage");
                 return;
             }
 
@@ -204,7 +210,7 @@ class AlertCommand extends BaseCommand {
                     return;
                 }
 
-                const savedConfig = await this.db.findOne({
+                const savedConfig = await database.findOne({
                     service,
                     guildId: message.guild.id,
                     userId: channelPage.user_id.toString()
@@ -214,17 +220,17 @@ class AlertCommand extends BaseCommand {
                     return;
                 }
 
-                await this.db.deleteOne({ _id: savedConfig._id });
+                await database.deleteOne({ _id: savedConfig._id });
                 await message.channel.sendTranslated("Stopped alerting for {{name}}", {
                     name: channelPage.name
                 });
 
-                const oldChannel = this.online.find(channel => {
+                const oldChannel = online.find(channel => {
                     return savedConfig.service === channel.service &&
                         savedConfig.userId === channel.userId &&
                         savedConfig.guildId === channel.guildId;
                 });
-                if (oldChannel) this.online.splice(this.online.indexOf(oldChannel), 1);
+                if (oldChannel) online.splice(online.indexOf(oldChannel), 1);
 
                 const guildChannel = message.guild.channels.get(savedConfig.channelId);
                 if (!guildChannel) return;
@@ -238,11 +244,12 @@ class AlertCommand extends BaseCommand {
                 await onlineMessage.delete();
                 return;
             }
-            return;
         }
+    });
 
-        if (/^list\b/i.test(msg)) {
-            const streams = await this.db.find({
+    alertCommand.registerSubCommand("list", new class extends BaseCommand {
+        async call(message) {
+            const streams = await database.find({
                 guildId: message.guild.id
             }).toArray();
 
@@ -271,84 +278,76 @@ class AlertCommand extends BaseCommand {
             }
 
             message.channel.send({ embed });
-
-            return;
         }
+    });
 
-        const channel = message.mentions.channels.first() || message.channel;
+    alertCommand.registerDefaultCommand(new class extends BaseCommand {
+        async call(message, msg) {
+            if (msg === "") {
+                return;
+            }
+            const channel = message.mentions.channels.first() || message.channel;
 
-        const url = msg.replace(new RegExp(channel.toString(), "g"), "").trim();
-        if (url === "") {
-            await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got nothing", {
-                url
-            });
-            return;
-        }
-        if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
-            await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
-                url
-            });
-            return;
-        }
-
-        const shorturl = url.match(/[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b\/([-a-zA-Z0-9@:%_+.~]{2,25})\b/)[0];
-        const [host, name] = shorturl.split("/");
-        const service = services[host];
-        if (!service) {
-            await message.channel.sendTranslated("MMMMMMMMMMMMHHHHHHHH I don't know this... {{service}} or whatever", {
-                service: host
-            });
-            return;
-        }
-        if (!name) {
-            await message.channel.sendTranslated("You should also give me your channel page in the url instead of just the site!");
-            return;
-        }
-
-        if (service === "picarto") {
-            let channelPage;
-            try {
-                channelPage = await request("channel/name/" + name);
-            } catch (err) {
-                await message.channel.sendTranslated("That user does not exist!");
+            const url = msg.replace(new RegExp(channel.toString(), "g"), "").trim();
+            if (url === "") {
+                await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got nothing", {
+                    url
+                });
+                return;
+            }
+            if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
+                await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
+                    url
+                });
                 return;
             }
 
-            const savedConfig = await this.db.findOne({
-                service,
-                guildId: channel.guild.id,
-                userId: channelPage.user_id.toString()
-            });
-            if (savedConfig) {
-                await message.channel.sendTranslated("This server is already subscribed to this streamer.");
+            const shorturl = url.match(/[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b\/([-a-zA-Z0-9@:%_+.~]{2,25})\b/)[0];
+            const [host, name] = shorturl.split("/");
+            const service = services[host];
+            if (!service) {
+                await message.channel.sendTranslated("MMMMMMMMMMMMHHHHHHHH I don't know this... {{service}} or whatever", {
+                    service: host
+                });
+                return;
+            }
+            if (!name) {
+                await message.channel.sendTranslated("You should also give me your channel page in the url instead of just the site!");
                 return;
             }
 
-            await this.db.insertOne({
-                service,
-                guildId: channel.guild.id,
-                channelId: channel.id,
-                userId: channelPage.user_id.toString(),
-                name: channelPage.name,
-                messageId: null
-            });
-            await message.channel.sendTranslated("Will be alerting y'all there when {{name}} goes online!", {
-                name: channelPage.name
-            });
-            return;
+            if (service === "picarto") {
+                let channelPage;
+                try {
+                    channelPage = await request("channel/name/" + name);
+                } catch (err) {
+                    await message.channel.sendTranslated("That user does not exist!");
+                    return;
+                }
+
+                const savedConfig = await database.findOne({
+                    service,
+                    guildId: channel.guild.id,
+                    userId: channelPage.user_id.toString()
+                });
+                if (savedConfig) {
+                    await message.channel.sendTranslated("This server is already subscribed to this streamer.");
+                    return;
+                }
+
+                await database.insertOne({
+                    service,
+                    guildId: channel.guild.id,
+                    channelId: channel.id,
+                    userId: channelPage.user_id.toString(),
+                    name: channelPage.name,
+                    messageId: null
+                });
+                await message.channel.sendTranslated("Will be alerting y'all there when {{name}} goes online!", {
+                    name: channelPage.name
+                });
+                return;
+            }
         }
-    }
-
-    usage(prefix) {
-        return `\`${prefix}alert <page url> <?channel>\` - subscribe Trixie to a Picarto channel
-\`page url\` - copy the url of the stream page and paste it in here
-\`channel\` - the channel to post the alert to later
-
-\`${prefix}alert remove <page url>\` - unsubscribe Trixie from a Picarto channel
-\`page url\` - copy the url of the stream page and paste it in here
-
-\`${prefix}alert list\` - list all active alerts`;
-    }
-}
-
-module.exports = AlertCommand;
+    });
+};

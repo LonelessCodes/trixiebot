@@ -1,54 +1,23 @@
-const log = require("../../modules/log");
-const BaseCommand = require("../../class/BaseCommand");
+const TextActionCommand = require("../../class/TextActionCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
+const Category = require("../../logic/commands/Category");
 
 const hugs = [
-    "(っ´▽｀)っ{{name}}",
-    "(っ´▽｀)っ{{name}}",
-    "(つˆ⌣ˆ)つ{{name}}",
-    "(つˆ⌣ˆ)つ{{name}}",
-    "╰(´︶`)╯{{name}}",
-    "(⊃｡•́‿•̀｡)⊃{{name}}",
-    "(づ｡◕‿‿◕｡)づ{{name}}",
-    "(つ≧▽≦)つ{{name}}",
-    "(つ≧▽≦)つ{{name}}",
-    "(づ￣ ³￣)づ{{name}} ⊂(´・ω・｀⊂)"
+    "(っ´▽｀)っ{{user}}",
+    "(っ´▽｀)っ{{user}}",
+    "(つˆ⌣ˆ)つ{{user}}",
+    "(つˆ⌣ˆ)つ{{user}}",
+    "╰(´︶`)╯{{user}}",
+    "(⊃｡•́‿•̀｡)⊃{{user}}",
+    "(づ｡◕‿‿◕｡)づ{{user}}",
+    "(つ≧▽≦)つ{{user}}",
+    "(つ≧▽≦)つ{{user}}",
+    "(づ￣ ³￣)づ{{user}} ⊂(´・ω・｀⊂)"
 ];
 
-class HugsCommand extends BaseCommand {
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^hug\b/i.test(message.content)) return;
-
-        const mention = message.channel.type === "text" ?
-            message.mentions.members.first() :
-            message.mentions.users.first();
-        if (!mention) {
-            await message.channel.sendTranslated("Hugging yourself? How about huggig someone you love!");
-            log("No user to hug given");
-            return;
-        }
-
-        let text = message.content;
-        for (const user of (message.mentions.members || message.mentions.users).array()) {
-            text = text.replace(user.toString(), "");
-        }
-        text = text.replace(/\s+/g, " ");
-        const tmp = text.substr(4);
-        let number = 1;
-        if (tmp !== "") {
-            number = parseInt(tmp);
-        }
-        const hug = hugs[number % 10 - 1];
-        if (!hug) return await message.channel.send(this.usage(message.prefix));
-        await message.channel.send(hug.replace("{{name}}", mention.displayName || mention.username));
-        log(`Requested hug. Given ${hug}`);
-    }
-
-    get guildOnly() { return true; }
-
-    usage(prefix) {
-        return `\`${prefix}hugs <user mention> <?intensity>\` hug someone!!!!!`;
-    }
-}
-
-module.exports = HugsCommand;
+module.exports = async function install(cr) {
+    cr.register("hug", new TextActionCommand(hugs, "Hugging yourself? How about huggig someone you love!"))
+        .setHelp(new HelpContent().setUsage("`{{prefix}}hugs <user mention> <?intensity>` hug someone!!!!!"))
+        .setCategory(Category.ACTION);
+    cr.registerAlias("hug", "hugs");
+};

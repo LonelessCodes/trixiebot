@@ -1,38 +1,52 @@
 const log = require("../../modules/log");
 const Discord = require("discord.js");
+
 const BaseCommand = require("../../class/BaseCommand");
+const TreeCommand = require("../../class/TreeCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
+const CommandPermission = require("../../logic/commands/CommandPermission");
+const Category = require("../../logic/commands/Category");
 
-class MuteCommand extends BaseCommand {
-    constructor(client, config, db) {
-        super(client, config);
+module.exports = async function install(cr, client, config, db) {
+    const database = db.collection("mute");
 
-        this.db = db.collection("mute");
-    }
+    const permission = new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
-    async onmessage(message) {
-        const muted_words = (await this.db.find({ guildId: message.guild.id }).toArray()).map(doc => doc.word);
-        const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
-        if (muted_words.length > 0 && !permission) {
-            const content = message.content.toLowerCase();
-            for (const word of muted_words) {
-                if (content.indexOf(word) === -1) continue;
-
-                await message.delete();
-
-                log(`Sent muted message with "${word}" in it from ${message.member.user.username} in guild ${message.guild.name}`);
-                return;
-            }
+    const muteCommand = cr.register("mute", new class extends TreeCommand {
+        async noPermission(message) {
+            await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
         }
 
-        if (!message.prefixUsed) return;
+        async beforeProcessCall(message, content) {
+            const muted_words = (await database.find({ guildId: message.guild.id }).toArray()).map(doc => doc.word);
 
-        if (/^mute list\b/i.test(message.content)) {
-            if (!permission) {
-                await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
-                log("Gracefully aborted attempt to list muted words without the required rights to do so");
-                return;
+            if (muted_words.length > 0 && !permission.test(message.member)) {
+                const msg = content.toLowerCase();
+                for (const word of muted_words) {
+                    if (msg.indexOf(word) === -1) continue;
+
+                    await message.delete();
+                    return;
+                }
             }
 
+            return muted_words;
+        }
+    })
+        .setHelp(new HelpContent().setUsage(`\`{{prefix}}mute <phrase>\`
+\`phrase\` - Word or phrase to be blacklisted
+
+\`{{prefix}}mute remove <phrase>\`
+\`phrase\` - Word or phrase to be unmuted
+
+\`{{prefix}}mute clear\` remove all muted words
+
+\`{{prefix}}mute list\` list all muted words and phrases`))
+        .setCategory(Category.MODERATION)
+        .setPermissions(permission);
+    
+    muteCommand.registerSubCommand("list", new class extends BaseCommand {
+        async call(message, content, muted_words) {
             let str = "";
             if (muted_words.length > 0) {
                 str = await message.channel.translate("Currently muted are:") + "\n";
@@ -43,63 +57,44 @@ class MuteCommand extends BaseCommand {
 
             await message.channel.send(str);
             log(`Sent list of muted words in guild ${message.guild.name}`);
-            return;
         }
+    });
 
-        if (/^mute clear\b/i.test(message.content)) {
-            if (!permission) {
-                await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
-                log("Gracefully aborted attempt to clear all muted words without the required rights to do so");
-                return;
-            }
-
-            await this.db.deleteMany({ guildId: message.guild.id });
+    muteCommand.registerSubCommand("clear", new class extends BaseCommand {
+        async call(message) {
+            await database.deleteMany({ guildId: message.guild.id });
 
             await message.channel.sendTranslated("Removed all muted words successfully");
             log(`Removed all muted words in guild ${message.guild.name}`);
-            return;
         }
+    });
 
-        if (/^mute remove\b/i.test(message.content)) {
-            if (!permission) {
-                await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
-                log("Gracefully aborted attempt to remove muted word from user without the required rights to do so");
-                return;
-            }
-
-            const word = message.content.substr(12).trim().toLowerCase();
+    muteCommand.registerSubCommand("remove", new class extends BaseCommand {
+        async call(message, content) {
+            const word = content.trim().toLowerCase();
 
             if (word === "") {
-                await message.channel.send(this.usage(message.prefix));
-                log("Requested usage of mute command");
                 return;
             }
 
-            await this.db.deleteOne({ guildId: message.guild.id, word });
+            await database.deleteOne({ guildId: message.guild.id, word });
 
             await message.channel.sendTranslated("Removed muted word \"{{word}}\" successfully", {
                 word
             });
 
             log(`Removed muted word "${word}" in guild ${message.guild.name}`);
-            return;
         }
+    });
 
-        if (/^mute\b/i.test(message.content)) {
-            if (!permission) {
-                message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
-                log("Gracefully aborted attempt to mute word without the required rights to do so");
-                return;
-            }
-
+    muteCommand.registerDefaultCommand(new class extends BaseCommand {
+        async call(message, content, muted_words) {
             /**
              * @type {string}
              */
-            const word = message.content.substr(5).trim().toLowerCase();
+            const word = content.trim().toLowerCase();
 
             if (word === "") {
-                await message.channel.send(this.usage(message.prefix));
-                log("Requested usage of mute command");
                 return;
             }
 
@@ -109,31 +104,15 @@ class MuteCommand extends BaseCommand {
                 return;
             }
 
-            await this.db.insertOne({ guildId: message.guild.id, word });
+            await database.insertOne({ guildId: message.guild.id, word });
 
             await message.channel.sendTranslated("Got it! Blacklisted use of \"{{word}}\"", {
                 word
             });
 
             log(`Muted word "${word}" in ${message.guild.id}`);
-            return;
         }
-    }
+    });
 
-    get guildOnly() { return true; }
-    get ignore() { return false; }
-
-    usage(prefix) {
-        return `\`${prefix}mute <phrase>\`
-\`phrase\` - Word or phrase to be blacklisted
-
-\`${prefix}mute remove <phrase>\`
-\`phrase\` - Word or phrase to be unmuted
-
-\`${prefix}mute clear\` remove all muted words
-
-\`${prefix}mute list\` list all muted words and phrases`;
-    }
-}
-
-module.exports = MuteCommand;
+    muteCommand.registerSubCommandAlias("*", "add");
+};

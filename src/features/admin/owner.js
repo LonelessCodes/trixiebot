@@ -3,9 +3,11 @@ const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
-const { resolveStdout, findDefaultChannel } = require("../../modules/util");
-const BaseCommand = require("../../class/BaseCommand");
+const { resolveStdout, findDefaultChannel } = require("../../modules/utils");
 const Discord = require("discord.js");
+
+const BaseCommand = require("../../class/BaseCommand");
+const Category = require("../../logic/commands/Category");
 
 const extnames = {
     ".js": "javascript",
@@ -15,21 +17,14 @@ const extnames = {
     ".json": "json"
 };
 
-class CreatorCommands extends BaseCommand {
-    async onbeforemessage(message) {
-        const permission = message.author.id === "108391799185285120"; // this id is the bot's creator id
+module.exports = async function install(cr, client) {
+    cr.register("file", new class extends BaseCommand {
+        async noPermission(message) { await message.channel.sendTranslated("no"); }
 
-        if (/^!file\b/i.test(message.content)) {
-            if (!permission) {
-                await message.channel.send("no");
-                log("Gracefully aborted attempt to access creator functions");
-                return;
-            }
-
-            const msg = message.content.substr(6);
+        async call(message, msg) {
             const file = path.join(process.cwd(), msg);
             const stat = await fs.stat(file);
-            
+
             if (!stat.isFile()) {
                 await message.channel.send("Not a file. Sorry :(");
                 log("Gracefully aborted attempt to read file. Not a file");
@@ -66,63 +61,33 @@ class CreatorCommands extends BaseCommand {
                 }
                 log(`Sent file contents of ${msg}`);
             });
-            return;
         }
+    }).setIgnore(false).setCategory(Category.OWNER);
 
-        if (/^!exec\b/i.test(message.content)) {
-            if (!permission) {
-                await message.channel.send("no");
-                log("Gracefully aborted attempt to access creator functions");
-                return;
-            }
-
-            const msg = message.content.substr(6);
+    cr.register("exec", new class extends BaseCommand {
+        async call(message, msg) {
             const content = await promisify(exec)(msg);
             await message.channel.send("```\n" + resolveStdout(content.stdout + content.stderr) + "\n```");
             log(`Sent stdout for command ${msg}`);
-            return;
         }
+    }).setIgnore(false).setCategory(Category.OWNER);
 
-        if (/^!eval\b/i.test(message.content)) {
-            if (!permission) {
-                await message.channel.send("no");
-                log("Gracefully aborted attempt to access creator functions");
-                return;
-            }
-
-            const msg = message.content.substr(6);
+    cr.register("eval", new class extends BaseCommand {
+        async call(message, msg) {
             const content = await eval(msg);
             await message.channel.send("```\n" + content + "\n```");
             log(`Evaluated ${msg} and sent result`);
-            return;
         }
+    }).setIgnore(false).setCategory(Category.OWNER);
 
-        if (/^!broadcast\b/i.test(message.content)) {
-            if (!permission) {
-                await message.channel.send("no");
-                log("Gracefully aborted attempt to access creator functions");
-                return;
-            }
-
-            const msg = message.content.substr(11);
-            this.client.guilds.forEach(guild => {
+    cr.register("broadcast", new class extends BaseCommand {
+        async call(message, msg) {
+            client.guilds.forEach(guild => {
                 if (!guild.available) return;
                 const defaultChannel = findDefaultChannel(guild);
                 defaultChannel.send("Broadcast from creator", { embed: new Discord.RichEmbed().setDescription(msg) });
             });
             log(`Broadcasted message ${msg}`);
-            return;
         }
-    }
-
-    get ignore() { return false; }
-
-    usage() {
-        return `\`!file <path>\`
-\`!exec <command>\`
-\`!eval <code>\`
-\`!broadcast <message>\``;
-    }
-}
-
-module.exports = CreatorCommands;
+    }).setIgnore(false).setCategory(Category.OWNER);
+};

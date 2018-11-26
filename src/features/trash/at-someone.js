@@ -1,5 +1,4 @@
 const log = require("../../modules/log");
-const BaseCommand = require("../../class/BaseCommand");
 
 const emoticons = [
     "¯(°_o)/¯",
@@ -14,17 +13,13 @@ const emoticons = [
     "(⁄ ⁄•⁄ω⁄•⁄ ⁄)"
 ];
 
-class AtSomeoneCommand extends BaseCommand {
-    async onbeforemessage(message) {
+module.exports = async function install(cr, client) {
+    client.addListener("message", async message => {
         if (!/@someone\b/i.test(message.content)) return;
 
         const array = message.guild.members.array();
         const member = array[Math.floor(Math.random() * array.length)];
         await message.channel.send(`${emoticons[Math.floor(Math.random() * emoticons.length)]} ***(${member.displayName})***`);
         log(`Requested someone. Picked ${member.displayName}`);
-    }
-
-    get guildOnly() { return true; }
-}
-
-module.exports = AtSomeoneCommand;
+    });
+};

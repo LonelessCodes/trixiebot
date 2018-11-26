@@ -1,35 +1,29 @@
-const log = require("../../modules/log");
 const tinytext = require("tiny-text");
+
 const BaseCommand = require("../../class/BaseCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
+const Category = require("../../logic/commands/Category");
 
-class SmolCommand extends BaseCommand {
-    async onmessage(message) {
-        if (!message.prefixUsed) return;
-        if (!/^smol\b/i.test(message.content)) return;
+module.exports = async function install(cr) {
+    cr.register("smol", new class extends BaseCommand {
+        get help() {
+            return new HelpContent().setUsage(`\`{{prefix}}smol <string|user>\`
+\`string|user\` - text or user to smollerize uwu`);
+        }
 
-        const mention = message.channel.type === "text" ?
-            message.mentions.members.first() :
-            message.mentions.users.first();
-        if (!mention) {
-            const text = message.content.replace(/[^\S\x0a\x0d]+/g, " ");
-            const tmp = text.substr(5);
-            if (tmp === "") {
-                await message.channel.send(`Usage: \`${message.prefix}smol <string|user>\``);
-                log("Sent smol usage");
+        async call(message, content) {
+            const mention = message.mentions.members.first();
+            if (!mention) {
+                const text = content.replace(/[^\S\x0a\x0d]+/g, " ");
+                if (text === "") {
+                    await message.channel.send(`Usage: \`${message.prefix}smol <string|user>\``);
+                    return;
+                }
+                await message.channel.send(tinytext(text));
                 return;
             }
-            await message.channel.send(tinytext(tmp));
-            log(`Smoled ${tmp}`);
-            return;
+            await message.channel.send(tinytext(mention.displayName));
         }
-        await message.channel.send(tinytext(mention.displayName || mention.username));
-        log(`Smoled ${(mention.user || mention).username}`);
-        return;
-    }
-    usage(prefix) {
-        return `\`${prefix}smol <string|user>\`
-\`string|user\` - text or user to smollerize uwu`;
-    }
-}
-
-module.exports = SmolCommand;
+    }).setCategory(Category.TEXT);
+    cr.registerAlias("smol", "small");
+};

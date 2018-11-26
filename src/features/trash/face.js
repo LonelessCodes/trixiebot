@@ -1,13 +1,16 @@
+const secureRandom = require("random-number-csprng");
+
 const SimpleCommand = require("../../class/SimpleCommand");
 const TextCommand = require("../../class/TextCommand");
+const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
 
 /**
  * Get random entry of an Array
  * @param {Array} arr 
  */
-function randomItem(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+async function randomItem(arr) {
+    return arr[secureRandom(0, arr.length - 1)];
 }
 
 const faces = [
@@ -135,12 +138,12 @@ const faces = [
 ];
 
 module.exports = async function install(cr) {
-    cr.register("face", new SimpleCommand(() => randomItem(faces))).setCategory(Category.MISC);
-    cr.register("lenny", new TextCommand(faces[0])).setCategory(Category.MISC);
-    cr.register("shrug", new TextCommand(faces[0])).setCategory(Category.MISC);
+    cr.register("face", new SimpleCommand(() => randomItem(faces))).setHelp(new HelpContent().setDescription("Get a random ASCII face")).setCategory(Category.MISC);
+    cr.register("lenny", new TextCommand(faces[0])).setHelp(new HelpContent().setDescription("( ͡° ͜ʖ ͡°)")).setCategory(Category.MISC);
+    cr.register("shrug", new TextCommand(faces[0])).setHelp(new HelpContent().setDescription("¯\\_(ツ)_/¯")).setCategory(Category.MISC);
 
-    cr.register("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻")).setCategory(Category.ACTION);
+    cr.register("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻")).setHelp(new HelpContent().setDescription("(╯°□°）╯︵ Tableflip")).setCategory(Category.ACTION);
     cr.registerAlias("tableflip", "tf");
-    cr.register("untableflip", new TextCommand("┬─┬ ノ( ゜-゜ノ)")).setCategory(Category.ACTION);
+    cr.register("untableflip", new TextCommand("┬─┬ ノ( ゜-゜ノ)")).setHelp(new HelpContent().setDescription("That's right, put it back where it was ノ( ゜-゜ノ)")).setCategory(Category.ACTION);
     cr.registerAlias("untableflip", "utf");
 };

@@ -1,5 +1,5 @@
 const { timeout } = require("../modules/utils");
-const randomNumber = require("random-number-csprng");
+const secureRandom = require("random-number-csprng");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 
@@ -176,7 +176,7 @@ module.exports = async function install(cr, client, config, db) {
 
                 let pending = 100;
                 while (!waifu && pending--) {
-                    const random = await randomNumber(0, allWaifus.length - 1);
+                    const random = await secureRandom(0, allWaifus.length - 1);
                     if (allWaifus[random].waifuId !== message.author.id &&
                         allWaifus[random].ownerId !== message.author.id &&
                         message.guild.members.has(allWaifus[random].waifuId))
@@ -221,7 +221,7 @@ module.exports = async function install(cr, client, config, db) {
             await timeout(500);
             await m2.edit("...");
 
-            const random = await randomNumber(0, 100);
+            const random = await secureRandom(0, 100);
 
             await timeout(1500);
 

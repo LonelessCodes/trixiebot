@@ -1,12 +1,13 @@
 const log = require("../modules/log");
 const { timeout } = require("../modules/utils");
+const secureRandom = require("random-number-csprng");
 
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
-Array.prototype.random = function randomItem() {
-    return this[Math.floor(Math.random() * this.length)];
+Array.prototype.random = async function randomItem() {
+    return this[await secureRandom(0, this.length - 1)];
 };
 
 const coin = ["heads", "tails"];
@@ -28,7 +29,7 @@ module.exports = async function install(cr) {
                 return;
             }
 
-            const result = coin.random();
+            const result = await coin.random();
 
             await message.channel.send("The coin flips into the air...");
             await timeout(2000);
@@ -36,11 +37,9 @@ module.exports = async function install(cr) {
                 `Whew! The coin landed on ${result}.` :
                 `Sorry! The coin landed on ${result}.`);
         }
-
-        get help() {
-            return new HelpContent()
-                .setUsage(`\`{{prefix}}coin <bet>\`
-\`bet\` - your bet. Either \`heads\` or \`tails\``);
-        }
-    }).setCategory(Category.MISC);
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<bet>")
+            .addParameter("bet", "your bet. Either `heads` or `tails`"))
+        .setCategory(Category.MISC);
 };

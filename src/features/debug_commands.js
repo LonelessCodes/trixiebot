@@ -36,10 +36,8 @@ module.exports = async function install(cr, client) {
 
             await message.channel.send({ embed });
         }
-        
-        get help() {
-            return new HelpContent()
-                .setUsage("`{{prefix}}stats` to get some statistics from Trixie regarding herself");
-        }
-    }).setCategory(Category.INFO);
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Get some statistics from Trixie regarding herself"))
+        .setCategory(Category.INFO);
 };

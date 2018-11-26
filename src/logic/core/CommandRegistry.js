@@ -75,7 +75,7 @@ class CommandRegistry {
             if (timeouted) return false;
         }
 
-        if (command.rateLimiter && !command.rateLimiter.test(message.author.id)) {
+        if (command.rateLimiter && !command.rateLimiter.testAndAdd(message.author.id)) {
             await command.rateLimit(message);
             return;
         }

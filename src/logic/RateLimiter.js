@@ -29,7 +29,7 @@ class RateLimit {
     }
 
     testAndAdd() {
-        if (this.triesLeft > 0) return false;
+        if (this.triesLeft <= 0) return false;
 
         this.decTries();
 
@@ -97,13 +97,13 @@ class RateLimiter {
             this.rateLimitedUsers.set(key, rateLimit);
         }
 
+        if (!rateLimit.testAndAdd()) {
+            return false;
+        }
+
         // go over everyone and check if cooldown over, to delete and save memory
         for (const [key, rl] of this.rateLimitedUsers) {
             if (rl.isCooldownOver()) this.rateLimitedUsers.delete(key);
-        }
-
-        if (!rateLimit.testAndAdd()) {
-            return false;
         }
 
         return true;

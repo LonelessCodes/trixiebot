@@ -5,6 +5,7 @@ const CONST = require("../modules/CONST");
 const BaseCommand = require("../class/BaseCommand");
 const AliasCommand = require("../class/AliasCommand");
 const HelpBuilder = require("../logic/commands/HelpBuilder");
+const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 function sortCommands(commands) {
@@ -20,6 +21,11 @@ module.exports = async function install(cr, client, config, database) {
                 if (!c) return;
 
                 let [name, command] = c;
+
+                if (command instanceof AliasCommand) {
+                    name = command.parentName;
+                    command = command.command;
+                }
                 
                 await HelpBuilder.sendHelp(message, name, command);
                 return true;
@@ -64,6 +70,11 @@ module.exports = async function install(cr, client, config, database) {
 
             return true;
         }
-    }).setCategory(Category.INFO);
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Haha, very funny")
+            .setUsage("<?command>")
+            .addParameterOptional("command", "The name of the command you want help for. Whole command list if omitted"))
+        .setCategory(Category.INFO);
     cr.registerAlias("help", "trixie");
 };

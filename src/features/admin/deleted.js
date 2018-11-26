@@ -28,9 +28,9 @@ module.exports = async function install(cr, client, config, db) {
         log(`Caught deleted message ${message.id}`);
     });
 
-    const purge = () => database.deleteMany({ timestamp: { $lt: new Date(Date.now() - 7 * 24 * 3600 * 1000) } });
-    purge();
-    setInterval(purge, 60 * 1000);
+    const prune = () => database.deleteMany({ timestamp: { $lt: new Date(Date.now() - 7 * 24 * 3600 * 1000) } });
+    prune();
+    setInterval(prune, 60 * 1000);
 
     // Registering down here
 
@@ -38,9 +38,10 @@ module.exports = async function install(cr, client, config, db) {
         async noPermission(message) {
             await message.channel.sendTranslated("No boi, git gud");
         }
-    }).setHelp(new HelpContent().setUsage(`\`{{prefix}}deleted clear\` clears list of deleted messages
-
-\`{{prefix}}deleted\` list all deleted messages from the last 7 days`))
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Trixie can collect deleted for up to 7 days, so you always know what's going on in your server behind your back.\nCommand enabled by default. Soon option to turn it off")
+            .setUsage("", "List all deleted messages from the last 7 days"))
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN);
     
@@ -50,7 +51,9 @@ module.exports = async function install(cr, client, config, db) {
 
             await message.channel.sendTranslated("Removed all deleted messages successfully");
         }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "Clears list of deleted messages"));
 
     deletedCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message) {

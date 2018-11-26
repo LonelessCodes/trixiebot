@@ -46,9 +46,11 @@ module.exports = async function install(cr, client) {
             }
         } 
     })
-        .setHelp(new HelpContent().setUsage(`\`{{prefix}}locale\` view the Trixie's locales in this server
-\`{{prefix}}locale <locale>\` set a global locale
-\`{{prefix}}locale <locale> <channel>\` set a channel to be a unique locale`))
+        .setHelp(new HelpContent()
+            .setDescription("Trixie supports multiple different languages, including " + client.locale.locales.map(v => `\`${v}\``).join(", ") + ". Here you can set them in your server")
+            .setUsage("<?locale> <?channel>", "view the Trixie's locales in this server")
+            .addParameterOptional("locale", "set a global locale. If `channel` is given, sets as channel-only locale")
+            .addParameterOptional("channel", "set a channel to be a unique locale"))
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN);
 };

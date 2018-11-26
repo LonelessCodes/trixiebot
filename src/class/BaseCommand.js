@@ -1,3 +1,4 @@
+const { toHumanTime } = require("../modules/time_utils");
 const { Message, Channel, Guild } = require("discord.js");
 const LocaleManager = require("../logic/managers/LocaleManager");
 const CommandPermission = require("../logic/commands/CommandPermission");
@@ -13,6 +14,11 @@ Guild.prototype.locale = async function () { return (await this.client.locale.ge
 Message.prototype.translate = LocaleManager.autoTranslate;
 Channel.prototype.translate = LocaleManager.autoTranslateChannel;
 Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
+
+Message.prototype.end = async function (...args) {
+    await this.channel.stopTyping();
+    return await this.channel.send(...args);
+};
 
 class BaseCommand {
     /**
@@ -47,7 +53,7 @@ class BaseCommand {
     }
 
     async rateLimitMessage(message) {
-        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area");
+        await message.channel.sendTranslated(`Whoa whoa not to fast! You may only do this ${this.rateLimiter.max} ${this.rateLimiter.max === 1 ? "time" : "times"} every ${this.rateLimiter.toString()}. There is still ${toHumanTime(this.rateLimiter.tryAgainIn(message.author.id))} left to wait.`);
     }
     
     setPermissions(permissions) {
@@ -61,7 +67,7 @@ class BaseCommand {
     }
 
     async noPermission(message) {
-        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area");
+        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area >:c");
     }
 
     setIgnore(v) {
@@ -103,7 +109,8 @@ class BaseCommand {
     async beforeProcessCall() { }
 
     async run(message, commandName, content, pass_through) {
-        await this.call(message, content, pass_through);
+        // await message.channel.startTyping();
+        return await this.call(message, content, pass_through);
     }
 
     async call() { }

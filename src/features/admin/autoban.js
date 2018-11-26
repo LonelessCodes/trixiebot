@@ -30,9 +30,9 @@ module.exports = async function install(cr, client, config, db) {
     });
 
     const autobanCommand = cr.register("autoban", new TreeCommand)
-        .setHelp(new HelpContent().setUsage(`\`{{prefix}}autoban\` view the autoban expressions of this server
-\`{{prefix}}autoban add <expression>\` add an expression banning joining users if they match it
-\`{{prefix}}autoban remove <expression>\` remove an expression again`))
+        .setHelp(new HelpContent()
+            .setDescription("Autoban allows admins to make sure to keep specific users out of the server, even if they create a new account*\nPatterns use the glob pattern documentation. It is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.\n\n* If in the pattern it's been made sure it would match these new similar accounts")
+            .setUsage("", "view the autoban patterns of this server"))
         .setCategory(Category.MODERATION)
         .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.BAN_MEMBERS]));
 
@@ -45,7 +45,10 @@ module.exports = async function install(cr, client, config, db) {
 
             await message.channel.send({ embed });
         }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<pattern>", "add a pattern banning joining users if they match it")
+            .addParameter("pattern", "Pattern to filter out by"));
 
     autobanCommand.registerSubCommand("remove", new class extends BaseCommand {
         async call(message, content) {
@@ -62,7 +65,9 @@ module.exports = async function install(cr, client, config, db) {
 
             await message.channel.send({ embed });
         }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<pattern>", "remove a pattern again"));
 
     autobanCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message) {

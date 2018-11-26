@@ -34,11 +34,6 @@ module.exports = async function install(cr, client, config, db) {
     const database = db.collection("santaslist");
 
     cr.register("naughty", new class extends BaseCommand {
-        get help() {
-            return new HelpContent()
-                .setDescription("It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!");
-        }
-
         async call(message) {
             const progress = await message.channel.send(`${progressBar(0.0, "█", "░")} | Waiting in queue...`);
 
@@ -135,6 +130,8 @@ module.exports = async function install(cr, client, config, db) {
             });
         }
     })
+        .setHelp(new HelpContent()
+            .setDescription("It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!"))
         .setCategory(Category.ANALYSIS);
     cr.registerAlias("naughty", "nice");
 };

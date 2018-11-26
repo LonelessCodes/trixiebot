@@ -1,13 +1,15 @@
-const log = require("../modules/log");
+const { splitArgs } = require("../modules/string_utils");
+const secureRandom = require("random-number-csprng");
 const fetch = require("node-fetch");
 const packageFile = require("../../package.json");
 
 const BaseCommand = require("../class/BaseCommand");
+const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
-Array.prototype.random = function randomItem() {
-    return this[Math.floor(Math.random() * this.length)];
+Array.prototype.random = async function randomItem() {
+    return this[await secureRandom(0, this.length - 1)];
 };
 
 async function get(params) {
@@ -15,7 +17,7 @@ async function get(params) {
     delete params.scope;
 
     let string = [];
-    for (const key in params) 
+    for (const key in params)
         string.push(key + "=" + params[key]);
     string = string.join("&");
 
@@ -28,149 +30,107 @@ async function get(params) {
     return await result.json();
 }
 
+async function process(message, msg, type) {
+    if (msg === "") return;
+
+    const args = splitArgs(msg, 2);
+
+    let amount = 1;
+    try {
+        const numParse = parseInt(args[0]);
+        if (typeof numParse === "number" && !Number.isNaN(numParse)) {
+            if (numParse < 1 || numParse > 5) {
+                await message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
+                return;
+            }
+            amount = numParse;
+        } else throw new Error("NaN Error"); // go catch
+    } catch (err) {
+        err;
+        amount = 1;
+        args[1] = args[0] + " " + args[1];
+        args[0] = "";
+    }
+
+    let query = args[1].replace(/\s+/g, "+").toLowerCase();
+
+    if (query === "") {
+        await message.channel.send(await message.channel.translate("`query` **must** be given"));
+        return;
+    }
+
+    if (!message.channel.nsfw && !/rating:(e|q|explicit|questionable)/g.test(query)) {
+        query += " rating:s";
+    }
+
+    const images = [];
+    const ids = [];
+
+    let result;
+    switch (type) {
+        case "random":
+            result = await get({
+                tags: query,
+                sf: "id",
+                sd: "desc",
+                limit: 300
+            });
+            for (let i = 0; i < Math.min(amount, result.length); i++) {
+                const image = await result.random();
+                images.push(image.file_url + " *<https://e621.net/post/show/" + image.id + ">*");
+                ids.push(image.id);
+            }
+            break;
+        case "latest":
+            result = await get({
+                tags: query,
+                sf: "id",
+                sd: "desc",
+                limit: amount
+            });
+            for (let i = 0; i < Math.min(amount, result.length); i++) {
+                const image = result[i];
+                images.push(image.file_url + " *<https://e621.net/post/show/" + image.id + ">*");
+                ids.push(image.id);
+            }
+            break;
+    }
+    
+    if (images.length === 0) {
+        await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+        return;
+    }
+
+    const output = images.join("\n");
+
+    await message.channel.send(output);
+}
+
 module.exports = async function install(cr) {
-    cr.register("e621", new class extends BaseCommand {
+    const e621Command = cr.register("e621", new TreeCommand)
+        .setHelp(new HelpContent()
+            .setDescription("Search images on e621"))
+        .setCategory(Category.IMAGE);
+    
+    /**
+     * SUB COMMANDS
+     */
+
+    e621Command.registerSubCommand("random", new class extends BaseCommand {
         async call(message, msg) {
-            if (msg === "") {
-                return;
-            }
-
-            const timestamp = Date.now();
-
-            log("Used !e621 with:", msg);
-
-            let i = 0;
-            let current_char = msg.charAt(i);
-
-            let num = 1;
-            try {
-                const a = parseInt(current_char);
-                if (typeof a === "number" && !Number.isNaN(a)) {
-                    num = "";
-                    while (current_char !== " ") {
-                        num += current_char;
-                        i++;
-                        current_char = msg.charAt(i);
-                    }
-                    i++;
-                    current_char = msg.charAt(i);
-                    try {
-                        const numParse = parseInt(num);
-                        if (numParse < 1 || numParse > 5) {
-                            await message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
-                            log("Gracefully aborted attempt to request e621 image. Amount out of range");
-                            return;
-                        }
-                        num = numParse;
-                    } catch (err) {
-                        message.channel.send(await message.channel.translate("Invalid input"));
-                        log("Gracefully aborted attempt to request e621 image. Invalid amount input");
-                        return;
-                    }
-                } else throw new Error(); // go to catch
-            } catch (err) {
-                if (err.message !== "") {
-                    log(err);
-                    return;
-                }
-                i = 0;
-                current_char = msg.charAt(i);
-                num = 1;
-            }
-
-            let order = "";
-            while (i < msg.length && current_char !== " ") {
-                order += current_char.toLowerCase();
-                i++;
-                current_char = msg.charAt(i);
-            }
-            i++;
-            current_char = msg.charAt(i);
-
-            if (!/latest|random/.test(order)) {
-                await message.channel.send(await message.channel.translate("`order` must be either `latest` or `random`!"));
-                log(`Gracefully aborted attempt to request e621 image. ${order} is not a valid type of order`);
-                return;
-            }
-
-            if (i >= msg.length) {
-                await message.channel.send(await message.channel.translate("`query` **must** be given"));
-                log("Gracefully aborted attempt to request e621 image. No query given");
-                return;
-            }
-
-            let query = "";
-            while (i < msg.length && current_char !== "") {
-                query += current_char;
-                i++;
-                current_char = msg.charAt(i);
-            }
-            query = query.replace(/\s/g, "+");
-
-            if (!message.channel.nsfw &&
-                query.indexOf("rating:e") === -1 &&
-                query.indexOf("rating:q") === -1 &&
-                query.indexOf("rating:explicit") === -1 &&
-                query.indexOf("rating:questionable") === -1) {
-                query += " rating:s";
-            }
-
-            let images = [];
-            let ids = [];
-
-            let result;
-            switch (order) {
-                case "latest":
-                    result = await get({
-                        tags: query,
-                        sf: "id",
-                        sd: "desc",
-                        limit: num
-                    });
-                    for (let i = 0; i < Math.min(num, result.length); i++) {
-                        const image = result[i];
-                        images.push(image.file_url);
-                        ids.push(image.id);
-                    }
-                    break;
-                case "random":
-                    result = await get({
-                        tags: query,
-                        sf: "id",
-                        sd: "desc",
-                        limit: 320
-                    });
-                    for (let i = 0; i < Math.min(num, result.length); i++) {
-                        const image = result.random();
-                        images.push(image.file_url);
-                        ids.push(image.id);
-                    }
-                    break;
-            }
-
-            if (images.length === 0) {
-                await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-                log(`No e621 images found for ${msg}`);
-                return;
-            }
-
-            let output = "";
-            for (let image of images) {
-                output += "\n";
-                output += image;
-            }
-
-            await message.channel.send(output);
-
-            log("Found e621 images", ...ids, `[${Date.now() - timestamp}ms]`);
+            await process(message, msg, "random");
         }
+    }).setHelp(new HelpContent()
+        .setUsage("<?amount> <query>")
+        .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
+        .addParameter("query", "a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)"));
 
-        get help() {
-            return new HelpContent()
-                .setUsage(`\`{{prefix}}e621 <?amount> <order:latest|random> <query>\`
-\`amount\` - optional - number ranging from 1 to 5 for how many results to return
-\`order\` - string of either \`latest\` or \`random\`
-\`query\` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)`)
+    e621Command.registerSubCommand("latest", new class extends BaseCommand {
+        async call(message, msg) {
+            await process(message, msg, "latest");
         }
-    }).setCategory(Category.IMAGE);
+    }).setHelp(new HelpContent()
+        .setUsage("<?amount> <query>"));
+
+    e621Command.registerSubCommandAlias("random", "*");
 };

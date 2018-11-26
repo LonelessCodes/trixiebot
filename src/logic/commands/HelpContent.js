@@ -1,10 +1,16 @@
 class HelpContent {
     constructor(description = null, parameters = new Map, options = null, usage = null, related = new Array) {
+        this.title = null;
         this.description = description;
         this.parameters = parameters;
         this.options = options;
         this.usage = usage;
         this.related = related;
+    }
+
+    setUsageTitle(title) {
+        this.title = title;
+        return this;
     }
 
     setDescription(description) {

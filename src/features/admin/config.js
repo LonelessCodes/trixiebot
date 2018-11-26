@@ -118,9 +118,11 @@ module.exports = async function install(cr, client, config) {
                 return;
             }
         }
-    }).setHelp(new HelpContent().setUsage(`\`{{prefix}}config\` view the Trixie's config in this server
-\`{{prefix}}config <parameter>\` view only this parameter's config
-\`{{prefix}}config <parameter> <value>\` set a parameter in Trixie's config. "default" for default config`))
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<?parameter> <?value>", "view the Trixie's config in this server")
+            .addParameterOptional("parameter", "view only this parameter's config")
+            .addParameterOptional("value", "set a parameter in Trixie's config. \"default\" for default config"))
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN);
     

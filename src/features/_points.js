@@ -9,7 +9,7 @@ function random_point() {
     return [10, 15][Math.floor(Math.random() * 2)];
 }
 
-const cooldown = new Map;
+const cooldown = new Set;
 const cooldowntime = 60 * 1000;
 
 class PointsCommand extends BaseCommand {
@@ -24,7 +24,7 @@ class PointsCommand extends BaseCommand {
 
         if (cooldown.has(message.member)) return;
 
-        cooldown.set(message.member, "1");
+        cooldown.add(message.member);
         setTimeout(() => cooldown.delete(message.member), cooldowntime);
 
         try {

@@ -1,4 +1,5 @@
 const BaseCommand = require("./BaseCommand");
+const secureRandom = require("random-number-csprng");
 
 class TextActionCommand extends BaseCommand {
     constructor(content, noMentionMessage, permissions) {
@@ -20,7 +21,7 @@ class TextActionCommand extends BaseCommand {
         
         content = content.replace(/\s+/g, " ");
 
-        let index = Math.floor(Math.random() * this.texts.length);
+        let index = await secureRandom(0, this.texts.length - 1);
         if (content !== "") {
             try {
                 index = Math.max(1, Math.min(this.texts.length, parseInt(content))) - 1;

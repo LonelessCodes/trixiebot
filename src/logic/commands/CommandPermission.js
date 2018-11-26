@@ -1,5 +1,5 @@
 const { isOwner } = require("../../modules/utils");
-const { Permissions } = require("discord.js");
+const { Permissions, GuildMember } = require("discord.js");
 
 const { FLAGS } = Permissions;
 
@@ -35,8 +35,11 @@ class CommandPermission {
 module.exports = {
     USER: new CommandPermission([]),
     ADMIN: new class extends CommandPermission {
+        /**
+         * @param {GuildMember} member 
+         */
         test(member) {
-            return member.hasPermission(FLAGS.MANAGE_SERVER, false, true, true) ||
+            return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) ||
                 module.exports.OWNER.test(member);
         }
         toString() {

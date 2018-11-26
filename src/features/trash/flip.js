@@ -7,11 +7,6 @@ const Category = require("../../logic/commands/Category");
 
 module.exports = async function install(cr) {
     cr.register("flip", new class extends BaseCommand {
-        get help() {
-            return new HelpContent().setUsage(`\`{{prefix}}flip <user|string>\`
-\`user|string\` - user or text to flip`);
-        }
-
         async call(message, content) {
             const mention = message.mentions.members.first();
             if (!mention) {
@@ -26,14 +21,10 @@ module.exports = async function install(cr) {
             await message.channel.send(`(╯°□°）╯︵ ${fliptext(mention.displayName)}`);
         }
     })
+        .setHelp(new HelpContent().setDescription("Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi").setUsage("<user|string>").addParameter("user|string", "user or text to flip"))
         .setCategory(Category.ACTION);
 
     cr.register("unflip", new class extends BaseCommand {
-        get help() {
-            return new HelpContent().setUsage(`\`{{prefix}}unflip <user|string>\`
-\`user|string\` - user or text to unflip`);
-        }
-
         async call(message, content) {
             const mention =  message.mentions.members.first();
             if (!mention) {
@@ -47,5 +38,6 @@ module.exports = async function install(cr) {
             await message.channel.send(`${mention.displayName || mention.username} ノ( ゜-゜ノ)`);
         }
     })
+        .setHelp(new HelpContent().setDescription("Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble").setUsage("<user|string>").addParameter("user|string", "user or text to unflip"))
         .setCategory(Category.ACTION);
 };

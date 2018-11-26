@@ -24,7 +24,7 @@ module.exports = async function install(cr) {
     cr.register("cat", new SimpleCommand(async message => {
         return await message.channel.translate("meow") + " " + catFace() + " " + await randomCat();
     }))
-        .setHelp(new HelpContent().setUsage("`{{prefix}}cat` returns cat image :3"))
+        .setHelp(new HelpContent().setDescription("Random cat image :3"))
         .setCategory(Category.IMAGE);
     cr.registerAlias("cat", "kitty");
 };

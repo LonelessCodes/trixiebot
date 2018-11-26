@@ -167,7 +167,8 @@ module.exports = async function install(cr, client, config, db) {
     const roleConfig = roleCommand.registerSubCommand("config", new TreeCommand)
         .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_ROLES]))
         .setHelp(new HelpContent()
-            .setUsage(null, "Configure roles that everyone can add"));
+            .setUsageTitle("Admin Area")
+            .setUsage("", "Configure roles that everyone can add"));
     roleConfig.registerSubCommand("add", new class extends BaseCommand {
         async call(message, content) {
             const args = findArgs(content);

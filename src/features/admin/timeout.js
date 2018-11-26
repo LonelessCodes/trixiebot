@@ -79,19 +79,66 @@ module.exports = async function install(cr, client, config, db) {
             return "pass_through";
         }
     })
-        .setHelp(new HelpContent().setUsage(`\`{{prefix}}timeout <time> <user mention 1> <user mention 2> ... \`
-\`time\` - timeout length. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
-\`user mention\` - user to timeout. Multiple users possible
-
-\`{{prefix}}timeout remove <user mention 1> <user mention 2> ... \`
-\`user mention\` - user to remove timeout from. Multiple users possible
-
-\`{{prefix}}timeout clear\` remove all timeouts
-
-\`{{prefix}}timeout list\` list all timeouts present at the moment`))
+        .setHelp(new HelpContent()
+            .setUsage("<time> <user mention 1> <user mention 2> ...")
+            .addParameter("time", "timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs")
+            .addParameter("user mention", "user to timeout. Multiple users possible"))
         .setCategory(Category.MODERATION)
         .setPermissions(permission)
         .setIgnore(false);
+
+    timeoutCommand.registerSubCommand("remove", new class extends BaseCommand {
+        async call(message) {
+            const members = message.mentions.members.array();
+
+            for (const member of members) {
+                await database_messages.updateMany({
+                    guildId: message.guild.id,
+                    memberId: member.id
+                }, {
+                    $set: {
+                        timeoutEnd: new Date
+                    }
+                });
+            }
+
+            const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
+
+            await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
+                users: members.map(member => member.displayName).join(" ")
+            });
+
+            await Promise.all(promises);
+            log(`Removed timeout from users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name}`);
+        }
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<user mention 1> <user mention 2> ...")
+            .addParameter("user mention", "user to remove timeout from. Multiple users possible"));
+
+    timeoutCommand.registerSubCommand("clear", new class extends BaseCommand {
+        async call(message) {
+            const timeouts = await database.find({ guildId: message.guild.id }).toArray();
+
+            for (const timeout of timeouts) {
+                await database_messages.updateMany({
+                    guildId: message.guild.id,
+                    memberId: timeout.memberId
+                }, {
+                    $set: {
+                        timeoutEnd: new Date
+                    }
+                });
+            }
+
+            await database.deleteMany({ guildId: message.guild.id });
+
+            await message.channel.sendTranslated("Removed all timeouts successfully");
+            log(`Removed all timeouts in guild ${message.guild.name}`);
+        }
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "remove all timeouts"));
     
     timeoutCommand.registerSubCommand("list", new class extends BaseCommand {
         async call(message) {
@@ -122,55 +169,9 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.send(str);
             log(`Sent list of timeouts in guild ${message.guild.name}`);
         }
-    });
-
-    timeoutCommand.registerSubCommand("clear", new class extends BaseCommand {
-        async call(message) {
-            const timeouts = await database.find({ guildId: message.guild.id }).toArray();
-
-            for (const timeout of timeouts) {
-                await database_messages.updateMany({
-                    guildId: message.guild.id,
-                    memberId: timeout.memberId
-                }, {
-                    $set: {
-                        timeoutEnd: new Date
-                    }
-                });
-            }
-
-            await database.deleteMany({ guildId: message.guild.id });
-
-            await message.channel.sendTranslated("Removed all timeouts successfully");
-            log(`Removed all timeouts in guild ${message.guild.name}`);
-        }
-    });
-
-    timeoutCommand.registerSubCommand("remove", new class extends BaseCommand {
-        async call(message) {
-            const members = message.mentions.members.array();
-
-            for (const member of members) {
-                await database_messages.updateMany({
-                    guildId: message.guild.id,
-                    memberId: member.id
-                }, {
-                    $set: {
-                        timeoutEnd: new Date
-                    }
-                });
-            }
-
-            const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
-
-            await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
-                users: members.map(member => member.displayName).join(" ")
-            });
-
-            await Promise.all(promises);
-            log(`Removed timeout from users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name}`);
-        }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "list all timeouts present at the moment"));
 
     timeoutCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, msg) {

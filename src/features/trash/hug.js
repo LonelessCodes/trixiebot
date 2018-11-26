@@ -17,7 +17,11 @@ const hugs = [
 
 module.exports = async function install(cr) {
     cr.register("hug", new TextActionCommand(hugs, "Hugging yourself? How about huggig someone you love!"))
-        .setHelp(new HelpContent().setUsage("`{{prefix}}hugs <user mention> <?intensity>` hug someone!!!!!"))
+        .setHelp(new HelpContent()
+            .setDescription("hug someone!!!!!")
+            .setUsage("<user mention> <?intensity>")
+            .addParameter("user mention", "who you'd want to hug")
+            .addParameterOptional("intensity", "how hard ya wanna hugg"))
         .setCategory(Category.ACTION);
     cr.registerAlias("hug", "hugs");
 };

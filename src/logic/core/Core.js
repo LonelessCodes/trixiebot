@@ -1,4 +1,5 @@
 const log = require("../../modules/log");
+const NanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/utils");
 const stats = require("../stats");
 const path = require("path");
@@ -47,11 +48,15 @@ class Core {
 
         const files = await walk(path.resolve(__dirname, "..", "..", this.commands_package));
 
-        await Promise.all(files.map(file => {
+        await Promise.all(files.map(async file => {
             if (path.extname(file) !== ".js") return;
 
+            const timer = new NanoTimer().begin();
+
             const install = require(path.resolve("../../" + this.commands_package, file));
-            return install(this.processor.REGISTRY, this.client, this.config, this.db);
+            await install(this.processor.REGISTRY, this.client, this.config, this.db);
+
+            log(`installed time:${(timer.end() / 1000000000).toFixed(3)}ms file:${path.basename(file)}`);
         }));
 
         log("Commands installed");

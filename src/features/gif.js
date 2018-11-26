@@ -1,24 +1,22 @@
 const giphy = require("giphy-api")(require("../../keys/giphy.json").key);
 const log = require("../modules/log");
+const secureRandom = require("random-number-csprng");
 
 const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
-Array.prototype.random = function randomItem() {
-    return this[Math.floor(Math.random() * this.length)];
+Array.prototype.random = async function randomItem() {
+    return this[await secureRandom(0, this.length - 1)];
 };
 
 module.exports = async function install(cr) {
-    const gifCommand = cr.register("gif", new class extends TreeCommand {
-        get help() {
-            return new HelpContent()
-                .setUsage(`\`{{prefix}}gif <query>\` - returns the top result for the given \`query\`
-\`{{prefix}}gif random <query>\` - returns a random gif for the given \`query\`
-\`{{prefix}}gif trending\` - returns a random trending gif`);
-        }
-    }).setCategory(Category.IMAGE);
+    const gifCommand = cr.register("gif", new TreeCommand)
+        .setHelp(new HelpContent()
+            .setUsage("<query>", "returns the top result for the given `query`")
+            .addParameter("query", "What type of gif you want to have"))
+        .setCategory(Category.IMAGE);
     
     gifCommand.registerSubCommand("random", new class extends BaseCommand {
         async call(message, query) {
@@ -49,7 +47,10 @@ module.exports = async function install(cr) {
             await message.channel.send(url);
             log(`Requested random gif ${gif.data.id} for ${query}`);
         }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<query>", "returns a random gif for the given `query`"));
+    
     gifCommand.registerSubCommand("trending", new class extends BaseCommand {
         async call(message) {
             const gif = await giphy.trending({
@@ -61,12 +62,15 @@ module.exports = async function install(cr) {
                 return;
             }
 
-            const url = gif.data.random().images.fixed_height.url;
+            const url = (await gif.data.random()).images.fixed_height.url;
 
             await message.channel.send(url);
             log(`Requested trending gif ${gif.data[0].id}`);
         }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "returns a random trending gif"));
+    
     gifCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, query) {
             if (query === "") {

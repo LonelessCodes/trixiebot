@@ -1,6 +1,7 @@
 const { promisify } = require("util");
 const { timeout } = require("../modules/utils");
 const log = require("../modules/log");
+const secureRandom = require("random-number-csprng");
 const Twit = require("twit");
 
 const BaseCommand = require("../class/BaseCommand");
@@ -10,8 +11,8 @@ const Category = require("../logic/commands/Category");
 Array.prototype.last = function lastItem() {
     return this[this.length - 1];
 };
-Array.prototype.random = function randomItem() {
-    return this[Math.floor(Math.random() * this.length)];
+Array.prototype.random = async function randomItem() {
+    return this[await secureRandom(0, this.length - 1)];
 };
 
 const twitter = new Twit(require("../../keys/twitter.json"));
@@ -45,23 +46,22 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
     log("Loaded all uberfacts:", facts.size);
 }).catch(log);
 
-function getFact() {
-    return [...facts].random();
+async function getFact() {
+    return await [...facts].random();
 }
 
 module.exports = async function install(cr) {
     cr.register("fact", new class extends BaseCommand {
         async call(message) {
             await firstSetLoaded;
-            const fact = getFact();
+            const fact = await getFact();
             await message.channel.send(fact);
             log("Fact requested");
         }
-
-        get help() {
-            return new HelpContent()
-                .setUsage("`{{prefix}}fact` gets random UberFacts fact");
-        }
-    }).setCategory(Category.UTILS);
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Gets random UberFacts fact"))
+        .setCategory(Category.UTILS);
+    
     cr.registerAlias("fact", "uberfacts");
 };

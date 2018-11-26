@@ -22,7 +22,7 @@ module.exports = async function install(cr, client) {
         async noPermission(message) { await message.channel.sendTranslated("no"); }
 
         async call(message, msg) {
-            const file = path.join(process.cwd(), msg);
+            const file = path.resolve(path.join(process.cwd(), msg));
             const stat = await fs.stat(file);
 
             if (!stat.isFile()) {

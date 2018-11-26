@@ -6,11 +6,6 @@ const Category = require("../../logic/commands/Category");
 
 module.exports = async function install(cr) {
     cr.register("smol", new class extends BaseCommand {
-        get help() {
-            return new HelpContent().setUsage(`\`{{prefix}}smol <string|user>\`
-\`string|user\` - text or user to smollerize uwu`);
-        }
-
         async call(message, content) {
             const mention = message.mentions.members.first();
             if (!mention) {
@@ -24,6 +19,11 @@ module.exports = async function install(cr) {
             }
             await message.channel.send(tinytext(mention.displayName));
         }
-    }).setCategory(Category.TEXT);
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Make teeeeny tiny text")
+            .setUsage("<string|user>")
+            .addParameter("string|user", "text or user to smollerize uwu"))
+        .setCategory(Category.TEXT);
     cr.registerAlias("smol", "small");
 };

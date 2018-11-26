@@ -245,13 +245,11 @@ module.exports = async function install(cr, client, config, db) {
             }));
             log(`Poll started. ${duration}ms. ${options.join(", ")}`);
         }
-
-        get help() {
-            return new HelpContent()
-                // .setDescription("Keep track of all your waifus")
-                .setUsage(`\`{{prefix}}poll <duration> <option 1>, <option 2>, ..., <option n>\`
-\`duration\` - Duration of the poll. E.g.: \`1h 20m 10s\`, \`0d 100m 70s\` or \`0.5h\` are valid inputs
-\`option\` - a comma seperated list of options to vote for`);
-        }
-    }).setCategory(Category.MISC);
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Create a poll that users can vote on")
+            .setUsage("<duration> <option 1>, <option 2>, ..., <option n>")
+            .addParameter("duration", "Duration of the poll. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs")
+            .addParameter("option", "a comma seperated list of options to vote for"))
+        .setCategory(Category.MISC);
 };

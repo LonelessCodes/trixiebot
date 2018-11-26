@@ -33,41 +33,12 @@ module.exports = async function install(cr, client, config, db) {
             return muted_words;
         }
     })
-        .setHelp(new HelpContent().setUsage(`\`{{prefix}}mute <phrase>\`
-\`phrase\` - Word or phrase to be blacklisted
-
-\`{{prefix}}mute remove <phrase>\`
-\`phrase\` - Word or phrase to be unmuted
-
-\`{{prefix}}mute clear\` remove all muted words
-
-\`{{prefix}}mute list\` list all muted words and phrases`))
+        .setHelp(new HelpContent()
+            .setDescription("Mute/Blacklist specific words in this server")
+            .setUsage("<phrase>")
+            .addParameter("phrase", "Word or phrase to be muted/blacklisted"))
         .setCategory(Category.MODERATION)
         .setPermissions(permission);
-    
-    muteCommand.registerSubCommand("list", new class extends BaseCommand {
-        async call(message, content, muted_words) {
-            let str = "";
-            if (muted_words.length > 0) {
-                str = await message.channel.translate("Currently muted are:") + "\n";
-                str += "`" + muted_words.join("`, `") + "`";
-            } else {
-                str = await message.channel.translate("Nothing yet muted");
-            }
-
-            await message.channel.send(str);
-            log(`Sent list of muted words in guild ${message.guild.name}`);
-        }
-    });
-
-    muteCommand.registerSubCommand("clear", new class extends BaseCommand {
-        async call(message) {
-            await database.deleteMany({ guildId: message.guild.id });
-
-            await message.channel.sendTranslated("Removed all muted words successfully");
-            log(`Removed all muted words in guild ${message.guild.name}`);
-        }
-    });
 
     muteCommand.registerSubCommand("remove", new class extends BaseCommand {
         async call(message, content) {
@@ -85,7 +56,38 @@ module.exports = async function install(cr, client, config, db) {
 
             log(`Removed muted word "${word}" in guild ${message.guild.name}`);
         }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<phrase>")
+            .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
+
+    muteCommand.registerSubCommand("clear", new class extends BaseCommand {
+        async call(message) {
+            await database.deleteMany({ guildId: message.guild.id });
+
+            await message.channel.sendTranslated("Removed all muted words successfully");
+            log(`Removed all muted words in guild ${message.guild.name}`);
+        }
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "Remove all muted words"));
+
+    muteCommand.registerSubCommand("list", new class extends BaseCommand {
+        async call(message, content, muted_words) {
+            let str = "";
+            if (muted_words.length > 0) {
+                str = await message.channel.translate("Currently muted are:") + "\n";
+                str += "`" + muted_words.join("`, `") + "`";
+            } else {
+                str = await message.channel.translate("Nothing yet muted");
+            }
+
+            await message.channel.send(str);
+            log(`Sent list of muted words in guild ${message.guild.name}`);
+        }
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "list all muted words and phrases"));
 
     muteCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, content, muted_words) {

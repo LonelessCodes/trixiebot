@@ -1,14 +1,15 @@
 const log = require("../../modules/log");
+const secureRandom = require("random-number-csprng");
 
 const BaseCommand = require("../../class/BaseCommand");
 const TreeCommand = require("../../class/TreeCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
-// const RateLimiter = require("../../logic/RateLimiter");
-// const TimeUnit = require("../../modules/TimeUnit");
+const RateLimiter = require("../../logic/RateLimiter");
+const TimeUnit = require("../../modules/TimeUnit");
 
-Array.prototype.random = function randomItem() {
-    return this[Math.floor(Math.random() * this.length)];
+Array.prototype.random = async function randomItem() {
+    return this[await secureRandom(0, this.length - 1)];
 };
 
 module.exports = async function install(cr, client, config, db) {
@@ -16,15 +17,11 @@ module.exports = async function install(cr, client, config, db) {
 
     const database = db.collection("fuck");
 
-    const fuckCommand = cr.register("fuck", new class extends TreeCommand {
-        get help() {
-            return new HelpContent().setUsage(`\`{{prefix}}fuck <user>\`
-\`user\` - the username of the user to fuck
-
-\`{{prefix}}fuck add <text>\`
-\`text\` - the text the bot is supposed to say. It must contain \`\${name}\` in the place the username should be set. E.g.: \`{{prefix}}fuck add rides \${name}'s skin bus into tuna town\``);
-        }
-    })
+    const fuckCommand = cr.register("fuck", new TreeCommand)
+        .setHelp(new HelpContent()
+            .setDescription("Do something lewddd to another user")
+            .setUsage("<user>")
+            .addParameter("user", "the username of the user to fuck"))
         .setCategory(Category.ACTION);
 
     /**
@@ -70,8 +67,11 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.send("Added!");
             log(`Added fuck phrase: ${text}`);
         }
-    });
-    // .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1));
+    })
+        .setHelp(new HelpContent()
+            .setUsage("<text>", "Add your own phrase")
+            .addParameter("text", "the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `{{prefix}}fuck add rides ${name}'s skin bus into tuna town`"))
+        .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 3));
 
     fuckCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message) {
@@ -87,7 +87,7 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            const phrase = phrases.random();
+            const phrase = await phrases.random();
             const username = mention.displayName;
             let text = phrase.text;
             text = text.replace(/\$\{name\}'s/g,

@@ -6,7 +6,6 @@ const Discord = require("discord.js");
 const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
-const CommandPermission = require("../logic/commands/CommandPermission");
 const Category = require("../logic/commands/Category");
 
 // const twitch = require("twitch");
@@ -151,21 +150,13 @@ module.exports = async function install(cr, client, config, db) {
     setInterval(() => checkChanges(), 60 * 1000);
     checkChanges();
 
-    const alertCommand = cr.register("alert", new class extends TreeCommand {
-        get help() {
-            return new HelpContent()
-                .setUsage(`\`{{prefix}}alert <page url> <?channel>\` - subscribe Trixie to a Picarto channel
-\`page url\` - copy the url of the stream page and paste it in here
-\`channel\` - the channel to post the alert to later
-
-\`{{prefix}}alert remove <page url>\` - unsubscribe Trixie from a Picarto channel
-\`page url\` - copy the url of the stream page and paste it in here
-
-\`{{prefix}}alert list\` - list all active alerts`);
-        }
-    })
-        .setCategory(Category.MODERATION) // IMPORTANT PUT THIS BEFORE SETPERMISSIONS
-        .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]));
+    const alertCommand = cr.register("alert", new TreeCommand)
+        .setHelp(new HelpContent()
+            .setDescription("Make Trixie announce streamers when they go live.\nWorks only with Picarto at the moment.")
+            .setUsage("<page url> <?channel>", "Subscribe Trixie to a Picarto channel!")
+            .addParameter("page url", "copy the url of the stream page and paste it in here")
+            .addParameterOptional("channel", "the channel to post the alert to later. If omitted will be this channel"))
+        .setCategory(Category.MODERATION);
 
     /**
      * SUB COMMANDS
@@ -245,7 +236,8 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
         }
-    });
+    })
+        .setHelp(new HelpContent().setUsage("<page url>", "unsubscribe Trixie from a Picarto channel"));
 
     alertCommand.registerSubCommand("list", new class extends BaseCommand {
         async call(message) {
@@ -279,7 +271,8 @@ module.exports = async function install(cr, client, config, db) {
 
             message.channel.send({ embed });
         }
-    });
+    })
+        .setHelp(new HelpContent().setUsage("", "list all active streaming alerts"));
 
     alertCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, msg) {
@@ -350,4 +343,6 @@ module.exports = async function install(cr, client, config, db) {
             }
         }
     });
+
+    alertCommand.registerSubCommandAlias("*", "add");
 };

@@ -103,7 +103,7 @@ class DocumentCache {
 
             const newdoc = new Document(Object.assign({}, values, { [this.keyName]: key }));
             this._documents.set(key, newdoc);
-            await this.db.updateOne({ [this.keyName]: key }, newdoc, { upsert: true });
+            await this.db.updateOne({ [this.keyName]: key }, { $set: newdoc }, { upsert: true });
         } else {
             const newdoc = new Document(Object.assign({}, values, { [this.keyName]: key }));
             this._documents.set(key, newdoc);

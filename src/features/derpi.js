@@ -1,8 +1,10 @@
 const derpibooruKey = require("../../keys/derpibooru.json");
+const { splitArgs } = require("../modules/string_utils");
 const log = require("../modules/log");
 const fetch = require("node-fetch");
 
 const BaseCommand = require("../class/BaseCommand");
+const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -21,179 +23,149 @@ async function get(params) {
     return await result.json();
 }
 
+async function process(message, msg, type) {
+    if (msg === "") return;
+
+    const args = splitArgs(msg, 2);
+
+    let amount = 1;
+    try {
+        const numParse = parseInt(args[0]);
+        if (typeof numParse === "number" && !Number.isNaN(numParse)) {
+            if (numParse < 1 || numParse > 5) {
+                await message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
+                return;
+            }
+            amount = numParse;
+        } else throw new Error("NaN Error"); // go catch
+    } catch (err) {
+        err;
+        amount = 1;
+        args[1] = args[0] + " " + args[1];
+        args[0] = "";
+    }
+
+    let query = args[1].replace(/,\s+/g, ",").replace(/\s+/g, "+").toLowerCase();
+
+    if (query === "") {
+        await message.channel.send(await message.channel.translate("`query` **must** be given"));
+        return;
+    }
+
+    if (!message.channel.nsfw &&
+        !/explicit|questionable|grimdark|semi-grimdark|grotesque/gi.test(query)) {
+        query += ",(safe OR suggestive)";
+    }
+
+    let images = [];
+    let ids = [];
+
+    let result;
+    switch (type) {
+        case "first":
+            result = await get({
+                q: query,
+                sf: "id",
+                sd: "asc"
+            });
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
+                const image = result.search[i];
+                images.push("https:" + image.representations.large);
+                ids.push(image.id);
+            }
+            break;
+        case "latest":
+            result = await get({
+                q: query,
+                sf: "id",
+                sd: "desc"
+            });
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
+                const image = result.search[i];
+                images.push("https:" + image.representations.large);
+                ids.push(image.id);
+            }
+            break;
+        case "top":
+            result = await get({
+                q: query,
+                sf: "score",
+                sd: "desc"
+            });
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
+                const image = result.search[i];
+                images.push("https:" + image.representations.large);
+                ids.push(image.id);
+            }
+            break;
+        case "random":
+            result = await get({
+                q: query
+            });
+            for (let i = 0; i < Math.min(amount, result.total); i++) {
+                images.push(get({
+                    q: query,
+                    random_image: "true"
+                }).then(({ id }) => get({
+                    scope: id
+                })));
+            }
+            images = await Promise.all(images);
+            ids = images.map(image => image.id);
+            images = images.map(image => "https:" + image.representations.large + " *<https://derpibooru.org/" + image.id + ">*");
+            break;
+    }
+
+    if (images.length === 0) {
+        await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+        return;
+    }
+
+    const output = images.join("\n");
+
+    await message.channel.send(output);
+}
+
 module.exports = async function install(cr) {
-    cr.register("derpi", new class extends BaseCommand {
+    const derpiCommand = cr.register("derpi", new TreeCommand)
+        .setHelp(new HelpContent()
+            .setDescription("Search images on Derpibooru"))
+        .setCategory(Category.IMAGE);
+
+    /**
+     * SUB COMMANDS
+     */
+
+    derpiCommand.registerSubCommand("random", new class extends BaseCommand {
         async call(message, msg) {
-            const timestamp = Date.now();
-
-            if (msg === "") {
-                return;
-            }
-
-            log("Used !db with:", msg);
-
-            let i = 0;
-            let current_char = msg.charAt(i);
-
-            let amount = 1;
-            try {
-                const a = parseInt(current_char);
-                if (typeof a === "number" && !Number.isNaN(a)) {
-                    amount = "";
-                    while (current_char !== " ") {
-                        amount += current_char;
-                        i++;
-                        current_char = msg.charAt(i);
-                    }
-                    i++;
-                    current_char = msg.charAt(i);
-                    try {
-                        const amountParse = parseInt(amount);
-                        if (amountParse < 1 || amountParse > 5) {
-                            await message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
-                            log("Gracefully aborted attempt to request derpi image. Amount out of range");
-                            return;
-                        }
-                        amount = amountParse;
-                    } catch (err) {
-                        await message.channel.send(await message.channel.translate("Invalid input"));
-                        log("Gracefully aborted attempt to request derpi image. Invalid amount input");
-                        return;
-                    }
-                } else throw new Error(); // go to catch
-            } catch (err) {
-                if (err.message !== "") {
-                    log(err);
-                    return;
-                }
-                i = 0;
-                current_char = msg.charAt(i);
-                amount = 1;
-            }
-
-            let order = "";
-            while (i < msg.length && current_char !== " ") {
-                order += current_char.toLowerCase();
-                i++;
-                current_char = msg.charAt(i);
-            }
-            i++;
-            current_char = msg.charAt(i);
-
-            if (!/first|latest|top|random/.test(order)) {
-                await message.channel.send(await message.channel.translate("`order` must be either `first`, `latest`, `top` or `random`!"));
-                log(`Gracefully aborted attempt to request derpi image. ${order} is not a valid type of order`);
-                return;
-            }
-
-            if (i >= msg.length) {
-                await message.channel.send(await message.channel.translate("`query` **must** be given"));
-                log("Gracefully aborted attempt to request derpi image. No query given");
-                return;
-            }
-
-            let query = "";
-            while (i < msg.length && current_char !== "") {
-                query += current_char;
-                i++;
-                current_char = msg.charAt(i);
-            }
-            query = query.replace(/,\s/g, ",");
-            query = query.replace(/\s/g, "+");
-
-            if (!message.channel.nsfw &&
-                query.indexOf("explicit") === -1 &&
-                query.indexOf("questionable") === -1 &&
-                query.indexOf("grimdark") === -1 &&
-                query.indexOf("semi-grimdark") === -1 &&
-                query.indexOf("grotesque") === -1) {
-                query += ",(safe OR suggestive)";
-            }
-
-            let images = [];
-            let ids = [];
-
-            let result;
-            switch (order) {
-                case "first":
-                    result = await get({
-                        q: query,
-                        sf: "id",
-                        sd: "asc"
-                    });
-                    for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                        const image = result.search[i];
-                        images.push("https:" + image.representations.large);
-                        ids.push(image.id);
-                    }
-                    break;
-                case "latest":
-                    result = await get({
-                        q: query,
-                        sf: "id",
-                        sd: "desc"
-                    });
-                    for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                        const image = result.search[i];
-                        images.push("https:" + image.representations.large);
-                        ids.push(image.id);
-                    }
-                    break;
-                case "top":
-                    result = await get({
-                        q: query,
-                        sf: "score",
-                        sd: "desc"
-                    });
-                    for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                        const image = result.search[i];
-                        images.push("https:" + image.representations.large);
-                        ids.push(image.id);
-                    }
-                    break;
-                case "random":
-                    result = await get({
-                        q: query
-                    });
-                    for (let i = 0; i < Math.min(amount, result.total); i++) {
-                        images.push(get({
-                            q: query,
-                            random_image: "true"
-                        }).then(({ id }) => get({
-                            scope: id
-                        })));
-                    }
-                    images = await Promise.all(images);
-                    ids = images.map(image => image.id);
-                    images = images.map(image => "https:" + image.representations.large);
-                    break;
-            }
-
-            if (images.length === 0) {
-                await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-                log(`No derpi images found for ${msg}`);
-                return;
-            }
-
-            let output = "";
-            for (const image of images) {
-                output += "\n";
-                output += image;
-            }
-
-            await message.channel.send(output);
-
-            log("Found derpi images", ...ids, `[${Date.now() - timestamp}ms]`);
+            await process(message, msg, "random");
         }
+    }).setHelp(new HelpContent()
+        .setUsage("<?amount> <query>")
+        .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
+        .addParameter("query", "a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)"));
 
-        get help() {
-            return new HelpContent()
-                .setUsage(`\`{{prefix}}db <?amount> <order:first|latest|top|random> <query>\`
-\`amount\` - optional - number ranging from 1 to 5 for how many results to return
-\`order\` - string of either \`first, latest, top\` or \`random\`
-\`query\` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)`);
+    derpiCommand.registerSubCommand("top", new class extends BaseCommand {
+        async call(message, msg) {
+            await process(message, msg, "top");
         }
-    }).setCategory(Category.IMAGE);
-    
+    }).setHelp(new HelpContent()
+        .setUsage("<?amount> <query>"));
+
+    derpiCommand.registerSubCommand("latest", new class extends BaseCommand {
+        async call(message, msg) {
+            await process(message, msg, "latest");
+        }
+    }).setHelp(new HelpContent()
+        .setUsage("<?amount> <query>"));
+
+    derpiCommand.registerSubCommand("first", new class extends BaseCommand {
+        async call(message, msg) {
+            await process(message, msg, "first");
+        }
+    }).setHelp(new HelpContent()
+        .setUsage("<?amount> <query>"));
+
+    derpiCommand.registerSubCommandAlias("random", "*");
     cr.registerAlias("derpi", "db");
 };

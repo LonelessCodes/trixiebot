@@ -109,12 +109,10 @@ module.exports = async function install(cr) {
             await message.channel.send({ embed });
             log(`Fulfilled wikia query for ${query} successfully.`);
         }
-        
-        get help() {
-            return new HelpContent()
-                // .setDescription("Keep track of all your waifus")
-                .setUsage(`\`{{prefix}}mlp <query>\`
-\`query\` - come look it up with me owo`);
-        }
-    }).setCategory(Category.UTILS);
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Query the MLP Wikia for fun!")
+            .setUsage("<query>", "come look it up with me owo")
+            .addParameter("query", "what you would like to look up"))
+        .setCategory(Category.UTILS);
 };

@@ -1,5 +1,6 @@
 const log = require("../modules/log");
 const CONST = require("../modules/CONST");
+const secureRandom = require("random-number-csprng");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../class/BaseCommand");
@@ -10,18 +11,64 @@ const Category = require("../logic/commands/Category");
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("penis");
 
-    const penisCommand = cr.register("penis", new class extends TreeCommand {
-        get help() {
-            return new HelpContent()
-                // .setDescription("Keep track of all your waifus")
-                .setUsage(`\`{{prefix}}penis <mention?>\` - check on what package your buddy is carrying~ (alias {{prefix}}cock, {{prefix}}dick)
-\`mention\` - optional`);
-        }
-    }).setCategory(Category.ACTION);
+    const penisCommand = cr.register("penis", new TreeCommand)
+        .setHelp(new HelpContent()
+            .setDescription("Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.")
+            .setUsage("<?mention>")
+            .addParameterOptional("mention", "User who's penis you wish to ~~pleasure~~ measure"))
+        .setCategory(Category.ACTION);
 
     /**
      * SUB COMMANDS
      */
+
+    penisCommand.registerDefaultCommand(new class extends BaseCommand {
+        async call(message) {
+            const uom = message.guild.config.uom;
+            const r = uom === "cm" ? 2.54 : 1;
+
+            const member = message.mentions.members.first() || message.member;
+
+            if (message.mentions.everyone) {
+                await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
+                log("Requested everyone's dicks");
+                return;
+            }
+
+            if (member.user.id === client.user.id) {
+                const length = 20;
+                const girth = 18;
+                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
+                log("Requested Trixie's dick");
+                return;
+            }
+
+            const doc = await database.findOne({ userId: member.user.id });
+            if (!doc) {
+                const random = (await secureRandom(0, 100)) / 100 - 0.2;
+                const length = Math.pow((random > 0 ?
+                    (Math.pow(random, 1.4) + 0.2) * 15 + 3 :
+                    (random + 0.2) * 15 + 3) / 20, 1.4) * 20 + 1.5;
+                const girth = Math.pow(((await secureRandom(0, 100)) / 100 + (random - 0.1) * 2) * 0.3, 2) * 8 + 6;
+
+                await database.insertOne({
+                    userId: member.user.id,
+                    girth,
+                    length
+                });
+
+                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
+                log(`Requested unknown dick => created new dick for user ${message.member.id} with ${girth} in girth, ${length} in length`);
+                return;
+            } else {
+                const { length, girth } = doc;
+
+                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
+                log(`Requested known dick of user ${message.member.id} with ${girth} in girth, ${length} in length`);
+                return;
+            }
+        }
+    });
 
     penisCommand.registerSubCommand("leaderboard", new class extends BaseCommand {
         async call(message) {
@@ -46,54 +93,9 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.send({ embed });
             log(`Served penis leaderboard for guild ${message.guild.id}`);
         }
-    });
-    penisCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message) {
-            const uom = message.guild.config.uom;
-            const r = uom === "cm" ? 2.54 : 1;
-
-            const member = message.mentions.members.first() || message.member;
-
-            if (message.mentions.everyone) {
-                await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
-                log("Requested everyone's dicks");
-                return;
-            }
-
-            if (member.user.id === client.user.id) {
-                const length = 20;
-                const girth = 18;
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-                log("Requested Trixie's dick");
-                return;
-            }
-
-            const doc = await database.findOne({ userId: member.user.id });
-            if (!doc) {
-                const random = Math.random() - 0.2;
-                const length = Math.pow((random > 0 ?
-                    (Math.pow(random, 1.4) + 0.2) * 15 + 3 :
-                    (random + 0.2) * 15 + 3) / 20, 1.4) * 20 + 1.5;
-                const girth = Math.pow((Math.random() + (random - 0.1) * 2) * 0.3, 2) * 8 + 6;
-
-                await database.insertOne({
-                    userId: member.user.id,
-                    girth,
-                    length
-                });
-
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-                log(`Requested unknown dick => created new dick for user ${message.member.id} with ${girth} in girth, ${length} in length`);
-                return;
-            } else {
-                const { length, girth } = doc;
-
-                await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-                log(`Requested known dick of user ${message.member.id} with ${girth} in girth, ${length} in length`);
-                return;
-            }
-        }
-    });
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "Shows where you are in the penis size ranking"));
 
     cr.registerAlias("penis", "cock");
     cr.registerAlias("penis", "dick");

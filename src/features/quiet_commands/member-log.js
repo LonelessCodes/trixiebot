@@ -1,7 +1,7 @@
-const log = require("../modules/log");
-const stats = require("../logic/stats");
-const { findDefaultChannel } = require("../modules/utils");
-const { format } = require("../logic/managers/LocaleManager");
+const log = require("../../modules/log");
+const stats = require("../../logic/stats");
+const { findDefaultChannel } = require("../../modules/utils");
+const { format } = require("../../logic/managers/LocaleManager");
 
 module.exports = async function install(cr, client, config) {
     const updateGuildStatistics = () => {

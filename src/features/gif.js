@@ -1,6 +1,6 @@
 const giphy = require("giphy-api")(require("../../keys/giphy.json").key);
 const log = require("../modules/log");
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../modules/secureRandom");
 
 const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
@@ -8,7 +8,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 Array.prototype.random = async function randomItem() {
-    return this[await secureRandom(0, this.length - 1)];
+    return await secureRandom(this);
 };
 
 module.exports = async function install(cr) {
@@ -94,4 +94,6 @@ module.exports = async function install(cr) {
             log(`Requested top gif ${gif.data[0].id} for ${query}`);
         }
     });
+
+    gifCommand.registerSubCommandAlias("*", "top");
 };

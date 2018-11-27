@@ -1,5 +1,5 @@
 const BaseCommand = require("./BaseCommand");
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../modules/secureRandom");
 
 class TextCommand extends BaseCommand {
     constructor(content, permissions) {
@@ -8,7 +8,7 @@ class TextCommand extends BaseCommand {
     }
 
     async run(message) {
-        await message.channel.send(this.content[await secureRandom(0, this.content.length - 1)]);
+        await message.channel.send(await secureRandom(this.content));
     }
 }
 

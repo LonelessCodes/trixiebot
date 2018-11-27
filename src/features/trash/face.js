@@ -1,4 +1,4 @@
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../../modules/secureRandom");
 
 const SimpleCommand = require("../../class/SimpleCommand");
 const TextCommand = require("../../class/TextCommand");
@@ -10,7 +10,7 @@ const Category = require("../../logic/commands/Category");
  * @param {Array} arr 
  */
 async function randomItem(arr) {
-    return arr[secureRandom(0, arr.length - 1)];
+    return await secureRandom(arr);
 }
 
 const faces = [

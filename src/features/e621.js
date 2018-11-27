@@ -1,7 +1,7 @@
 const { splitArgs } = require("../modules/string_utils");
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../modules/secureRandom");
 const fetch = require("node-fetch");
-const packageFile = require("../../package.json");
+const INFO = require("../info");
 
 const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
@@ -9,7 +9,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 Array.prototype.random = async function randomItem() {
-    return this[await secureRandom(0, this.length - 1)];
+    return await secureRandom(this);
 };
 
 async function get(params) {
@@ -24,7 +24,7 @@ async function get(params) {
     const result = await fetch(`https://e621.net/post/${scope}.json?${string}`, {
         timeout: 10000,
         headers: {
-            "User-Agent": `TrixieBot/${packageFile.version} (by Loneless on e621)`
+            "User-Agent": `TrixieBot/${INFO.VERSION} (by Loneless on e621)`
         }
     });
     return await result.json();

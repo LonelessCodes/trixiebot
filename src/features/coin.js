@@ -1,13 +1,13 @@
 const log = require("../modules/log");
 const { timeout } = require("../modules/utils");
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../modules/secureRandom");
 
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 Array.prototype.random = async function randomItem() {
-    return this[await secureRandom(0, this.length - 1)];
+    return await secureRandom(this);
 };
 
 const coin = ["heads", "tails"];

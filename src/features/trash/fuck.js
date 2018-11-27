@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../../modules/secureRandom");
 
 const BaseCommand = require("../../class/BaseCommand");
 const TreeCommand = require("../../class/TreeCommand");
@@ -9,7 +9,7 @@ const RateLimiter = require("../../logic/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
 
 Array.prototype.random = async function randomItem() {
-    return this[await secureRandom(0, this.length - 1)];
+    return await secureRandom(this);
 };
 
 module.exports = async function install(cr, client, config, db) {

@@ -1,7 +1,7 @@
 const { promisify } = require("util");
 const { timeout } = require("../modules/utils");
 const log = require("../modules/log");
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../modules/secureRandom");
 const Twit = require("twit");
 
 const BaseCommand = require("../class/BaseCommand");
@@ -12,7 +12,7 @@ Array.prototype.last = function lastItem() {
     return this[this.length - 1];
 };
 Array.prototype.random = async function randomItem() {
-    return this[await secureRandom(0, this.length - 1)];
+    return await secureRandom(this);
 };
 
 const twitter = new Twit(require("../../keys/twitter.json"));

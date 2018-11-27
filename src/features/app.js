@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const packageFile = require("../../package.json");
+const INFO = require("../info");
 
 const TextCommand = require("../class/TextCommand");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -23,7 +23,7 @@ module.exports = async function install(cr, client) {
         .setHelp(new HelpContent().setDescription("**TrixieBot costs $6 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤"))
         .setCategory(Category.INFO);
 
-    cr.register("version", new TextCommand(`v${packageFile.version}`))
+    cr.register("version", new TextCommand(`v${INFO.VERSION}`))
         .setHelp(new HelpContent().setDescription("Returns the currently running version of TrixieBot"))
         .setCategory(Category.INFO);
     cr.registerAlias("version", "v");

@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const packageFile = require("../../package.json");
+const INFO = require("../info");
 const CONST = require("../modules/CONST");
 
 const BaseCommand = require("../class/BaseCommand");
@@ -64,7 +64,7 @@ module.exports = async function install(cr, client, config, database) {
 
             embed.setAuthor("TrixieBot Help", client.user.avatarURL);
             embed.setDescription(`**Command list**\nTo check command usage, type \`${message.guild.config.prefix}help <command>\``);
-            embed.setFooter(`TrixieBot v${packageFile.version} | Commands: ${cr.commands.size}`, client.user.avatarURL);
+            embed.setFooter(`TrixieBot v${INFO.VERSION} | Commands: ${cr.commands.size}`, client.user.avatarURL);
 
             await message.channel.send({ embed });
 

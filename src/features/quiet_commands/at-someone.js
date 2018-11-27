@@ -1,5 +1,5 @@
 const log = require("../../modules/log");
-const secureRandom = require("random-number-csprng");
+const secureRandom = require("../../modules/secureRandom");
 
 const emoticons = [
     "¯(°_o)/¯",
@@ -19,8 +19,8 @@ module.exports = async function install(cr, client) {
         if (!/@someone\b/i.test(message.content)) return;
 
         const array = message.guild.members.array();
-        const member = array[await secureRandom(0, array.length - 1)];
-        await message.channel.send(`${emoticons[await secureRandom(0, emoticons.length - 1)]} ***(${member.displayName})***`);
+        const member = await secureRandom(array);
+        await message.channel.send(`${await secureRandom(emoticons)} ***(${member.displayName})***`);
         log(`Requested someone. Picked ${member.displayName}`);
     });
 };

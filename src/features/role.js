@@ -18,23 +18,36 @@ async function rolesMessage(guild, channel, db) {
         guildId: guild.id
     }).toArray();
 
-    const available_roles = {};
+    const available_roles = new Map;
     for (const role of roles) {
         let role_obj = guild.roles.get(role.roleId);
         if (!role_obj) continue;
 
         role.category = role.category || await channel.translate("Other");
-        if (!available_roles[role.category])
-            available_roles[role.category] = [];
-        available_roles[role.category].push(role_obj);
+        if (!available_roles.has(role.category))
+            available_roles.set(role.category, []);
+        available_roles.get(role.category).push(role_obj);
     }
 
     let roles_message = "";
-    for (const category in available_roles) {
+    for (const [category, roles] of available_roles) {
         roles_message += `__**${category}**__\n`;
         roles_message += "```\n";
-        for (const role of available_roles[category])
-            roles_message += `${role.name}\n`;
+
+        let maxLength = 0;
+        let numberLength = 0;
+        for (const role of roles) {
+            let n = role.members.size.toString().length;
+            if (numberLength < n)
+                numberLength = n;
+            if (maxLength < role.name.length)
+                maxLength = role.name.length;
+        }
+
+        for (const role of roles) {
+            roles_message += role.name + new Array((maxLength - role.name.length) + 1 + (numberLength - role.members.size.toString().length)).fill(" ").join("") + role.members.size + " members\n";
+        }
+        
         roles_message += "```\n";
     }
     
@@ -54,7 +67,7 @@ module.exports = async function install(cr, client, config, db) {
             .setUsage("<role> <?user mention 1> <?user mention 2> ...", "to add roles")
             .addParameter("role", "The role you would like to have added")
             .addParameterOptional("user mention", "this is irrelevant to you, if you don't have rights to manage roles yourself"))
-        .setCategory(Category.MISC);
+        .setCategory(Category.UTILS);
 
     /*
      * SUB COMMANDS

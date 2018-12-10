@@ -2,6 +2,7 @@ const log = require("../modules/log");
 const { findArgs } = require("../modules/string_utils");
 const Discord = require("discord.js");
 
+const AliasCommand = require("../class/AliasCommand");
 const TreeCommand = require("../class/TreeCommand");
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -175,7 +176,7 @@ module.exports = async function install(cr, client, config, db) {
         }
     };
     roleCommand.registerSubCommand("available", listRoles);
-    cr.register("roles", listRoles);
+    cr.register("roles", new AliasCommand("role", listRoles));
 
     const roleConfig = roleCommand.registerSubCommand("config", new TreeCommand)
         .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_ROLES]))

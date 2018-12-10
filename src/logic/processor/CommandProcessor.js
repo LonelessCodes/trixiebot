@@ -44,14 +44,14 @@ class CommandProcessor {
 
         const [command_name, processed_content] = splitArgs(raw_content, 2);
 
-        await this.REGISTRY.process(msg, command_name, processed_content, prefix, prefixUsed);
+        const executed = await this.REGISTRY.process(msg, command_name, processed_content, prefix, prefixUsed);
 
         // const diff = timer.end();
         // commandTime.observe(diff);
 
         // use some stats observing software
 
-        return true;
+        return executed;
     }
 }
 

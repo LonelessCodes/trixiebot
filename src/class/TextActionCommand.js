@@ -7,30 +7,28 @@ class TextActionCommand extends BaseCommand {
 
         this.texts = content instanceof Array ? content : [content];
         this.noMentionMessage = noMentionMessage;
+        this.everyone = false;
     }
 
-    async run(message, content) {
+    async run(message) {
         const mention = message.mentions.members.first();
-        if (!mention) {
+        if (!mention && !message.mentions.everyone) {
             await message.channel.sendTranslated(this.noMentionMessage);
             return;
         }
 
-        for (const [, member] of message.mentions.members)
-            content = content.replace(member.toString(), "");
-        
-        content = content.replace(/\s+/g, " ");
+        const phrase = await secureRandom(this.texts);
 
-        let index = await secureRandom(0, this.texts.length);
-        if (content !== "") {
-            try {
-                index = Math.max(1, Math.min(this.texts.length, parseInt(content))) - 1;
-            } catch (err) {
-                err;
-            }
+        if (message.mentions.everyone) {
+            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
+            return;
         }
-        const phrase = this.texts[index];
-        await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), mention.displayName));
+        else await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), mention.displayName));
+    }
+
+    setAllowEveryone(v) {
+        this.everyone = v;
+        return this;
     }
 }
 

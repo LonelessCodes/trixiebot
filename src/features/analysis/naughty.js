@@ -47,6 +47,7 @@ module.exports = async function install(cr, client, config, db) {
                 const limit = 4000;
                 let total = 0;
                 let total_messages = 0;
+                let total_user_messages = 0;
                 let bad_words = 0;
                 const bad_words_used = new Object;
                 for (let i = 0; i < channels.length; i++) {
@@ -72,6 +73,7 @@ module.exports = async function install(cr, client, config, db) {
                                     bad_words_used[match]++;
                                 }
                             }
+                            total_user_messages++;
                             total += message.content.split(/\s+/g).length;
                         });
 
@@ -98,18 +100,18 @@ module.exports = async function install(cr, client, config, db) {
                     embed.setColor(CONST.COLOR.ERROR);
                     embed.setThumbnail("https://derpicdn.net/img/view/2018/4/9/1703511.png");
                     embed.setTitle(`**${user.username}** #${user.discriminator} is on the Naughty list`);
-                    embed.setDescription(`${str}Oh dear ... You swore a total of **${bad_words}** times in the messages we analysed (${total}). It's a lump of coal in your stocking this year, you naughty thing.`);
+                    embed.setDescription(`${str}Oh dear ... You swore a total of **${bad_words}** times in the messages we analysed (${total_user_messages}). It's a lump of coal in your stocking this year, you naughty thing.`);
                 } else {
                     embed.setColor(0x67c23a);
                     embed.setThumbnail("https://derpicdn.net/img/view/2018/11/13/1881039.png");
                     embed.setTitle(`**${user.username}** #${user.discriminator} is on the Nice list`);
                     if (naughty_percent === 0) {
-                        embed.setDescription(`${str}Wow! You didn't swear at all in the messages we analysed (${total}). Come on! Live a little. No one can be good all the time.`);
+                        embed.setDescription(`${str}Wow! You didn't swear at all in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time.`);
                     } else if (naughty_percent < 0.2) {
-                        embed.setDescription(`${str}Wow! You only swore **${bad_words}** times in the messages we analysed (${total}). Come on! Live a little. No one can be good all the time`);
+                        embed.setDescription(`${str}Wow! You only swore **${bad_words}** times in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time`);
                     } else {
                         embed.setColor(CONST.COLOR.WARNING);
-                        embed.setDescription(`${str}Close call! You swore **${bad_words}** times in the messages we analysed (${total}). Come on! Live a little. No one can be good all the time`);
+                        embed.setDescription(`${str}Close call! You swore **${bad_words}** times in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time`);
                     }
                     embed.setFooter("Art by ItsSpoopsB");
                 }

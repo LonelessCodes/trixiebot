@@ -39,8 +39,8 @@ module.exports = async function install(cr, client, config, db) {
             .addParameter("phrase", "Word or phrase to be muted/blacklisted"))
         .setCategory(Category.MODERATION)
         .setPermissions(permission);
-
-    muteCommand.registerSubCommand("remove", new class extends BaseCommand {
+    
+    const removeCommand = new class extends BaseCommand {
         async call(message, content) {
             const word = content.trim().toLowerCase();
 
@@ -56,10 +56,14 @@ module.exports = async function install(cr, client, config, db) {
 
             log(`Removed muted word "${word}" in guild ${message.guild.name}`);
         }
-    })
+    };
+
+    muteCommand.registerSubCommand("remove", removeCommand)
         .setHelp(new HelpContent()
             .setUsage("<phrase>")
             .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
+    
+    cr.register("unmute", removeCommand);
 
     muteCommand.registerSubCommand("clear", new class extends BaseCommand {
         async call(message) {

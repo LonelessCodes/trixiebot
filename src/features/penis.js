@@ -12,6 +12,7 @@ module.exports = async function install(cr, client, config, db) {
     const database = db.collection("penis");
 
     const penisCommand = cr.register("penis", new TreeCommand)
+        .setExplicit()
         .setHelp(new HelpContent()
             .setDescription("Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.")
             .setUsage("<?mention>")
@@ -45,11 +46,11 @@ module.exports = async function install(cr, client, config, db) {
 
             const doc = await database.findOne({ userId: member.user.id });
             if (!doc) {
-                const random = (await secureRandom(100)) - 0.2;
+                const random = (await secureRandom()) - 0.2;
                 const length = Math.pow((random > 0 ?
                     (Math.pow(random, 1.4) + 0.2) * 15 + 3 :
                     (random + 0.2) * 15 + 3) / 20, 1.4) * 20 + 1.5;
-                const girth = Math.pow(((await secureRandom(100)) + (random - 0.1) * 2) * 0.3, 2) * 8 + 6;
+                const girth = Math.pow(((await secureRandom()) + (random - 0.1) * 2) * 0.3, 2) * 8 + 6;
 
                 await database.insertOne({
                     userId: member.user.id,

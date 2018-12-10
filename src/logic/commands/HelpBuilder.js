@@ -1,10 +1,9 @@
 const TreeCommand = require("../../class/TreeCommand");
 const AliasCommand = require("../../class/AliasCommand");
-const CommandPermission = require("../../logic/commands/CommandPermission");
-const { RichEmbed, Permissions } = require("discord.js");
+const CommandPermission = require("./CommandPermission");
+const Category = require("./Category");
+const { RichEmbed } = require("discord.js");
 const CONST = require("../../modules/CONST");
-
-const { FLAGS } = Permissions;
 
 function ucFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -85,6 +84,9 @@ class HelpBuilder extends RichEmbed {
                 for (const [sub_cmd_name, sub_command] of command.sub_commands) {
                     if (sub_command instanceof AliasCommand) continue;
                     if (sub_cmd_name === "*") continue;
+                    if (!message.channel.nsfw && sub_command.explicit) continue;
+                    if (!sub_command.list) continue;
+                    if (sub_command.category === Category.OWNER) continue;
 
                     const sub_name = name + " " + sub_cmd_name;
                     

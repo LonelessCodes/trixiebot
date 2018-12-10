@@ -25,8 +25,8 @@ module.exports = async function install(cr) {
             const embed = new Discord.RichEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
                 .setTitle(`${magic.answer} :crystal_ball:`)
-                .setImage("https://derpicdn.net/img/view/2017/7/20/1490419.png")
-                .setFooter("Edited screenshot by xhazxmatx");
+                // .setImage("https://derpicdn.net/img/view/2017/7/20/1490419.png")
+                // .setFooter("Edited screenshot by xhazxmatx");
 
             await message.channel.send({ embed });
             log(`Fulfilled fortune for ${question} successfully.`);

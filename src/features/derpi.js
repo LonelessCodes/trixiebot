@@ -53,8 +53,8 @@ async function process(message, msg, type) {
     }
 
     if (!message.channel.nsfw &&
-        !/explicit|questionable|grimdark|semi-grimdark|grotesque/gi.test(query)) {
-        query += ",(safe OR suggestive)";
+        !/explicit|questionable|suggestive|grimdark|semi-grimdark|grotesque/gi.test(query)) {
+        query += ",safe";
     }
 
     let images = [];
@@ -129,7 +129,7 @@ async function process(message, msg, type) {
 module.exports = async function install(cr) {
     const derpiCommand = cr.register("derpi", new TreeCommand)
         .setHelp(new HelpContent()
-            .setDescription("Search images on Derpibooru"))
+            .setDescription("Search images on Derpibooru. This command ***does not*** return lewd images in a not nsfw channel! Unless you explicitly give the query the `explicit`, `questionable` or `suggestive` tag! Same for Grimdark and grotesque."))
         .setCategory(Category.IMAGE);
 
     /**

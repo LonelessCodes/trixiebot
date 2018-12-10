@@ -5,10 +5,10 @@ const { format } = require("../../logic/managers/LocaleManager");
 
 module.exports = async function install(cr, client, config) {
     const updateGuildStatistics = () => {
-        stats.get(stats.NAME.SERVER_COUNT).set(client.guilds.size);
-        stats.get(stats.NAME.LARGE_SERVERS).set(client.guilds.filter(guild => !!guild.large).size);
-        stats.get(stats.NAME.TOTAL_MEMBERS).set(client.guilds.array().map(g => g.members.size).reduce((pv, cv) => pv + cv, 0));
-        stats.get(stats.NAME.TEXT_CHANNELS).set(client.channels.filter(guild => guild.type === "text").size);
+        stats.bot.get(stats.bot.NAME.TOTAL_SERVERS).set(client.guilds.size);
+        stats.bot.get(stats.bot.NAME.LARGE_SERVERS).set(client.guilds.filter(guild => !!guild.large).size);
+        stats.bot.get(stats.bot.NAME.TOTAL_USERS).set(client.users.size);
+        stats.bot.get(stats.bot.NAME.TEXT_CHANNELS).set(client.channels.filter(guild => guild.type === "text").size);
     };
 
     updateGuildStatistics();

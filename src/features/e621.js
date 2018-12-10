@@ -109,7 +109,7 @@ async function process(message, msg, type) {
 module.exports = async function install(cr) {
     const e621Command = cr.register("e621", new TreeCommand)
         .setHelp(new HelpContent()
-            .setDescription("Search images on e621"))
+            .setDescription("Search images on e621. This command ***does not*** return lewd images in a not nsfw channel! Unless you explicitly give the query the `rating:e` or `rating:q` tag!"))
         .setCategory(Category.IMAGE);
     
     /**

@@ -35,6 +35,7 @@ class BaseCommand {
         this._help = null;
         this.aliases = [];
         this.name = null;
+        this.explicit = false;
     }
 
     setRateLimiter(rateLimiter) {
@@ -53,7 +54,7 @@ class BaseCommand {
     }
 
     async rateLimitMessage(message) {
-        await message.channel.sendTranslated(`Whoa whoa not to fast! You may only do this ${this.rateLimiter.max} ${this.rateLimiter.max === 1 ? "time" : "times"} every ${this.rateLimiter.toString()}. There is still ${toHumanTime(this.rateLimiter.tryAgainIn(message.author.id))} left to wait.`);
+        await message.channel.sendTranslated(`Whoa whoa not so fast! You may only do this ${this.rateLimiter.max} ${this.rateLimiter.max === 1 ? "time" : "times"} every ${this.rateLimiter.toString()}. There is still ${toHumanTime(this.rateLimiter.tryAgainIn(message.author.id))} left to wait.`);
     }
     
     setPermissions(permissions) {
@@ -70,7 +71,7 @@ class BaseCommand {
         await message.channel.sendTranslated("IDK what you're doing here. This is restricted area >:c");
     }
 
-    setIgnore(v) {
+    setIgnore(v = false) {
         this.ignore = v;
         return this;
     }
@@ -97,6 +98,11 @@ class BaseCommand {
 
     dontList() {
         this.list = false;
+        return this;
+    }
+
+    setExplicit(v = true) {
+        this.explicit = v;
         return this;
     }
 

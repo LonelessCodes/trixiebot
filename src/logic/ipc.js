@@ -2,7 +2,8 @@ const log = require("../modules/log");
 const uuid = require("uuid");
 const ipc = require("node-ipc");
 
-ipc.config.id = "trixiebot";
+ipc.config.silent = process.env.NODE_ENV === "development" ? false : true;
+ipc.config.id = process.env.NODE_ENV === "development" ? "trixiedev" : "trixiebot";
 ipc.config.retry = 1000;
 ipc.config.logger = log.bind(log);
 
@@ -52,6 +53,7 @@ server.on(
 );
 
 function getSocket() {
+    if (server.sockets.length === 0) return null;
     return server.sockets[server.sockets.length - 1]; // getting the newest connected socket
 }
 
@@ -62,37 +64,34 @@ function emit(message_bus, ...data) {
 server.emit = emit.bind(server);
 
 server.answer = function answer(message_bus, callback) {
-    server.on(message_bus, (message, socket) => {
+    server.on(message_bus, async (message, socket) => {
         const { id, data } = message;
 
-        callback(data).then(response => {
-            oldEmit(socket, message_bus, {
-                id,
-                data: response
-            });
-        }).catch(err => ipc.log(err));
+        const response = await callback(data);
+        oldEmit(socket, message_bus, {
+            id,
+            data: response
+        });
     });
 };
 
 server.awaitAnswer = function awaitAnswer(message_bus, data) {
     return new Promise((resolve, reject) => {
-        if (!server.started) reject();
-        if (!server.connected) reject();
+        const socket = getSocket();
+        if (!socket) reject();
 
         const id = uuid.v1();
 
-        const socket = getSocket();
-
-        const handler = (message, s) => {
+        const handler = (message, sock) => {
             if (message.id !== id) return;
-            if (s !== socket) return;
+            if (sock.id !== socket.id) return;
 
             server.off(message_bus, handler);
             resolve(message.data);
         };
         server.on(message_bus, handler);
 
-        server.emit(socket, message_bus, {
+        oldEmit(socket, message_bus, {
             id,
             data
         });

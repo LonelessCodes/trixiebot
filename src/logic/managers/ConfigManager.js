@@ -163,6 +163,14 @@ class ConfigManager {
 
         delete values._id;
 
+        const func = obj => {
+            for (const key in obj) {
+                if (typeof obj[key] === "string" && obj[key] === "") obj[key] = null;
+                else if (typeof obj[key] === "object") func(obj[key]);
+            }
+        };
+        func(values);
+
         const config = await this._cache.get(guildId) || {};
         for (const key in values) {
             index(config, key, values[key]);

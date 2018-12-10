@@ -15,6 +15,9 @@ sudo ufw enable # Run firewall
 # install build-essentials
 sudo apt-get install build-essential
 
+# install graphics magic for image commands
+sudo apt-get install graphicsmagick
+
 # prepare nodejs installation
 curl -sL https://deb.nodesource.com/setup_9.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh
@@ -38,6 +41,12 @@ sudo systemctl enable mongod
 
 # install production manager 2
 sudo npm install -g pm2
+
+# install certbot for Let's Encrypt
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get update
+sudo apt-get install certbot 
 
 # and now install the bot's packages already
 npm install

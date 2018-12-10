@@ -1,10 +1,9 @@
 const BaseCommand = require("./BaseCommand");
 
 class AliasCommand extends BaseCommand {
-    constructor(aliasName, originalName, command) {
+    constructor(originalName, command) {
         super();
 
-        this.aliasName = aliasName;
         this.originalName = originalName;
         this.command = command;
     }

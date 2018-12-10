@@ -15,6 +15,7 @@ module.exports = async function install(cr, client, config, db) {
     database.createIndex("timestamp", { expireAfterSeconds: 7 * 24 * 3600 });
 
     client.on("messageDelete", async message => {
+        if (message.author.bot) return;
         if (message.author.id === client.user.id) return;
         if (message.content === "") return;
         await database.insertOne({

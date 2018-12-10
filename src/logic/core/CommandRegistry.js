@@ -65,6 +65,8 @@ class CommandRegistry {
 
         if (!prefixUsed || !command) return false;
 
+        if (!message.channel.nsfw && command.explicit && !message.guild.config.explicit) return false;
+
         if (!command.permissions.test(message.member)) {
             await command.noPermission(message);
             return;
@@ -91,11 +93,12 @@ class CommandRegistry {
             return true;
         } else {
             const pass_through = await promises.get(command_name);
-            const command_result = await command.run(message, command_name, content, pass_through);
+            // const command_result = await command.run(message, command_name, content, pass_through);
+            await command.run(message, command_name, content, pass_through);
 
             await Promise.all(promises.values());
 
-            return command_result;
+            return true;
         }
     }
 
@@ -113,7 +116,7 @@ class CommandRegistry {
 
         const cmd = this.commands.get(command);
         cmd.aliases.push(alias);
-        this.register(alias, new AliasCommand(alias, command, cmd));
+        this.register(alias, new AliasCommand(command, cmd));
     }
 
     addSubCommandTo(command, name, subCommand) {

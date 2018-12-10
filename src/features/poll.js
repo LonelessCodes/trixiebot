@@ -115,7 +115,7 @@ class Poll {
             }, {
                 $set: {
                     votes: this.votes,
-                    users: [...this.users.keys()]
+                    users: Array.from(this.users.keys())
                 }
             });
 

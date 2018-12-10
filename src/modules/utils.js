@@ -78,7 +78,7 @@ module.exports.isPlainObject = function isPlainObject(input) {
 };
 
 module.exports.findDefaultChannel = function findDefaultChannel(guild) {
-    return guild.channels.find(c => c.name === "general") ||
+    return guild.channels.find(c => new RegExp("general", "g").test(c.name)) ||
         guild.channels
             .filter(c => c.type === "text" && c.send && {}.toString.call(c.send) === "[object Function]")
             .sort((a, b) => a.position - b.position)

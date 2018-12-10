@@ -40,6 +40,7 @@ module.exports = async function install(cr, client, config, database) {
             for (const [name, command] of cr.commands) {
                 if (command instanceof AliasCommand) continue;
                 if (disabledCommands.some(row => row.name === name)) continue;
+                if (!message.channel.nsfw && command.explicit) continue;
                 if (!command.list) continue;
                 if (!command.category) continue;
                 if (command.category === Category.OWNER) continue;

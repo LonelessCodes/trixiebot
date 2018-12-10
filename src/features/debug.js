@@ -68,18 +68,18 @@ module.exports = async function install(cr, client) {
                 + " --------- Technical Information --------- \n\n"
                 + "Commands: " + cr.commands.size + "\n"
                 + "Bot Version: " + INFO.VERSION + "\n"
-                + "Node.js Version: " + process.version + "\n"
+                + "Node.js Version: " + process.version.substr(1) + "\n"
                 + "Discord.js Version: " + Discord.version + "\n"
-                + "CPU Usage: " + (await getCPUUsage()).toFixed(1) + "%" + "\n"
+                + "CPU Usage: " + ((await getCPUUsage()) * 100).toFixed(1) + "%" + "\n"
                 + "CPU Cores: " + os.cpus().length + "\n"
                 + "Memory Usage: " + (os.freemem() / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB" + "\n"
-                + "Server Uptime: " + toHumanTime(os.uptime()) + "\n"
-                + "Bot Uptime: " + toHumanTime(Math.floor(process.uptime())) + "\n"
+                + "Server Uptime: " + toHumanTime(Math.floor(os.uptime() * 1000)) + "\n"
+                + "Bot Uptime: " + toHumanTime(Math.floor(process.uptime() * 1000)) + "\n"
                 + "\n --------- Trixie Information --------- \n\n"
                 + "Guilds: " + guilds.size + "\n"
                 + "Users: " + users.size + "\n"
                 + "Channels: " + channels.size + "\n"
-                + "Executed Commands: " + /* "Since Startup: " + client.getCommandTotalInt() + " / Total: " +*/ stats.get(stats.NAME.COMMANDS_EXECUTED).get() + "\n"
+                + "Executed Commands: " + /* "Since Startup: " + client.getCommandTotalInt() + " / Total: " +*/ stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).get() + "\n"
                 + "```");
         }
     })
@@ -106,13 +106,13 @@ module.exports = async function install(cr, client) {
         async call(message) {
             const embed = new Discord.RichEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
-                .addField("Server Count", stats.get(stats.NAME.SERVER_COUNT).get().toLocaleString("en"), true)
-                .addField("Large Servers", stats.get(stats.NAME.LARGE_SERVERS).get().toLocaleString("en"), true)
-                .addField("Total Members", stats.get(stats.NAME.TOTAL_MEMBERS).get().toLocaleString("en"), true)
-                .addField("Text Channels", stats.get(stats.NAME.TEXT_CHANNELS).get().toLocaleString("en"), true)
-                .addField("Active Web Users", stats.get(stats.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
-                .addField("Total Web Users", stats.get(stats.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"), true)
-                .addField("Commands Executed", stats.get(stats.NAME.COMMANDS_EXECUTED).get().toLocaleString("en"), true);
+                .addField("Total Servers", stats.bot.get(stats.bot.NAME.TOTAL_SERVERS).get().toLocaleString("en"), true)
+                .addField("Large Servers", stats.bot.get(stats.bot.NAME.LARGE_SERVERS).get().toLocaleString("en"), true)
+                .addField("Total Users", stats.bot.get(stats.bot.NAME.TOTAL_USERS).get().toLocaleString("en"), true)
+                .addField("Text Channels", stats.bot.get(stats.bot.NAME.TEXT_CHANNELS).get().toLocaleString("en"), true)
+                .addField("Active Web Users", stats.web.get(stats.web.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
+                .addField("Total Web Users", stats.web.get(stats.web.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"), true)
+                .addField("Commands Executed", stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).get().toLocaleString("en"), true);
 
             await message.channel.send({ embed });
         }

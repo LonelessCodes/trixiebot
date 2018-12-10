@@ -7,6 +7,7 @@ const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
 const RateLimiter = require("../../logic/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
+const HelpBuilder = require("../../logic/commands/HelpBuilder");
 
 Array.prototype.random = async function randomItem() {
     return await secureRandom(this);
@@ -18,6 +19,7 @@ module.exports = async function install(cr, client, config, db) {
     const database = db.collection("fuck");
 
     const fuckCommand = cr.register("fuck", new TreeCommand)
+        .setExplicit()
         .setHelp(new HelpContent()
             .setDescription("Do something lewddd to another user")
             .setUsage("<user>")
@@ -41,6 +43,11 @@ module.exports = async function install(cr, client, config, db) {
             if (text.length <= 10 || text.length > 256) {
                 await message.channel.send("Text must be longer than 10 and shorter than 256 characters.");
                 log("Gracefully aborted adding fuck text. Text too long");
+                return;
+            }
+            if (/<[@#]!?(1|\d{17,19})>/g.test(text)) {
+                await message.channel.send("You may not add texts with mentioned roles, channels or users. That's just bull");
+                log("Gracefully aborted adding fuck text. something mentioned");
                 return;
             }
             if (!/\$\{name\}/g.test(text)) {
@@ -77,6 +84,7 @@ module.exports = async function install(cr, client, config, db) {
         async call(message) {
             const mention = message.mentions.members.first();
             if (!mention) {
+                await HelpBuilder.sendHelp(message, fuckCommand.name, fuckCommand);
                 return;
             }
             

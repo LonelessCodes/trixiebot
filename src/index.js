@@ -11,11 +11,6 @@ Array.prototype.last = function () {
     return this[this.length - 1];
 };
 
-function setStatus(client) {
-    client.user.setStatus("online");
-    client.user.setActivity("!trixie", { type: "PLAYING" });
-}
-
 new class App {
     constructor() {
         this.client = new Discord.Client({ autoReconnect: true }).setMaxListeners(Infinity);
@@ -24,9 +19,6 @@ new class App {
 
         this.initialize().then(() => {
             log.debug("App", "I am ready");
-
-            setStatus(this.client);
-            setInterval(() => setStatus(this.client), 3600000 * 12);
         }).catch(err => {
             log.error("Failed to log in");
             log.error(err);
@@ -52,6 +44,7 @@ new class App {
 
             // new Parameter("calling", "📞 Accept calls servers", false, Boolean),
             new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
+            new Parameter("explicit", "💦 Use explicit commands in not-nsfw channels?", false, Boolean),
             // new Parameter("time", "🕑 Time display preference", "24h", ["24h", "12h"]),
 
             new Parameter([

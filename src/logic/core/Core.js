@@ -2,13 +2,17 @@ const log = require("../../modules/log");
 const NanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/utils");
 const stats = require("../stats");
+const statsDatabaseWrapper = require("../statsDatabaseWrapper");
 const path = require("path");
+const secureRandom = require("../../modules/secureRandom");
 const WebsiteManager = require("../managers/WebsiteManager");
 const CommandProcessor = require("../processor/CommandProcessor");
 const CommandListener = require("../listener/CommandListener");
+const CalendarEvents = require("../CalendarEvents");
 
 const Discord = require("discord.js");
-const { Message, Collector, Client } = Discord;
+// eslint-disable-next-line no-unused-vars
+const { Client } = Discord;
 
 class Core {
     /**
@@ -25,6 +29,8 @@ class Core {
 
         this.db = db;
 
+        statsDatabaseWrapper(stats, this.db.collection("bot_stats"));
+
         this.processor = new CommandProcessor(this.client, this.config, this.db);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.db);
         this.commandListener = new CommandListener(this.processor);
@@ -37,8 +43,8 @@ class Core {
 
     async startMainComponents() {
         await this.loadCommands();
-        await this.initCommandStats();
         await this.attachListeners();
+        await this.setStatus();
     }
 
     async loadCommands() {
@@ -62,52 +68,50 @@ class Core {
         log("Commands installed");
     }
 
-    async initCommandStats() {
-        const commandStat = stats.get(stats.NAME.COMMANDS_EXECUTED);
-
-        const statsDb = this.db.collection("bot_stats");
-
-        commandStat.set((await statsDb.findOne({ name: stats.NAME.COMMANDS_EXECUTED }) || { value: 0 }).value);
-
-        commandStat.on("change", value => statsDb.updateOne({ name: stats.NAME.COMMANDS_EXECUTED }, { $set: { value } }, { upsert: true }));
-
-        /** @type {Map<string, Collector>} */
-        this.collectors = new Map;
-
-        // command statistics
-        this.client.addListener("message", async message => {
-            if (!message.content.startsWith(await this.config.get(message.guild.id, "prefix"))) return;
-
-            if (typeof message.channel.awaitMessages !== "function") return;
-            if (this.collectors.has(message.channel.id)) {
-                this.collectors.get(message.channel.id).stop();
-            }
-
-            const collector = message.channel.createCollector(message => message.member.id === message.guild.me.id, {
-                max: 1,
-                maxMatches: 1,
-                time: 60 * 1000
-            });
-            this.collectors.set(message.channel.id, collector);
-
-            collector.once("end", (collected, reason) => {
-                if (reason === "time") {
-                    if (this.collectors.has(message.channel.id))
-                        this.collectors.delete(message.channel.id);
-                } else {
-                    if (this.collectors.has(message.channel.id))
-                        this.collectors.delete(message.channel.id);
-                    if (!collected.size) return;
-                    commandStat.inc(1);
-                }
-            });
-        });
-    }
-
     async attachListeners() {
         this.client.addListener("message", message => {
             this.commandListener.onMessage(message);
         });
+    }
+
+    async setStatus() {
+        let timeout = null;
+
+        const updateStatus = async () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(updateStatus, 20 * 60000);
+
+            let status = "";
+            if (CalendarEvents.CHRISTMAS.isToday()) status = "Merry Christmas!";
+            else if (CalendarEvents.HALLOWEEN.isToday()) status = "Happy Halloween!";
+            else if (CalendarEvents.NEW_YEARS.isToday()) status = "Happy New Year!";
+            else {
+                status = await secureRandom([
+                    "Trixie is the highest level unicorn!",
+                    "Cheated? Moi?",
+                    "Hello... princess!",
+                    "Behold, the Peat and Growerful Triskie...!",
+                    "No fruit calls in my class!",
+                    "Everypony deserves a second chance—even a third chance!",
+                    "It's good to be the queen!",
+                    "Trixie will go with you, too!"
+                ]);
+            }
+
+            this.client.user.setStatus("online");
+            this.client.user.setActivity(`!trixie | ${status}`, { type: "PLAYING" });
+
+            log("Set Status: " + status);
+        };
+
+        CalendarEvents.CHRISTMAS.on("start", updateStatus);
+        CalendarEvents.CHRISTMAS.on("end", updateStatus);
+        CalendarEvents.HALLOWEEN.on("start", updateStatus);
+        CalendarEvents.HALLOWEEN.on("end", updateStatus);
+        CalendarEvents.NEW_YEARS.on("start", updateStatus);
+        CalendarEvents.NEW_YEARS.on("end", updateStatus);
+
+        updateStatus();
     }
 }
 

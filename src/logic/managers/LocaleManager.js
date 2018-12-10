@@ -110,21 +110,41 @@ module.exports = class LocaleManager {
     }
 
     async set(guildId, channelId, locale) {
-        if (!locale) {
-            locale = channelId;
-            channelId = null;
-        }
-        if (!["global", "default", ...this.locales].includes(locale)) {
-            throw new Error("Not a known locale");
-        }
-        let config = await this.get(guildId);
-        if (channelId) {
-            if (/(global|default)/i.test(locale)) delete config.channels[channelId];
-            else config.channels[channelId] = locale;
+        if (channelId && typeof channelId !== "string") {
+            let config = {
+                global: channelId.global,
+                channels: channelId.channels
+            };
+            await this._cache.set(guildId, config);
         } else {
-            config.global = locale;
+            if (!locale) {
+                locale = channelId;
+                channelId = null;
+            }
+            if (!["global", "default", ...this.locales].includes(locale)) {
+                throw new Error("Not a known locale");
+            }
+            let config = await this.get(guildId);
+            if (channelId) {
+                if (/(global|default)/i.test(locale)) delete config.channels[channelId];
+                else config.channels[channelId] = locale;
+            } else {
+                config.global = locale;
+            }
+            await this._cache.set(guildId, config);
         }
-        await this._cache.set(guildId, config);
+    }
+
+    async delete(guildId, channelId) {
+        if (!channelId) {
+            await this._cache.delete(guildId);
+        } else {
+            let config = await this.get(guildId);
+            if (config) {
+                if (config.channels[channelId]) delete config.channels[channelId];
+                await this._cache.set(guildId, config);
+            }
+        }
     }
 };
 

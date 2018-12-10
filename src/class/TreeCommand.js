@@ -52,7 +52,7 @@ class TreeCommand extends BaseCommand {
 
         const cmd = this.sub_commands.get(command);
         cmd.aliases.push(alias);
-        this.registerSubCommand(alias, new AliasCommand(alias, command, cmd));
+        this.registerSubCommand(alias, new AliasCommand(command, cmd));
     }
 
     registerDefaultCommand(command) {

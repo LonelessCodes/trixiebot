@@ -1,4 +1,5 @@
 const { timeout } = require("../modules/utils");
+const { splitArgs } = require("../modules/string_utils");
 const secureRandom = require("../modules/secureRandom");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
@@ -8,7 +9,7 @@ const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
-async function getData(message, database) {
+async function getData(message, database, databaseSlots) {
     const mentioned_member = message.mentions.members.first();
 
     const all_waifus = await database.find({ guildId: message.guild.id }).toArray();
@@ -32,12 +33,20 @@ async function getData(message, database) {
         guildId: message.guild.id
     });
 
+    const slots = await databaseSlots.findOne({
+        waifuId: message.author.id
+    });
+
     return {
         mentioned_member,
         owner_waifus,
-        owner_of_me
+        owner_of_me,
+        all_waifus,
+        slots: slots ? slots.slots : defaultSlots
     };
 }
+
+const defaultSlots = 3;
 
 // Database
 // { ownerId,
@@ -49,6 +58,7 @@ module.exports = async function install(cr, client, config, db) {
     const cooldown_user = new Array;
 
     const database = db.collection("waifu");
+    const databaseSlots = db.collection("waifu_slots");
 
     const waifuCommand = cr.register("waifu", new TreeCommand)
         .setHelp(new HelpContent()
@@ -64,8 +74,9 @@ module.exports = async function install(cr, client, config, db) {
         async call(message) {
             const {
                 mentioned_member,
-                owner_waifus
-            } = await getData(message, database);
+                owner_waifus,
+                slots
+            } = await getData(message, database, databaseSlots);
 
             if (!mentioned_member) {
                 await message.channel.send("must give @ mention your dream waifu!");
@@ -77,7 +88,7 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            if (3 - owner_waifus.length === 0) {
+            if (slots - owner_waifus.length === 0) {
                 await message.channel.send("Stop it. Get some help. You have filled all your waifu slots already!");
                 return;
             }
@@ -119,7 +130,7 @@ module.exports = async function install(cr, client, config, db) {
             const {
                 mentioned_member,
                 owner_waifus
-            } = await getData(message, database);
+            } = await getData(message, database, databaseSlots);
 
             if (!mentioned_member) {
                 await message.channel.send("must give @ mention!");
@@ -144,43 +155,43 @@ module.exports = async function install(cr, client, config, db) {
         async call(message) {
             const {
                 mentioned_member,
-                owner_waifus
-            } = await getData(message, database);
+                owner_waifus,
+                all_waifus,
+                slots
+            } = await getData(message, database, databaseSlots);
 
-            if (3 - owner_waifus.length === 0) {
+            if (slots - owner_waifus.length === 0) {
                 await message.channel.send("Stop it. Get some help. You have filled all your waifu slots already!");
                 return;
             }
 
             if (cooldown_guild.includes(message.guild.id)) {
-                await message.channel.send("Not so hastily!");
+                await message.channel.sendTranslated("Whoa whoa not so fast! There's also a little global cooldown.");
                 return;
             }
             cooldown_guild.push(message.guild.id);
             setTimeout(() => {
                 cooldown_guild.splice(cooldown_guild.indexOf(message.guild.id), 1);
-            }, 10 * 1000);
+            }, 15 * 1000);
 
             if (cooldown_user.includes(message.guild.id)) {
-                await message.channel.send("Not so hastily!");
+                await message.channel.sendTranslated("Whoa whoa not so fast! Doing this too often in a row will obvi defeat the purpose of the claim command");
                 return;
             }
             cooldown_user.push(message.guild.id);
             setTimeout(() => {
                 cooldown_user.splice(cooldown_user.indexOf(message.guild.id), 1);
-            }, 60 * 1000);
+            }, 120 * 1000);
 
             let waifu;
             if (!mentioned_member) {
-                const allWaifus = await database.find({ guildId: message.guild.id }).toArray();
-
                 let pending = 100;
                 while (!waifu && pending--) {
-                    const random = await secureRandom(allWaifus);
-                    if (allWaifus[random].waifuId !== message.author.id &&
-                        allWaifus[random].ownerId !== message.author.id &&
-                        message.guild.members.has(allWaifus[random].waifuId))
-                        waifu = allWaifus[random];
+                    const random = await secureRandom(all_waifus);
+                    if (random.waifuId !== message.author.id &&
+                        random.ownerId !== message.author.id &&
+                        message.guild.members.has(random.waifuId))
+                        waifu = random;
                 }
             } else {
                 if (message.author.id === mentioned_member.user.id) {
@@ -255,7 +266,7 @@ module.exports = async function install(cr, client, config, db) {
         async call(message, content) {
             const {
                 owner_waifus
-            } = await getData(message, database);
+            } = await getData(message, database, databaseSlots);
 
             if (message.mentions.members.size !== 2) {
                 await message.channel.send("Specify waifu you want to trade, and the waifu you want to have.");
@@ -348,12 +359,30 @@ module.exports = async function install(cr, client, config, db) {
     //     }
     // });
 
+    waifuCommand.registerSubCommand("addslots", new class extends BaseCommand {
+        async call(message, content) {
+            const member = message.mentions.members.first();
+            if (!member) return;
+
+            const v = splitArgs(content, 2);
+
+            const slots = parseInt(v[1]);
+            if (Number.isNaN(slots)) return;
+
+            await databaseSlots.updateOne({ waifuId: member.user.id }, { $set: { slots } }, { upsert: true });
+
+            await message.channel.send("yo :ok_hand:");
+        }
+    })
+        .setCategory(Category.OWNER);
+
     waifuCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message) {
             const {
                 owner_waifus,
-                owner_of_me
-            } = await getData(message, database);
+                owner_of_me,
+                slots
+            } = await getData(message, database, databaseSlots);
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setThumbnail(message.author.avatarURL);
@@ -377,7 +406,7 @@ module.exports = async function install(cr, client, config, db) {
                     embed.addField("Owned by", `**${owner.user.username}** #${owner.user.discriminator}\n`);
             }
 
-            embed.setFooter(`Total Waifus: ${owner_waifus.length} - Available Slots: ${3 - owner_waifus.length}`);
+            embed.setFooter(`Total Waifus: ${owner_waifus.length} - Available Slots: ${slots - owner_waifus.length}`);
             await message.channel.send({ embed });
         }
     });  

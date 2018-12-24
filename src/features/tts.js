@@ -13,6 +13,12 @@ module.exports = async function install(cr) {
                 return;
             }
 
+            if (!/[a-z0-9]/.test(content)) {
+                message.react("❌");
+                message.channel.sendTranslated("Ehhh rather send a normal message. This kind of message is know to kinda break me");
+                return;
+            }
+
             // Only try to join the sender's voice channel if they are in one themselves
             if (!message.member.voiceChannel) {
                 message.react("❌");

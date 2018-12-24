@@ -1,6 +1,6 @@
 {
   "name": "trixiebot",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
   "main": "index.js",
   "scripts": {
@@ -40,9 +40,12 @@
     "node-ipc": "^9.1.1",
     "node-opus": "^0.2.9",
     "random-number-csprng": "^1.0.2",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5",
     "tiny-text": "^1.0.1",
     "twit": "^2.2.11",
-    "twitch": "^1.0.3"
+    "twitch": "^1.0.3",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/mongodb": "^3.1.12",

@@ -42,6 +42,10 @@ class Core {
     }
 
     async startMainComponents() {
+        for (const voice of this.client.voiceConnections.array()) {
+            voice.disconnect();
+        }
+
         await this.loadCommands();
         await this.attachListeners();
         await this.setStatus();
@@ -94,7 +98,16 @@ class Core {
                     "No fruit calls in my class!",
                     "Everypony deserves a second chance—even a third chance!",
                     "It's good to be the queen!",
-                    "Trixie will go with you, too!"
+                    "Trixie will go with you, too!",
+
+                    // Season 7
+                    "Whoops! I guess I pictured a teacup poodle? Heh.",
+                    "[clears throat] Teleport.",
+
+                    // Season 6 
+                    "It's a working title.",
+                    "I'd love to perform for peanut butter crackers...",
+                    "Starlight? What time is it?"
                 ]);
             }
 

@@ -3,7 +3,9 @@ const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
-const { resolveStdout, findDefaultChannel } = require("../../modules/utils");
+const { resolveStdout, findDefaultChannel, isOwner } = require("../../modules/utils");
+const { splitArgs } = require("../../modules/string_utils");
+const ipc = require("../../logic/ipc");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../../class/BaseCommand");
@@ -89,5 +91,27 @@ module.exports = async function install(cr, client) {
             });
             log(`Broadcasted message ${msg}`);
         }
+    }).setIgnore(false).setCategory(Category.OWNER); // 505123661003358210
+
+    cr.register("send", new class extends BaseCommand {
+        async call(message, msg) {
+            const s = splitArgs(msg, 2);
+            const guild = client.guilds.get(s[0]);
+            if (!guild.available) return;
+            const defaultChannel = findDefaultChannel(guild);
+            defaultChannel.send(s[1]);
+        }
     }).setIgnore(false).setCategory(Category.OWNER);
+
+    client.addListener("message", async message => {
+        if (message.author.bot) return;
+        if (message.channel.type !== "dm") return;
+        if (!isOwner(message.author)) return;
+
+        if (!/^(backup|database|mongoarchive)\b/i.test(message.content)) return;
+        
+        const url = await ipc.awaitAnswer("admin:mongoarchive");
+
+        await message.channel.send(`Get your archive here: ${url}`);
+    });
 };

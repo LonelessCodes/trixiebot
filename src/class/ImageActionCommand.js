@@ -1,17 +1,23 @@
 const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../modules/secureRandom");
+const RateLimiter = require("../logic/RateLimiter");
+const TimeUnit = require("../modules/TimeUnit");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
+const { Attachment } = require("discord.js");
+
 class TextActionCommand extends BaseCommand {
-    constructor(description, content, noMentionMessage, permissions) {
+    constructor(image, content, noMentionMessage, permissions) {
         super(permissions);
 
+        this.setRateLimiter(new RateLimiter(TimeUnit.SECOND, 10));
         this.setHelp(new HelpContent()
-            .setDescription(description)
+            // .setDescription(image + " someone!!!!!")
             .setUsage("<@user>"));
         this.setCategory(Category.ACTION);
 
+        this.image = image;
         this.texts = content instanceof Array ? content : [content];
         this.noMentionMessage = noMentionMessage;
         this.everyone = false;
@@ -25,12 +31,11 @@ class TextActionCommand extends BaseCommand {
         }
 
         const phrase = await secureRandom(this.texts);
+        const user = message.mentions.everyone ? `all ${message.guild.members.size} users` : mention.displayName;
 
-        if (message.mentions.everyone) {
-            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
-            return;
-        }
-        else await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), mention.displayName));
+        const attachment = new Attachment(this.image);
+
+        await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), user), attachment);
     }
 
     setAllowEveryone(v) {

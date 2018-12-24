@@ -33,7 +33,7 @@ module.exports = async function install(cr) {
                 gif = await giphy.random({
                     limit: 1,
                     tag: query,
-                    rating: message.channel.nsfw ? "r" : "s"
+                    rating: message.channel.nsfw ? "r" : "g"
                 });
                 if (!gif.data.image_original_url) {
                     await message.channel.sendTranslated("No GIFs were found matching this query.");
@@ -80,7 +80,7 @@ module.exports = async function install(cr) {
             const gif = await giphy.search({
                 q: query,
                 limit: 1,
-                rating: message.channel.nsfw ? "r" : "s"
+                rating: message.channel.nsfw ? "r" : "g"
             });
             if (!gif.data || gif.data.length === 0) {
                 await message.channel.sendTranslated("No GIFs were found matching this query.");

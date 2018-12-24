@@ -38,7 +38,7 @@ new class App {
     async initialize() {
         this.db = await this.loadDB();
 
-        const Parameter = ConfigManager.Parameter;
+        const { Parameter } = ConfigManager;
         this.config = new ConfigManager(this.client, this.db, [
             new Parameter("prefix", "❗ Prefix", "!", String),
 
@@ -65,7 +65,9 @@ new class App {
             new Parameter([
                 new Parameter("ban.enabled", "true/false", false, Boolean),
                 new Parameter("ban.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true)
-            ], "🔨 Announce banned users")
+            ], "🔨 Announce banned users"),
+
+            // new Parameter("disabled", "❌ Disabled Channels", [], new ParameterList(Discord.TextChannel))
         ]);
 
         this.locale = new LocaleManager(this.client, this.db, [

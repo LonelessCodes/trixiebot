@@ -22,13 +22,15 @@ class CommandListener {
 
             stats.bot.get(stats.bot.NAME.MESSAGES_TODAY).inc(1);
 
-            const self = message.guild.me;
-            /** @type {TextChannel} */
-            const channel = message.channel;
-            if (!channel.memberPermissions(self).has(Permissions.FLAGS.SEND_MESSAGES, true))
-                return;
+            if (message.channel.type === "text") {
+                const self = message.guild.me;
+                /** @type {TextChannel} */
+                const channel = message.channel;
+                if (!channel.memberPermissions(self).has(Permissions.FLAGS.SEND_MESSAGES, true))
+                    return;
+            }
 
-            const executed = this.commandProcessor.run(message);
+            const executed = await this.commandProcessor.run(message);
             if (executed) {
                 stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).inc(1);
             }

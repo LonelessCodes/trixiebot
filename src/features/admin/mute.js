@@ -38,7 +38,8 @@ module.exports = async function install(cr, client, config, db) {
             .setUsage("<phrase>")
             .addParameter("phrase", "Word or phrase to be muted/blacklisted"))
         .setCategory(Category.MODERATION)
-        .setPermissions(permission);
+        .setPermissions(permission)
+        .setIgnore(false);
     
     const removeCommand = new class extends BaseCommand {
         async call(message, content) {

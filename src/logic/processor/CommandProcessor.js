@@ -13,20 +13,20 @@ class CommandProcessor {
     async run(message) {
         let raw_content = message.content;
 
-        message.guild.config = await this.config.get(message.guild.id);
-
         // remove prefix
         let me = "";
         let prefix = "";
         let prefixUsed = true;
 
         if (message.channel.type === "text") {
+            message.guild.config = await this.config.get(message.guild.id);
+
             me = message.guild.me.toString();
             prefix = message.guild.config.prefix;
-        } else if (message.channel.type === "dm" ||
-            message.channel.type === "group") {
-            me = message.client.user.toString();
-            prefix = message.client.config.default_config;
+        // } else if (message.channel.type === "dm" ||
+        //     message.channel.type === "group") {
+        //     me = message.client.user.toString();
+        //     prefix = message.client.config.default_config;
         } else {
             return;
         }
@@ -44,7 +44,7 @@ class CommandProcessor {
 
         const [command_name, processed_content] = splitArgs(raw_content, 2);
 
-        const executed = await this.REGISTRY.process(msg, command_name, processed_content, prefix, prefixUsed);
+        const executed = await this.REGISTRY.process(msg, command_name.toLowerCase(), processed_content, prefix, prefixUsed);
 
         // const diff = timer.end();
         // commandTime.observe(diff);

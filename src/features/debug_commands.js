@@ -72,14 +72,14 @@ module.exports = async function install(cr, client) {
                 + "Discord.js Version: " + Discord.version + "\n"
                 + "CPU Usage: " + ((await getCPUUsage()) * 100).toFixed(1) + "%" + "\n"
                 + "CPU Cores: " + os.cpus().length + "\n"
-                + "Memory Usage: " + (os.freemem() / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB" + "\n"
+                + "Memory Usage: " + ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB" + "\n"
                 + "Server Uptime: " + toHumanTime(Math.floor(os.uptime() * 1000)) + "\n"
                 + "Bot Uptime: " + toHumanTime(Math.floor(process.uptime() * 1000)) + "\n"
                 + "\n --------- Trixie Information --------- \n\n"
                 + "Guilds: " + guilds.size + "\n"
                 + "Users: " + users.size + "\n"
                 + "Channels: " + channels.size + "\n"
-                + "Executed Commands: " + /* "Since Startup: " + client.getCommandTotalInt() + " / Total: " +*/ stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).get() + "\n"
+                + "Executed Commands: " + stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).get() + "\n"
                 + "```");
         }
     })

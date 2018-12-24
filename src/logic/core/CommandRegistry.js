@@ -1,6 +1,8 @@
 const log = require("../../modules/log");
 const { isOwner } = require("../../modules/utils");
 const { splitArgs } = require("../../modules/string_utils");
+// eslint-disable-next-line no-unused-vars
+const BaseCommand = require("../../class/BaseCommand");
 const AliasCommand = require("../../class/AliasCommand");
 const TreeCommand = require("../../class/TreeCommand");
 const Category = require("../commands/Category");
@@ -13,6 +15,7 @@ class CommandRegistry {
         this.config = config;
         this.database = database;
 
+        /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;
     }
 
@@ -20,39 +23,60 @@ class CommandRegistry {
         // only for now!!!
         if (message.channel.type !== "text") return false;
 
-        const command = this.commands.get(command_name);
+        let command = this.commands.get(command_name);
 
-        const blacklistedUsers = await this.database.collection("blacklisted").findOne({ userId: message.author.id });
-        if (blacklistedUsers) {
-            // if (rl.process(event.getAuthor())) {
-            await message.channel.send("You have been blacklisted from using all of Mantaro's functions. " +
-                "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere.");
-            // }
-            return false;
+        if (command && command instanceof AliasCommand) {
+            command_name = command.parentName;
+            command = command.command;
         }
 
         // is the case of cases, Owner should be able to use Owner commands everywhere, regardless of timeouts and other problems
         const isOwnerCommand = command && command.category && command.category === Category.OWNER && isOwner(message.author);
 
         if (prefixUsed && command && command.ignore && !isOwnerCommand) {
-            const disabledCommands = await this.database.collection("disabled_commands").findOne({
-                guildId: message.guild.id,
-                name: command instanceof AliasCommand ? command.parentName : command_name
-            });
+            const blacklistedUsers = await this.database.collection("blacklisted").findOne({ userId: message.author.id });
+            if (blacklistedUsers) {
+                await message.channel.send("You have been blacklisted from using all of Trixie's functions. " +
+                    "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere.");
+                return false;
+            }
+
+            const [disabledCommands, disabledUsers, disabledChannels] = await Promise.all([
+                this.database.collection("disabled_commands").findOne({
+                    guildId: message.guild.id,
+                    commands: {
+                        $all: [command_name]
+                    }
+                }),
+                this.database.collection("disabled_users").findOne({
+                    guildId: message.guild.id,
+                    members: {
+                        $all: [message.member.id]
+                    }
+                }),
+                this.database.collection("disabled_channels").findOne({
+                    guildId: message.guild.id,
+                    channels: {
+                        $all: [message.channel.id]
+                    }
+                })
+            ]);
+
             if (disabledCommands) return false;
-
-            const disabledUsers = await this.database.collection("disabled_users").findOne({
-                guildId: message.guild.id,
-                memberId: message.member.id
-            });
             if (disabledUsers) return false;
-
-            const disabledChannels = await this.database.collection("disabled_channels").findOne({
-                guildId: message.guild.id,
-                channelId: message.channel.id
-            });
-            const category = (command instanceof AliasCommand ? command.parentCategory : command.category);
+            const category = command.category;
             if (disabledChannels &&
+                category !== Category.MODERATION &&
+                category !== Category.OWNER) return false;
+
+            const disabledCommandChannels = await this.database.collection("disabled_commands_channels").findOne({
+                guildId: message.guild.id,
+                command: command_name,
+                channels: {
+                    $all: [message.channel.id]
+                }
+            });
+            if (disabledCommandChannels &&
                 category !== Category.MODERATION &&
                 category !== Category.OWNER) return false;
         }
@@ -60,6 +84,7 @@ class CommandRegistry {
         const promises = new Map;
 
         for (const [key, cmd] of this.commands) {
+            if (cmd instanceof AliasCommand) continue;
             promises.set(key, cmd.beforeProcessCall(message, content));
         }
 
@@ -82,16 +107,18 @@ class CommandRegistry {
             return;
         }
 
-        log.debug("Command Registry", `command:${command_name}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
-
         // good to send help when using `command help` and `help command`
         if (/^(help|usage)$/i.test(splitArgs(content, 2)[0])) {
+            log.debug("Command Registry", `command:help, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+
             await HelpBuilder.sendHelp(message, command_name, command);
 
             await Promise.all(promises.values());
 
             return true;
         } else {
+            log.debug("Command Registry", `command:${command_name}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+
             const pass_through = await promises.get(command_name);
             // const command_result = await command.run(message, command_name, content, pass_through);
             await command.run(message, command_name, content, pass_through);
@@ -130,8 +157,8 @@ class CommandRegistry {
     }
 }
 
-CommandRegistry.GUILD_ONLY = 0;
-CommandRegistry.GUILD_AND_GROUP = 1;
-CommandRegistry.ALL = 2;
+// CommandRegistry.GUILD_ONLY = 0;
+// CommandRegistry.GUILD_AND_GROUP = 1;
+// CommandRegistry.ALL = 2;
 
 module.exports = CommandRegistry;

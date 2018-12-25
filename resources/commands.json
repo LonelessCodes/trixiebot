@@ -291,9 +291,9 @@
     {
       "name": "mlp",
       "help": {
-        "description": "Query the MLP Wikia for fun!",
-        "usage": "\n`!mlp <query>` - come look it up with me owo\n`query` - what you would like to look up",
-        "category": "Utility"
+        "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
+        "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
+        "category": "My Little Pony"
       }
     },
     {
@@ -327,6 +327,38 @@
         "description": "Finds the source of an image on e621's and Derpibooru's database",
         "usage": "\n`!source`",
         "category": "Image"
+      }
+    },
+    {
+      "name": "smol",
+      "help": {
+        "description": "Make teeeeny tiny text",
+        "usage": "\n`!smol <string|user>` *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
+        "category": "Text"
+      }
+    },
+    {
+      "name": "pirate",
+      "help": {
+        "description": "Translate something into pirate-ish",
+        "usage": "\n`!pirate <text>`\n`text` - The text to translate",
+        "category": "Text"
+      }
+    },
+    {
+      "name": "yoda",
+      "help": {
+        "description": "Translate something into yoda-ish",
+        "usage": "\n`!yoda <text>`\n`text` - The text to translate",
+        "category": "Text"
+      }
+    },
+    {
+      "name": "dolan",
+      "help": {
+        "description": "Translate something into dolan duck-ish",
+        "usage": "\n`!dolan <text>`\n`text` - The text to translate",
+        "category": "Text"
       }
     },
     {
@@ -367,6 +399,15 @@
       "help": {
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!config <?parameter> <?value>` - view the Trixie's config in this server *(alias `!cfg`, `!opts`)*\n`parameter` - optional- view only this parameter's config\n`value` - optional- set a parameter in Trixie's config. \"default\" for default config",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "prefix",
+      "help": {
+        "description": "Alias for `{{prefix}}config prefix <?value>`",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!prefix <?prefix>` - vue Trixie's prefix in this server\n`prefix` - optional- set the prefix in Trixie's config. \"default\" for default prefix `(!)`",
         "category": "Moderation"
       }
     },
@@ -498,7 +539,7 @@
       "name": "fuck",
       "help": {
         "explicit": true,
-        "description": "Do something lewddd to another user",
+        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions.",
         "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
         "category": "Action"
       }
@@ -525,14 +566,6 @@
         "description": "Blep the chat :3",
         "usage": "\n`!blep`",
         "category": "Action"
-      }
-    },
-    {
-      "name": "smol",
-      "help": {
-        "description": "Make teeeeny tiny text",
-        "usage": "\n`!smol <string|user>` *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
-        "category": "Text"
       }
     },
     {

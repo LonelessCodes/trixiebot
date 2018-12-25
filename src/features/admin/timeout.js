@@ -1,4 +1,4 @@
-const { userToString } = require("../modules/utils");
+const { userToString } = require("../../modules/utils");
 const log = require("../../modules/log");
 const LocaleManager = require("../../logic/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../modules/time_utils");

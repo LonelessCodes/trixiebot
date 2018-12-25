@@ -1,4 +1,4 @@
-const { userToString } = require("../modules/utils");
+const { userToString } = require("../../modules/utils");
 const log = require("../../modules/log");
 const stats = require("../../logic/stats");
 const { findDefaultChannel } = require("../../modules/utils");

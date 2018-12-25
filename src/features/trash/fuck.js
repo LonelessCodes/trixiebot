@@ -21,7 +21,7 @@ module.exports = async function install(cr, client, config, db) {
     const fuckCommand = cr.register("fuck", new TreeCommand)
         .setExplicit()
         .setHelp(new HelpContent()
-            .setDescription("Do something lewddd to another user")
+            .setDescription("Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions.")
             .setUsage("<user>")
             .addParameter("user", "the username of the user to fuck"))
         .setCategory(Category.ACTION);

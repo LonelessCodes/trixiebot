@@ -24,5 +24,7 @@ module.exports = Object.freeze({
     OWNER: new Category(CommandPermission.OWNER, "Owner"),
     INFO: new Category(CommandPermission.USER, "Info"),
     UTILS: new Category(CommandPermission.USER, "Utility"),
-    MISC: new Category(CommandPermission.USER, "Misc")
+    MISC: new Category(CommandPermission.USER, "Misc"),
+
+    MLP: new Category(CommandPermission.USER, "My Little Pony"),
 });

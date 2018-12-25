@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/utils");
 const log = require("../../modules/log");
 const stats = require("../../logic/stats");
 const { findDefaultChannel } = require("../../modules/utils");
@@ -65,7 +66,7 @@ module.exports = async function install(cr, client, config) {
         const str = format(guild_config.leave.text ||
             ("**" + await channel.translate("A soldier has left us") + "**\n" +
                 await channel.translate("{{user}} left the server. Bye bye")), {
-            user: `**${member.user.username}** #${member.user.discriminator}`
+            user: userToString(member)
         });
 
         await channel.send(str);
@@ -84,7 +85,7 @@ module.exports = async function install(cr, client, config) {
 
         const str = format(guild_config.ban.text ||
             "{{user}} has been banned from the server. Don't let the door hit your ass on the way out!", {
-            user: `**${user.username}** #${user.discriminator}`
+            user: userToString(user)
         });
 
         await channel.send(str);

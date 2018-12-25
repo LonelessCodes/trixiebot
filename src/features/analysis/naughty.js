@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/utils");
 const CONST = require("../../modules/CONST");
 const Queue = require("../../logic/Queue");
 const fs = require("fs-extra");
@@ -99,12 +100,12 @@ module.exports = async function install(cr, client, config, db) {
                 if (naughty_percent >= 0.5) {
                     embed.setColor(CONST.COLOR.ERROR);
                     embed.setThumbnail("https://derpicdn.net/img/view/2018/4/9/1703511.png");
-                    embed.setTitle(`**${user.username}** #${user.discriminator} is on the Naughty list`);
+                    embed.setTitle(`${userToString(user)} is on the Naughty list`);
                     embed.setDescription(`${str}Oh dear ... You swore a total of **${bad_words}** times in the messages we analysed (${total_user_messages}). It's a lump of coal in your stocking this year, you naughty thing.`);
                 } else {
                     embed.setColor(0x67c23a);
                     embed.setThumbnail("https://derpicdn.net/img/view/2018/11/13/1881039.png");
-                    embed.setTitle(`**${user.username}** #${user.discriminator} is on the Nice list`);
+                    embed.setTitle(`${userToString(user)} is on the Nice list`);
                     if (naughty_percent === 0) {
                         embed.setDescription(`${str}Wow! You didn't swear at all in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time.`);
                     } else if (naughty_percent < 0.2) {

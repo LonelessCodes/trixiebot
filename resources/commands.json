@@ -1,0 +1,579 @@
+{
+  "prefix": "!",
+  "commands": [
+    {
+      "name": "8ball",
+      "help": {
+        "description": "An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy",
+        "usage": "\n`!8ball <question>` *(alias `!tellme`)*\n`question` - The question you are eager to ask",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "hug",
+      "help": {
+        "description": "Hug someone!!!",
+        "usage": "\n`!hug <@user>` *(alias `!hugs`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "pat",
+      "help": {
+        "description": "*patpat*",
+        "usage": "\n`!pat <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "kiss",
+      "help": {
+        "description": "Kiss someone -3-",
+        "usage": "\n`!kiss <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "touch",
+      "help": {
+        "description": "Touch someone o.o\"",
+        "usage": "\n`!touch <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "point",
+      "help": {
+        "description": "Point at someone",
+        "usage": "\n`!point <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "poke",
+      "help": {
+        "description": "Poke poke",
+        "usage": "\n`!poke <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "slap",
+      "help": {
+        "description": "Slap someone real dirty >:c",
+        "usage": "\n`!slap <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "bite",
+      "help": {
+        "description": "Ouchie! Bite someone",
+        "usage": "\n`!bite <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "lick",
+      "help": {
+        "description": "Lick someone clean!",
+        "usage": "\n`!lick <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "tickle",
+      "help": {
+        "description": "Nuuuu I'm so ticklish!!!! >~<\nTickle someone",
+        "usage": "\n`!tickle <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "smile",
+      "help": {
+        "description": "Smile at someone",
+        "usage": "\n`!smile <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "stare",
+      "help": {
+        "description": "Stare at someone :eyes:",
+        "usage": "\n`!stare <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "holdhands",
+      "help": {
+        "description": "Hold hands with a cutie",
+        "usage": "\n`!holdhands <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "cuddle",
+      "help": {
+        "description": "Cuddle someone and give them a warm feeling",
+        "usage": "\n`!cuddle <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "snuggle",
+      "help": {
+        "description": "Snuggle someone and die from the cuteness!!! >3<",
+        "usage": "\n`!snuggle <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "nuzzle",
+      "help": {
+        "description": "Nuzzle someone",
+        "usage": "\n`!nuzzle <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "nom",
+      "help": {
+        "description": "nomnom someone",
+        "usage": "\n`!nom <@user>` *(alias `!nomnom`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "alert",
+      "help": {
+        "description": "Make Trixie announce streamers when they go live.\nWorks only with Picarto at the moment.",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!alert <page url> <?channel>` - Subscribe Trixie to a Picarto channel! *(alias `!alert add`)*\n`page url` - copy the url of the stream page and paste it in here\n`channel` - optional- the channel to post the alert to later. If omitted will be this channel\n\n`!alert remove <page url>` - unsubscribe Trixie from a Picarto channel\n\n`!alert list` - list all active streaming alerts",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "cat",
+      "help": {
+        "description": "Random cat image :3",
+        "usage": "\n`!cat` *(alias `!kitty`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "dog",
+      "help": {
+        "description": "Random dog image :3",
+        "usage": "\n`!dog` *(alias `!doggo`, `!puppy`, `!bork`, `!pup`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "fox",
+      "help": {
+        "description": "Random fox image :3",
+        "usage": "\n`!fox` *(alias `!foxie`, `!foxi`, `!weff`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "shibe",
+      "help": {
+        "description": "Random SHIBE image :3",
+        "usage": "\n`!shibe`",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "bird",
+      "help": {
+        "description": "Random Birb image ovo",
+        "usage": "\n`!bird` *(alias `!birb`, `!borb`, `!birbo`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "ascii",
+      "help": {
+        "description": "Generates ascii art from an image",
+        "usage": "\n`!ascii <?url>`\n`url` - optional- Url to an image. Or add an attachment to your message",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "catfact",
+      "help": {
+        "description": "Get you a cat fact that will help you raise your babies better <3",
+        "usage": "\n`!catfact`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "chucknorris",
+      "help": {
+        "description": "Chuck\nNorris\nFacts!!!",
+        "usage": "\n`!chucknorris`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "coin",
+      "help": {
+        "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "info",
+      "help": {
+        "description": "Gets the bot technical information. Nothing all that interesting.",
+        "usage": "\n`!info`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "ping",
+      "help": {
+        "description": "Ping-Pong-Ping-Pong-Ping-WEE HEEEEE.",
+        "usage": "\n`!ping` *(alias `!trixie ping`)*",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "stats",
+      "help": {
+        "description": "Get some statistics from Trixie regarding herself",
+        "usage": "\n`!stats`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "derpi",
+      "help": {
+        "description": "Search images on Derpibooru. This command ***does not*** return lewd images in a not nsfw channel! Unless you explicitly give the query the `explicit`, `questionable` or `suggestive` tag! Same for Grimdark and grotesque.",
+        "usage": "\n`!derpi` *(alias `!db`)*\n\n`!derpi random <?amount> <query>` *(alias `!derpi`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)\n\n`!derpi top <?amount> <query>`\n\n`!derpi latest <?amount> <query>`\n\n`!derpi first <?amount> <query>`",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "e621",
+      "help": {
+        "description": "Search images on e621. This command ***does not*** return lewd images in a not nsfw channel! Unless you explicitly give the query the `rating:e` or `rating:q` tag!",
+        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "fact",
+      "help": {
+        "description": "Gets random UberFacts fact",
+        "usage": "\n`!fact` *(alias `!uberfacts`)*",
+        "category": "Utility"
+      }
+    },
+    {
+      "name": "gif",
+      "help": {
+        "usage": "\n`!gif <query>` - returns the top result for the given `query` *(alias `!gif top`)*\n`query` - What type of gif you want to have\n\n`!gif random <query>` - returns a random gif for the given `query`\n\n`!gif trending` - returns a random trending gif",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "help",
+      "help": {
+        "description": "Haha, very funny",
+        "usage": "\n`!help <?command>` *(alias `!trixie`)*\n`command` - optional- The name of the command you want help for. Whole command list if omitted",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "mlp",
+      "help": {
+        "description": "Query the MLP Wikia for fun!",
+        "usage": "\n`!mlp <query>` - come look it up with me owo\n`query` - what you would like to look up",
+        "category": "Utility"
+      }
+    },
+    {
+      "name": "penis",
+      "help": {
+        "explicit": true,
+        "description": "Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.",
+        "usage": "\n`!penis <?mention>` *(alias `!cock`, `!dick`)*\n`mention` - optional- User who's penis you wish to ~~pleasure~~ measure\n\n`!penis leaderboard` - Shows where you are in the penis size ranking",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "role",
+      "help": {
+        "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
+        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\nAdmin Area:",
+        "category": "Utility"
+      }
+    },
+    {
+      "name": "serverinfo",
+      "help": {
+        "description": "Receive information about this server",
+        "usage": "\n`!serverinfo`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "source",
+      "help": {
+        "description": "Finds the source of an image on e621's and Derpibooru's database",
+        "usage": "\n`!source`",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "trump",
+      "help": {
+        "description": "What would Trump say?\nGets a random Trump quote",
+        "usage": "\n`!trump <?@mention>`\n`@mention` - optional- If mentioned a user, command will return a personalized quote",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "tts",
+      "help": {
+        "description": "Make Trixie join the user's current voice channel and read the `message` out aloud.",
+        "usage": "\n`!tts <message>`\n`message` - The message to be read out by Trixie",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "waifu",
+      "help": {
+        "description": "This tool helps you manage your waifus with ease!",
+        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%.\n`@mention` - The waifu you want to perform actions on\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "autoban",
+      "help": {
+        "description": "Autoban allows admins to make sure to keep specific users out of the server, even if they create a new account*\nPatterns use the glob pattern documentation. It is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.\n\n* If in the pattern it's been made sure it would match these new similar accounts",
+        "permissions": "Ban Members",
+        "usage": "\n`!autoban` - view the autoban patterns of this server\n\n`!autoban add <pattern>` - add a pattern banning joining users if they match it\n`pattern` - Pattern to filter out by\n\n`!autoban remove <pattern>` - remove a pattern again",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "config",
+      "help": {
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!config <?parameter> <?value>` - view the Trixie's config in this server *(alias `!cfg`, `!opts`)*\n`parameter` - optional- view only this parameter's config\n`value` - optional- set a parameter in Trixie's config. \"default\" for default config",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "deleted",
+      "help": {
+        "description": "Trixie can collect deleted for up to 7 days, so you always know what's going on in your server behind your back.\nCommand enabled by default. Soon option to turn it off",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!deleted` - List all deleted messages from the last 7 days\n\n`!deleted clear` - Clears list of deleted messages",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "disable",
+      "help": {
+        "description": "Disable Trixie from listening to some commands or channels",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "enable",
+      "help": {
+        "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "locale",
+      "help": {
+        "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional- set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional- set a channel to be a unique locale",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "mute",
+      "help": {
+        "description": "Mute/Blacklist specific words in this server",
+        "permissions": "Manage Messages",
+        "usage": "\n`!mute <phrase>` *(alias `!mute add`)*\n`phrase` - Word or phrase to be muted/blacklisted\n\n`!mute remove <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted\n\n`!mute clear` - Remove all muted words\n\n`!mute list` - list all muted words and phrases",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "unmute",
+      "help": {
+        "permissions": "Manage Messages",
+        "usage": "\n`!unmute <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted"
+      }
+    },
+    {
+      "name": "timeout",
+      "help": {
+        "permissions": "Manage Messages",
+        "usage": "\n`!timeout <time> <user mention 1> <user mention 2> ...`\n`time` - timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`user mention` - user to timeout. Multiple users possible\n\n`!timeout remove <user mention 1> <user mention 2> ...`\n`user mention` - user to remove timeout from. Multiple users possible\n\n`!timeout clear` - remove all timeouts\n\n`!timeout list` - list all timeouts present at the moment",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "naughty",
+      "help": {
+        "description": "It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!",
+        "usage": "\n`!naughty` *(alias `!nice`)*",
+        "category": "Analysis"
+      }
+    },
+    {
+      "name": "face",
+      "help": {
+        "description": "Get a random ASCII face",
+        "usage": "\n`!face`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "lenny",
+      "help": {
+        "description": "( ͡° ͜ʖ ͡°)",
+        "usage": "\n`!lenny`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "shrug",
+      "help": {
+        "description": "¯\\_(ツ)_/¯",
+        "usage": "\n`!shrug`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "tableflip",
+      "help": {
+        "description": "(╯°□°）╯︵ Tableflip",
+        "usage": "\n`!tableflip` *(alias `!tf`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "untableflip",
+      "help": {
+        "description": "That's right, put it back where it was ノ( ゜-゜ノ)",
+        "usage": "\n`!untableflip` *(alias `!utf`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "flip",
+      "help": {
+        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
+        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "unflip",
+      "help": {
+        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
+        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "fuck",
+      "help": {
+        "explicit": true,
+        "description": "Do something lewddd to another user",
+        "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "larson",
+      "help": {
+        "description": "well\nyeah",
+        "usage": "\n`!larson`",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "mlem",
+      "help": {
+        "description": "Mlem the chat :3",
+        "usage": "\n`!mlem`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "blep",
+      "help": {
+        "description": "Blep the chat :3",
+        "usage": "\n`!blep`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "smol",
+      "help": {
+        "description": "Make teeeeny tiny text",
+        "usage": "\n`!smol <string|user>` *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
+        "category": "Text"
+      }
+    },
+    {
+      "name": "cider",
+      "help": {
+        "description": "Serve the chat some cider",
+        "usage": "\n`!cider`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "poll",
+      "help": {
+        "description": "Create a poll that users can vote on",
+        "usage": "\n`!poll <duration> <option 1>, <option 2>, ..., <option n>`\n`duration` - Duration of the poll. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`option` - a comma seperated list of options to vote for",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "donate",
+      "help": {
+        "description": "**TrixieBot costs $6 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤",
+        "usage": "\n`!donate`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "version",
+      "help": {
+        "description": "Returns the currently running version of TrixieBot",
+        "usage": "\n`!version` *(alias `!v`)*",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "invite",
+      "help": {
+        "description": "Gives a link to invite TrixieBot to your own server.",
+        "usage": "\n`!invite`",
+        "category": "Info"
+      }
+    }
+  ]
+}

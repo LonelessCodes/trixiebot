@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/utils");
 const fetch = require("node-fetch");
 const querystring = require("querystring");
 
@@ -12,7 +13,7 @@ module.exports = async function install(cr) {
                 const member = message.mentions.members.first();
 
                 /** @type {} */
-                const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" + querystring.escape(member.displayName));
+                const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" + querystring.escape(userToString(member)));
                 const magic = await request.json();
                 if (!magic) {
                     throw new Error("API fucked up");

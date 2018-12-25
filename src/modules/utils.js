@@ -91,3 +91,10 @@ module.exports.isOwner = function isOwner(member) {
     const id = member.id;
     return id === ownerId;
 };
+
+module.exports.userToString = function userToString(member, plainText = false) {
+    if (member instanceof Discord.GuildMember) member = member.user;
+    return plainText ?
+        `${member.username}#${member.discriminator}` :
+        `**${member.username}** #${member.discriminator}`;
+};

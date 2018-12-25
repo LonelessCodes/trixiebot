@@ -1,8 +1,8 @@
 const tinytext = require("tiny-text");
 
-const BaseCommand = require("../../class/BaseCommand");
-const HelpContent = require("../../logic/commands/HelpContent");
-const Category = require("../../logic/commands/Category");
+const BaseCommand = require("../class/BaseCommand");
+const HelpContent = require("../logic/commands/HelpContent");
+const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
     cr.register("smol", new class extends BaseCommand {

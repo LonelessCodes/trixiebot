@@ -1,5 +1,6 @@
 const log = require("../../modules/log");
 const secureRandom = require("../../modules/secureRandom");
+const Discord = require("discord.js");
 
 const emoticons = [
     "¯(°_o)/¯",
@@ -15,6 +16,11 @@ const emoticons = [
 ];
 
 class Keyword {
+    async run(message) {
+        if (message.author.bot) return;
+        
+        await this.call(message);
+    }
     async call() { }
 }
 
@@ -22,7 +28,7 @@ const keywords = [];
 
 module.exports = async function install(cr, client) {
     client.addListener("message", async message => {
-        keywords.forEach(key => key.call(message));
+        keywords.forEach(key => key.run(message));
     });
 
     keywords.push(new class extends Keyword {
@@ -40,7 +46,9 @@ module.exports = async function install(cr, client) {
         async call(message) {
             if (!/lone pone\b/gi.test(message.content)) return;
 
-            await message.channel.send("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
+            const attachment = new Discord.Attachment("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
+
+            await message.channel.send(attachment);
         }
     });
 };

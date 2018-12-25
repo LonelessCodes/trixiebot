@@ -111,8 +111,10 @@ module.exports = async function install(cr) {
         }
     })
         .setHelp(new HelpContent()
-            .setDescription("Query the MLP Wikia for fun!")
+            .setDescription("Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.")
             .setUsage("<query>", "come look it up with me owo")
             .addParameter("query", "what you would like to look up"))
-        .setCategory(Category.UTILS);
+        .setCategory(Category.MLP);
+    
+    cr.registerAlias("mlp", "pony");
 };

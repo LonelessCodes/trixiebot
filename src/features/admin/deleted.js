@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/utils");
 const log = require("../../modules/log");
 const CONST = require("../../modules/CONST");
 const Discord = require("discord.js");
@@ -99,8 +100,8 @@ module.exports = async function install(cr, client, config, db) {
                     str += ` | ${timestamp} | `;
 
                     const member = message.guild.members.get(deleted_message.memberId);
-                    if (member) str += `**${member.displayName}**: `;
-                    else str += "**deleted user**";
+                    if (member) str += `${userToString(member)}: `;
+                    else str += "**deleted user**: ";
 
                     str += "\n";
                     str += `\`${deleted_message.message.replace(/`/g, "´")}\``;

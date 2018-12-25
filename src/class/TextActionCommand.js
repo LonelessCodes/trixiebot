@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/utils");
 const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../modules/secureRandom");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -30,7 +31,7 @@ class TextActionCommand extends BaseCommand {
             await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
             return;
         }
-        else await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), mention.displayName));
+        else await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), userToString(mention)));
     }
 
     setAllowEveryone(v) {

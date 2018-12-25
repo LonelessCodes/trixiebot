@@ -18,6 +18,8 @@ function HelpToJSON(config, name, command) {
 
     const json = {};
 
+    if (command.explicit) json.explicit = true;
+
     if (help.description) json.description = help.description;
 
     const prefix = config.prefix;

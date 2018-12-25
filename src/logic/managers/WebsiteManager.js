@@ -1,3 +1,4 @@
+const { userToString } = require("../../modules/utils");
 const ipc = require("../ipc");
 const AliasCommand = require("../../class/AliasCommand");
 const Category = require("../commands/Category");
@@ -135,7 +136,7 @@ class WebsiteManager {
                 const channel = this.client.channels.get(row.channelId);
                 const user = this.client.users.get(row.memberId);
                 deleted.push({
-                    user: user ? user.username : "unknown-user",
+                    user: user ? userToString(user, true) : "unknown-user",
                     channel: {
                         id: channel ? channel.id : row.channelId,
                         name: channel ? channel.name : "deleted-channel"

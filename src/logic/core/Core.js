@@ -1,13 +1,17 @@
 const log = require("../../modules/log");
 const NanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/utils");
+const helpToJSON = require("../../logic/managers/website/helpToJSON.js");
 const stats = require("../stats");
 const statsDatabaseWrapper = require("../statsDatabaseWrapper");
 const path = require("path");
+const fs = require("fs-extra");
 const secureRandom = require("../../modules/secureRandom");
 const WebsiteManager = require("../managers/WebsiteManager");
 const CommandProcessor = require("../processor/CommandProcessor");
 const CommandListener = require("../listener/CommandListener");
+// eslint-disable-next-line no-unused-vars
+const ConfigManager = require("../managers/ConfigManager");
 const CalendarEvents = require("../CalendarEvents");
 
 const Discord = require("discord.js");
@@ -68,6 +72,21 @@ class Core {
 
             log(`installed time:${(timer.end() / 1000000000).toFixed(3)}ms file:${path.basename(file)}`);
         }));
+
+        const jason = {
+            prefix: this.config.default_config.prefix,
+            commands: []
+        };
+
+        for (const [name, cmd] of this.processor.REGISTRY.commands) {
+            if (!cmd.help) continue;
+            jason.commands.push({
+                name,
+                help: helpToJSON(this.config.default_config, name, cmd)
+            });
+        }
+
+        await fs.writeFile(path.join(process.cwd(), "resources", "commands.json"), JSON.stringify(jason, null, 2));
 
         log("Commands installed");
     }

@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/utils");
 const log = require("../../modules/log");
 const LocaleManager = require("../../logic/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../modules/time_utils");
@@ -105,7 +106,7 @@ module.exports = async function install(cr, client, config, db) {
             const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
 
             await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
-                users: members.map(member => member.displayName).join(" ")
+                users: members.map(member => userToString(member)).join(" ")
             });
 
             await Promise.all(promises);
@@ -148,8 +149,8 @@ module.exports = async function install(cr, client, config, db) {
                 doc.member = message.guild.members.has(doc.memberId) ?
                     message.guild.members.get(doc.memberId) :
                     null;
-                if (longestName < doc.member.displayName.length) {
-                    longestName = doc.member.displayName.length;
+                if (longestName < userToString(doc.member).length) {
+                    longestName = userToString(doc.member).length;
                 }
                 doc.string = toHumanTime(doc.expiresAt.getTime() - Date.now());
                 if (longestString < doc.string.length) {
@@ -160,8 +161,8 @@ module.exports = async function install(cr, client, config, db) {
             let str = "```";
             for (const doc of docs) {
                 str += "\n";
-                str += doc.member.displayName;
-                str += new Array(longestName - doc.member.displayName.length).fill(" ").join("");
+                str += userToString(doc.member);
+                str += new Array(longestName - userToString(doc.member).length).fill(" ").join("");
                 str += " | ";
                 str += doc.string;
             }
@@ -235,7 +236,7 @@ module.exports = async function install(cr, client, config, db) {
                 .translate("{{users}} is now timeouted for the next {{timeLeft}}")
                 .ifPlural("{{users}} are now timeouted for the next {{timeLeft}}")
                 .fetch(members.size), {
-                users: members.map(member => member.displayName).join(" "),
+                users: members.map(member => userToString(member)).join(" "),
                 timeLeft: msg
             }));
 

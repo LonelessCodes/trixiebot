@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/utils");
 const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../modules/secureRandom");
 const RateLimiter = require("../logic/RateLimiter");
@@ -31,7 +32,7 @@ class TextActionCommand extends BaseCommand {
         }
 
         const phrase = await secureRandom(this.texts);
-        const user = message.mentions.everyone ? `all ${message.guild.members.size} users` : mention.displayName;
+        const user = message.mentions.everyone ? `all ${message.guild.members.size} users` : userToString(mention);
 
         const attachment = new Attachment(this.image);
 

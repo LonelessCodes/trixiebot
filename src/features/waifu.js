@@ -1,4 +1,4 @@
-const { timeout } = require("../modules/utils");
+const { timeout, userToString } = require("../modules/utils");
 const { splitArgs } = require("../modules/string_utils");
 const secureRandom = require("../modules/secureRandom");
 const CONST = require("../modules/CONST");
@@ -120,7 +120,7 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.send({
                 embed: new Discord.RichEmbed()
                     .setColor(CONST.COLOR.PRIMARY)
-                    .setAuthor(`Successful claim!!! Deep snug with ${mentioned_member.displayName} incoming!`, mentioned_member.user.avatarURL)
+                    .setAuthor(`Successful claim!!! Deep snug with ${userToString(mentioned_member, true)} incoming!`, mentioned_member.user.avatarURL)
             });
         }
     }).setHelp(new HelpContent().setUsage("<@mention>", "Claim the person you mentioned if not already claimed."));
@@ -224,7 +224,7 @@ module.exports = async function install(cr, client, config, db) {
             const ownerUser = message.guild.members.get(waifu.ownerId);
             const waifuUser = message.guild.members.get(waifu.waifuId);
 
-            const m1 = await message.channel.send(`**${ownerUser.displayName}**'s waifu **${waifuUser.displayName}** just seemed to have appeared nearby. You are quietly approaching them...`);
+            const m1 = await message.channel.send(`${userToString(ownerUser)}'s waifu ${userToString(waifuUser)} just seemed to have appeared nearby. You are quietly approaching them...`);
             await timeout(1000);
             const m2 = await message.channel.send(".");
             await timeout(500);
@@ -249,12 +249,12 @@ module.exports = async function install(cr, client, config, db) {
                 await m2.edit("... ***ATTACC***", {
                     embed: new Discord.RichEmbed()
                         .setColor(CONST.COLOR.PRIMARY)
-                        .setAuthor(`Successful steal!!! ${waifuUser.displayName} now belongs to you!`, waifuUser.user.avatarURL)
+                        .setAuthor(`Successful steal!!! ${userToString(waifuUser, true)} now belongs to you!`, waifuUser.user.avatarURL)
                 });
                 return;
             } else {
                 await m1.delete();
-                await m2.edit(`**${waifuUser.displayName}** had got wind of your plans and dashed off at the next chance :c`);
+                await m2.edit(`${userToString(waifuUser)} had got wind of your plans and dashed off at the next chance :c`);
                 return;
             }
         }
@@ -291,7 +291,7 @@ module.exports = async function install(cr, client, config, db) {
 
             const waifu = owner_waifus.find(w => w.waifuId === my_waifu.user.id);
             if (!waifu) {
-                await message.channel.send(`**${my_waifu.displayName}** can't be traded, because they don't belong to you!`);
+                await message.channel.send(`${userToString(my_waifu)} can't be traded, because they don't belong to you!`);
                 return;
             }
 
@@ -300,17 +300,17 @@ module.exports = async function install(cr, client, config, db) {
                 guildId: message.guild.id
             });
             if (trade_waifu.ownerId === message.author.id) {
-                await message.channel.send(`**${other_waifu.displayName}** belongs to you. But second @mention should be someone else's waifu.`);
+                await message.channel.send(`${userToString(other_waifu)} belongs to you. But second @mention should be someone else's waifu.`);
                 return;
             }
 
             const other_owner = message.guild.members.get(trade_waifu.ownerId);
             if (!trade_waifu || !other_owner) {
-                await message.channel.send(`**${my_waifu.displayName}** can't be traded, because they don't belong to anyone!`);
+                await message.channel.send(`${userToString(my_waifu)} can't be traded, because they don't belong to anyone!`);
                 return;
             }
 
-            await message.channel.send(`**${other_owner.displayName}**, do you agree to trade your **${other_waifu.displayName}** with **${my_waifu.displayName}**? \`yes\`, \`no\`?`);
+            await message.channel.send(`${userToString(other_owner)}, do you agree to trade your ${userToString(other_waifu)} with ${userToString(my_waifu)}? \`yes\`, \`no\`?`);
 
             const messages = await message.channel.awaitMessages((message) => {
                 if (message.author.id !== other_owner.user.id) return false;
@@ -318,7 +318,7 @@ module.exports = async function install(cr, client, config, db) {
                 return true;
             }, {
                 maxMatches: 1,
-                time: 2 * 60 * 1000
+                time: 4 * 60 * 1000
             });
 
             if (messages.size === 0) {
@@ -329,7 +329,7 @@ module.exports = async function install(cr, client, config, db) {
             const resultContent = messages.first().content;
 
             if (/^(no+|no+pe)\b/i.test(resultContent)) {
-                await message.channel.send(`N'aww :c poor **${message.member.displayName}**`);
+                await message.channel.send(`N'aww :c poor ${userToString(message.member)}`);
                 return;
             }
 
@@ -340,8 +340,8 @@ module.exports = async function install(cr, client, config, db) {
                 embed: new Discord.RichEmbed()
                     .setColor(CONST.COLOR.PRIMARY)
                     .setTitle("Trading")
-                    .setDescription(`**${my_waifu.displayName}** :arrow_right: **${other_owner.displayName}**
-**${message.member.displayName}** :arrow_left: **${other_waifu.displayName}**`)
+                    .setDescription(`${userToString(my_waifu)}** :arrow_right: ${userToString(other_owner)}**` + 
+                    `**${userToString(message.member)}** :arrow_left: **${userToString(other_waifu)}**`)
             });
         }
     }).setHelp(new HelpContent()
@@ -395,7 +395,7 @@ module.exports = async function install(cr, client, config, db) {
                 for (const waifu of owner_waifus) {
                     const member = message.guild.members.get(waifu.waifuId);
                     if (!member) continue;
-                    str += `**${member.user.username}** #${member.user.discriminator}\n`;
+                    str += userToString(member);
                 }
                 embed.setDescription(str);
             }
@@ -403,7 +403,7 @@ module.exports = async function install(cr, client, config, db) {
             if (owner_of_me) {
                 const owner = message.guild.members.get(owner_of_me.ownerId);
                 if (owner)
-                    embed.addField("Owned by", `**${owner.user.username}** #${owner.user.discriminator}\n`);
+                    embed.addField("Owned by", userToString(owner));
             }
 
             embed.setFooter(`Total Waifus: ${owner_waifus.length} - Available Slots: ${slots - owner_waifus.length}`);

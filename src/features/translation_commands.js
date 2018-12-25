@@ -4,6 +4,8 @@ const querystring = require("querystring");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const RateLimiter = require("../logic/RateLimiter");
+const TimeUnit = require("../modules/TimeUnit");
 
 const baseURL = "https://api.funtranslations.com/translate/";
 
@@ -27,7 +29,8 @@ function translator(type, description) {
             .setDescription(description)
             .setUsage("<text>")
             .addParameter("text", "The text to translate"))
-        .setCategory(Category.TEXT);
+        .setCategory(Category.TEXT)
+        .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 2));
 }
 
 module.exports = async function install(cr) {

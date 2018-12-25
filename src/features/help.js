@@ -78,4 +78,5 @@ module.exports = async function install(cr, client, config, database) {
             .addParameterOptional("command", "The name of the command you want help for. Whole command list if omitted"))
         .setCategory(Category.INFO);
     cr.registerAlias("help", "trixie");
+    cr.registerAlias("help", "h");
 };

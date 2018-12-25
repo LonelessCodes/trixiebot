@@ -46,6 +46,7 @@ class BaseCommand {
             this._rateLimitMessageRateLimiter = null;
             this.rateLimiter = null;
         }
+        return this;
     }
     
     async rateLimit(message, commandName) {

@@ -1,6 +1,7 @@
 const botlist_keys = require("../../../keys/botlist_keys.json");
 const request = require("request-promise-native");
 const log = require("../../modules/log");
+const info = require("../../info");
 const NanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/utils");
 const helpToJSON = require("../../logic/managers/website/helpToJSON.js");
@@ -55,7 +56,7 @@ class Core {
         await this.loadCommands();
         await this.attachListeners();
         await this.setStatus();
-        this.setupDiscordBots();
+        if (!info.DEV) this.setupDiscordBots();
     }
 
     async loadCommands() {

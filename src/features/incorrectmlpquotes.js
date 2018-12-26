@@ -20,7 +20,8 @@ module.exports = async function install(cr) {
                     .replace(usernameRegExp, (match, username) => `http://${username}.tumblr.com`));
         })
         .then(q => quotes = q)
-        .then(() => log("mlpquotes", "loaded"));
+        .then(() => log("mlpquotes", "loaded"))
+        .catch(() => { });
 
     cr.register("mlpquote", new class extends BaseCommand {
         async call(message) {

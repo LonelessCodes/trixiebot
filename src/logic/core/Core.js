@@ -158,18 +158,24 @@ class Core {
 
     async updateStatistics() {
         const {
-            divinediscordbots: divinediscordbots_key
+            divinediscordbots: divinediscordbots_key,
+            botsfordiscord: botsfordiscord_key
         } = botlist_keys;
 
         const server_count = this.client.guilds.size;
 
         await Promise.all([
             request.post(`https://divinediscordbots.com/bots/${this.client.user.id}/stats`, {
-                json: {
-                    server_count
-                },
+                json: { server_count },
                 headers: {
                     Authorization: divinediscordbots_key
+                }
+            }),
+            request.post(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
+                json: { server_count },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: botsfordiscord_key
                 }
             })
         ]);

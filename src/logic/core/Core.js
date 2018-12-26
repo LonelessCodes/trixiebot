@@ -1,3 +1,5 @@
+const botlist_keys = require("../../../keys/botlist_keys.json");
+const request = require("request-promise-native");
 const log = require("../../modules/log");
 const NanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/utils");
@@ -53,6 +55,7 @@ class Core {
         await this.loadCommands();
         await this.attachListeners();
         await this.setStatus();
+        this.setupDiscordBots();
     }
 
     async loadCommands() {
@@ -144,6 +147,34 @@ class Core {
         CalendarEvents.NEW_YEARS.on("end", updateStatus);
 
         updateStatus();
+    }
+
+    setupDiscordBots() {
+        this.client.addListener("guildCreate", () => this.updateStatistics());
+        this.client.addListener("guildDelete", () => this.updateStatistics());
+
+        this.updateStatistics();
+    }
+
+    async updateStatistics() {
+        const {
+            divinediscordbots: divinediscordbots_key
+        } = botlist_keys;
+
+        const server_count = this.client.guilds.size;
+
+        await Promise.all([
+            request.post(`https://divinediscordbots.com/bots/${this.client.user.id}/stats`, {
+                json: {
+                    server_count
+                },
+                headers: {
+                    Authorization: divinediscordbots_key
+                }
+            })
+        ]);
+
+        log.debug("Bot List", "Stats updated");
     }
 }
 

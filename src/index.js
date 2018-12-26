@@ -44,7 +44,7 @@ new class App {
 
             // new Parameter("calling", "📞 Accept calls servers", false, Boolean),
             new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
-            new Parameter("explicit", "💦 Use explicit commands in not-nsfw channels?", false, Boolean),
+            // new Parameter("explicit", "💦 Use explicit commands in not-nsfw channels?", false, Boolean),
             // new Parameter("time", "🕑 Time display preference", "24h", ["24h", "12h"]),
 
             new Parameter([

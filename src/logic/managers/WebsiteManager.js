@@ -1,4 +1,4 @@
-const { userToString } = require("../../modules/utils");
+const { userToString, isOwner } = require("../../modules/utils");
 const ipc = require("../ipc");
 const AliasCommand = require("../../class/AliasCommand");
 const Category = require("../commands/Category");
@@ -332,6 +332,52 @@ class WebsiteManager {
                 },
                 disabled: []
             };
+        });
+
+        // ADMIN
+
+        ipc.answer("admin:isadmin", async userId => {
+            const user = this.client.users.get(userId);
+            if (!user) return false;
+
+            const isAdmin = isOwner(user);
+            return isAdmin;
+        });
+
+        ipc.answer("admin:fucks", async (req = {}) => {
+            let fucks = [];
+            if (req.all == true) {
+                fucks = await this.db.collection("fuck").find({}).toArray();
+            } else {
+                fucks = await this.db.collection("fuck").find({
+                    verified: {
+                        $not: {
+                            $eq: true
+                        }
+                    }
+                }).toArray();
+            }
+
+            return {
+                success: true,
+                fucks
+            };
+        });
+
+        ipc.answer("admin:verifyFuck", async ({ fuckId, verified }) => {
+            await this.db.collection("fuck").updateOne({
+                _id: fuckId
+            }, { $set: { verified: !!verified }});
+
+            return { success: true };
+        });
+
+        ipc.answer("admin:deleteFuck", async _id => {
+            await this.db.collection("fuck").deleteOne({
+                _id
+            });
+
+            return { success: true };
         });
     }
 }

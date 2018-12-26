@@ -346,4 +346,7 @@ module.exports = async function install(cr, client, config, db) {
         }
     });
     roleCommand.registerSubCommandAlias("*", "add");
+
+    cr.registerAlias("role", "rank");
+    cr.registerAlias("roles", "ranks");
 };

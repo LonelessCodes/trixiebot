@@ -19,7 +19,10 @@ module.exports = async function install(cr, client, config) {
             const channel = findDefaultChannel(guild);
             if (!channel) return;
 
-            await channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\nI'm TrixieBot, a feature rich Discord bot for pony lovers (or losers, your choice) including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
+            // await channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\nI'm TrixieBot, a feature rich Discord bot for pony lovers including Derpibooru, e621, Giphy, etc. integration as well as great admin features like timeouting users. I can be your fun little bot or mature server management system.\nJust call `!trixie` if you need help");
+            await channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\n" +
+                "I'm TrixieBot, a bot which offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins. My set of commands range from random, simple fun, booru and GIF searching, imageboard commands, great moderation commands and so much more!\n" +
+                "Just call `!trixie` if you need my help");
             log(`Trixie got invited and joined new guild ${guild.name}`);
             updateGuildStatistics();
         });

@@ -21,7 +21,7 @@ module.exports = async function install(cr, client, config, db) {
     const fuckCommand = cr.register("fuck", new TreeCommand)
         .setExplicit()
         .setHelp(new HelpContent()
-            .setDescription("Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions.")
+            .setDescription("Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.")
             .setUsage("<user>")
             .addParameter("user", "the username of the user to fuck"))
         .setCategory(Category.ACTION);
@@ -88,7 +88,7 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
             
-            const phrases = await database.find({}).toArray(); // return only text and author
+            const phrases = await database.find({ verified: true }).toArray(); // return only text and author
             if (phrases.length === 0) {
                 message.channel.send(`I'm sorry, but... I don't have any fucks to give. Add fucks using \`${message.prefix}fuck add\``);
                 log("Couldn't serve fuck phrase. No fuck phrases in DB");

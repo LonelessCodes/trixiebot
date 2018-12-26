@@ -1,8 +1,9 @@
 const discordKeys = require("../keys/discord.json");
 const discordKeyDev = require("../keys/discord_dev.json");
 const log = require("./modules/log");
+const info = require("./info");
 const Discord = require("discord.js");
-const { MongoClient } = require("mongodb");
+const getDatabase = require("./modules/getDatabase");
 const ConfigManager = require("./logic/managers/ConfigManager");
 const LocaleManager = require("./logic/managers/LocaleManager");
 const Core = require("./logic/core/Core");
@@ -26,17 +27,8 @@ new class App {
         });
     }
 
-    async loadDB() {
-        return await MongoClient
-            .connect("mongodb://localhost:27017/", {
-                autoReconnect: true,
-                useNewUrlParser: true
-            })
-            .then(client => client.db(process.env.NODE_ENV === "development" ? "trixiedev" : "trixiebot"));
-    }
-
     async initialize() {
-        this.db = await this.loadDB();
+        this.db = await getDatabase();
 
         const { Parameter } = ConfigManager;
         this.config = new ConfigManager(this.client, this.db, [
@@ -81,7 +73,7 @@ new class App {
         await new Promise(resolve => {
             this.client.once("ready", () => resolve());
 
-            this.client.login(process.env.NODE_ENV === "development" ? discordKeyDev.token : discordKeys.token);
+            this.client.login(info.DEV ? discordKeyDev.token : discordKeys.token);
         });
 
         this.core = new Core(this.client, this.config, this.db);

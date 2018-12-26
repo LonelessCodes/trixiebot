@@ -1,9 +1,10 @@
+const info = require("../info");
 const log = require("../modules/log");
 const uuid = require("uuid");
 const ipc = require("node-ipc");
 
-ipc.config.silent = process.env.NODE_ENV === "development" ? false : true;
-ipc.config.id = process.env.NODE_ENV === "development" ? "trixiedev" : "trixiebot";
+ipc.config.silent = info.DEV ? false : true;
+ipc.config.id = info.DEV ? "trixiedev" : "trixiebot";
 ipc.config.retry = 1000;
 ipc.config.logger = log.bind(log);
 

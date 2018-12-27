@@ -160,12 +160,14 @@ class Core {
     async updateStatistics() {
         const {
             divinediscordbots: divinediscordbots_key,
-            botsfordiscord: botsfordiscord_key
+            botsfordiscord: botsfordiscord_key,
+            "discord.bots.gg": discordbotsgg_key,
+            "botlist.space": botlistspace_key
         } = botlist_keys;
 
         const server_count = this.client.guilds.size;
 
-        await Promise.all([
+        const response = await Promise.all([
             request.post(`https://divinediscordbots.com/bots/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {
@@ -178,10 +180,25 @@ class Core {
                     "Content-Type": "application/json",
                     Authorization: botsfordiscord_key
                 }
+            }),
+            request.post(`https://discord.bots.gg/api/v1/bots/${this.client.user.id}/stats`, {
+                json: { guildCount: server_count },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: discordbotsgg_key
+                }
+            }),
+            request.post(`https://botlist.space/api/bots/${this.client.user.id}`, {
+                json: { server_count },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: botlistspace_key
+                }
             })
         ]);
 
         log.debug("Bot List", "Stats updated");
+        log.debug("Bot List", "Response codes: ", response.map(r => r.status));
     }
 }
 

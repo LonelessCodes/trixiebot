@@ -51,6 +51,7 @@ module.exports = async function install(cr, client, config, database) {
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
+            embed.addField("My Little Pony Commands", sortCommands(categories.get(Category.MLP)));
             embed.addField("Analysis Commands", sortCommands(categories.get(Category.ANALYSIS)));
             embed.addField("Action Commands", sortCommands(categories.get(Category.ACTION)));
             embed.addField("Text Modification Commands", sortCommands(categories.get(Category.TEXT)));

@@ -20,7 +20,8 @@ module.exports = async function install(cr) {
                     .replace(usernameRegExp, (match, username) => `http://${username}.tumblr.com`));
         })
         .then(q => quotes = q)
-        .then(() => log("mlpquotes", "loaded"));
+        .then(() => log("mlpquotes", "loaded"))
+        .catch(() => { });
 
     cr.register("mlpquote", new class extends BaseCommand {
         async call(message) {
@@ -35,7 +36,7 @@ module.exports = async function install(cr) {
     })
         .setHelp(new HelpContent()
             .setDescription("Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com"))
-        .setCategory(Category.FUN)
+        .setCategory(Category.MLP)
         .dontList();
     
     cr.registerAlias("mlpquote", "mlpquotes");

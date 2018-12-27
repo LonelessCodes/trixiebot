@@ -36,7 +36,7 @@ module.exports = async function install(cr) {
     })
         .setHelp(new HelpContent()
             .setDescription("Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com"))
-        .setCategory(Category.FUN)
+        .setCategory(Category.MLP)
         .dontList();
     
     cr.registerAlias("mlpquote", "mlpquotes");

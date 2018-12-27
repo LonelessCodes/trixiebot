@@ -203,6 +203,15 @@
       }
     },
     {
+      "name": "boobs",
+      "help": {
+        "explicit": true,
+        "description": "I wonder what this does",
+        "usage": "\n`!boobs` *(alias `!boobies`, `!bewbs`)*",
+        "category": "Image"
+      }
+    },
+    {
       "name": "catfact",
       "help": {
         "description": "Get you a cat fact that will help you raise your babies better <3",
@@ -284,8 +293,25 @@
       "name": "help",
       "help": {
         "description": "Haha, very funny",
-        "usage": "\n`!help <?command>` *(alias `!trixie`)*\n`command` - optional- The name of the command you want help for. Whole command list if omitted",
+        "usage": "\n`!help <?command>` *(alias `!trixie`, `!h`)*\n`command` - optional- The name of the command you want help for. Whole command list if omitted",
         "category": "Info"
+      }
+    },
+    {
+      "name": "horsepussy",
+      "help": {
+        "explicit": true,
+        "description": "Get some gud quality horse pussi OwO",
+        "usage": "\n`!horsepussy` *(alias `!horsepussi`, `!ponypussy`, `!ponypussi`, `!ponepussi`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "mlpquote",
+      "help": {
+        "description": "Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com",
+        "usage": "\n`!mlpquote` *(alias `!mlpquotes`)*",
+        "category": "Fun"
       }
     },
     {
@@ -309,7 +335,7 @@
       "name": "role",
       "help": {
         "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
-        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\nAdmin Area:",
+        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\nAdmin Area:",
         "category": "Utility"
       }
     },
@@ -341,6 +367,7 @@
       "name": "pirate",
       "help": {
         "description": "Translate something into pirate-ish",
+        "rateLimiter": "1 hour",
         "usage": "\n`!pirate <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -349,6 +376,7 @@
       "name": "yoda",
       "help": {
         "description": "Translate something into yoda-ish",
+        "rateLimiter": "1 hour",
         "usage": "\n`!yoda <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -357,6 +385,7 @@
       "name": "dolan",
       "help": {
         "description": "Translate something into dolan duck-ish",
+        "rateLimiter": "1 hour",
         "usage": "\n`!dolan <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -539,7 +568,7 @@
       "name": "fuck",
       "help": {
         "explicit": true,
-        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions.",
+        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.",
         "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
         "category": "Action"
       }

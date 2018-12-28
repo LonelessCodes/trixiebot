@@ -54,9 +54,6 @@ const defaultSlots = 3;
 //   guildId }
 
 module.exports = async function install(cr, client, config, db) {
-    const cooldown_guild = new Array;
-    const cooldown_user = new Array;
-
     const database = db.collection("waifu");
     const databaseSlots = db.collection("waifu_slots");
 
@@ -152,6 +149,13 @@ module.exports = async function install(cr, client, config, db) {
     }).setHelp(new HelpContent().setUsage("<@mention>", "Unclaim the person you mentioned if already claimed."));
 
     waifuCommand.registerSubCommand("steal", new class extends BaseCommand {
+        constructor() {
+            super();
+
+            this.cooldown_guild = new Array;
+            this.cooldown_user = new Array;
+        }
+
         async call(message) {
             const {
                 mentioned_member,
@@ -165,23 +169,23 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            if (cooldown_guild.includes(message.guild.id)) {
+            if (this.cooldown_guild.includes(message.guild.id)) {
                 await message.channel.sendTranslated("Whoa whoa not so fast! There's also a little global cooldown.");
                 return;
             }
-            cooldown_guild.push(message.guild.id);
+            this.cooldown_guild.push(message.guild.id);
             setTimeout(() => {
-                cooldown_guild.splice(cooldown_guild.indexOf(message.guild.id), 1);
+                this.cooldown_guild.splice(this.cooldown_guild.indexOf(message.guild.id), 1);
             }, 15 * 1000);
 
-            if (cooldown_user.includes(message.guild.id)) {
+            if (this.cooldown_user.includes(message.guild.id)) {
                 await message.channel.sendTranslated("Whoa whoa not so fast! Doing this too often in a row will obvi defeat the purpose of the claim command");
                 return;
             }
-            cooldown_user.push(message.guild.id);
+            this.cooldown_user.push(message.guild.id);
             setTimeout(() => {
-                cooldown_user.splice(cooldown_user.indexOf(message.guild.id), 1);
-            }, 120 * 1000);
+                this.cooldown_user.splice(this.cooldown_user.indexOf(message.guild.id), 1);
+            }, 3 * 60 * 1000);
 
             let waifu;
             if (!mentioned_member) {
@@ -245,22 +249,100 @@ module.exports = async function install(cr, client, config, db) {
                         ownerId: message.author.id
                     }
                 });
-                await m1.delete();
                 await m2.edit("... ***ATTACC***", {
                     embed: new Discord.RichEmbed()
                         .setColor(CONST.COLOR.PRIMARY)
                         .setAuthor(`Successful steal!!! ${userToString(waifuUser, true)} now belongs to you!`, waifuUser.user.avatarURL)
                 });
+                await timeout(60000);
+                await m1.delete();
                 return;
             } else {
-                await m1.delete();
                 await m2.edit(`${userToString(waifuUser)} had got wind of your plans and dashed off at the next chance :c`);
+                await timeout(60000);
+                await m1.delete();
                 return;
             }
         }
     }).setHelp(new HelpContent()
-        .setUsage("<@mention>", "Steals a random waifu with a chance of 5%.")
+        .setUsage("<@mention>", "Steals a random waifu with a chance of 5%. Cooldown: 3 minutes")
         .addParameter("@mention", "The waifu you want to perform actions on"));
+
+    waifuCommand.registerSubCommand("escape", new class extends BaseCommand {
+        constructor() {
+            super();
+
+            this.cooldown_user = new Array;
+        }
+
+        async call(message) {
+            const {
+                owner_of_me
+            } = await getData(message, database, databaseSlots);
+
+            if (!owner_of_me) {
+                await message.channel.send(`You don't... have an owner... BE FREE. FREE AS A BEE. Well..., actually, according to all known laws
+of aviation,
+
+there is no way a bee
+should be able to fly.
+
+Its wings are too small to get
+its fat little body off the ground.
+
+The bee, of course, flies anyway
+  
+because bees don...`);
+                return;
+            }
+
+            if (this.cooldown_user.includes(message.guild.id)) {
+                await message.channel.sendTranslated("Whoa whoa not so fast! Doing this too often in a row will obvi defeat the purpose of this all");
+                return;
+            }
+            this.cooldown_user.push(message.guild.id);
+            setTimeout(() => {
+                this.cooldown_user.splice(this.cooldown_user.indexOf(message.guild.id), 1);
+            }, 5 * 60 * 1000);
+
+            const ownerUser = message.guild.members.get(owner_of_me.ownerId);
+
+            const m1 = await message.channel.send(`You are out for walkies with your owner, ${userToString(ownerUser)}. You are following them and their orders, preparing for the perfect escape...`);
+            await timeout(1000);
+            const m2 = await message.channel.send("As if out of nowhere you pull on your leash.");
+            await timeout(500);
+            await m2.edit("As if out of nowhere you pull on your leash..");
+            await timeout(500);
+            await m2.edit("As if out of nowhere you pull on your leash...");
+
+            const random = await secureRandom(101);
+
+            await timeout(1500);
+
+            if (random > 95) {
+                await database.deleteOne({
+                    guildId: message.guild.id,
+                    waifuId: message.author.id
+                });
+                await message.channel.send("... ***ATTACC***\nThe leash tore and you are dashing off in the free world", {
+                    embed: new Discord.RichEmbed()
+                        .setColor(CONST.COLOR.PRIMARY)
+                        .setAuthor(`Successful escape!!! ${userToString(message.member, true)} is now free!`, message.author.avatarURL)
+                });
+                await timeout(60000);
+                await m1.delete();
+                await m2.delete();
+                return;
+            } else {
+                await message.channel.send(`${userToString(ownerUser)} reacted quickly and grabs you by your arm. "One day..." you mumble to yourself.`);
+                await timeout(60000);
+                await m1.delete();
+                await m2.delete();
+                return;
+            }
+        }
+    }).setHelp(new HelpContent()
+        .setUsage("", "Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes"));
 
     waifuCommand.registerSubCommand("trade", new class extends BaseCommand {
         async call(message, content) {

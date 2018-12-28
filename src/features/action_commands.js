@@ -68,7 +68,8 @@ module.exports = async function install(cr) {
         .setAllowEveryone(true);
 
     cr.register("lick", new TextActionCommand("Lick someone clean!", "*licks {{user}}* :heart:", "*licks you*"))
-        .setAllowEveryone(true);
+        .setAllowEveryone(true)
+        .setExplicit(true);
 
     cr.register("tickle", new TextActionCommand("Nuuuu I'm so ticklish!!!! >~<\nTickle someone", "*tickles {{user}}*", "*tickles you*"))
         .setAllowEveryone(true);

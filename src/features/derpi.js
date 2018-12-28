@@ -7,7 +7,25 @@ const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
-async function get(params) {
+//                                                                                               no real gore, but candy gore is allowed
+const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "(gore AND -candy gore)", "foal abuse"];
+
+function findAndRemove(arr, elem) {
+    const i = arr.indexOf(elem);
+    if (i > -1) arr.splice(i, 1);
+}
+
+function getArtist(tags) {
+    const arr = tags.split(/,\s*/g);
+    for (const tag of arr) {
+        if (/^artist:[\w\s]+/gi.test(tag)) {
+            const artist = tag.replace(/^artist:/i, "");
+            return artist;
+        }
+    }
+}
+
+async function fetchDerpi(params) {
     const scope = params.scope || "search";
     delete params.scope;
 
@@ -16,10 +34,12 @@ async function get(params) {
         string.push(key + "=" + params[key]);
     string = string.join("&");
 
-    const result = await fetch(`https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`, {
-        timeout: 10000
-    });
-    return await result.json();
+    const url = `https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`;
+
+    const response = await fetch(url, { timeout: 10000 })
+        .then(request => request.json());
+
+    return response;
 }
 
 async function process(message, msg, type) {
@@ -32,7 +52,7 @@ async function process(message, msg, type) {
         const numParse = parseInt(args[0]);
         if (typeof numParse === "number" && !Number.isNaN(numParse)) {
             if (numParse < 1 || numParse > 5) {
-                await message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
+                message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
                 return;
             }
             amount = numParse;
@@ -44,83 +64,133 @@ async function process(message, msg, type) {
         args[0] = "";
     }
 
-    let query = args[1].replace(/,\s+/g, ",").replace(/\s+/g, "+").toLowerCase();
+    const tags = args[1].toLowerCase().split(/,\s*/g);
 
-    if (query === "") {
-        await message.channel.send(await message.channel.translate("`query` **must** be given"));
+    if (tags.length === 0) {
+        await message.channel.sendTranslated("`query` **must** be given");
         return;
     }
 
-    if (!message.channel.nsfw &&
-        !/explicit|questionable|suggestive|grimdark|semi-grimdark|grotesque/gi.test(query)) {
-        query += ",safe";
+    // filter nsfw tags in sfw channel
+    if (!message.channel.nsfw) {
+        for (const tag of ["explicit", "questionable", "suggestive", "grimdark", "semi-grimdark", "grotesque"])
+            findAndRemove(tags, tag);
+        tags.push("safe");
     }
 
-    let images = [];
-    let ids = [];
+    // filter tags that are not allowed by the discord community guidelines
+    const length_before = tags.length;
+    for (const tag of filter_tags) findAndRemove(tags, tag);
 
+    let warning = "";
+    if (length_before > tags.length) warning = "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly\n";
+    tags.push(...filter_tags.map(tag => "-" + tag));
+
+    // join to a query string
+    const query = tags.join(",").replace(/\s+/g, "+");
+    
+    const results = [];
+    const promises = [];
+    let responses = [];
     let result;
     switch (type) {
         case "first":
-            result = await get({
+            result = await fetchDerpi({
                 q: query,
                 sf: "id",
-                sd: "asc"
+                sd: "asc",
+                perpage: amount
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
-                images.push("https:" + image.representations.large);
-                ids.push(image.id);
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artist: getArtist(image.tags)
+                });
             }
             break;
         case "latest":
-            result = await get({
+            result = await fetchDerpi({
                 q: query,
                 sf: "id",
-                sd: "desc"
+                sd: "desc",
+                perpage: amount
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
-                images.push("https:" + image.representations.large);
-                ids.push(image.id);
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artist: getArtist(image.tags)
+                });
             }
             break;
         case "top":
-            result = await get({
+            result = await fetchDerpi({
                 q: query,
                 sf: "score",
-                sd: "desc"
+                sd: "desc",
+                perpage: amount
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
-                images.push("https:" + image.representations.large);
-                ids.push(image.id);
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artist: getArtist(image.tags)
+                });
             }
             break;
         case "random":
-            result = await get({
+            result = await fetchDerpi({
                 q: query
             });
             for (let i = 0; i < Math.min(amount, result.total); i++) {
-                images.push(get({
+                const promise = fetchDerpi({
                     q: query,
                     random_image: "true"
-                }).then(({ id }) => get({
-                    scope: id
-                })));
+                }).then(response => fetchDerpi({ scope: response.id }));
+                promises.push(promise);
             }
-            images = await Promise.all(images);
-            ids = images.map(image => image.id);
-            images = images.map(image => "https:" + image.representations.large + " *<https://derpibooru.org/" + image.id + ">*");
+            responses = await Promise.all(promises);
+
+            for (const image of responses) {
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artist: getArtist(image.tags)
+                });
+            }
             break;
     }
 
-    if (images.length === 0) {
-        await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+    if (results.length === 0) {
+        if (warning === "") await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+        else await message.channel.sendTranslated(warning);
         return;
     }
 
-    const output = images.join("\n");
+    /*
+    Credit MUST always be given to the site in the form of a link. 
+
+    If images are used, the artist MUST always be credited (if provided) 
+    and the original source URL MUST be displayed alongside the image, 
+    either in textual form or as a link. A link to the Derpibooru page 
+    is optional but recommended; we recommend the derpibooru.org domain
+    as a canonical domain. The https protocol MUST be specified on all 
+    URIs; Derpibooru does not support plaintext HTTP connections.
+
+    (from Derpibooru API License)
+    */
+
+    const output = warning + results.map(result => {
+        let str = "";
+        if (result.artist) str += `**${result.artist}** `;
+        str += `*<https://derpibooru.org/${result.id}>* `;
+        str += `https:${result.image_url}`;
+        return str;
+    }).join("\n");
 
     await message.channel.send(output);
 }
@@ -128,7 +198,7 @@ async function process(message, msg, type) {
 module.exports = async function install(cr) {
     const derpiCommand = cr.register("derpi", new TreeCommand)
         .setHelp(new HelpContent()
-            .setDescription("Search images on Derpibooru. This command ***does not*** return lewd images in a not nsfw channel! Unless you explicitly give the query the `explicit`, `questionable` or `suggestive` tag! Same for Grimdark and grotesque."))
+            .setDescription("Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
         .setCategory(Category.IMAGE);
 
     /**

@@ -12,7 +12,7 @@ module.exports = async function install(cr, client, config, db) {
     const database = db.collection("penis");
 
     const penisCommand = cr.register("penis", new TreeCommand)
-        .setExplicit()
+        .setExplicit(true)
         .setHelp(new HelpContent()
             .setDescription("Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.")
             .setUsage("<?mention>")

@@ -178,13 +178,13 @@ module.exports = async function install(cr, client, config, db) {
                 this.cooldown_guild.splice(this.cooldown_guild.indexOf(message.guild.id), 1);
             }, 15 * 1000);
 
-            if (this.cooldown_user.includes(message.guild.id)) {
+            if (this.cooldown_user.includes(message.author.id)) {
                 await message.channel.sendTranslated("Whoa whoa not so fast! Doing this too often in a row will obvi defeat the purpose of the claim command");
                 return;
             }
-            this.cooldown_user.push(message.guild.id);
+            this.cooldown_user.push(message.author.id);
             setTimeout(() => {
-                this.cooldown_user.splice(this.cooldown_user.indexOf(message.guild.id), 1);
+                this.cooldown_user.splice(this.cooldown_user.indexOf(message.author.id), 1);
             }, 3 * 60 * 1000);
 
             let waifu;
@@ -296,13 +296,13 @@ because bees don...`);
                 return;
             }
 
-            if (this.cooldown_user.includes(message.guild.id)) {
+            if (this.cooldown_user.includes(message.author.id)) {
                 await message.channel.sendTranslated("Whoa whoa not so fast! Doing this too often in a row will obvi defeat the purpose of this all");
                 return;
             }
-            this.cooldown_user.push(message.guild.id);
+            this.cooldown_user.push(message.author.id);
             setTimeout(() => {
-                this.cooldown_user.splice(this.cooldown_user.indexOf(message.guild.id), 1);
+                this.cooldown_user.splice(this.cooldown_user.indexOf(message.author.id), 1);
             }, 5 * 60 * 1000);
 
             const ownerUser = message.guild.members.get(owner_of_me.ownerId);

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.28.0"></a>
+# [1.28.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.27.1...v1.28.0) (2018-12-28)
+
+
+### Features
+
+* **waifu:** added waifu escape command ([3496320](https://bitbucket.org/Loneless/trixiebot/commits/3496320))
+
+
+
 <a name="1.27.0"></a>
 # [1.27.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.25.6...v1.27.0) (2018-12-28)
 

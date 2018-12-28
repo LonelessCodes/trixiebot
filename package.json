@@ -1,13 +1,13 @@
 {
   "name": "trixiebot",
-  "version": "1.27.0",
+  "version": "1.27.1",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development node index.js",
     "setup": "chmod +x install.sh && ./install.sh",
-    "release": "standard-version"
+    "release": "node tag_commit.js && standard-version"
   },
   "keywords": [
     "discord",

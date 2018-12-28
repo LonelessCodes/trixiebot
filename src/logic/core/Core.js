@@ -174,39 +174,39 @@ class Core {
                 headers: {
                     Authorization: divinediscordbots_key
                 }
-            }),
+            }).catch(err => err),
             request.post(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: botsfordiscord_key
                 }
-            }),
+            }).catch(err => err),
             request.post(`https://discord.bots.gg/api/v1/bots/${this.client.user.id}/stats`, {
                 json: { guildCount: server_count },
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: discordbotsgg_key
                 }
-            }),
+            }).catch(err => err),
             request.post(`https://botlist.space/api/bots/${this.client.user.id}`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: botlistspace_key
                 }
-            }),
+            }).catch(err => err),
             request.post(`https://ls.terminal.ink/api/v2/bots/${this.client.user.id}`, {
                 json: { bot: { count: server_count } },
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: terminalink_key
                 }
-            })
+            }).catch(err => err)
         ]);
 
         log.debug("Bot List", "Stats updated");
-        log.debug("Bot List", "Response codes: ", response.map(r => r.status));
+        log.debug("Bot List", "Response codes: ", response.map(r => r.statusCode || 200));
     }
 }
 

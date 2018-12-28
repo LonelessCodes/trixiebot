@@ -395,7 +395,7 @@ module.exports = async function install(cr, client, config, db) {
                 for (const waifu of owner_waifus) {
                     const member = message.guild.members.get(waifu.waifuId);
                     if (!member) continue;
-                    str += userToString(member);
+                    str += userToString(member) + "\n";
                 }
                 embed.setDescription(str);
             }

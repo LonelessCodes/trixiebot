@@ -69,7 +69,7 @@ async function process(message, msg, type) {
         args[0] = "";
     }
 
-    const tags = args[1].toLowerCase().split(/,?\s+/g);
+    const tags = args[1].toLowerCase().trim().split(/,?\s+/g);
 
     if (tags.length === 0) {
         await message.channel.send(await message.channel.translate("`query` **must** be given"));

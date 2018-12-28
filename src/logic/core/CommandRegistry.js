@@ -1,6 +1,6 @@
 const log = require("../../modules/log");
-const { isOwner } = require("../../modules/utils");
-const { splitArgs } = require("../../modules/string_utils");
+const { isOwner } = require("../../modules/util");
+const { splitArgs } = require("../../modules/util/string");
 // eslint-disable-next-line no-unused-vars
 const BaseCommand = require("../../class/BaseCommand");
 const AliasCommand = require("../../class/AliasCommand");

@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
-const { timeout, roll } = require("../modules/utils");
+const { timeout, roll } = require("../modules/util");
 const fetch = require("node-fetch");
 const EventEmitter = require("events");
 const Discord = require("discord.js");

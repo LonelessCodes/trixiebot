@@ -3,8 +3,8 @@ const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
-const { resolveStdout, findDefaultChannel, isOwner } = require("../../modules/utils");
-const { splitArgs } = require("../../modules/string_utils");
+const { resolveStdout, findDefaultChannel, isOwner } = require("../../modules/util");
+const { splitArgs } = require("../../modules/util/string");
 const ipc = require("../../logic/ipc");
 const Discord = require("discord.js");
 

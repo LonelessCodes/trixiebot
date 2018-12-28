@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const { timeout } = require("../modules/utils");
+const { timeout } = require("../modules/util");
 const secureRandom = require("../modules/secureRandom");
 
 const BaseCommand = require("../class/BaseCommand");

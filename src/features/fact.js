@@ -1,5 +1,5 @@
 const { promisify } = require("util");
-const { timeout } = require("../modules/utils");
+const { timeout } = require("../modules/util");
 const log = require("../modules/log");
 const secureRandom = require("../modules/secureRandom");
 const Twit = require("twit");

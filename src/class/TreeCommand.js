@@ -1,6 +1,6 @@
 const BaseCommand = require("./BaseCommand");
 const AliasCommand = require("./AliasCommand");
-const { splitArgs } = require("../modules/string_utils");
+const { splitArgs } = require("../modules/util/string");
 
 class TreeCommand extends BaseCommand {
     constructor(permissions) {

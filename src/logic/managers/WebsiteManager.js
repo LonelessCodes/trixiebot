@@ -1,4 +1,4 @@
-const { userToString, isOwner } = require("../../modules/utils");
+const { userToString, isOwner } = require("../../modules/util");
 const ipc = require("../ipc");
 const AliasCommand = require("../../class/AliasCommand");
 const Category = require("../commands/Category");

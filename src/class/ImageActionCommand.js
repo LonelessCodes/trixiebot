@@ -1,4 +1,4 @@
-const { userToString } = require("../modules/utils");
+const { userToString } = require("../modules/util");
 const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../modules/secureRandom");
 const RateLimiter = require("../logic/RateLimiter");

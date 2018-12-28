@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const { findArgs } = require("../modules/string_utils");
+const { findArgs } = require("../modules/util/string");
 const Discord = require("discord.js");
 
 const AliasCommand = require("../class/AliasCommand");

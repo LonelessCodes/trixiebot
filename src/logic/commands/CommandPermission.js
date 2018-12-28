@@ -1,4 +1,4 @@
-const { isOwner } = require("../../modules/utils");
+const { isOwner } = require("../../modules/util");
 const { Permissions, GuildMember } = require("discord.js");
 
 const { FLAGS } = Permissions;

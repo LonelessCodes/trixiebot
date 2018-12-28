@@ -1,4 +1,4 @@
-const { timeout } = require("../modules/utils");
+const { timeout } = require("../modules/util");
 const fetch = require("node-fetch");
 
 /**

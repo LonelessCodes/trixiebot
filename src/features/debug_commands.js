@@ -1,8 +1,8 @@
 const log = require("../modules/log");
 const stats = require("../logic/stats");
 const os = require("os");
-const { toHumanTime } = require("../modules/time_utils");
-const { timeout } = require("../modules/utils");
+const { toHumanTime } = require("../modules/util/time");
+const { timeout } = require("../modules/util");
 const INFO = require("../info");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");

@@ -1,5 +1,5 @@
-const { timeout, userToString } = require("../modules/utils");
-const { splitArgs } = require("../modules/string_utils");
+const { timeout, userToString } = require("../modules/util");
+const { splitArgs } = require("../modules/util/string");
 const secureRandom = require("../modules/secureRandom");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");

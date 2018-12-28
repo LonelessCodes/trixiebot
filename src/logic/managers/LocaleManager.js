@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
-const { isPlainObject } = require("../../modules/utils");
+const { isPlainObject } = require("../../modules/util");
 const { po } = require("gettext-parser");
 const Gettext = require("node-gettext");
 const DocumentCache = require("../DocumentCache");

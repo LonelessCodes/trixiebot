@@ -1,4 +1,4 @@
-const { timeout } = require("../../modules/utils");
+const { timeout } = require("../../modules/util");
 
 const BaseCommand = require("../../class/BaseCommand");
 const TreeCommand = require("../../class/TreeCommand");

@@ -1,7 +1,7 @@
-const { userToString } = require("../../modules/utils");
+const { userToString } = require("../../modules/util");
 const log = require("../../modules/log");
 const LocaleManager = require("../../logic/managers/LocaleManager");
-const { toHumanTime, parseHumanTime } = require("../../modules/time_utils");
+const { toHumanTime, parseHumanTime } = require("../../modules/util/time");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../../class/BaseCommand");

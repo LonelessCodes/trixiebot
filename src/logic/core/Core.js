@@ -159,10 +159,11 @@ class Core {
 
     async updateStatistics() {
         const {
-            divinediscordbots: divinediscordbots_key,
-            botsfordiscord: botsfordiscord_key,
+            "divinediscordbots.com": divinediscordbots_key,
+            "botsfordiscord.com": botsfordiscord_key,
             "discord.bots.gg": discordbotsgg_key,
-            "botlist.space": botlistspace_key
+            "botlist.space": botlistspace_key,
+            "terminal.ink": terminalink_key
         } = botlist_keys;
 
         const server_count = this.client.guilds.size;
@@ -193,6 +194,13 @@ class Core {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: botlistspace_key
+                }
+            }),
+            request.post(`https://ls.terminal.ink/api/v2/bots/${this.client.user.id}`, {
+                json: { bot: { count: server_count } },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: terminalink_key
                 }
             })
         ]);

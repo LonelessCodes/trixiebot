@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.28.1"></a>
+## [1.28.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.0...v1.28.1) (2018-12-28)
+
+
+### Bug Fixes
+
+* **waifu:** cooldown typos fixed ([72ad396](https://bitbucket.org/Loneless/trixiebot/commits/72ad396))
+
+
+
 <a name="1.28.0"></a>
 # [1.28.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.27.1...v1.28.0) (2018-12-28)
 

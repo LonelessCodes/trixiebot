@@ -76,6 +76,7 @@
     {
       "name": "lick",
       "help": {
+        "explicit": true,
         "description": "Lick someone clean!",
         "usage": "\n`!lick <@user>`",
         "category": "Action"
@@ -261,7 +262,7 @@
     {
       "name": "derpi",
       "help": {
-        "description": "Search images on Derpibooru. This command ***does not*** return lewd images in a not nsfw channel! Unless you explicitly give the query the `explicit`, `questionable` or `suggestive` tag! Same for Grimdark and grotesque.",
+        "description": "Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
         "usage": "\n`!derpi` *(alias `!db`)*\n\n`!derpi random <?amount> <query>` *(alias `!derpi`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)\n\n`!derpi top <?amount> <query>`\n\n`!derpi latest <?amount> <query>`\n\n`!derpi first <?amount> <query>`",
         "category": "Image"
       }
@@ -269,8 +270,8 @@
     {
       "name": "e621",
       "help": {
-        "description": "Search images on e621. This command ***does not*** return lewd images in a not nsfw channel! Unless you explicitly give the query the `rating:e` or `rating:q` tag!",
-        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`",
+        "description": "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
+        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional- Popular by 'day', 'week' or 'month'. Default: 'week'",
         "category": "Image"
       }
     },
@@ -311,7 +312,7 @@
       "help": {
         "description": "Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com",
         "usage": "\n`!mlpquote` *(alias `!mlpquotes`)*",
-        "category": "Fun"
+        "category": "My Little Pony"
       }
     },
     {
@@ -410,7 +411,7 @@
       "name": "waifu",
       "help": {
         "description": "This tool helps you manage your waifus with ease!",
-        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%.\n`@mention` - The waifu you want to perform actions on\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n",
+        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 3 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n",
         "category": "Action"
       }
     },

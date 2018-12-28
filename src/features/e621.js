@@ -86,6 +86,8 @@ async function process(message, msg, type) {
     // filter tags that are not allowed by the discord community guidelines
     let warning = "";
     if (filter_tags.some(tag => tags.includes(tag))) {
+        for (const tag of filter_tags)
+            findAndRemove(tags, tag);
         warning = "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly\n";
     }
 

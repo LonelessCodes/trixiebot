@@ -36,8 +36,6 @@ new class App {
 
             // new Parameter("calling", "📞 Accept calls servers", false, Boolean),
             new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
-            // new Parameter("explicit", "💦 Use explicit commands in not-nsfw channels?", false, Boolean),
-            // new Parameter("time", "🕑 Time display preference", "24h", ["24h", "12h"]),
 
             new Parameter([
                 new Parameter("announce.channel", "Channel. 'none' disables announcements", null, Discord.TextChannel, true),
@@ -57,9 +55,7 @@ new class App {
             new Parameter([
                 new Parameter("ban.enabled", "true/false", false, Boolean),
                 new Parameter("ban.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true)
-            ], "🔨 Announce banned users"),
-
-            // new Parameter("disabled", "❌ Disabled Channels", [], new ParameterList(Discord.TextChannel))
+            ], "🔨 Announce banned users")
         ]);
 
         this.locale = new LocaleManager(this.client, this.db, [

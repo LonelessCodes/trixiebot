@@ -82,7 +82,7 @@ module.exports = async function install(cr, client, config, db) {
 
     fuckCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message) {
-            const mention = message.mentions.members.first();
+            const mention = message.alt_mentions.members.first();
             if (!mention) {
                 await HelpBuilder.sendHelp(message, fuckCommand.name, fuckCommand);
                 return;

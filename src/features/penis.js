@@ -28,9 +28,9 @@ module.exports = async function install(cr, client, config, db) {
             const uom = message.guild.config.uom;
             const r = uom === "cm" ? 2.54 : 1;
 
-            const member = message.mentions.members.first() || message.member;
+            const member = message.alt_mentions.members.first() || message.member;
 
-            if (message.mentions.everyone) {
+            if (message.alt_mentions.everyone) {
                 await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
                 log("Requested everyone's dicks");
                 return;

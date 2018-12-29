@@ -9,8 +9,8 @@ const Category = require("../logic/commands/Category");
 module.exports = async function install(cr) {
     cr.register("trump", new class extends BaseCommand {
         async call(message) {
-            if (message.mentions.members.size > 0) {
-                const member = message.mentions.members.first();
+            if (message.alt_mentions.members.size > 0) {
+                const member = message.alt_mentions.members.first();
 
                 /** @type {} */
                 const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" + querystring.escape(userToString(member)));

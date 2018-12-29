@@ -90,7 +90,7 @@ module.exports = async function install(cr, client, config, db) {
 
     timeoutCommand.registerSubCommand("remove", new class extends BaseCommand {
         async call(message) {
-            const members = message.mentions.members.array();
+            const members = message.alt_mentions.members.array();
 
             for (const member of members) {
                 await database_messages.updateMany({
@@ -180,19 +180,21 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            if (message.mentions.members.has(message.member.id)) {
+            let members = message.alt_mentions.members;
+
+            if (members.has(message.member.id)) {
                 await message.channel.sendTranslated("You cannot timeout yourself, dummy!");
                 log("Gracefully aborted attempt to timeout themselves");
                 return;
             }
 
-            if (message.mentions.members.has(message.client.user.id)) {
+            if (members.has(message.client.user.id)) {
                 await message.channel.sendTranslated("You cannot timeout TrixieBot! I own you.");
                 log("Gracefully aborted attempt to timeout TrixieBot");
                 return;
             }
 
-            const members = message.mentions.members.array();
+            members = members.array();
 
             for (const member of members) {
                 if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {

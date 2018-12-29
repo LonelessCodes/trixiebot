@@ -8,7 +8,7 @@ const Category = require("../../logic/commands/Category");
 module.exports = async function install(cr) {
     cr.register("flip", new class extends BaseCommand {
         async call(message, content) {
-            const mention = message.mentions.members.first();
+            const mention = message.alt_mentions.members.first();
             if (!mention) {
                 if (content === "") {
                     await message.channel.send(`Usage: \`${message.prefix}flip <user|string>\``);
@@ -26,7 +26,7 @@ module.exports = async function install(cr) {
 
     cr.register("unflip", new class extends BaseCommand {
         async call(message, content) {
-            const mention =  message.mentions.members.first();
+            const mention =  message.alt_mentions.members.first();
             if (!mention) {
                 if (content === "") {
                     await message.channel.send(`Usage: \`${message.prefix}unflip <user|string>\``);

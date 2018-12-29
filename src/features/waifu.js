@@ -185,7 +185,7 @@ module.exports = async function install(cr, client, config, db) {
             this.cooldown_user.push(message.guild.id);
             setTimeout(() => {
                 this.cooldown_user.splice(this.cooldown_user.indexOf(message.guild.id), 1);
-            }, 3 * 60 * 1000);
+            }, 5 * 60 * 1000);
 
             let waifu;
             if (!mentioned_member) {
@@ -265,7 +265,7 @@ module.exports = async function install(cr, client, config, db) {
             }
         }
     }).setHelp(new HelpContent()
-        .setUsage("<@mention>", "Steals a random waifu with a chance of 5%. Cooldown: 3 minutes")
+        .setUsage("<@mention>", "Steals a random waifu with a chance of 5%. Cooldown: 5 minutes")
         .addParameter("@mention", "The waifu you want to perform actions on"));
 
     waifuCommand.registerSubCommand("escape", new class extends BaseCommand {

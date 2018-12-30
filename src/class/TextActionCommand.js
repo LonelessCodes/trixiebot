@@ -1,4 +1,4 @@
-const { userToString } = require("../modules/utils");
+const { userToString } = require("../modules/util");
 const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../modules/secureRandom");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -19,15 +19,15 @@ class TextActionCommand extends BaseCommand {
     }
 
     async run(message) {
-        const mention = message.mentions.members.first();
-        if (!mention && !message.mentions.everyone) {
+        const mention = message.alt_mentions.members.first();
+        if (!mention && !message.alt_mentions.everyone) {
             await message.channel.sendTranslated(this.noMentionMessage);
             return;
         }
 
         const phrase = await secureRandom(this.texts);
 
-        if (message.mentions.everyone) {
+        if (message.alt_mentions.everyone) {
             await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
             return;
         }

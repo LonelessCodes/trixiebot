@@ -7,7 +7,9 @@
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development node index.js",
     "setup": "chmod +x install.sh && ./install.sh",
-    "release": "standard-version"
+    "release": "standard-version",
+    "releaseminor": "standard-version --release-as minor",
+    "releasepatch": "standard-version --release-as patch"
   },
   "keywords": [
     "discord",

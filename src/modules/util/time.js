@@ -1,4 +1,4 @@
-const TimeUnit = require("./TimeUnit");
+const TimeUnit = require("../TimeUnit");
 
 const names = ["d", "h", "m", "s"];
 

@@ -1,5 +1,5 @@
 const derpibooruKey = require("../../keys/derpibooru.json");
-const { splitArgs } = require("../modules/string_utils");
+const { splitArgs } = require("../modules/util/string");
 const fetch = require("node-fetch");
 
 const BaseCommand = require("../class/BaseCommand");

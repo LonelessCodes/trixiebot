@@ -1,4 +1,4 @@
-const { isPlainObject } = require("../../modules/utils");
+const { isPlainObject } = require("../../modules/util");
 const { Db } = require("mongodb");
 const { Client, TextChannel } = require("discord.js");
 const DocumentCache = require("../DocumentCache");

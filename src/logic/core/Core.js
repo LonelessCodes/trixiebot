@@ -3,7 +3,7 @@ const request = require("request-promise-native");
 const log = require("../../modules/log");
 const info = require("../../info");
 const NanoTimer = require("../../modules/NanoTimer");
-const { walk } = require("../../modules/utils");
+const { walk } = require("../../modules/util");
 const helpToJSON = require("../../logic/managers/website/helpToJSON.js");
 const stats = require("../stats");
 const statsDatabaseWrapper = require("../statsDatabaseWrapper");
@@ -163,7 +163,8 @@ class Core {
             "botsfordiscord.com": botsfordiscord_key,
             "discord.bots.gg": discordbotsgg_key,
             "botlist.space": botlistspace_key,
-            "terminal.ink": terminalink_key
+            "terminal.ink": terminalink_key,
+            "discordbotlist.com": discordbotlist_key
         } = botlist_keys;
 
         const server_count = this.client.guilds.size;
@@ -201,6 +202,17 @@ class Core {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: terminalink_key
+                }
+            }).catch(err => err),
+            request.post(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
+                json: { 
+                    guilds: server_count,
+                    users: this.client.users.size,
+                    voice_connections: this.client.voiceConnections.size
+                },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bot " + discordbotlist_key
                 }
             }).catch(err => err)
         ]);

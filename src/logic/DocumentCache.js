@@ -1,4 +1,4 @@
-const { isPlainObject } = require("../modules/utils");
+const { isPlainObject } = require("../modules/util");
 const { CronJob } = require("cron");
 
 // DatabaseCache does not scale well now. Memory usage goes up linear to database size

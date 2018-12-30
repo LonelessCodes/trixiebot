@@ -1,4 +1,4 @@
-const { userToString } = require("../modules/utils");
+const { userToString } = require("../modules/util");
 const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../modules/secureRandom");
 const RateLimiter = require("../logic/RateLimiter");
@@ -25,14 +25,15 @@ class TextActionCommand extends BaseCommand {
     }
 
     async run(message) {
-        const mention = message.mentions.members.first();
-        if (!mention && !message.mentions.everyone) {
+        const mentions = message.alt_mentions;
+        const mention = mentions.members.first();
+        if (!mention && !mentions.everyone) {
             await message.channel.sendTranslated(this.noMentionMessage);
             return;
         }
 
         const phrase = await secureRandom(this.texts);
-        const user = message.mentions.everyone ? `all ${message.guild.members.size} users` : userToString(mention);
+        const user = mentions.everyone ? `all ${message.guild.members.size} users` : userToString(mention);
 
         const attachment = new Attachment(this.image);
 

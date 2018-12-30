@@ -1,6 +1,6 @@
 const log = require("../../modules/log");
-const { isOwner } = require("../../modules/utils");
-const { splitArgs } = require("../../modules/string_utils");
+const { isOwner } = require("../../modules/util");
+const { splitArgs } = require("../../modules/util/string");
 // eslint-disable-next-line no-unused-vars
 const BaseCommand = require("../../class/BaseCommand");
 const AliasCommand = require("../../class/AliasCommand");
@@ -8,6 +8,7 @@ const TreeCommand = require("../../class/TreeCommand");
 const Category = require("../commands/Category");
 const CommandPermission = require("../commands/CommandPermission");
 const HelpBuilder = require("../commands/HelpBuilder");
+const MessageMentions = require("../../modules/getMentions");
 
 class CommandRegistry {
     constructor(client, config, database) {
@@ -80,6 +81,8 @@ class CommandRegistry {
                 category !== Category.MODERATION &&
                 category !== Category.OWNER) return false;
         }
+
+        message.alt_mentions = new MessageMentions(content, message.guild);
 
         const promises = new Map;
 

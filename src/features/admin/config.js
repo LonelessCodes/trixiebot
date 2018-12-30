@@ -1,4 +1,4 @@
-const { findArgs } = require("../../modules/string_utils");
+const { findArgs } = require("../../modules/util/string");
 const CONST = require("../../modules/CONST");
 const Discord = require("discord.js");
 

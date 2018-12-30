@@ -1,4 +1,4 @@
-const { userToString } = require("../../modules/utils");
+const { userToString } = require("../../modules/util");
 const CONST = require("../../modules/CONST");
 const Discord = require("discord.js");
 

@@ -1,7 +1,7 @@
-const { userToString } = require("../../modules/utils");
+const { userToString } = require("../../modules/util");
 const log = require("../../modules/log");
 const stats = require("../../logic/stats");
-const { findDefaultChannel } = require("../../modules/utils");
+const { findDefaultChannel } = require("../../modules/util");
 const { format } = require("../../logic/managers/LocaleManager");
 
 module.exports = async function install(cr, client, config) {

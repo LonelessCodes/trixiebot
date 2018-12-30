@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const { findArgs } = require("../modules/string_utils");
+const { findArgs } = require("../modules/util/string");
 const Discord = require("discord.js");
 
 const AliasCommand = require("../class/AliasCommand");
@@ -48,10 +48,10 @@ async function rolesMessage(guild, channel, db) {
         for (const role of roles) {
             roles_message += role.name + new Array((maxLength - role.name.length) + 1 + (numberLength - role.members.size.toString().length)).fill(" ").join("") + role.members.size + " members\n";
         }
-        
+
         roles_message += "```\n";
     }
-    
+
     if (roles_message === "") {
         return await channel.translate("This server doesn't have any publicly available roles :/");
     } else {
@@ -80,7 +80,7 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            const members = message.mentions.members.array();
+            const members = message.alt_mentions.members.array();
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
             if (members.length > 0) {
                 if (!permission) {
@@ -166,7 +166,7 @@ module.exports = async function install(cr, client, config, db) {
             .addParameter("role", "The role you would like to have removed")
             .addParameter("user mention", "This is irrelevant to you, if you don't have rights to manage roles yourself"));
 
-    const listRoles = new class extends BaseCommand {
+    const listRoles = roleCommand.registerSubCommand("available", new class extends BaseCommand {
         get help() {
             return new HelpContent().setUsage("", "Show all public roles that you can add to yourself.");
         }
@@ -174,8 +174,7 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.send(await rolesMessage(message.guild, message.channel, database));
             log(`Requested available roles for guild ${message.guild.name}`);
         }
-    };
-    roleCommand.registerSubCommand("available", listRoles);
+    });
     cr.register("roles", new AliasCommand("role", listRoles));
 
     const roleConfig = roleCommand.registerSubCommand("config", new TreeCommand)
@@ -257,7 +256,7 @@ module.exports = async function install(cr, client, config, db) {
             }
 
             // get all mentions
-            const members = message.mentions.members.array();
+            const members = message.alt_mentions.members.array();
             // check permission of author
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
             // if there are mentions perform action to add roles to other users

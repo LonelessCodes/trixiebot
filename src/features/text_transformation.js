@@ -7,7 +7,7 @@ const Category = require("../logic/commands/Category");
 module.exports = async function install(cr) {
     cr.register("smol", new class extends BaseCommand {
         async call(message, content) {
-            const mention = message.mentions.members.first();
+            const mention = message.alt_mentions.members.first();
             if (!mention) {
                 const text = content.replace(/[^\S\x0a\x0d]+/g, " ");
                 if (text === "") {

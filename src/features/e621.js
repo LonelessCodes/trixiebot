@@ -1,4 +1,4 @@
-const { splitArgs } = require("../modules/string_utils");
+const { splitArgs } = require("../modules/util/string");
 const secureRandom = require("../modules/secureRandom");
 const fetch = require("node-fetch");
 const INFO = require("../info");

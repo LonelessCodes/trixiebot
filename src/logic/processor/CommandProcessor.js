@@ -1,4 +1,4 @@
-const { splitArgs } = require("../../modules/string_utils");
+const { splitArgs } = require("../../modules/util/string");
 const CommandRegistry = require("../core/CommandRegistry");
 
 class CommandProcessor {

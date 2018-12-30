@@ -1,4 +1,4 @@
-const { toHumanTime } = require("../modules/time_utils");
+const { toHumanTime } = require("../modules/util/time");
 const { Message, Channel, Guild } = require("discord.js");
 const LocaleManager = require("../logic/managers/LocaleManager");
 const CommandPermission = require("../logic/commands/CommandPermission");

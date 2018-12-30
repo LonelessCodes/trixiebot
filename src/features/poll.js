@@ -1,6 +1,6 @@
 const log = require("../modules/log");
 const LocaleManager = require("../logic/managers/LocaleManager");
-const { parseHumanTime, toHumanTime } = require("../modules/time_utils");
+const { parseHumanTime, toHumanTime } = require("../modules/util/time");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 

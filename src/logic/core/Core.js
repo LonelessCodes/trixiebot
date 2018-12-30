@@ -163,7 +163,8 @@ class Core {
             "botsfordiscord.com": botsfordiscord_key,
             "discord.bots.gg": discordbotsgg_key,
             "botlist.space": botlistspace_key,
-            "terminal.ink": terminalink_key
+            "terminal.ink": terminalink_key,
+            "discordbots.org": discordbots_key
         } = botlist_keys;
 
         const server_count = this.client.guilds.size;
@@ -201,6 +202,13 @@ class Core {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: terminalink_key
+                }
+            }).catch(err => err),
+            request.post(`https://discordbots.org/api/bots/${this.client.user.id}/stats`, {
+                json: { server_count },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: discordbots_key
                 }
             }).catch(err => err)
         ]);

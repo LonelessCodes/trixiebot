@@ -1,7 +1,6 @@
 const { timeout, userToString } = require("../modules/util");
 const { splitArgs } = require("../modules/util/string");
 const secureRandom = require("../modules/secureRandom");
-const MessageMentions = require("../modules/getMentions");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 
@@ -10,8 +9,8 @@ const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
-async function getData(msg, message, database, databaseSlots) {
-    const mentions = new MessageMentions(msg, message.guild);
+async function getData(message, database, databaseSlots) {
+    const mentions = message.alt_mentions;
     const mentioned_member = mentions.members.first();
 
     const all_waifus = await database.find({ guildId: message.guild.id }).toArray();
@@ -71,12 +70,12 @@ module.exports = async function install(cr, client, config, db) {
      */
 
     waifuCommand.registerSubCommand("claim", new class extends BaseCommand {
-        async call(message, msg) {
+        async call(message) {
             const {
                 mentioned_member,
                 owner_waifus,
                 slots
-            } = await getData(msg, message, database, databaseSlots);
+            } = await getData(message, database, databaseSlots);
 
             if (!mentioned_member) {
                 await message.channel.send("must give @ mention your dream waifu!");
@@ -126,11 +125,11 @@ module.exports = async function install(cr, client, config, db) {
     }).setHelp(new HelpContent().setUsage("<@mention>", "Claim the person you mentioned if not already claimed."));
 
     waifuCommand.registerSubCommand("unclaim", new class extends BaseCommand {
-        async call(message, msg) {
+        async call(message) {
             const {
                 mentioned_member,
                 owner_waifus
-            } = await getData(msg, message, database, databaseSlots);
+            } = await getData(message, database, databaseSlots);
 
             if (!mentioned_member) {
                 await message.channel.send("must give @ mention!");
@@ -165,7 +164,7 @@ module.exports = async function install(cr, client, config, db) {
                 owner_waifus,
                 all_waifus,
                 slots
-            } = await getData(msg, message, database, databaseSlots);
+            } = await getData(message, database, databaseSlots);
 
             if (slots - owner_waifus.length === 0) {
                 await message.channel.send("Stop it. Get some help. You have filled all your waifu slots already!");
@@ -348,11 +347,11 @@ because bees don...`);
         .setUsage("", "Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes"));
 
     waifuCommand.registerSubCommand("trade", new class extends BaseCommand {
-        async call(message, content) {
+        async call(message) {
             const {
                 mentions,
                 owner_waifus
-            } = await getData(content, message, database, databaseSlots);
+            } = await getData(message, database, databaseSlots);
 
             if (message.mentions.members.size !== 2) {
                 await message.channel.send("Specify waifu you want to trade, and the waifu you want to have.");
@@ -433,12 +432,12 @@ because bees don...`);
         .addParameter("@other waifu", "Must be someone's waifu. This is the one you want to get"));
 
     // waifuCommand.registerSubCommand("buyslot", new class extends BaseCommand {
-    //     async call(message, msg) {
+    //     async call(message) {
     //         const {
     //             mentioned_member,
     //             owner_waifus,
     //             owner_of_me
-    //         } = await getData(msg, message, database);
+    //         } = await getData(message, database);
     //     }
     // });
 
@@ -460,12 +459,12 @@ because bees don...`);
         .setCategory(Category.OWNER);
 
     waifuCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, msg) {
+        async call(message) {
             const {
                 owner_waifus,
                 owner_of_me,
                 slots
-            } = await getData(msg, message, database, databaseSlots);
+            } = await getData(message, database, databaseSlots);
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setThumbnail(message.author.avatarURL);

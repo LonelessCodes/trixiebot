@@ -226,7 +226,6 @@ class Core {
         ]);
 
         log.debug("Bot List", "Stats updated");
-        log.debug("Bot List", "Response codes: ", response.map(r => r.statusCode || 200));
     }
 }
 

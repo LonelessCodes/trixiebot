@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.29.0"></a>
+# [1.29.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.1...v1.29.0) (2018-12-30)
+
+
+### Bug Fixes
+
+* fixed some optional property issues ([6b3e85d](https://bitbucket.org/Loneless/trixiebot/commits/6b3e85d))
+* **mention users:** fixed mentioning in waifu command ([02e9788](https://bitbucket.org/Loneless/trixiebot/commits/02e9788))
+* **waifu:** cooldown set higher ([46be470](https://bitbucket.org/Loneless/trixiebot/commits/46be470))
+
+
+### Features
+
+* **stats:** post stats to discordbotlist.com ([acfccd5](https://bitbucket.org/Loneless/trixiebot/commits/acfccd5))
+* Instead of mentioning users, can also Username[#0000](https://bitbucket.org/Loneless/trixiebot/issues/0000) them ([8e93701](https://bitbucket.org/Loneless/trixiebot/commits/8e93701))
+* **stats:** post stats to discordbots.org ([6afaf39](https://bitbucket.org/Loneless/trixiebot/commits/6afaf39))
+* **votes:** added vote webhooks ([648df90](https://bitbucket.org/Loneless/trixiebot/commits/648df90))
+
+
+
 <a name="1.28.1"></a>
 ## [1.28.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.0...v1.28.1) (2018-12-28)
 

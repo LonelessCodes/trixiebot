@@ -164,7 +164,8 @@ class Core {
             "discord.bots.gg": discordbotsgg_key,
             "botlist.space": botlistspace_key,
             "terminal.ink": terminalink_key,
-            "discordbotlist.com": discordbotlist_key
+            "discordbotlist.com": discordbotlist_key,
+            "discordbots.org": discordbots_key
         } = botlist_keys;
 
         const server_count = this.client.guilds.size;
@@ -205,7 +206,7 @@ class Core {
                 }
             }).catch(err => err),
             request.post(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
-                json: { 
+                json: {
                     guilds: server_count,
                     users: this.client.users.size,
                     voice_connections: this.client.voiceConnections.size
@@ -213,6 +214,13 @@ class Core {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: "Bot " + discordbotlist_key
+                }
+            }).catch(err => err),
+            request.post(`https://discordbots.org/api/bots/${this.client.user.id}/stats`, {
+                json: { server_count },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: discordbots_key
                 }
             }).catch(err => err)
         ]);

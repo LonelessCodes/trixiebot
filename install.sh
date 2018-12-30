@@ -10,6 +10,7 @@ sudo ufw allow http # HTTP
 sudo ufw allow https # HTTPS
 sudo ufw allow ssh # SSH
 sudo ufw allow 8080 # Dev Port
+sudo ufw allow 5000 # Votes Port
 sudo ufw enable # Run firewall
 
 # install build-essentials

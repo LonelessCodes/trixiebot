@@ -26,7 +26,7 @@ module.exports = async function install(cr, client, config, db) {
             if (!timeout_notices[message.channel.id])
                 timeout_notices[message.channel.id] = {};
             
-            const timeout_entry = await database.findOne({ guildId: message.guild.id, memberId: message.member.id });
+            const timeout_entry = await database.findOne({ guildId: message.guild.id, memberId: message.author.id });
             if (timeout_entry) {
                 const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
                 if (timeleft > 0) {

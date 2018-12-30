@@ -13,7 +13,7 @@ module.exports = async function install(cr) {
             embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
             embed.setThumbnail(message.guild.iconURL);
 
-            embed.addField("Owner", message.guild.owner.user.tag, true);
+            if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
             embed.addField("ID", message.guild.id, true);
             embed.addField("User Count", message.guild.memberCount, true);
             embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }), true);

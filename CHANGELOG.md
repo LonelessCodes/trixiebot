@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.29.1"></a>
+## [1.29.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.0...v1.29.1) (2018-12-31)
+
+
+### Bug Fixes
+
+* **upvotes:** forgot to import UpvotesManager in Core xD ([95f4beb](https://bitbucket.org/Loneless/trixiebot/commits/95f4beb))
+
+
+
 <a name="1.29.0"></a>
 # [1.29.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.1...v1.29.0) (2018-12-30)
 

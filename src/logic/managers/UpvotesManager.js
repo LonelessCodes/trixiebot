@@ -6,8 +6,10 @@ const tokens = require("../../../keys/botlist_keys.json");
 const secrets = require("../../../keys/webhook.json");
 
 class UpvotesManager extends EventEmitter {
-    constructor(db) {
+    constructor(client, db) {
         super();
+
+        this.client = client;
 
         this.port = 5000;
         this.path = "/webhook/upvote/";

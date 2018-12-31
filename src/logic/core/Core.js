@@ -15,6 +15,7 @@ const CommandProcessor = require("../processor/CommandProcessor");
 const CommandListener = require("../listener/CommandListener");
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("../managers/ConfigManager");
+const UpvotesManager = require("../managers/UpvotesManager");
 const CalendarEvents = require("../CalendarEvents");
 
 const Discord = require("discord.js");
@@ -41,6 +42,7 @@ class Core {
         this.processor = new CommandProcessor(this.client, this.config, this.db);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.db);
         this.commandListener = new CommandListener(this.processor);
+        this.upvotes = new UpvotesManager(this.client, this.db);
     }
 
     setCommandsPackage(commands_package) {

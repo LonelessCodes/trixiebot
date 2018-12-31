@@ -411,7 +411,7 @@
       "name": "waifu",
       "help": {
         "description": "This tool helps you manage your waifus with ease!",
-        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 3 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n",
+        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n",
         "category": "Action"
       }
     },

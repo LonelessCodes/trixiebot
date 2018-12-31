@@ -1,4 +1,5 @@
 const { userToString, isOwner } = require("../../modules/util");
+const getChangelog = require("../../modules/getChangelog");
 const ipc = require("../ipc");
 const AliasCommand = require("../../class/AliasCommand");
 const Category = require("../commands/Category");
@@ -378,6 +379,11 @@ class WebsiteManager {
             });
 
             return { success: true };
+        });
+
+        ipc.answer("site:changelog", async () => {
+            const changelog = await getChangelog();
+            return { logs: changelog };
         });
     }
 }

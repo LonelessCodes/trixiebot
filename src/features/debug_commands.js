@@ -3,6 +3,7 @@ const stats = require("../logic/stats");
 const os = require("os");
 const { toHumanTime } = require("../modules/util/time");
 const { timeout } = require("../modules/util");
+const getChangelog = require("../modules/getChangelog");
 const INFO = require("../info");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
@@ -51,8 +52,6 @@ function getCPUInfo() {
     };
 }
 
-
-
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
@@ -70,7 +69,7 @@ module.exports = async function install(cr, client) {
                 + "Bot Version: " + INFO.VERSION + "\n"
                 + "Node.js Version: " + process.version.substr(1) + "\n"
                 + "Discord.js Version: " + Discord.version + "\n"
-                + "CPU Usage: " + ((await getCPUUsage()) * 100).toFixed(1) + "%" + "\n"
+                + "CPU Usage: " + ((await getCPUUsage()) * 100).toFixed(0) + "%" + "\n"
                 + "CPU Cores: " + os.cpus().length + "\n"
                 + "Memory Usage: " + ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB" + "\n"
                 + "Server Uptime: " + toHumanTime(Math.floor(os.uptime() * 1000)) + "\n"
@@ -80,6 +79,7 @@ module.exports = async function install(cr, client) {
                 + "Users: " + users.size + "\n"
                 + "Channels: " + channels.size + "\n"
                 + "Executed Commands: " + stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).get() + "\n"
+                + "Processed Messages: " + stats.bot.get(stats.bot.NAME.MESSAGES_TODAY).get() + "\n"
                 + "```");
         }
     })
@@ -120,4 +120,35 @@ module.exports = async function install(cr, client) {
         .setHelp(new HelpContent()
             .setDescription("Get some statistics from Trixie regarding herself"))
         .setCategory(Category.INFO);
+    
+    cr.register("changelog", new class extends BaseCommand {
+        async call(message) {
+            const logs = await getChangelog();
+
+            const latest = logs[0];
+            const embed = new Discord.RichEmbed()
+                .setColor(CONST.COLOR.PRIMARY);
+
+            embed.setTitle("v" + latest.version);
+
+            const s = latest.body.split("\n");
+            let title = null;
+            let str = "";
+            for (const line of s) {
+                if (line.startsWith("###")) {
+                    if (title) embed.addField(title, str.trim());
+                    else embed.setDescription(str.trim());
+                    str = "";
+                    title = line.replace(/^###+\s+/, "");
+                }
+                else str += line;
+            }
+            if (title) embed.addField(title, str.trim());
+            else embed.setDescription(str.trim());
+
+            embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
+
+            await message.channel.send({ embed });
+        }
+    })
 };

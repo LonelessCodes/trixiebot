@@ -4,6 +4,7 @@ const querystring = require("querystring");
 const log = require("../../modules/log");
 const tokens = require("../../../keys/botlist_keys.json");
 const secrets = require("../../../keys/webhook.json");
+const info = require("../../info");
 
 class UpvotesManager extends EventEmitter {
     constructor(client, db) {
@@ -11,7 +12,7 @@ class UpvotesManager extends EventEmitter {
 
         this.client = client;
 
-        this.port = 5000;
+        this.port = info.DEV ? 5001 : 5000;
         this.path = "/webhook/upvote/";
 
         this.db = db.collection("votes");

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.30.0"></a>
+# [1.30.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.1...v1.30.0) (2018-12-31)
+
+
+### Features
+
+* add changelog command ([9e2da74](https://bitbucket.org/Loneless/trixiebot/commits/9e2da74))
+
+
+
 <a name="1.29.1"></a>
 ## [1.29.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.0...v1.29.1) (2018-12-31)
 

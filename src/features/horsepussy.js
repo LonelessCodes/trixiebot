@@ -30,7 +30,11 @@ async function get(params) {
     return await result.json();
 }
 
-const query = "pony, vulva, -penis, nudity, -foalcon, -photo, upvotes.gte:100".replace(/,\s+/g, ",").replace(/\s+/g, "+").toLowerCase();
+const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "gore", "foal abuse"];
+
+const tags = ["pony", "vulva", "-penis", "nudity", "-photo", ...filter_tags.map(tag => "-" + tag), "upvotes.gte:100"];
+
+const query = tags.join(",").replace(/\s+/g, "+").toLowerCase();
 
 async function process(message) {
     const image = await get({

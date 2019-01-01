@@ -5,6 +5,16 @@ const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
+function getArtist(tags) {
+    const arr = tags.split(/,\s*/g);
+    for (const tag of arr) {
+        if (/^artist:[\w\s]+/gi.test(tag)) {
+            const artist = tag.replace(/^artist:/i, "");
+            return artist;
+        }
+    }
+}
+
 async function get(params) {
     const scope = params.scope || "search";
     delete params.scope;
@@ -30,9 +40,14 @@ async function process(message) {
         scope: id
     }));
 
-    const output = "https:" + image.representations.large + " *<https://derpibooru.org/" + image.id + ">*";
+    const artist = getArtist(image.tags);
 
-    await message.channel.send(output);
+    let str = "";
+    if (artist) str += `**${artist}** `;
+    str += `*<https://derpibooru.org/${image.id}>* `;
+    str += `https:${image.representations.large}`;
+
+    await message.channel.send(str);
 }
 
 module.exports = async function install(cr) {

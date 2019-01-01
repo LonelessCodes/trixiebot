@@ -140,7 +140,7 @@ const faces = [
 module.exports = async function install(cr) {
     cr.register("face", new SimpleCommand(() => randomItem(faces))).setHelp(new HelpContent().setDescription("Get a random ASCII face")).setCategory(Category.MISC);
     cr.register("lenny", new TextCommand(faces[0])).setHelp(new HelpContent().setDescription("( ͡° ͜ʖ ͡°)")).setCategory(Category.MISC);
-    cr.register("shrug", new TextCommand(faces[0])).setHelp(new HelpContent().setDescription("¯\\_(ツ)_/¯")).setCategory(Category.MISC);
+    cr.register("shrug", new TextCommand(faces[1])).setHelp(new HelpContent().setDescription("¯\\_(ツ)_/¯")).setCategory(Category.MISC);
 
     cr.register("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻")).setHelp(new HelpContent().setDescription("(╯°□°）╯︵ Tableflip")).setCategory(Category.ACTION);
     cr.registerAlias("tableflip", "tf");

@@ -78,8 +78,8 @@ module.exports = async function install(cr, client) {
                 + "Guilds: " + guilds.size + "\n"
                 + "Users: " + users.size + "\n"
                 + "Channels: " + channels.size + "\n"
-                + "Executed Commands: " + stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).get() + "\n"
-                + "Processed Messages: " + stats.bot.get(stats.bot.NAME.MESSAGES_TODAY).get() + "\n"
+                + "Executed Commands: " + stats.bot.get("COMMANDS_EXECUTED").get() + "\n"
+                + "Processed Messages: " + stats.bot.get("MESSAGES_TODAY").get() + "\n"
                 + "```");
         }
     })
@@ -106,13 +106,13 @@ module.exports = async function install(cr, client) {
         async call(message) {
             const embed = new Discord.RichEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
-                .addField("Total Servers", stats.bot.get(stats.bot.NAME.TOTAL_SERVERS).get().toLocaleString("en"), true)
-                .addField("Large Servers", stats.bot.get(stats.bot.NAME.LARGE_SERVERS).get().toLocaleString("en"), true)
-                .addField("Total Users", stats.bot.get(stats.bot.NAME.TOTAL_USERS).get().toLocaleString("en"), true)
-                .addField("Text Channels", stats.bot.get(stats.bot.NAME.TEXT_CHANNELS).get().toLocaleString("en"), true)
+                .addField("Total Servers", stats.bot.get("TOTAL_SERVERS").get().toLocaleString("en"), true)
+                .addField("Large Servers", stats.bot.get("LARGE_SERVERS").get().toLocaleString("en"), true)
+                .addField("Total Users", stats.bot.get("TOTAL_USERS").get().toLocaleString("en"), true)
+                .addField("Text Channels", stats.bot.get("TEXT_CHANNELS").get().toLocaleString("en"), true)
                 .addField("Active Web Users", stats.web.get(stats.web.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
                 .addField("Total Web Users", stats.web.get(stats.web.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"), true)
-                .addField("Commands Executed", stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).get().toLocaleString("en"), true);
+                .addField("Commands Executed", stats.bot.get("COMMANDS_EXECUTED").get().toLocaleString("en"), true);
 
             await message.channel.send({ embed });
         }

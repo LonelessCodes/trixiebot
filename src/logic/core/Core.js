@@ -6,7 +6,6 @@ const NanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/util");
 const helpToJSON = require("../../logic/managers/website/helpToJSON.js");
 const stats = require("../stats");
-const statsDatabaseWrapper = require("../statsDatabaseWrapper");
 const path = require("path");
 const fs = require("fs-extra");
 const secureRandom = require("../../modules/secureRandom");
@@ -36,8 +35,6 @@ class Core {
         this.commands_package = null;
 
         this.db = db;
-
-        statsDatabaseWrapper(stats, this.db.collection("bot_stats"));
 
         this.processor = new CommandProcessor(this.client, this.config, this.db);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.db);

@@ -1,5 +1,6 @@
 const ipc = require("./ipc");
 const EventEmitter = require("events");
+const database = require("../modules/getDatabase");
 
 class Stat extends EventEmitter {
     /**
@@ -18,25 +19,31 @@ class Stat extends EventEmitter {
         return this._value;
     }
 
+    get value() {
+        return this._value;
+    }
+
+    set value(val) {
+        this._value = val;
+        this.emit("change", this._value);
+    }
+
     /** @param {number} value */
     set(value) {
         this._tmp = value - this._value;
-        this._value = value;
-        this.emit("change", this._value);
+        this.value = value;
     }
 
     /** @param {number} inc */
     inc(inc = 1) {
         this._tmp += inc;
-        this._value += inc;
-        this.emit("change", this._value);
+        this.value += inc;
     }
 
     /** @param {number} dec */
     dec(dec = 1) {
         this._tmp -= dec;
-        this._value -= dec;
-        this.emit("change", this._value);
+        this.value -= dec;
     }
 }
 
@@ -44,24 +51,10 @@ class BotStats extends EventEmitter {
     constructor() {
         super();
 
-        this.NAME = Object.freeze({
-            "TOTAL_SERVERS": "TOTAL_SERVERS",
-            "LARGE_SERVERS": "LARGE_SERVERS",
-            "TEXT_CHANNELS": "TEXT_CHANNELS",
-            "TOTAL_USERS": "TOTAL_USERS",
-            "SHARDS": "SHARDS",
-            "COMMANDS_EXECUTED": "COMMANDS_EXECUTED",
-            "MESSAGES_TODAY": "MESSAGES_TODAY"
-        });
+        this.db = database().then(db => db.collection("bot_stats"));
 
         /** @type {Map<string, Stat>} */
         this._map = new Map;
-
-        for (const name in this.NAME) {
-            const stat = new Stat;
-            stat.on("change", value => this.emit("change", { name, value }));
-            this._map.set(name, stat);
-        }
 
         this.broadcastStats();
     }
@@ -80,12 +73,30 @@ class BotStats extends EventEmitter {
         });
     }
 
-    has(name) {
-        return this._map.has(name);
+    async register(id, saveToDatabase = false) {
+        if (this._map.has(id)) return this._map.get(id);
+
+        const stat = new Stat(id);
+        stat.on("change", val => {
+            this.emit("change", { name: id, value: val });
+            if (saveToDatabase) this.db.then(db => db.updateOne({ name: id }, { $set: { value: val } }, { upsert: true }));
+        });
+        this._map.set(id, stat);
+
+        if (saveToDatabase) {
+            const entry = await this.db.then(db => db.findOne({ name: id }));
+            if (entry) stat.set(entry.value);
+        }
+
+        return stat;
     }
 
-    get(name) {
-        return this._map.get(name);
+    has(id) {
+        return this._map.has(id);
+    }
+
+    get(id) {
+        return this._map.get(id);
     }
 
     toJSON() {

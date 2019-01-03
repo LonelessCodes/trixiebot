@@ -5,11 +5,16 @@ const { findDefaultChannel } = require("../../modules/util");
 const { format } = require("../../logic/managers/LocaleManager");
 
 module.exports = async function install(cr, client, config) {
+    await stats.bot.register("TOTAL_SERVERS");
+    await stats.bot.register("LARGE_SERVERS");
+    await stats.bot.register("TOTAL_USERS");
+    await stats.bot.register("TEXT_CHANNELS");
+
     const updateGuildStatistics = () => {
-        stats.bot.get(stats.bot.NAME.TOTAL_SERVERS).set(client.guilds.size);
-        stats.bot.get(stats.bot.NAME.LARGE_SERVERS).set(client.guilds.filter(guild => !!guild.large).size);
-        stats.bot.get(stats.bot.NAME.TOTAL_USERS).set(client.users.size);
-        stats.bot.get(stats.bot.NAME.TEXT_CHANNELS).set(client.channels.filter(guild => guild.type === "text").size);
+        stats.bot.get("TOTAL_SERVERS").set(client.guilds.size);
+        stats.bot.get("LARGE_SERVERS").set(client.guilds.filter(guild => !!guild.large).size);
+        stats.bot.get("TOTAL_USERS").set(client.users.size);
+        stats.bot.get("TEXT_CHANNELS").set(client.channels.filter(guild => guild.type === "text").size);
     };
 
     updateGuildStatistics();

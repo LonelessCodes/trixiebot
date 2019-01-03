@@ -11,6 +11,9 @@ async function onProcessingError(message, err) {
 class CommandListener {
     constructor(commandProcessor) {
         this.commandProcessor = commandProcessor;
+
+        stats.bot.register("MESSAGES_TODAY", true);
+        stats.bot.register("COMMANDS_EXECUTED", true);
     }
 
     /**
@@ -20,7 +23,7 @@ class CommandListener {
         try {
             if (message.author.bot || message.author.equals(message.client.user)) return;
 
-            stats.bot.get(stats.bot.NAME.MESSAGES_TODAY).inc(1);
+            stats.bot.get("MESSAGES_TODAY").inc(1);
 
             if (message.channel.type === "text") {
                 const self = message.guild.me;
@@ -32,7 +35,7 @@ class CommandListener {
 
             const executed = await this.commandProcessor.run(message);
             if (executed) {
-                stats.bot.get(stats.bot.NAME.COMMANDS_EXECUTED).inc(1);
+                stats.bot.get("COMMANDS_EXECUTED").inc(1);
             }
         } catch (err) {
             onProcessingError(message, err);

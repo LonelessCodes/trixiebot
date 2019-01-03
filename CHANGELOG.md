@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.30.1"></a>
+## [1.30.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.0...v1.30.1) (2019-01-03)
+
+
+### Bug Fixes
+
+* **commands:** fixed shrug command ([22217d5](https://bitbucket.org/Loneless/trixiebot/commits/22217d5))
+* **commands:** horsep**** command following Derpi API License ([9a73861](https://bitbucket.org/Loneless/trixiebot/commits/9a73861))
+
+
+### Features
+
+* new stats logic ([f4f7057](https://bitbucket.org/Loneless/trixiebot/commits/f4f7057))
+
+
+
 <a name="1.30.0"></a>
 # [1.30.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.1...v1.30.0) (2018-12-31)
 

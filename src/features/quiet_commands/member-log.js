@@ -1,6 +1,7 @@
 const { userToString } = require("../../modules/util");
 const log = require("../../modules/log");
 const stats = require("../../logic/stats");
+const guild_stats = require("../../logic/managers/GuildStatsManager");
 const { findDefaultChannel } = require("../../modules/util");
 const { format } = require("../../logic/managers/LocaleManager");
 
@@ -9,6 +10,12 @@ module.exports = async function install(cr, client, config) {
     await stats.bot.register("LARGE_SERVERS");
     await stats.bot.register("TOTAL_USERS");
     await stats.bot.register("TEXT_CHANNELS");
+
+    await guild_stats.register("users", "value");
+
+    for (const [guildId, guild] of client.guilds) {
+        guild_stats.get("users").set(new Date, guildId, null, guild.members.size);
+    }
 
     const updateGuildStatistics = () => {
         stats.bot.get("TOTAL_SERVERS").set(client.guilds.size);
@@ -30,6 +37,8 @@ module.exports = async function install(cr, client, config) {
                 "Just call `!trixie` if you need my help");
             log(`Trixie got invited and joined new guild ${guild.name}`);
             updateGuildStatistics();
+
+            guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
         });
     });
 
@@ -58,6 +67,8 @@ module.exports = async function install(cr, client, config) {
         await channel.send(str);
         log(`New member ${member.user.username} joined guild ${guild.name}`);
         updateGuildStatistics();
+
+        guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
     });
 
     client.addListener("guildMemberRemove", async member => {
@@ -80,6 +91,8 @@ module.exports = async function install(cr, client, config) {
         await channel.send(str);
         log(`Member ${member.user.username} left guild ${guild.name}`);
         updateGuildStatistics();
+
+        guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
     });
 
     client.addListener("guildBanAdd", async (guild, user) => {
@@ -99,5 +112,7 @@ module.exports = async function install(cr, client, config) {
         await channel.send(str);
         log(`User ${user.username} has been banned from guild ${guild.name}`);
         updateGuildStatistics();
+
+        guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
     });
 };

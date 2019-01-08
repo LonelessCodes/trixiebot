@@ -1,6 +1,7 @@
 const { userToString, isOwner } = require("../../modules/util");
 const getChangelog = require("../../modules/getChangelog");
 const ipc = require("../ipc");
+const guild_stats = require("./GuildStatsManager");
 const AliasCommand = require("../../class/AliasCommand");
 const Category = require("../commands/Category");
 
@@ -19,6 +20,43 @@ class WebsiteManager {
 
         ipc.answer("checkGuilds", async guildIds => {
             return guildIds.filter(guildId => this.client.guilds.has(guildId));
+        });
+
+        ipc.answer("overview", async guildId => {
+            const month = new Date;
+            month.setMonth(month.getMonth() - 1);
+
+            const now = new Date;
+
+            const results = await Promise.all([
+                guild_stats.get("commands").getRange(month, now, guildId),
+                guild_stats.get("messages").getRange(month, now, guildId),
+                guild_stats.get("users").getRange(month, now, guildId),
+            ]);
+            return {
+                success: true,
+                commands: {
+                    type: guild_stats.get("commands").type,
+                    data: results[0].map(a => {
+                        a.timestamp = a.timestamp.toString();
+                        return a;
+                    })
+                },
+                messages: {
+                    type: guild_stats.get("messages").type,
+                    data: results[1].map(a => {
+                        a.timestamp = a.timestamp.toString();
+                        return a;
+                    })
+                },
+                users: {
+                    type: guild_stats.get("users").type,
+                    data: results[2].map(a => {
+                        a.timestamp = a.timestamp.toString();
+                        return a;
+                    })
+                },
+            };
         });
 
         ipc.answer("commands", async guildId => {

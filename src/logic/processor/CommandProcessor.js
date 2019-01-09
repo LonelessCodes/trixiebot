@@ -1,4 +1,6 @@
 const { splitArgs } = require("../../modules/util/string");
+const stats = require("../stats");
+const guild_stats = require("../managers/GuildStatsManager");
 const CommandRegistry = require("../core/CommandRegistry");
 
 class CommandProcessor {
@@ -8,6 +10,10 @@ class CommandProcessor {
         this.db = database;
 
         this.REGISTRY = new CommandRegistry(client, config, database);
+
+        stats.bot.register("COMMANDS_EXECUTED", true);
+
+        guild_stats.register("commands", "counter");
     }
 
     async run(message) {
@@ -51,7 +57,15 @@ class CommandProcessor {
 
         // use some stats observing software
 
-        return executed;
+        if (executed) {
+            stats.bot.get("COMMANDS_EXECUTED").inc(1);
+            
+            if (message.channel.type === "text")
+                await guild_stats.get("commands").increment(new Date, message.guild.id, command_name, 1);
+            const start = new Date;
+            start.setHours(start.getHours() - 24);
+            console.log(await guild_stats.get("commands").getRange(start, null, message.guild.id));
+        }
     }
 }
 

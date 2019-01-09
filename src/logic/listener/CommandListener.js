@@ -1,5 +1,6 @@
 const log = require("../../modules/log");
 const stats = require("../stats");
+const guild_stats = require("../managers/GuildStatsManager");
 // eslint-disable-next-line no-unused-vars
 const { Message, TextChannel, Permissions } = require("discord.js");
 
@@ -13,7 +14,8 @@ class CommandListener {
         this.commandProcessor = commandProcessor;
 
         stats.bot.register("MESSAGES_TODAY", true);
-        stats.bot.register("COMMANDS_EXECUTED", true);
+
+        guild_stats.register("messages", "counter");
     }
 
     /**
@@ -24,6 +26,8 @@ class CommandListener {
             if (message.author.bot || message.author.equals(message.client.user)) return;
 
             stats.bot.get("MESSAGES_TODAY").inc(1);
+            if (message.channel.type === "text")
+                guild_stats.get("messages").increment(new Date, message.guild.id, null, 1);
 
             if (message.channel.type === "text") {
                 const self = message.guild.me;
@@ -33,10 +37,7 @@ class CommandListener {
                     return;
             }
 
-            const executed = await this.commandProcessor.run(message);
-            if (executed) {
-                stats.bot.get("COMMANDS_EXECUTED").inc(1);
-            }
+            await this.commandProcessor.run(message);
         } catch (err) {
             onProcessingError(message, err);
         }

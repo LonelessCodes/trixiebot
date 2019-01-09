@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.31.0"></a>
+## [1.31.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.1...v1.31.0) (2019-01-09)
+
+
+### Features
+
+* add guild stats logging ([6a1d858](https://bitbucket.org/Loneless/trixiebot/commits/6a1d858))
+
+
+
 <a name="1.30.1"></a>
 ## [1.30.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.0...v1.30.1) (2019-01-03)
 

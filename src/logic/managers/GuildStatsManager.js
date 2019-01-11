@@ -141,6 +141,24 @@ class Value extends Base {
 
         await this.db.then(db => db.updateOne(query, { $set: { value } }, { upsert: true }));
     }
+
+    async getLastItemBefore(end, data) {
+        const query = {
+            type: this.type,
+            id: this.id,
+            timestamp: {
+                $lte: end
+            }
+        };
+        if (data) query.data = data;
+
+        const rows = await this.db.then(db => db.find(query).sort({ "timestamp": -1 }).limit(1).toArray());
+
+        return rows[0] ? {
+            timestamp: rows[0].timestamp,
+            value: rows[0].value
+        } : undefined;
+    }
 }
 
 class Counter extends Base {

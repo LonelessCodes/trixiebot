@@ -32,6 +32,8 @@ class WebsiteManager {
                 guild_stats.get("commands").getRange(month, now, guildId),
                 guild_stats.get("messages").getRange(month, now, guildId),
                 guild_stats.get("users").getRange(month, now, guildId),
+
+                guild_stats.get("users").getLastItemBefore(month),
             ]);
             return {
                 success: true,
@@ -54,7 +56,8 @@ class WebsiteManager {
                     data: results[2].map(a => {
                         a.timestamp = a.timestamp.toString();
                         return a;
-                    })
+                    }),
+                    before: results[3]
                 },
             };
         });

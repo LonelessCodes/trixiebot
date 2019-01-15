@@ -63,24 +63,32 @@ module.exports = async function install(cr, client) {
             const users = client.users;
             const channels = client.channels;
 
-            await message.channel.send("```prolog\n"
-                + " --------- Technical Information --------- \n\n"
-                + "Commands: " + cr.commands.size + "\n"
-                + "Bot Version: " + INFO.VERSION + "\n"
-                + "Node.js Version: " + process.version.substr(1) + "\n"
-                + "Discord.js Version: " + Discord.version + "\n"
-                + "CPU Usage: " + ((await getCPUUsage()) * 100).toFixed(0) + "%" + "\n"
-                + "CPU Cores: " + os.cpus().length + "\n"
-                + "Memory Usage: " + ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB" + "\n"
-                + "Server Uptime: " + toHumanTime(Math.floor(os.uptime() * 1000)) + "\n"
-                + "Bot Uptime: " + toHumanTime(Math.floor(process.uptime() * 1000)) + "\n"
-                + "\n --------- Trixie Information --------- \n\n"
-                + "Guilds: " + guilds.size + "\n"
-                + "Users: " + users.size + "\n"
-                + "Channels: " + channels.size + "\n"
-                + "Executed Commands: " + stats.bot.get("COMMANDS_EXECUTED").get() + "\n"
-                + "Processed Messages: " + stats.bot.get("MESSAGES_TODAY").get() + "\n"
-                + "```");
+            const embed = new Discord.RichEmbed()
+                .setColor(CONST.COLOR.PRIMARY)
+
+                .addField("Commands", cr.commands.size.toLocaleString("en"))
+
+                .addField("Bot Version", INFO.VERSION, true)
+                .addField("Node.js Version", process.version.substr(1), true)
+                .addField("Discord.js Version", Discord.version)
+
+                .addField("CPU Usage", ((await getCPUUsage()) * 100).toFixed(0) + "%", true)
+                .addField("CPU Cores", os.cpus().length.toString(), true)
+                .addField("Memory Usage", ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB")
+
+                .addField("Uptime", "Server: " + toHumanTime(Math.floor(os.uptime() * 1000)) + ", Bot: " + toHumanTime(Math.floor(process.uptime() * 1000)))
+
+                .addField("Total Servers", guilds.size.toLocaleString("en"), true)
+                .addField("Text Channels", channels.filter(c => c.type === "text").size.toLocaleString("en"), true)
+                .addField("Total Users", users.size.toLocaleString("en"))
+
+                .addField("Executed Commands", stats.bot.get("COMMANDS_EXECUTED").get().toLocaleString("en"), true)
+                .addField("Processed Messages", stats.bot.get("MESSAGES_TODAY").get().toLocaleString("en"))
+
+                .addField("Active Web Users", stats.web.get(stats.web.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
+                .addField("Total Web Users", stats.web.get(stats.web.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"));
+
+            await message.channel.send({ embed });
         }
     })
         .setHelp(new HelpContent().setDescription("Gets the bot technical information. Nothing all that interesting."))
@@ -102,25 +110,6 @@ module.exports = async function install(cr, client) {
         .setCategory(Category.INFO);
     cr.registerAlias("ping", "trixie ping");
 
-    cr.register("stats", new class extends BaseCommand {
-        async call(message) {
-            const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOR.PRIMARY)
-                .addField("Total Servers", stats.bot.get("TOTAL_SERVERS").get().toLocaleString("en"), true)
-                .addField("Large Servers", stats.bot.get("LARGE_SERVERS").get().toLocaleString("en"), true)
-                .addField("Total Users", stats.bot.get("TOTAL_USERS").get().toLocaleString("en"), true)
-                .addField("Text Channels", stats.bot.get("TEXT_CHANNELS").get().toLocaleString("en"), true)
-                .addField("Active Web Users", stats.web.get(stats.web.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
-                .addField("Total Web Users", stats.web.get(stats.web.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"), true)
-                .addField("Commands Executed", stats.bot.get("COMMANDS_EXECUTED").get().toLocaleString("en"), true);
-
-            await message.channel.send({ embed });
-        }
-    })
-        .setHelp(new HelpContent()
-            .setDescription("Get some statistics from Trixie regarding herself"))
-        .setCategory(Category.INFO);
-    
     cr.register("changelog", new class extends BaseCommand {
         async call(message) {
             const logs = await getChangelog();
@@ -150,5 +139,5 @@ module.exports = async function install(cr, client) {
 
             await message.channel.send({ embed });
         }
-    })
+    });
 };

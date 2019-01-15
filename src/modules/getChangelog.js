@@ -1,7 +1,7 @@
 const fs = require("fs-extra");
 const path = require("path");
 
-module.exports = async function () {
+module.exports = async function getChangelog() {
     const p = path.join(__dirname, "..", "..", "CHANGELOG.md");
     if (!(await fs.exists(p))) return [];
 

@@ -5,7 +5,6 @@ const info = require("../../info");
 const NanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/util");
 const helpToJSON = require("../../logic/managers/website/helpToJSON.js");
-const stats = require("../stats");
 const path = require("path");
 const fs = require("fs-extra");
 const secureRandom = require("../../modules/secureRandom");
@@ -169,7 +168,7 @@ class Core {
 
         const server_count = this.client.guilds.size;
 
-        const response = await Promise.all([
+        await Promise.all([
             request.post(`https://divinediscordbots.com/bots/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {

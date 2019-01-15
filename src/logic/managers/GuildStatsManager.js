@@ -219,8 +219,6 @@ class Counter extends Base {
             }
         }).toArray());
 
-        console.log(rows);
-
         return rows[0] ? rows[0].sum : 0;
     }
 
@@ -248,8 +246,6 @@ class Counter extends Base {
             }
         }).toArray());
 
-        console.log(rows);
-
         return rows[0] ? rows[0].sum : 0;
     }
 }
@@ -266,6 +262,7 @@ class GuildStatsManager {
      * Register a new Histogram
      * @param {string} id 
      * @param {"counter"|"value"} type
+     * @returns {Counter|Value}
      */
     register(id, type) {
         if (type === "counter") {

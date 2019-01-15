@@ -64,7 +64,6 @@ class CommandProcessor {
                 await guild_stats.get("commands").increment(new Date, message.guild.id, command_name, 1);
             const start = new Date;
             start.setHours(start.getHours() - 24);
-            console.log(await guild_stats.get("commands").getRange(start, null, message.guild.id));
         }
     }
 }

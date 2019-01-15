@@ -95,7 +95,6 @@ async function process(message, msg, type) {
 
     // join to a query string
     const query = tags.join(" ");
-    console.log(query);
 
     const results = [];
     let whileBreak = 100;
@@ -157,7 +156,6 @@ async function process(message, msg, type) {
                 tags: encodeURIComponent(query),
                 limit: amount
             });
-            console.log(result);
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
                 whileBreak--;

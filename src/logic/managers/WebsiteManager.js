@@ -178,7 +178,7 @@ class WebsiteManager {
                 const channel = this.client.channels.get(row.channelId);
                 const user = this.client.users.get(row.memberId);
                 deleted.push({
-                    user: user ? userToString(user, true) : "unknown-user",
+                    user: user ? userToString(user, true) : (row.name || "unknown-user"), // "unknown-user" for backwards compatability support
                     channel: {
                         id: channel ? channel.id : row.channelId,
                         name: channel ? channel.name : "deleted-channel"

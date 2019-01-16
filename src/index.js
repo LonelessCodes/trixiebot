@@ -8,6 +8,8 @@ const ConfigManager = require("./logic/managers/ConfigManager");
 const LocaleManager = require("./logic/managers/LocaleManager");
 const Core = require("./logic/core/Core");
 
+log("Running trixiebot v" + info.VERSION);
+
 Array.prototype.last = function () {
     return this[this.length - 1];
 };

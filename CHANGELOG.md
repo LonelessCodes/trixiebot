@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.32.0"></a>
+# [1.32.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.31.0...v1.32.0) (2019-01-16)
+
+
+### Bug Fixes
+
+* **deleted command:** save and return user tag from db if user not found ([697cc00](https://bitbucket.org/Loneless/trixiebot/commits/697cc00))
+* **guild stats:** send better stats to web instance ([014fb80](https://bitbucket.org/Loneless/trixiebot/commits/014fb80))
+
+
+### Features
+
+* add guild stats logging ([6a1d858](https://bitbucket.org/Loneless/trixiebot/commits/6a1d858))
+* add stats command for guild stats ([213c988](https://bitbucket.org/Loneless/trixiebot/commits/213c988))
+* chat/cleverbot command added ([b16bb0a](https://bitbucket.org/Loneless/trixiebot/commits/b16bb0a))
+
+
+
 <a name="1.31.0"></a>
 ## [1.31.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.1...v1.31.0) (2019-01-09)
 

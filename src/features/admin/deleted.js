@@ -28,7 +28,6 @@ module.exports = async function install(cr, client, config, db) {
             message: message.content,
             timestamp: new Date(message.createdTimestamp)
         });
-        log(`Caught deleted message ${message.id}`);
     });
 
     const prune = () => database.deleteMany({ timestamp: { $lt: new Date(Date.now() - 7 * 24 * 3600 * 1000) } });

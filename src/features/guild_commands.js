@@ -25,7 +25,7 @@ function findFirstIndex(arr, cb) {
     for (let i = 0; i < arr.length; i++) {
         if (cb(arr[i])) return i;
     }
-    return -1;
+    return arr.length;
 }
 
 /**
@@ -49,6 +49,7 @@ function getString(start, end, [commands, messages, users, last_user]) {
     if (end) {
         if (commands.length) commands = commands.slice(0, findFirstIndex(commands, findIndexEnd));
         if (messages.length) messages = messages.slice(0, findFirstIndex(messages, findIndexEnd));
+        if (users.length) users = users.slice(0, findFirstIndex(users, findIndexEnd));
     }
 
     str += `${messages.reduce((sum, entry) => sum + entry.value, 0)} Messages`;
@@ -57,12 +58,9 @@ function getString(start, end, [commands, messages, users, last_user]) {
     if (commands_total) str += ` and ${commands_total} Commands`;
     
     if (users.length > 0) {
-        const lastIndex = end ? findFirstIndex(users, findIndexEnd) : users.length - 1;
-        let users_diff = users[lastIndex > 0 ?
-            lastIndex - 1 :
-            users.length - 1].value;
+        let users_diff = users[users.length - 1].value;
         
-        const beginIndex = users.indexOf(users[0]);
+        const beginIndex = findFirstIndex(users, findIndex);
         if (beginIndex === 0) users_diff -= last_user ? last_user.value : users[0].value;
         else if (beginIndex > 0) users_diff -= users[beginIndex - 1].value;
 
@@ -97,7 +95,7 @@ function getAverageString(start, divider, [commands, messages, users, last_user]
     if (users.length > 0) {
         let users_diff = users[users.length - 1].value;
 
-        const beginIndex = users.indexOf(users[0]);
+        const beginIndex = findFirstIndex(users, findIndex);
         if (beginIndex === 0) users_diff -= last_user ? last_user.value : users[0].value;
         else if (beginIndex > 0) users_diff -= users[beginIndex - 1].value;
 
@@ -165,7 +163,7 @@ module.exports = async function install(cr) {
             if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
             embed.addField("ID", message.guild.id, true);
             embed.addField("User Count", message.guild.memberCount, true);
-            embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }), true);
+            embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
             embed.addField("Channel Count", message.guild.channels.filter(c => c.type === "text").size, true);
             embed.addField("Emoji Count", message.guild.emojis.size, true);
             embed.addField("Region", message.guild.region, true);

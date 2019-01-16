@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.32.1"></a>
+## [1.32.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.0...v1.32.1) (2019-01-16)
+
+
+### Bug Fixes
+
+* **guild stats:** guild stats command showing right user sums now ([0be9d47](https://bitbucket.org/Loneless/trixiebot/commits/0be9d47))
+* **logging:** stop logging every deleted messages ([0928d9b](https://bitbucket.org/Loneless/trixiebot/commits/0928d9b))
+
+
+
 <a name="1.32.0"></a>
 # [1.32.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.31.0...v1.32.0) (2019-01-16)
 

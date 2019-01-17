@@ -149,10 +149,8 @@ class Core {
     }
 
     setupDiscordBots() {
-        this.client.addListener("guildCreate", () => this.updateStatistics());
-        this.client.addListener("guildDelete", () => this.updateStatistics());
-
         this.updateStatistics();
+        setInterval(() => this.updateStatistics(), 1800 * 1000);
     }
 
     async updateStatistics() {

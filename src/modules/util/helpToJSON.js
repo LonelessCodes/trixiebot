@@ -1,6 +1,6 @@
-const TreeCommand = require("../../../class/TreeCommand");
-const AliasCommand = require("../../../class/AliasCommand");
-const CommandPermission = require("../../commands/CommandPermission");
+const TreeCommand = require("../../class/TreeCommand");
+const AliasCommand = require("../../class/AliasCommand");
+const CommandPermission = require("../../logic/commands/CommandPermission");
 
 function format(message, format = {}) {
     for (const f in format) {

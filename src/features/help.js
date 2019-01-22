@@ -7,6 +7,8 @@ const AliasCommand = require("../class/AliasCommand");
 const HelpBuilder = require("../logic/commands/HelpBuilder");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+// eslint-disable-next-line no-unused-vars
+const CategoryClass = Category.Category;
 
 function sortCommands(commands) {
     return Array.from(commands.keys()).sort().map(s => `\`${s}\``).join(", ");
@@ -35,6 +37,7 @@ module.exports = async function install(cr, client, config, database) {
                 guildId: message.guild.id
             }).toArray();
 
+            /** @type {Map<CategoryClass, Map<string, BaseCommand>>} */
             const categories = new Map;
 
             for (const [name, command] of cr.commands) {
@@ -68,7 +71,7 @@ module.exports = async function install(cr, client, config, database) {
 
             for (const cat of ordered) {
                 const commands = categories.get(cat);
-                if (commands.length > 0) {
+                if (commands && commands.size > 0) {
                     embed.addField(cat.toString() + " Commands", sortCommands(commands));
                 }
             }

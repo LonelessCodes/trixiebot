@@ -49,4 +49,6 @@ module.exports = Object.freeze({
 
     // owner only commands
     OWNER: new Category(CommandPermission.OWNER, "Owner"),
+
+    Category
 });

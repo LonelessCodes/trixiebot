@@ -221,7 +221,7 @@ module.exports = async function install(cr, client, config, db) {
 
             // update message deletion if there
             for (const member of members) {
-                await database_messages.update({
+                await database_messages.updateMany({
                     guildId: message.guild.id,
                     memberId: member.id
                 }, {

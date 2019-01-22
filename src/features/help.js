@@ -51,18 +51,27 @@ module.exports = async function install(cr, client, config, database) {
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
-            embed.addField("My Little Pony Commands", sortCommands(categories.get(Category.MLP)));
-            embed.addField("Analysis Commands", sortCommands(categories.get(Category.ANALYSIS)));
-            embed.addField("Action Commands", sortCommands(categories.get(Category.ACTION)));
-            embed.addField("Text Modification Commands", sortCommands(categories.get(Category.TEXT)));
-            embed.addField("Audio Commands", sortCommands(categories.get(Category.AUDIO)));
-            // embed.addField("Currency Commands", sortCommands(categories.get(Category.CURRENCY)));
-            embed.addField("Images Commands", sortCommands(categories.get(Category.IMAGE)));
-            // embed.addField("Fun Commands", sortCommands(categories.get(Category.FUN)));
-            embed.addField("Moderation Commands", sortCommands(categories.get(Category.MODERATION)));
-            embed.addField("Info Commands", sortCommands(categories.get(Category.INFO)));
-            embed.addField("Utility Commands", sortCommands(categories.get(Category.UTILS)));
-            embed.addField("Misc Commands", sortCommands(categories.get(Category.MISC)));
+            const ordered = [
+                Category.MLP,
+                Category.ANALYSIS,
+                Category.ACTION,
+                Category.TEXT,
+                Category.AUDIO,
+                Category.CURRENCY,
+                Category.IMAGE,
+                Category.FUN,
+                Category.MODERATION,
+                Category.INFO,
+                Category.UTILS,
+                Category.MISC
+            ];
+
+            for (const cat of ordered) {
+                const commands = categories.get(cat);
+                if (commands.length > 0) {
+                    embed.addField(cat.toString() + " Commands", sortCommands(commands));
+                }
+            }
 
             embed.setAuthor("TrixieBot Help", client.user.avatarURL);
             embed.setDescription(`**Command list**\nTo check command usage, type \`${message.guild.config.prefix}help <command>\``);

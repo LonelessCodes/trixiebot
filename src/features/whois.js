@@ -17,14 +17,11 @@ module.exports = async function install(cr) {
             embed.setAuthor(userToString(member, true), member.user.avatarURL);
             embed.setThumbnail(member.user.avatarURL);
 
-            const profile = await member.user.fetchProfile().then(profile => profile).catch(() => null);
-
             if (member.user.bot) embed.addField("Is Bot", "✅");
             embed.addField("ID", member.user.id, true);
             if (member.nickname) embed.addField("Nickname", member.nickname, true);
             embed.addField("Status", member.user.presence.status, true);
             if (member.user.presence.game) embed.addField("Game", member.user.presence.game, true);
-            if (profile && profile.premium) embed.addField("Discord Nitro", profile.premiumSince ? "Since " + profile.premiumSince.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC" : "✅");
             embed.addField("Registered", member.user.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
             embed.addField("Joined", member.joinedAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
             if (member.highestRole) embed.addField("Highest Role", member.highestRole, true);

@@ -1,6 +1,8 @@
 const { timeout, userToString } = require("../modules/util");
 const { splitArgs } = require("../modules/util/string");
+const { toHumanTime } = require("../modules/util/time");
 const secureRandom = require("../modules/secureRandom");
+const credits = require("../logic/managers/CreditsManager");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 
@@ -8,6 +10,8 @@ const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const RateLimiter = require("../logic/RateLimiter");
+const TimeUnit = require("../modules/TimeUnit");
 
 async function getData(message, database, databaseSlots) {
     const mentions = message.alt_mentions;
@@ -44,11 +48,12 @@ async function getData(message, database, databaseSlots) {
         owner_waifus,
         owner_of_me,
         all_waifus,
-        slots: slots ? slots.slots : defaultSlots
+        slots: slots ? slots.slots : DEFAULT_SLOTS
     };
 }
 
-const defaultSlots = 3;
+const DEFAULT_SLOTS = 3;
+const MAX_SLOTS = 15;
 
 // Database
 // { ownerId,
@@ -422,8 +427,8 @@ because bees don...`);
                 embed: new Discord.RichEmbed()
                     .setColor(CONST.COLOR.PRIMARY)
                     .setTitle("Trading")
-                    .setDescription(`${userToString(my_waifu)}** :arrow_right: ${userToString(other_owner)}**` + 
-                    `**${userToString(message.member)}** :arrow_left: **${userToString(other_waifu)}**`)
+                    .setDescription(`${userToString(my_waifu)}** :arrow_right: ${userToString(other_owner)}**` +
+                        `**${userToString(message.member)}** :arrow_left: **${userToString(other_waifu)}**`)
             });
         }
     }).setHelp(new HelpContent()
@@ -431,17 +436,80 @@ because bees don...`);
         .addParameter("@your waifu", "Must be one of your waifus. This one will be traded")
         .addParameter("@other waifu", "Must be someone's waifu. This is the one you want to get"));
 
-    // waifuCommand.registerSubCommand("buyslot", new class extends BaseCommand {
-    //     async call(message) {
-    //         const {
-    //             mentioned_member,
-    //             owner_waifus,
-    //             owner_of_me
-    //         } = await getData(message, database);
-    //     }
-    // });
+    /** @type {number[]} */
+    const prices = new Array(MAX_SLOTS).fill(0);
+    let price = 3000;
+    for (let i = 3; i < prices.length; i++) {
+        prices[i] = price;
+        price = Math.ceil(price * 1.25 * 0.01) * 100;
+    }
 
-    waifuCommand.registerSubCommand("addslots", new class extends BaseCommand {
+    waifuCommand.registerSubCommand("buyslot", new class extends BaseCommand {
+        constructor() {
+            super();
+
+            this.cooldown_user = new RateLimiter(TimeUnit.HOUR, 1, 2);
+            this.active = new Set;
+        }
+
+        async call(message) {
+            const user = message.author;
+            if (this.active.has(user.id)) return;
+
+            if (this.cooldown_user.test(user.id)) {
+                message.channel.send("You can only purchase 2 slots an hour! Wait " + toHumanTime(this.cooldown_user.tryAgainIn(user.id)) + " before you can go again");
+                return;
+            }
+
+            const { slots } = await getData(message, database, databaseSlots);
+
+            if (slots >= MAX_SLOTS) {
+                return message.channel.send("You have reached the maximum amount of waifu slots, which is " + MAX_SLOTS + "!");
+            }
+
+            const cost = prices[slots]; // slots length is pretty much also the index of the next slot
+            const new_slots = slots + 1;
+
+            const name = await credits.getName(message.guild);
+
+            if (!(await credits.canPurchase(user, cost))) {
+                message.channel.send(`:atm: You don't have enough ${name.plural} to buy more slots! You need **${credits.getBalanceString(cost, name)}**.`);
+                return;
+            }
+
+            await message.channel.send(`:atm: The new slot will cost you **${credits.getBalanceString(cost, name)}**. Type either \`buy\` or \`cancel\``);
+
+            this.active.add(user.id);
+
+            message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content), { max: 1, time: 60000, errors: ["time"] })
+                .then(async messages => {
+                    const m = messages.first();
+                    if (/^buy$/i.test(m.content)) {
+                        this.cooldown_user.testAndAdd(user.id);
+
+                        if (!(await credits.canPurchase(user, cost))) {
+                            message.channel.send(":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
+                            return;
+                        }
+
+                        const [, new_balance] = await Promise.all([
+                            databaseSlots.updateOne({ waifuId: user.id }, { $set: { slots: new_slots } }, { upsert: true }),
+                            credits.decBalance(user, cost)
+                        ]);
+
+                        message.channel.send(":atm: 'Aight! There you go. Who will be your new waifu? (:yen: new account balance: **" + credits.getBalanceString(new_balance, name) + "**)");
+                        return;
+                    }
+
+                    message.channel.send("Then not");
+                })
+                .catch(() => message.channel.send("Time's up. Try again"))
+                .then(() => this.active.delete(user.id));
+        }
+    }).setHelp(new HelpContent()
+        .setDescription("Buy additional waifu slots with Trixie's currency"));
+
+    waifuCommand.registerSubCommand("addslot", new class extends BaseCommand {
         async call(message, content) {
             const member = message.mentions.members.first();
             if (!member) return;
@@ -491,5 +559,5 @@ because bees don...`);
             embed.setFooter(`Total Waifus: ${owner_waifus.length} - Available Slots: ${slots - owner_waifus.length}`);
             await message.channel.send({ embed });
         }
-    });  
+    });
 };

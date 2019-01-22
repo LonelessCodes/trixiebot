@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.33.0"></a>
+# [1.33.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.1...v1.33.0) (2019-01-22)
+
+
+### Bug Fixes
+
+* **ascii command:** tried to fix the ascii command ([6b21f70](https://bitbucket.org/Loneless/trixiebot/commits/6b21f70))
+* **help command:** fixed some help command bugs ([0e3ea71](https://bitbucket.org/Loneless/trixiebot/commits/0e3ea71))
+* **timeout command:** fix wrong database call and therefore a deprecation error ([560d865](https://bitbucket.org/Loneless/trixiebot/commits/560d865))
+* **whois command:** remove fetchUser code, as it's being deprecated ([623dfaa](https://bitbucket.org/Loneless/trixiebot/commits/623dfaa))
+
+
+### Features
+
+* add a currency system ([cdec948](https://bitbucket.org/Loneless/trixiebot/commits/cdec948))
+* bank and daily command added ([5b6f49a](https://bitbucket.org/Loneless/trixiebot/commits/5b6f49a))
+* whois command added ([f5d9551](https://bitbucket.org/Loneless/trixiebot/commits/f5d9551))
+* **waifu command:** buyslots command added ([947b91e](https://bitbucket.org/Loneless/trixiebot/commits/947b91e))
+
+
+
 <a name="1.32.1"></a>
 ## [1.32.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.0...v1.32.1) (2019-01-16)
 

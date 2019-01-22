@@ -3,7 +3,14 @@ const PATTERNS = Object.freeze({
 });
 
 module.exports = new class StringUtils {
+    /**
+     * @param {string} raw 
+     * @param {number} expectedSize 
+     */
     normalizeArray(raw, expectedSize) {
+        /**
+         * @type {string[]}
+         */
         const normalized = new Array(expectedSize).fill("");
 
         for (let i = 0; i < normalized.length; i++) {

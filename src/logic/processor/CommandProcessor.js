@@ -29,10 +29,6 @@ class CommandProcessor {
 
             me = message.guild.me.toString();
             prefix = message.guild.config.prefix;
-        // } else if (message.channel.type === "dm" ||
-        //     message.channel.type === "group") {
-        //     me = message.client.user.toString();
-        //     prefix = message.client.config.default_config;
         } else {
             return;
         }

@@ -160,8 +160,4 @@ class CommandRegistry {
     }
 }
 
-// CommandRegistry.GUILD_ONLY = 0;
-// CommandRegistry.GUILD_AND_GROUP = 1;
-// CommandRegistry.ALL = 2;
-
 module.exports = CommandRegistry;

@@ -21,7 +21,7 @@ class UpvotesManager extends EventEmitter {
 
         this.server.listen(this.port, this._emitListening.bind(this));
 
-        this.on("vote", ({ id, type = "vote", query, timestamp, site }) => {
+        this.on("vote", ({ id, type = "vote", timestamp, site }) => {
             if (type === "vote") {
                 this.db.insertOne({
                     userId: id,

@@ -134,8 +134,6 @@ class Core {
 
             this.client.user.setStatus("online");
             this.client.user.setActivity(`!trixie | ${status}`, { type: "PLAYING" });
-
-            log("Set Status: " + status);
         };
 
         CalendarEvents.CHRISTMAS.on("start", updateStatus);

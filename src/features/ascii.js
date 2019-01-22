@@ -2,7 +2,7 @@ const asciiPromise = require("asciify-image");
 
 const options = {
     fit: "box",
-    width: 32,
+    width: 31,
     height: 32,
     color: false
 };
@@ -14,19 +14,22 @@ const Category = require("../logic/commands/Category");
 module.exports = async function install(cr) {
     cr.register("ascii", new class extends BaseCommand {
         async call(message, content) {
-            let url;
-            if (/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g.test(content)) {
-                url = content.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g)[0];
-            } else if (message.attachments.size > 0) {
-                const attach = message.attachments.first();
-                url = attach.url;
+            const urls = [];
+            const match = content.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
+            urls.push(...(match || []));
+            for (const a of message.attachments.array()) {
+                urls.push(a.url);
             }
 
-            if (!url) return;
+            if (urls.length === 0) return;
 
-            const ascii = await asciiPromise(url, options);
+            try {
+                const ascii = await asciiPromise(urls[0], options);
 
-            await message.channel.send("```\n" + ascii + "\n```");
+                await message.channel.send("```\n" + ascii + "\n```");
+            } catch (err) {
+                await message.channel.send("Soooooooooooooooooooooooooomething went wrong");
+            }
         }
     })
         .setHelp(new HelpContent()

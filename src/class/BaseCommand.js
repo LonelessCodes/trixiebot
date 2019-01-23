@@ -116,7 +116,6 @@ class BaseCommand {
     async beforeProcessCall() { }
 
     async run(message, commandName, content, pass_through) {
-        // await message.channel.startTyping();
         return await this.call(message, content, pass_through);
     }
 

@@ -8,7 +8,7 @@ const TreeCommand = require("../../class/TreeCommand");
 const Category = require("../commands/Category");
 const CommandPermission = require("../commands/CommandPermission");
 const HelpBuilder = require("../commands/HelpBuilder");
-const MessageMentions = require("../../modules/getMentions");
+const MessageMentions = require("../../modules/MessageMentions");
 
 class CommandRegistry {
     constructor(client, config, database) {

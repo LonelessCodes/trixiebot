@@ -40,20 +40,6 @@ server.promiseStart = new Promise(resolve => {
 
 server.start();
 
-server.on(
-    "app.message",
-    function (data, socket) {
-        server.emit(
-            socket,
-            "app.message",
-            {
-                id: ipc.config.id,
-                message: data.message + " world!"
-            }
-        );
-    }
-);
-
 function getSocket() {
     if (server.sockets.length === 0) return null;
     return server.sockets[server.sockets.length - 1]; // getting the newest connected socket

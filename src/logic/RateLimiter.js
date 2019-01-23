@@ -125,3 +125,4 @@ class RateLimiter {
 RateLimiter.RateLimit = RateLimit;
 
 module.exports = RateLimiter;
+module.exports.TimeUnit = TimeUnit;

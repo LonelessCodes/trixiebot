@@ -1,6 +1,7 @@
 const database = require("../../modules/getDatabase");
 const secureRandom = require("../../modules/secureRandom");
-const { GuildMember } = require("discord.js");
+// eslint-disable-next-line no-unused-vars
+const { GuildMember, User, Guild } = require("discord.js");
 
 class CreditsManager {
     constructor() {
@@ -9,6 +10,11 @@ class CreditsManager {
         this.dailies = database().then(db => db.collection("credits_dailies"));
     }
 
+    /**
+     * Get the bank account of a user
+     * @param {User} user 
+     * @returns {Promise<{ userId: string; balance: number }>}
+     */
     async getAccount(user) {
         if (user instanceof GuildMember) user = user.user;
 
@@ -17,6 +23,11 @@ class CreditsManager {
         return account;
     }
 
+    /**
+     * Create a bank account for a user
+     * @param {User} user 
+     * @returns {Promise<{ exists: boolean; account: { userId: string; balance: number } }>}
+     */
     async createAccount(user) {
         if (user instanceof GuildMember) user = user.user;
 
@@ -35,6 +46,10 @@ class CreditsManager {
         };
     }
 
+    /**
+     * Get a users balance
+     * @param {User} user 
+     */
     async getBalance(user) {
         const account = await this.getAccount(user);
 
@@ -43,6 +58,11 @@ class CreditsManager {
         return account.balance;
     }
 
+    /**
+     * Raise someone's balance
+     * @param {User} user 
+     * @param {number} value 
+     */
     async incBalance(user, value) {
         if (user instanceof GuildMember) user = user.user;
 
@@ -51,6 +71,11 @@ class CreditsManager {
         return await this.getBalance(user);
     }
 
+    /**
+     * Lower someone's balance
+     * @param {User} user 
+     * @param {number} value
+     */
     async decBalance(user, value) {
         if (user instanceof GuildMember) user = user.user;
 
@@ -59,6 +84,12 @@ class CreditsManager {
         return await this.getBalance(user);
     }
 
+
+    /**
+     * Set someone's balance
+     * @param {User} user
+     * @param {number} value
+     */
     async setBalance(user, value) {
         if (user instanceof GuildMember) user = user.user;
 
@@ -67,12 +98,21 @@ class CreditsManager {
         return await this.getBalance(user);
     }
 
+    /**
+     * Checks if someone has enough money on the bank to purchase something
+     * @param {User} user 
+     * @param {number} cost 
+     */
     async canPurchase(user, cost) {
         const balance = await this.getBalance(user);
 
         return balance !== undefined ? balance >= cost : false;
     }
 
+    /**
+     * Check and get dailies for someone. The dailies have to be added to the bank account manually
+     * @param {User} user 
+     */
     async getDailies(user) {
         if (user instanceof GuildMember) user = user.user;
 
@@ -104,6 +144,11 @@ class CreditsManager {
         };
     }
 
+    /**
+     * Get the currency name configuration of a guild
+     * @param {Guild} guild 
+     * @returns {Promise<{ singular: string; plural: string }>}
+     */
     async getName(guild) {
         const config = await this.config.then(db => db.findOne({ guildId: guild.id }));
 
@@ -117,6 +162,12 @@ class CreditsManager {
         return config.name;
     }
 
+    /**
+     * Set the currency name configuration of a guild
+     * @param {Guild} guild 
+     * @param {string} singular 
+     * @param {string} plural
+     */
     async setName(guild, singular, plural) {
         await this.config.then(db => db.updateOne({ guildId: guild.id }, {
             $set: {
@@ -128,10 +179,20 @@ class CreditsManager {
         }, { upsert: true }));
     }
 
+    /**
+     * Checks if a streak is high enough to get a bonus
+     * @param {number} streak 
+     */
     isBonus(streak) {
         return streak === CreditsManager.MAX_STREAK;
     }
 
+    /**
+     * Convert a balance to a univeral string
+     * @param {number} balance 
+     * @param {{ singular: string; plural: string }} names
+     * @param {string} middle 
+     */
     getBalanceString(balance = 0, names, middle) {
         if (balance === 1 || !names.plural) return `${balance.toLocaleString("en")} ${middle ? middle + " " : ""}${names.singular}`;
         else return `${balance.toLocaleString("en")} ${middle ? middle + " " : ""}${names.plural}`;

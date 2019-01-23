@@ -41,13 +41,12 @@ module.exports = async function install(cr) {
         async call(message) {
             const user = message.author;
 
-            const balance = await credits.getBalance(user);
-
-            if (balance === undefined) {
+            const account = await credits.getAccount(user);
+            if (!account) {
                 return await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
             }
 
-            await message.channel.send(`:yen: You currently have an account balance of **${credits.getBalanceString(balance, await credits.getName(message.guild))}**. oof`);
+            await message.channel.send(`:yen: You currently have an account balance of **${credits.getBalanceString(account.balance, await credits.getName(message.guild))}**. oof`);
         }
     })
         .setHelp(new HelpContent()
@@ -135,6 +134,11 @@ module.exports = async function install(cr) {
             const member = message.mentions.members.first();
             if (!member) return;
 
+            const account = await credits.getAccount(member);
+            if (!account) {
+                return await message.channel.send("To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`");
+            }
+
             const args = splitArgs(content, 3); // if someone adds the currency name at the end, it should still work
 
             let amount = 0;
@@ -174,6 +178,11 @@ module.exports = async function install(cr) {
     cr.register("daily", new class extends BaseCommand {
         async call(message) {
             const user = message.author;
+
+            const account = await credits.getAccount(user);
+            if (!account) {
+                return await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            }
 
             const { dailies = 0, streak = 0 } = await credits.getDailies(user);
             if (dailies === 0) return;

@@ -221,6 +221,14 @@
       }
     },
     {
+      "name": "chat",
+      "help": {
+        "description": "Talk with Trixie1!!! (using a cleverbot integration)",
+        "usage": "\n`!chat` *(alias `!cleverbot`)*",
+        "category": "Fun"
+      }
+    },
+    {
       "name": "chucknorris",
       "help": {
         "description": "Chuck\nNorris\nFacts!!!",
@@ -236,6 +244,22 @@
       }
     },
     {
+      "name": "bank",
+      "help": {
+        "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` *(alias `!open`)*\n\n`!bank balance`\n\n`!bank pay <@user> <cost>`\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank name <?singular> <?plural>` - If not given any arguments, view the current configuration\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
+        "category": "Currency"
+      }
+    },
+    {
+      "name": "daily",
+      "help": {
+        "description": "Gather your daily payouts every 22 hours and occasionally get bonus money.",
+        "usage": "\n`!daily` *(alias `!dailies`)*",
+        "category": "Currency"
+      }
+    },
+    {
       "name": "info",
       "help": {
         "description": "Gets the bot technical information. Nothing all that interesting.",
@@ -248,14 +272,6 @@
       "help": {
         "description": "Ping-Pong-Ping-Pong-Ping-WEE HEEEEE.",
         "usage": "\n`!ping` *(alias `!trixie ping`)*",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "stats",
-      "help": {
-        "description": "Get some statistics from Trixie regarding herself",
-        "usage": "\n`!stats`",
         "category": "Info"
       }
     },
@@ -288,6 +304,22 @@
       "help": {
         "usage": "\n`!gif <query>` - returns the top result for the given `query` *(alias `!gif top`)*\n`query` - What type of gif you want to have\n\n`!gif random <query>` - returns a random gif for the given `query`\n\n`!gif trending` - returns a random trending gif",
         "category": "Image"
+      }
+    },
+    {
+      "name": "stats",
+      "help": {
+        "description": "Get some stats about the alive-ness of this server",
+        "usage": "\n`!stats`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "serverinfo",
+      "help": {
+        "description": "Receive information about this server",
+        "usage": "\n`!serverinfo`",
+        "category": "Info"
       }
     },
     {
@@ -338,22 +370,6 @@
         "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
         "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\nAdmin Area:",
         "category": "Utility"
-      }
-    },
-    {
-      "name": "serverinfo",
-      "help": {
-        "description": "Receive information about this server",
-        "usage": "\n`!serverinfo`",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "source",
-      "help": {
-        "description": "Finds the source of an image on e621's and Derpibooru's database",
-        "usage": "\n`!source`",
-        "category": "Image"
       }
     },
     {
@@ -411,8 +427,16 @@
       "name": "waifu",
       "help": {
         "description": "This tool helps you manage your waifus with ease!",
-        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n",
+        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n`!waifu buyslot`\n\n",
         "category": "Action"
+      }
+    },
+    {
+      "name": "whois",
+      "help": {
+        "description": "Receive information about a user or about yourself",
+        "usage": "\n`!whois <@user>`\n`@user` - optional- If given, return info about that user, otherwise return info about yourself",
+        "category": "Info"
       }
     },
     {
@@ -603,7 +627,7 @@
       "help": {
         "description": "Serve the chat some cider",
         "usage": "\n`!cider`",
-        "category": "Misc"
+        "category": "My Little Pony"
       }
     },
     {

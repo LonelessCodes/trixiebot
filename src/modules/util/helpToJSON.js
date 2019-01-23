@@ -58,7 +58,7 @@ function HelpToJSON(config, name, command) {
                 field.usage += `\`${prefix}${name}\``;
 
             let aliases = [...command.aliases.map(v => {
-                if (v !== "*") return v;
+                if (v !== "*") return parentName ? parentName + " " + v : v;
                 else return parentName;
             })];
             if (command instanceof TreeCommand && command.sub_commands.has("*")) {

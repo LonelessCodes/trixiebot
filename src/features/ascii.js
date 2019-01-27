@@ -1,4 +1,6 @@
 const asciiPromise = require("asciify-image");
+const filetype = require("file-type");
+const request = require("request");
 
 const options = {
     fit: "box",
@@ -23,13 +25,44 @@ module.exports = async function install(cr) {
 
             if (urls.length === 0) return;
 
-            try {
-                const ascii = await asciiPromise(urls[0], options);
+            new Promise((resolve, reject) => {
+                const req = request(urls[0], { timeout: 5000, encoding: null }, (err, res, body) => {
+                    const type = filetype(body);
 
-                await message.channel.send("```\n" + ascii + "\n```");
-            } catch (err) {
-                await message.channel.send("Soooooooooooooooooooooooooomething went wrong");
-            }
+                    if (!/jpg|png|gif/.test(type.ext)) {
+                        return reject("The image must be JPG, PNG or GIF");
+                    }
+
+                    asciiPromise(body, options, async (err, ascii) => {
+                        if (err) {
+                            return reject("Soooooooooooooooooooooooooomething went wrong");
+                        }
+
+                        resolve("```\n" + ascii + "\n```");
+                    });
+                });
+
+                req.on("error", () => {
+                    req.destroy();
+                    return reject("Request failed");
+                });
+                req.on("response", res => {
+                    if (res.statusCode !== 200) {
+                        res.destroy();
+                        return reject("Request failed");
+                    }
+
+                    const header = res.headers["content-type"].split("/")[1];
+                    if (!header || !/jpg|jpeg|png|gif/.test(header)) {
+                        res.destroy();
+                        return reject("The image must be JPG, PNG or GIF");
+                    }
+                });
+            }).then(body => {
+                message.channel.send(body);
+            }).catch(err => {
+                message.channel.send(err);
+            });
         }
     })
         .setHelp(new HelpContent()

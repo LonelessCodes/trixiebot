@@ -55,7 +55,13 @@ class UpvotesManager extends EventEmitter {
         const service = req.url.substr(this.path.length);
 
         let data = "";
-        req.on("data", chunk => data += chunk);
+        req.on("data", chunk => {
+            if (data.length > 10000) {
+                req.destroy();
+                return this._returnResponse(res, 400);
+            }
+            data += chunk;
+        });
         req.on("end", () => {
             if (data) {
                 try {
@@ -75,7 +81,7 @@ class UpvotesManager extends EventEmitter {
         const [service] = url.split("/");
 
         if (service === UpvotesManager.discordbotlist) {
-            const signature = req.headers["X-DBL-Signature"];
+            const signature = req.headers["x-dbl-signature"];
             if (!signature) return this._returnResponse(res, 400);
 
             const [secret, timestamp] = signature.split(" ");
@@ -96,7 +102,7 @@ class UpvotesManager extends EventEmitter {
             });
             return this._returnResponse(res, 200, "Webhook successfully received");
         } else if (service === UpvotesManager.discordbots) {
-            const secret = req.headers["Authorization"];
+            const secret = req.headers["authorization"];
             if (secret !== secrets[UpvotesManager.discordbots]) return this._returnResponse(res, 400);
 
             if (data.query === "") data.query = undefined;
@@ -122,7 +128,7 @@ class UpvotesManager extends EventEmitter {
             }
             return this._returnResponse(res, 200, "Webhook successfully received");
         } else if (service === UpvotesManager.botlistspace) {
-            const secret = req.headers["Authorization"];
+            const secret = req.headers["authorization"];
             if (secret !== tokens[UpvotesManager.botlistspace]) return this._returnResponse(res, 400);
 
             this.emit("vote", {
@@ -132,7 +138,7 @@ class UpvotesManager extends EventEmitter {
             });
             return this._returnResponse(res, 200, "Webhook successfully received");
         } else if (service === UpvotesManager.botsfordiscord) {
-            const secret = req.headers["Authorization"];
+            const secret = req.headers["authorization"];
             if (secret !== secrets[UpvotesManager.botsfordiscord]) return this._returnResponse(res, 400);
 
             this.emit("vote", {

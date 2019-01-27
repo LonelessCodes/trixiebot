@@ -139,7 +139,7 @@ class WebsiteManager {
             }
         });
 
-        function cleanContent(str, guild) {
+        const cleanContent = (str, guild) => {
             return str
                 .replace(/@(everyone|here)/g, "@\u200b$1")
                 .replace(/<@!?[0-9]+>/g, input => {
@@ -161,7 +161,7 @@ class WebsiteManager {
                     const role = guild.roles.get(input.replace(/<|@|>|&/g, ""));
                     return role ? `@${role.name}` : input;
                 });
-        }
+        };
 
         ipc.answer("deleted", async guildId => {
             if (!this.client.guilds.has(guildId))

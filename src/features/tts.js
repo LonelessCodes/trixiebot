@@ -1,6 +1,8 @@
 const log = require("../modules/log");
 const voicerssKey = require("../../keys/voicerss.json");
 const fetch = require("node-fetch");
+const AudioManager = require("../logic/managers/AudioManager");
+const { ConnectError } = AudioManager;
 
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -9,9 +11,7 @@ const Category = require("../logic/commands/Category");
 module.exports = async function install(cr) {
     cr.register("tts", new class extends BaseCommand {
         async call(message, content) {
-            if (content === "") {
-                return;
-            }
+            if (content === "") return;
 
             if (!/[a-z0-9]/.test(content)) {
                 message.react("❌");
@@ -19,18 +19,12 @@ module.exports = async function install(cr) {
                 return;
             }
 
-            // Only try to join the sender's voice channel if they are in one themselves
-            if (!message.member.voiceChannel) {
-                message.react("❌");
-                message.channel.sendTranslated("You need to join a voice channel first!");
-                log("Gracefully aborted attempt to call tts. User in no voice channel");
-                return;
-            }
+            const audio = AudioManager.getGuild(message.guild);
 
-            if (message.client.voiceConnections.get(message.channel.guild.id)) {
+            if (audio.playing) {
                 message.react("❌");
-                message.channel.sendTranslated("I only have one muzzle, you know!");
-                log("Gracefully aborted attempt to call tts. Already present in a voice chat");
+                message.channel.sendTranslated("Something is already playing, don't wanna interrupt!");
+                log("Gracefully aborted attempt to call tts. Already playing audio");
                 return;
             }
 
@@ -41,29 +35,21 @@ module.exports = async function install(cr) {
                 return;
             }
 
-            const url = `http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-us&f=44khz_16bit_mono&c=OGG&src=${content}`;
+            try {
+                const url = `http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-us&f=44khz_16bit_mono&c=OGG&src=${content}`;
 
-            const connection = await message.member.voiceChannel.join();
-            message.react("👍");
-            const request = await fetch(url);
-            const dispatcher = connection.playStream(request.body);
-            dispatcher.addListener("end", async () => {
-                await connection.disconnect();
-                if (message.client.voiceConnections.get(message.channel.guild.id)) {
-                    await message.client.voiceConnections.get(message.channel.guild.id).disconnect();
-                    await message.client.voiceConnections.get(message.channel.guild.id)._destroy();
-                    await message.client.voiceConnections.remove(message.client.voiceConnections.get(message.guild.id));
-                }
-            });
-            dispatcher.addListener("error", async error => {
-                await connection.disconnect();
-                log(error);
-                if (message.client.voiceConnections.get(message.channel.guild.id)) {
-                    await message.client.voiceConnections.get(message.channel.guild.id).disconnect();
-                    await message.client.voiceConnections.get(message.channel.guild.id)._destroy();
-                    await message.client.voiceConnections.remove(message.client.voiceConnections.get(message.guild.id));
-                }
-            });
+                const connection = await audio.connect(message.member);
+                const request = await fetch(url);
+
+                connection.playStream(request.body);
+
+                await message.react("👍");
+            } catch (err) {
+                await message.react("❌");
+                if (err instanceof ConnectError) return message.channel.sendTranslated(err.message);
+                log.error(err);
+                message.channel.sendTranslated("Some error happened and caused some whoopsies");
+            }
         }
     })
         .setHelp(new HelpContent()

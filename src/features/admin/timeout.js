@@ -31,7 +31,7 @@ module.exports = async function install(cr, client, config, db) {
                 const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
                 if (timeleft > 0) {
                     const content = message.content;
-                    await message.delete();
+                    message.delete().catch(() => { });
 
                     const expiresIn = toHumanTime(timeleft);
 

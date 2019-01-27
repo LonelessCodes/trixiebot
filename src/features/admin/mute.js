@@ -25,7 +25,7 @@ module.exports = async function install(cr, client, config, db) {
                 for (const word of muted_words) {
                     if (msg.indexOf(word) === -1) continue;
 
-                    await message.delete();
+                    await message.delete().catch(() => { });
                     return;
                 }
             }

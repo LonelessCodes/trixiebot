@@ -262,12 +262,12 @@ module.exports = async function install(cr, client, config, db) {
                         .setAuthor(`Successful steal!!! ${userToString(waifuUser, true)} now belongs to you!`, waifuUser.user.avatarURL)
                 });
                 await timeout(60000);
-                await m1.delete();
+                await m1.delete().catch(() => { });
                 return;
             } else {
                 await m2.edit(`${userToString(waifuUser)} had got wind of your plans and dashed off at the next chance :c`);
                 await timeout(60000);
-                await m1.delete();
+                await m1.delete().catch(() => { });
                 return;
             }
         }
@@ -337,14 +337,14 @@ because bees don...`);
                         .setAuthor(`Successful escape!!! ${userToString(message.member, true)} is now free!`, message.author.avatarURL)
                 });
                 await timeout(60000);
-                await m1.delete();
-                await m2.delete();
+                await m1.delete().catch(() => { });
+                await m2.delete().catch(() => { });
                 return;
             } else {
                 await message.channel.send(`${userToString(ownerUser)} reacted quickly and grabs you by your arm. "One day..." you mumble to yourself.`);
                 await timeout(60000);
-                await m1.delete();
-                await m2.delete();
+                await m1.delete().catch(() => { });
+                await m2.delete().catch(() => { });
                 return;
             }
         }

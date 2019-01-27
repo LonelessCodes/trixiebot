@@ -96,7 +96,7 @@ module.exports = async function install(cr, client, config, db) {
                 });
 
                 // also delete the online message
-                const onlineMessage = await guildChannel.fetchMessage((oldChannel || savedConfig).messageId);
+                const onlineMessage = await guildChannel.fetchMessage((oldChannel || savedConfig).messageId).catch(() => { });
                 if (!onlineMessage) return;
 
                 await onlineMessage.delete();
@@ -231,7 +231,7 @@ module.exports = async function install(cr, client, config, db) {
                 const channel = oldChannel || savedConfig;
                 if (!channel.messageId) return;
 
-                const onlineMessage = await guildChannel.fetchMessage(channel.messageId);
+                const onlineMessage = await guildChannel.fetchMessage(channel.messageId).catch(() => { });
                 if (!onlineMessage) return;
 
                 await onlineMessage.delete();

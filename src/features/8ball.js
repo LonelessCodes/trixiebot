@@ -1,35 +1,121 @@
-const fetch = require("node-fetch");
-const log = require("../modules/log");
-const querystring = require("querystring");
 const CONST = require("../modules/CONST");
+const RandomChance = require("../modules/RandomChance");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
+const replies = new RandomChance();
+replies.add({
+    text: "It is certain",
+    type: 1
+}, 2);
+replies.add({
+    text: "Yes – definitely",
+    type: 1
+}, 2);
+replies.add({
+    text: "Without a doubt",
+    type: 1
+}, 2);
+replies.add({
+    text: "Outlook good",
+    type: 1
+}, 2);
+replies.add({
+    text: "Ye",
+    type: 1
+}, 2);
+replies.add({
+    text: "You may rely on it",
+    type: 1
+}, 2);
+replies.add({
+    text: "As I see it, yes",
+    type: 1
+}, 2);
+replies.add({
+    text: "Most likely",
+    type: 1
+}, 2);
+replies.add({
+    text: "Signs point to yes",
+    type: 1
+}, 2);
+replies.add({
+    text: "It is decidedly so",
+    type: 1
+}, 2);
+
+replies.add({
+    text: "Very doubtful",
+    type: -1
+}, 4);
+replies.add({
+    text: "My sources say no",
+    type: -1
+}, 4);
+replies.add({
+    text: "Outlook not so good",
+    type: -1
+}, 4);
+replies.add({
+    text: "Don't count on it",
+    type: -1
+}, 4);
+replies.add({
+    text: "No",
+    type: -1
+}, 4);
+
+replies.add({
+    text: "Cannot predict now",
+    type: 0
+}, 1);
+replies.add({
+    text: "Better not tell you now",
+    type: 0
+}, 1);
+replies.add({
+    text: "Concentrate and ask again",
+    type: 0
+}, 1);
+replies.add({
+    text: "Reply hazy, try again",
+    type: 0
+}, 1);
+replies.add({
+    text: "Ask again later",
+    type: 0
+}, 1);
+
 module.exports = async function install(cr) {
     cr.register("8ball", new class extends BaseCommand {
         async call(message, question) {
-            if (question === "") {
-                return;
-            }
+            if (question === "") return;
 
-            /** @type {} */
-            const request = await fetch(`https://8ball.delegator.com/magic/JSON/${querystring.escape(question)}`);
-            const { magic } = await request.json();
-            if (!magic) {
-                throw new Error("TellMe didn't return a valid json body");
+            /** @type {{ text: string; type: number; }} */
+            const reply = await replies.random();
+
+            let emoji = "";
+            switch (reply.type) {
+                case 1:
+                    emoji = ":white_check_mark:";
+                    break;
+                case -1:
+                    emoji = ":x:";
+                    break;
+                case 0:
+                    emoji = ":crystal_ball:";
+                    break;
             }
 
             const embed = new Discord.RichEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
-                .setTitle(`${magic.answer} :crystal_ball:`)
-                // .setImage("https://derpicdn.net/img/view/2017/7/20/1490419.png")
-                // .setFooter("Edited screenshot by xhazxmatx");
+                .setTitle(`${reply.text} ${emoji}`);
 
             await message.channel.send({ embed });
-            log(`Fulfilled fortune for ${question} successfully.`);
         }
     })
         .setHelp(new HelpContent()

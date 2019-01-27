@@ -1,6 +1,7 @@
 const log = require("../../modules/log");
 const { isOwner } = require("../../modules/util");
 const { splitArgs } = require("../../modules/util/string");
+const { toHumanTime } = require("../../modules/util/time");
 // eslint-disable-next-line no-unused-vars
 const BaseCommand = require("../../class/BaseCommand");
 const AliasCommand = require("../../class/AliasCommand");
@@ -9,6 +10,8 @@ const Category = require("../commands/Category");
 const CommandPermission = require("../commands/CommandPermission");
 const HelpBuilder = require("../commands/HelpBuilder");
 const MessageMentions = require("../../modules/MessageMentions");
+const RateLimiter = require("../RateLimiter");
+const TimeUnit = require("../../modules/TimeUnit");
 
 class CommandRegistry {
     constructor(client, config, database) {
@@ -18,6 +21,14 @@ class CommandRegistry {
 
         /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;
+
+        this.global_ratelimit = new RateLimiter(TimeUnit.MINUTE, 15, 20);
+        this.global_ratelimit_message = new RateLimiter(TimeUnit.MINUTE, 5);
+    }
+
+    async rateLimit(message, commandName) {
+        if (!this.global_ratelimit || (this.global_ratelimit_message && !this.global_ratelimit_message.testAndAdd(`${commandName}:${message.guild.id}:${message.channel.id}`))) return;
+        await message.channel.sendTranslated(`Whoa whoa not so fast! You may only do this ${this.global_ratelimit.max} ${this.global_ratelimit.max === 1 ? "time" : "times"} every ${this.global_ratelimit.toString()}. There is still ${toHumanTime(this.global_ratelimit.tryAgainIn(message.author.id))} left to wait.`);
     }
 
     async process(message, command_name, content, prefix, prefixUsed) {
@@ -103,6 +114,11 @@ class CommandRegistry {
         if (!isOwnerCommand && !CommandPermission.ADMIN.test(message.member) && command.ignore) {
             const timeouted = await this.database.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
             if (timeouted) return false;
+        }
+
+        if (this.global_ratelimit && !this.global_ratelimit.testAndAdd(message.author.id)) {
+            await this.rateLimit(message, command_name);
+            return;
         }
 
         if (command.rateLimiter && !command.rateLimiter.testAndAdd(message.author.id)) {

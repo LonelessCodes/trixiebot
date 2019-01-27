@@ -36,8 +36,6 @@ class BaseCommand {
         this.aliases = [];
         this.name = null;
         this.explicit = false;
-        
-        this.setRateLimiter(new RateLimiter(TimeUnit.MINUTE, 15, 20));
     }
 
     setRateLimiter(rateLimiter) {
@@ -51,8 +49,8 @@ class BaseCommand {
         return this;
     }
     
-    async rateLimit(message, commandName) {
-        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(`${commandName}:${message.guild.id}:${message.channel.id}`))) return;
+    async rateLimit(message) {
+        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(`${message.guild.id}:${message.channel.id}`))) return;
         await this.rateLimitMessage(message);
     }
 

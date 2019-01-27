@@ -110,7 +110,11 @@ class RateLimiter {
     }
 
     toString() {
-        return this.timeUnit.toString(this.timeNum);
+        if (this.max > 1) {
+            return this.timeUnit.toString(`${this.max} times in ${this.timeNum}`);
+        } else {
+            return this.timeUnit.toString(this.timeNum);
+        }
     }
 
     tryAgainIn(key) {

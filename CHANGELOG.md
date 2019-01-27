@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.34.0"></a>
+# [1.34.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.33.0...v1.34.0) (2019-01-27)
+
+
+### Bug Fixes
+
+* **ascii command:** finally fixed ascii command DOS (I hope) ([1b12402](https://bitbucket.org/Loneless/trixiebot/commits/1b12402))
+* **credits:** check account state before getting dailies ([6f1d58e](https://bitbucket.org/Loneless/trixiebot/commits/6f1d58e))
+* **credits help:** fixed some usage issues ([ae4fb30](https://bitbucket.org/Loneless/trixiebot/commits/ae4fb30))
+* **website manager:** undefined this error while getting deleted messages fixed ([d1853cd](https://bitbucket.org/Loneless/trixiebot/commits/d1853cd))
+* added a Rate Limiter to every command. ([cbd3420](https://bitbucket.org/Loneless/trixiebot/commits/cbd3420))
+* commands throwing errors when deleting messages that were already deleted ([37b9080](https://bitbucket.org/Loneless/trixiebot/commits/37b9080))
+* encode most queries in URLs (trump, mlp, derpi) to URI components now, so they return the wanted results ([2c65cb1](https://bitbucket.org/Loneless/trixiebot/commits/2c65cb1))
+* help generation for website fix ([acc848a](https://bitbucket.org/Loneless/trixiebot/commits/acc848a))
+* hoping to fix some "missing permission" errors ([8bb362c](https://bitbucket.org/Loneless/trixiebot/commits/8bb362c))
+
+
+### Features
+
+* join, stop, leave commands added ([cc7b0dc](https://bitbucket.org/Loneless/trixiebot/commits/cc7b0dc))
+* new audio manager for easier voice channel handling ([6975736](https://bitbucket.org/Loneless/trixiebot/commits/6975736))
+* **8ball command:** give less neutral replies ([8304377](https://bitbucket.org/Loneless/trixiebot/commits/8304377))
+* **daily command:** send time left ([db3f89d](https://bitbucket.org/Loneless/trixiebot/commits/db3f89d))
+* new paginator: now emoji based ([1ffbd90](https://bitbucket.org/Loneless/trixiebot/commits/1ffbd90))
+
+
+
 <a name="1.33.0"></a>
 # [1.33.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.1...v1.33.0) (2019-01-22)
 

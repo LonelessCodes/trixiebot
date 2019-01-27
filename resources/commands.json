@@ -247,7 +247,7 @@
       "name": "bank",
       "help": {
         "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
-        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` *(alias `!open`)*\n\n`!bank balance`\n\n`!bank pay <@user> <cost>`\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank name <?singular> <?plural>` - If not given any arguments, view the current configuration\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank name <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
         "category": "Currency"
       }
     },
@@ -384,7 +384,7 @@
       "name": "pirate",
       "help": {
         "description": "Translate something into pirate-ish",
-        "rateLimiter": "1 hour",
+        "rateLimiter": "2 times in 1 hours",
         "usage": "\n`!pirate <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -393,7 +393,7 @@
       "name": "yoda",
       "help": {
         "description": "Translate something into yoda-ish",
-        "rateLimiter": "1 hour",
+        "rateLimiter": "2 times in 1 hours",
         "usage": "\n`!yoda <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -402,7 +402,7 @@
       "name": "dolan",
       "help": {
         "description": "Translate something into dolan duck-ish",
-        "rateLimiter": "1 hour",
+        "rateLimiter": "2 times in 1 hours",
         "usage": "\n`!dolan <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -420,6 +420,30 @@
       "help": {
         "description": "Make Trixie join the user's current voice channel and read the `message` out aloud.",
         "usage": "\n`!tts <message>`\n`message` - The message to be read out by Trixie",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "leavevc",
+      "help": {
+        "description": "Make Trixie leave the voice channel!",
+        "usage": "\n`!leavevc` *(alias `!leave`, `!begone`)*",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "stopvc",
+      "help": {
+        "description": "Stop whatever Trixie is saying in VC",
+        "usage": "\n`!stopvc`",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "joinvc",
+      "help": {
+        "description": "Stop whatever Trixie is saying in VC",
+        "usage": "\n`!joinvc` *(alias `!join`)*",
         "category": "Audio"
       }
     },

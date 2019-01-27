@@ -9,7 +9,7 @@ const HelpContent = require("../../logic/commands/HelpContent");
 const CommandPermission = require("../../logic/commands/CommandPermission");
 const Category = require("../../logic/commands/Category");
 
-const Pagination = require("../../logic/Pagination");
+const Paginator = require("../../logic/Paginator");
 
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("deleted_messages");
@@ -59,60 +59,48 @@ module.exports = async function install(cr, client, config, db) {
 
     deletedCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message) {
-            const doc_count = await database.countDocuments({
+            const messages = await database.find({
                 guildId: message.guild.id
-            });
+            }).toArray();
 
-            if (doc_count === 0) {
-                await message.channel.sendTranslated("Yeeeeah, nothing found");
-                log("Sent deleted messages. None exist");
-                return;
-            }
+            // if (messages.length === 0) {
+            //     await message.channel.sendTranslated("Yeeeeah, nothing found");
+            //     log("Sent deleted messages. None exist");
+            //     return;
+            // }
 
             const page_limit = 10;
-
-            const pages = new Pagination(page_limit, doc_count, message.author.id, message.channel.awaitMessages.bind(message.channel));
-
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setTitle("Deleted Messages");
-            embed.setDescription(`Messages deleted or edited by users: **${doc_count}**\n` +
-                `Total pages: **${pages.pages_count}**\n` +
-                "Type the page number you want to look at. Sorted oldest to newest message");
-
-            await message.channel.send({ embed });
-
-            pages.on("change", async (skip, limit, page_number) => {
-                const messages = await database.find({
-                    guildId: message.guild.id
-                }).skip(skip).limit(limit).toArray();
-
-                const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-
-                embed.setFooter(`Deleted Messages - Page ${page_number}/${pages.pages_count}`);
-
+            
+            const items = [];
+            for (const deleted_message of messages) {
                 let str = "";
-                for (const deleted_message of messages) {
-                    const channel = message.guild.channels.get(deleted_message.channelId);
-                    if (channel) str += `# **${channel.name}**`;
-                    else str += "# **deleted channel**";
+                const channel = message.guild.channels.get(deleted_message.channelId);
+                if (channel) str += `# **${channel.name}**`;
+                else str += "# **deleted channel**";
 
-                    const timestamp = deleted_message.timestamp.toLocaleString().slice(0, -3);
-                    str += ` | ${timestamp} | `;
+                const timestamp = deleted_message.timestamp.toLocaleString().slice(0, -3);
+                str += ` | ${timestamp} | `;
 
-                    const member = message.guild.members.get(deleted_message.memberId);
-                    if (member) str += `${userToString(member)}: `;
-                    else str += "**deleted user**: ";
+                const member = message.guild.members.get(deleted_message.memberId);
+                if (member) str += `${userToString(member)}: `;
+                else str += "**deleted user**: ";
 
-                    str += "\n";
-                    str += `\`${deleted_message.message.replace(/`/g, "´")}\``;
-                    str += "\n";
-                    str += "\n";
-                }
+                str += "\n";
+                str += `\`${deleted_message.message.replace(/`/g, "´")}\``;
+                str += "\n";
+                items.push(str);
+            }
 
-                embed.setDescription(str);
+            for (let i = 0; i < 100; i++) {
+                items.push("Messages deleted or edited by users");
+            }
 
-                await message.channel.send({ embed });
+            const paginator = new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author, 60000, true, true, false, false);
+            paginator.once("end", async m => {
+                await message.channel.send("Aight we done here");
+                await m.delete().catch(() => { });
             });
+            paginator.display(message.channel);
         }
     });
 };

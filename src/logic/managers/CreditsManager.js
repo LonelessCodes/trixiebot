@@ -120,8 +120,10 @@ class CreditsManager {
             userId: user.id
         }));
 
-        if (lastDaily &&
-            lastDaily.lastDaily > new Date(Date.now() - CreditsManager.COOLDOWN)) return {
+        const time_left = lastDaily.lastDaily.getTime() + CreditsManager.COOLDOWN - Date.now();
+
+        if (lastDaily && time_left > 0) return {
+            time_left,
             dailies: 0,
             streak: 0
         };

@@ -6,7 +6,8 @@ const Permissions = require("../logic/commands/CommandPermission");
 
 const credits = require("../logic/managers/CreditsManager");
 const { splitArgs } = require("../modules/util/string");
-const { userToString } = require("../modules/util/index");
+const { toHumanTime } = require("../modules/util/time");
+const { userToString, timeout } = require("../modules/util/index");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 
@@ -182,8 +183,13 @@ module.exports = async function install(cr) {
                 return await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
             }
 
-            const { dailies = 0, streak = 0 } = await credits.getDailies(user);
-            if (dailies === 0) return;
+            const { dailies = 0, streak = 0, time_left = 0 } = await credits.getDailies(user);
+            if (time_left > 0) {
+                const m = await message.channel.send(`:atm: ${userToString(user)}, daily :yen: credits reset in **${toHumanTime(time_left)}**.`);
+                await timeout(1000 * 10);
+                m.delete().catch(() => { });
+                return;
+            }
 
             const currency_name = await credits.getName(message.guild);
 

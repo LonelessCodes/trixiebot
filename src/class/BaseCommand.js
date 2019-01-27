@@ -36,6 +36,8 @@ class BaseCommand {
         this.aliases = [];
         this.name = null;
         this.explicit = false;
+        
+        this.setRateLimiter(new RateLimiter(TimeUnit.MINUTE, 15, 20));
     }
 
     setRateLimiter(rateLimiter) {

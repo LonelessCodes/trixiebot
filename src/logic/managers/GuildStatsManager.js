@@ -252,7 +252,12 @@ class Counter extends Base {
 
 class GuildStatsManager {
     constructor() {
-        this.db = database().then(db => db.collection("guild_stats"));
+        this.db = database()
+            .then(db => db.collection("guild_stats"))
+            .then(async db => {
+                await db.createIndex({ timestamp: 1 });
+                return db;
+            });
 
         /** @type {Map<string, Counter | Value>} */
         this._map = new Map;

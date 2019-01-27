@@ -32,7 +32,7 @@ module.exports = async function install(cr) {
             } else {
                 gif = await giphy.random({
                     limit: 1,
-                    tag: query,
+                    tag: encodeURIComponent(query),
                     rating: message.channel.nsfw ? "r" : "g"
                 });
                 if (!gif.data.image_original_url) {
@@ -73,12 +73,10 @@ module.exports = async function install(cr) {
     
     gifCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, query) {
-            if (query === "") {
-                return;
-            }
+            if (query === "") return;
 
             const gif = await giphy.search({
-                q: query,
+                q: encodeURIComponent(query),
                 limit: 1,
                 rating: message.channel.nsfw ? "r" : "g"
             });

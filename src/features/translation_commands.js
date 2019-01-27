@@ -1,5 +1,4 @@
 const fetch = require("node-fetch");
-const querystring = require("querystring");
 
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -10,7 +9,7 @@ const TimeUnit = require("../modules/TimeUnit");
 const baseURL = "https://api.funtranslations.com/translate/";
 
 async function translate(type, text) {
-    const url = `${baseURL}${type}.json?text=${querystring.escape(text)}`;
+    const url = `${baseURL}${type}.json?text=${encodeURIComponent(text)}`;
     const request = await fetch(url);
     const { success, contents } = await request.json();
     if (!success) {

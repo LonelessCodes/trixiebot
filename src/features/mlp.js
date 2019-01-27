@@ -15,7 +15,7 @@ module.exports = async function install(cr) {
                 return;
             }
 
-            const searchRequest = await fetch(`http://mlp.wikia.com/api/v1/Search/List?query=${query}&format=json&limit=1`);
+            const searchRequest = await fetch(`http://mlp.wikia.com/api/v1/Search/List?query=${encodeURIComponent(query)}&format=json&limit=1`);
             const searchJson = await searchRequest.json();
             if (!searchJson.items || !searchJson.items[0]) {
                 await message.channel.send("*shrug* nothing here apparently");

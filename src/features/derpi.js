@@ -87,7 +87,7 @@ async function process(message, msg, type) {
     tags.push(...filter_tags.map(tag => "-" + tag));
 
     // join to a query string
-    const query = tags.join(",").replace(/\s+/g, "+");
+    const query = tags.map(t => encodeURIComponent(t)).join(",").replace(/\s+/g, "+");
     
     const results = [];
     const promises = [];

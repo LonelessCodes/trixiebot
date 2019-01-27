@@ -1,6 +1,5 @@
 const { userToString } = require("../modules/util");
 const fetch = require("node-fetch");
-const querystring = require("querystring");
 
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -13,7 +12,7 @@ module.exports = async function install(cr) {
                 const member = message.alt_mentions.members.first();
 
                 /** @type {} */
-                const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" + querystring.escape(userToString(member)));
+                const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" + encodeURIComponent(userToString(member)));
                 const magic = await request.json();
                 if (!magic) {
                     throw new Error("API fucked up");

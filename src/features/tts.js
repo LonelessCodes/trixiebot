@@ -36,7 +36,7 @@ module.exports = async function install(cr) {
             }
 
             try {
-                const url = `http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-us&f=44khz_16bit_mono&c=OGG&src=${content}`;
+                const url = `http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-us&f=44khz_16bit_mono&c=OGG&src=${encodeURIComponent(content)}`;
 
                 const connection = await audio.connect(message.member);
                 const request = await fetch(url);

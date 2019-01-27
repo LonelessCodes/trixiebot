@@ -34,7 +34,7 @@ const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "
 
 const tags = ["pony", "vulva", "-penis", "nudity", "-photo", ...filter_tags.map(tag => "-" + tag), "upvotes.gte:100"];
 
-const query = tags.join(",").replace(/\s+/g, "+").toLowerCase();
+const query = tags.map(t => encodeURIComponent(t)).join(",").replace(/\s+/g, "+").toLowerCase();
 
 async function process(message) {
     const image = await get({

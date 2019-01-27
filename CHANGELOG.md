@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.34.1"></a>
+## [1.34.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.0...v1.34.1) (2019-01-27)
+
+
+### Bug Fixes
+
+* global rate limiter (so sorry so sorry that it showed up in every help command) ([dfb14cd](https://bitbucket.org/Loneless/trixiebot/commits/dfb14cd))
+* **upvotes:** headers for receiving upvotes fixed ([4ee3843](https://bitbucket.org/Loneless/trixiebot/commits/4ee3843))
+
+
+
 <a name="1.34.0"></a>
 # [1.34.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.33.0...v1.34.0) (2019-01-27)
 

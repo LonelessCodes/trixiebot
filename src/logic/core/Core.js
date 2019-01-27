@@ -218,8 +218,6 @@ class Core {
                 }
             }).catch(err => err)
         ]);
-
-        log.debug("Bot List", "Stats updated");
     }
 }
 

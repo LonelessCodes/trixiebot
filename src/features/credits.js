@@ -34,7 +34,7 @@ module.exports = async function install(cr) {
         }
     })
         .setHelp(new HelpContent()
-            .setDescription("Create a bank account to send, receive, spend and earn credits."));
+            .setUsage("", "Create a bank account to send, receive, spend and earn credits."));
     bankCmd.registerSubCommandAlias("create", "open");
 
     bankCmd.registerSubCommand("balance", new class extends BaseCommand {
@@ -50,7 +50,7 @@ module.exports = async function install(cr) {
         }
     })
         .setHelp(new HelpContent()
-            .setDescription("Check out the balance on your account!"));
+            .setUsage("", "Check out the balance on your account!"));
 
     bankCmd.registerSubCommand("pay", new class extends BaseCommand {
         async call(message, content) {
@@ -101,8 +101,7 @@ module.exports = async function install(cr) {
         }
     })
         .setHelp(new HelpContent()
-            .setDescription("Pay some other user money")
-            .setUsage("<@user> <cost>")
+            .setUsage("<@user> <cost>", "Pay some other user money")
             .addParameter("@user", "Use to pay money to")
             .addParameter("cost", "Ammount of money to pay"));
 
@@ -123,8 +122,7 @@ module.exports = async function install(cr) {
         }
     })
         .setHelp(new HelpContent()
-            .setDescription("Change the name of the currency")
-            .setUsage("<?singular> <?plural>", "If not given any arguments, view the current configuration")
+            .setUsage("<?singular> <?plural>", "Change the name of the currency. If not given any arguments, view the current configuration")
             .addParameterOptional("singular", "Sets the singular of the currency name")
             .addParameterOptional("plural", "Sets the plural of the currency name. If omitted, singular name will be used for everything"))
         .setPermissions(Permissions.ADMIN);

@@ -1,12 +1,27 @@
 const log = require("../../modules/log");
+const INFO = require("../../info");
 const stats = require("../stats");
 const guild_stats = require("../managers/GuildStatsManager");
 // eslint-disable-next-line no-unused-vars
 const { Message, TextChannel, Permissions } = require("discord.js");
 
+/**
+ * @param {Message} message 
+ */
 async function onProcessingError(message, err) {
     log(err);
-    await message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
+    
+    try {
+        if (message.channel.type === "text") {
+            const self = message.guild.me;
+            /** @type {TextChannel} */
+            const channel = message.channel;
+            if (!channel.memberPermissions(self).has(Permissions.FLAGS.SEND_MESSAGES, true))
+                return;
+        }
+        if (INFO.DEV) await message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
+        else await message.channel.sendTranslated("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
+    } catch (_) { _; }
 }
 
 class CommandListener {

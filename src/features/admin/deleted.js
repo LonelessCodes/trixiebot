@@ -1,7 +1,4 @@
 const { userToString } = require("../../modules/util");
-const log = require("../../modules/log");
-const CONST = require("../../modules/CONST");
-const Discord = require("discord.js");
 
 const BaseCommand = require("../../class/BaseCommand");
 const TreeCommand = require("../../class/TreeCommand");
@@ -63,11 +60,10 @@ module.exports = async function install(cr, client, config, db) {
                 guildId: message.guild.id
             }).toArray();
 
-            // if (messages.length === 0) {
-            //     await message.channel.sendTranslated("Yeeeeah, nothing found");
-            //     log("Sent deleted messages. None exist");
-            //     return;
-            // }
+            if (messages.length === 0) {
+                await message.channel.sendTranslated("Yeeeeah, nothing found");
+                return;
+            }
 
             const page_limit = 10;
             
@@ -91,15 +87,7 @@ module.exports = async function install(cr, client, config, db) {
                 items.push(str);
             }
 
-            for (let i = 0; i < 100; i++) {
-                items.push("Messages deleted or edited by users");
-            }
-
-            const paginator = new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author, 60000, true, true, false, false);
-            paginator.once("end", async m => {
-                await message.channel.send("Aight we done here");
-                await m.delete().catch(() => { });
-            });
+            const paginator = new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author);
             paginator.display(message.channel);
         }
     });

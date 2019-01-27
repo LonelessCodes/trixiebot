@@ -494,7 +494,7 @@ because bees don...`);
 
                         const [, new_balance] = await Promise.all([
                             databaseSlots.updateOne({ waifuId: user.id }, { $set: { slots: new_slots } }, { upsert: true }),
-                            credits.decBalance(user, cost)
+                            credits.makeTransaction(message.guild, user, -cost, "waifu/slot", "Bought a waifu slot")
                         ]);
 
                         message.channel.send(":atm: 'Aight! There you go. Who will be your new waifu? (:yen: new account balance: **" + credits.getBalanceString(new_balance, name) + "**)");

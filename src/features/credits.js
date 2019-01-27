@@ -5,10 +5,12 @@ const Category = require("../logic/commands/Category");
 const Permissions = require("../logic/commands/CommandPermission");
 
 const credits = require("../logic/managers/CreditsManager");
+const moment = require("moment");
 const { splitArgs } = require("../modules/util/string");
 const { toHumanTime } = require("../modules/util/time");
 const { userToString, timeout } = require("../modules/util/index");
 const CONST = require("../modules/CONST");
+const Paginator = require("../logic/Paginator");
 const Discord = require("discord.js");
 
 module.exports = async function install(cr) {
@@ -95,8 +97,8 @@ module.exports = async function install(cr) {
                 return await message.channel.send(":atm: You do not have enough money on your account to pay " + userToString(other_user) + " this much");
             }
 
-            await credits.incBalance(other_user, amount);
-            await credits.decBalance(me, amount);
+            await credits.makeTransaction(message.guild, other_user, amount, "pay", `Got money from ${userToString(me, true)}`);
+            await credits.makeTransaction(message.guild, me, -amount, "pay", `Send money to ${userToString(other_user, true)}`);
 
             await message.channel.send(`💴 **${credits.getBalanceString(amount, name)}**\n${userToString(me)} ▶ ${userToString(other_user)}`);
         }
@@ -105,6 +107,56 @@ module.exports = async function install(cr) {
             .setUsage("<@user> <cost>", "Pay some other user money")
             .addParameter("@user", "Use to pay money to")
             .addParameter("cost", "Ammount of money to pay"));
+
+    bankCmd.registerSubCommand("transactions", new class extends BaseCommand {
+        async call(message) {
+            const user = message.author;
+
+            const account = await credits.getAccount(user);
+            if (!account) {
+                return await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            }
+
+            const trans_raw = await credits.getTransactions(user);
+
+            if (trans_raw.length > 0) {
+                const transactions = trans_raw.map(trans => ({
+                    ts: moment(trans.ts).fromNow(),
+                    cost: trans.cost >= 0 ?
+                        `+${trans.cost.toLocaleString("en")}` :
+                        `${trans.cost.toLocaleString("en")}`,
+                    description: trans.description,
+                }));
+
+                const items = [];
+                let len = 10;
+                for (let i = 0; i < Math.ceil(transactions.length / 10); i++) {
+                    const trans_part = transactions.slice(i * len, (i + 1) * len);
+
+                    const ts_length = Math.max(...trans_part.map(trans => trans.ts.length));
+                    const cost_length = Math.max(...trans_part.map(trans => trans.cost.length));
+
+                    const trans_str = [];
+                    for (const trans of trans_part) {
+                        trans_str.push(
+                            trans.ts + new Array(ts_length - trans.ts.length).fill(" ").join("") + " | " +
+                            trans.cost + new Array(cost_length - trans.cost.length).fill(" ").join("") + " | " +
+                            trans.description
+                        );
+                    }
+                    items.push("```cs\n" + trans_str.join("\n\n") + "\n```");
+                }
+
+                const paginator = new Paginator("Transactions", `All of ${userToString(user)}'s (your) transactions`, 1, items, message.author);
+                paginator.display(message.channel);
+            } else {
+                await message.channel.send("Looks like you didn't earn or spend money yet! Let's start by `" + message.guild.config.prefix + "daily`, to earn some munz");
+            }
+        }
+    })
+        .setHelp(new HelpContent()
+            .setUsage("", "Display all your transactions from ever!"));    
+    bankCmd.registerSubCommandAlias("transactions", "trans");
 
     bankCmd.registerSubCommand("name", new class extends BaseCommand {
         async call(message, content) {
@@ -147,7 +199,9 @@ module.exports = async function install(cr) {
                 return await message.channel.send("That is not a valid number, bruh! Remember it's `<@user> <amount>`");
             }
 
-            const new_balance = await credits.setBalance(member, amount);
+            const old_balance = await credits.getBalance(member);
+            const new_balance = await credits.makeTransaction(message.guild, member, amount - old_balance, "set_balance",
+                "Balance was set to " + credits.getBalanceString(amount, await credits.getName(message.guild)) + " by " + userToString(message.author, true));
 
             await message.channel.send("yo :ok_hand: new balance: " + new_balance);
         }
@@ -167,7 +221,34 @@ module.exports = async function install(cr) {
 
             embed.setAuthor(userToString(member, true) + "'s Bank Account", member.user.avatarURL);
 
-            embed.addField("Balance", credits.getBalanceString(account.balance, await credits.getName(message.guild)));
+            embed.addField("Balance", "```cs\n" + credits.getBalanceString(account.balance, await credits.getName(message.guild)) + "\n```");
+
+            const trans_raw = await credits.getTransactions(member, 5);
+
+            if (trans_raw.length > 0) {
+                const transactions = trans_raw.map(trans => ({
+                    ts: moment(trans.ts).fromNow(),
+                    cost: trans.cost >= 0 ?
+                        `+${trans.cost.toLocaleString("en")}` :
+                        `${trans.cost.toLocaleString("en")}`,
+                    description: trans.description,
+                }));
+
+                const ts_length = Math.max(...transactions.map(trans => trans.ts.length));
+                const cost_length = Math.max(...transactions.map(trans => trans.cost.length));
+
+                const trans_str = ["```cs"];
+                for (const trans of transactions) {
+                    trans_str.push(
+                        trans.ts + new Array(ts_length - trans.ts.length).fill(" ").join("") + " | " +
+                        trans.cost + new Array(cost_length - trans.cost.length).fill(" ").join("") + " | " +
+                        trans.description
+                    );
+                }
+                trans_str.push("```");
+
+                embed.addField("Last Transactions", trans_str.join("\n"));
+            }
 
             await message.channel.send({ embed });
         }
@@ -186,7 +267,7 @@ module.exports = async function install(cr) {
             const { dailies = 0, streak = 0, time_left = 0 } = await credits.getDailies(user);
             if (time_left > 0) {
                 const m = await message.channel.send(`:atm: ${userToString(user)}, daily :yen: credits reset in **${toHumanTime(time_left)}**.`);
-                await timeout(1000 * 10);
+                await timeout(1000 * 15);
                 m.delete().catch(() => { });
                 return;
             }
@@ -196,7 +277,7 @@ module.exports = async function install(cr) {
             const bonus = credits.isBonus(streak) ? 100 : 0;
             const total = dailies + bonus;
 
-            await credits.incBalance(user, total);
+            await credits.makeTransaction(message.guild, user, total, "dailies", "Collected dailies");
 
             let str = `:atm: ${userToString(user)}, you received your :yen: **${credits.getBalanceString(dailies, currency_name, "daily")}**!\n\nStreak:   `;
 

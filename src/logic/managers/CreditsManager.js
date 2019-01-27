@@ -8,6 +8,10 @@ class CreditsManager {
         this.accounts = database().then(db => db.collection("credits_accounts"));
         this.config = database().then(db => db.collection("credits_config"));
         this.dailies = database().then(db => db.collection("credits_dailies"));
+        this.transactions = database().then(db => db.collection("credits_transactions")).then(async db => {
+            await db.createIndex({ ts: 1 });
+            return db;
+        });
     }
 
     /**
@@ -107,6 +111,60 @@ class CreditsManager {
         const balance = await this.getBalance(user);
 
         return balance !== undefined ? balance >= cost : false;
+    }
+
+    /**
+     * Make a transaction that will be logged to the database and the !bank commands transactions field
+     * @param {Guild} guild 
+     * @param {User} user 
+     * @param {number} cost 
+     * @param {string} namespace 
+     * @param {string} description 
+     */
+    async makeTransaction(guild, user, cost, namespace, description) {
+        if (user instanceof GuildMember) user = user.user;
+
+        const balance = await this.incBalance(user, cost);
+
+        const timestamp = new Date;
+        await this.transactions.then(db => db.insertOne({
+            ts: timestamp,
+            guildId: guild.id,
+            userId: user.id,
+            cost,
+            balance,
+            ns: namespace,
+            description
+        }));
+
+        return balance;
+    }
+
+    /**
+     * @param {User} user 
+     * @param {string} namespace 
+     * @param {number} amount 
+     * @returns {{ ts: Date; guildId: string; cost: number; balance: number; ns: string; description: string; }[]}
+     */
+    async getTransactions(user, namespace, amount) {
+        if (user instanceof GuildMember) user = user.user;
+        
+        if (typeof namespace === "number") {
+            amount = namespace;
+            namespace = null;
+        }
+
+        const query = {
+            userId: user.id
+        };
+        if (namespace) query.namespace = namespace;
+
+        let cursor = await this.transactions.then(db => db.find(query)
+            .sort({ ts: -1 })
+            .project({ ts: 1, guildId: 1, cost: 1, balance: 1, ns: 1, description: 1 }));
+        if (amount) cursor = cursor.limit(amount);
+        
+        return await cursor.toArray();
     }
 
     /**

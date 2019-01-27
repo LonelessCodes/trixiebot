@@ -1,3 +1,4 @@
+const { userToString } = require("../modules/util");
 const CONST = require("../modules/const");
 const Events = require("events");
 // eslint-disable-next-line no-unused-vars
@@ -14,7 +15,7 @@ class Paginator extends Events {
      * @param {boolean} show_page_numbers 
      * @param {boolean} allow_text_input 
      */
-    constructor(title, content, items_per_page, items, user, timeout = 60000, show_page_numbers = true, wrap_page_ends = true, number_items = false, allow_text_input = true) {
+    constructor(title, content, items_per_page, items, user, timeout = 60000, show_page_numbers = true, wrap_page_ends = true, number_items = false, prefix_suffix = ["", ""]) {
         super();
 
         this.title = title;
@@ -28,7 +29,7 @@ class Paginator extends Events {
         this.page_count = Math.ceil(this.total_items / this.items_per_page);
         this.wrap_page_ends = wrap_page_ends;
         this.number_items = number_items;
-        this.allow_text_input = allow_text_input;
+        this.prefix_suffix = [prefix_suffix[0] || "", prefix_suffix[1] || ""];
     }
 
     /**
@@ -79,7 +80,8 @@ class Paginator extends Events {
             await message.react(Paginator.RIGHT);
             this.pagination(message, page_num);
         } else {
-            this.emit("end", message);
+            await message.react(Paginator.STOP);
+            this.pagination(message, page_num);
         }
     }
 
@@ -107,7 +109,7 @@ class Paginator extends Events {
         );
 
         collector.on("end", (collected, reason) => {
-            if (reason === "time" || collected.size === 0) return this.emit("end", message);
+            if (reason === "time" || collected.size === 0) return this.end(message);
 
             this.handleMessageReactionAddAction(collected.first(), message, page_num);
         });
@@ -153,7 +155,7 @@ class Paginator extends Events {
                     new_page_num++;
                 break;
             case Paginator.STOP:
-                this.emit("end", message);
+                await this.end(message);
                 return;
         }
 
@@ -168,20 +170,25 @@ class Paginator extends Events {
     renderPage(page_num) {
         const embed = new RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
-        if (this.title && this.title !== "") embed.setTitle(this.title);
+        if (this.title && this.title !== "") {
+            embed.setAuthor(userToString(this.user, true) + " | " + this.title, this.user.avatarURL);
+        } else {
+            embed.setAuthor(userToString(this.user, true), this.user.avatarURL);
+        }
 
         const start = (page_num - 1) * this.items_per_page;
         const end = this.strings.length < page_num * this.items_per_page ?
             this.strings.length :
             page_num * this.items_per_page;
         
-        const rows = [];
+        const rows = [this.prefix_suffix[0]];
         for (let i = start; i < end; i++) {
             let str = "";
             if (this.number_items) str += "`" + (i + 1) + ".` ";
             str += this.strings[i] + "\n";
             rows.push(str);
         }
+        rows.push(this.prefix_suffix[1]);
         embed.setDescription(rows.join("\n"));
 
         if (this.show_page_numbers) embed.setFooter(`Page ${page_num}/${this.page_count}`);
@@ -190,6 +197,14 @@ class Paginator extends Events {
             this.content,
             { embed }
         ];
+    }
+
+    /**
+     * @param {Message} message 
+     */
+    async end(message) {
+        await message.clearReactions().catch(() => { });
+        this.emit("end", message);
     }
 }
 

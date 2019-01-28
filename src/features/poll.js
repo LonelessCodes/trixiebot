@@ -96,7 +96,9 @@ class Poll {
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         for (const vote of result)
             embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
-        embed.setFooter(LocaleManager.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").fetch(total));
+        embed.setFooter(LocaleManager.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").format({
+            votesCount: total
+        }).fetch(total));
 
         await this.channel.sendTranslated("{{user}} Poll ended!", {
             user: this.creator.toString()

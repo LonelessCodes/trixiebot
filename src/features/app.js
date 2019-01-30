@@ -1,25 +1,14 @@
-const Discord = require("discord.js");
 const INFO = require("../info");
+const CONST = require("../modules/const");
+const Discord = require("discord.js");
 
 const TextCommand = require("../class/TextCommand");
+const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr, client) {
-    const FLAGS = Discord.Permissions.FLAGS;
-    const invite_link = await client.generateInvite([
-        FLAGS.MANAGE_ROLES,
-        FLAGS.MANAGE_CHANNELS,
-        FLAGS.VIEW_CHANNEL,
-        FLAGS.MANAGE_MESSAGES,
-        FLAGS.EMBED_LINKS,
-        FLAGS.MENTION_EVERYONE,
-        FLAGS.ADD_REACTIONS,
-        FLAGS.BAN_MEMBERS,
-        FLAGS.KICK_MEMBERS
-    ]);
-
-    cr.register("donate", new TextCommand("https://ko-fi.com/loneless ❤"))
+    cr.register("donate", new TextCommand("https://paypal.me/loneless ❤"))
         .setHelp(new HelpContent().setDescription("**TrixieBot costs $6 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤"))
         .setCategory(Category.INFO);
 
@@ -27,8 +16,25 @@ module.exports = async function install(cr, client) {
         .setHelp(new HelpContent().setDescription("Returns the currently running version of TrixieBot"))
         .setCategory(Category.INFO);
     cr.registerAlias("version", "v");
-    
-    cr.register("invite", new TextCommand(invite_link))
+
+    cr.register("invite", new TextCommand(INFO.WEBSITE + "/invite"))
         .setHelp(new HelpContent().setDescription("Gives a link to invite TrixieBot to your own server."))
+        .setCategory(Category.INFO);
+
+    cr.register("vote", new TextCommand(":eyes: https://discordbots.org/bot/397037692963258368/vote"))
+        .setHelp(new HelpContent().setDescription("Vote for TrixieBot on bot listing sites! Pls"))
+        .setCategory(Category.INFO);
+    
+    cr.register("trixie", new SimpleCommand(m => ({
+        embed: new Discord.RichEmbed()
+            .setColor(CONST.COLOR.PRIMARY)
+            .setAuthor("TrixieBot", client.user.avatarURL, INFO.WEBSITE)
+            .setDescription("**Trixie is an all-in-one Discord Bot for pony lovers**\n\n" +
+                "She offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins.\n" +
+                "For a list of all commands, go `" + m.guild.config.prefix + "help`.\n\n" + 
+                "Website " + INFO.WEBSITE)
+            .setFooter(`TrixieBot v${INFO.VERSION}`)
+    })))
+        .setHelp(new HelpContent().setDescription("First command to call."))
         .setCategory(Category.INFO);
 };

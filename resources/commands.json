@@ -196,6 +196,46 @@
       }
     },
     {
+      "name": "donate",
+      "help": {
+        "description": "**TrixieBot costs $6 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤",
+        "usage": "\n`!donate`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "version",
+      "help": {
+        "description": "Returns the currently running version of TrixieBot",
+        "usage": "\n`!version` *(alias `!v`)*",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "invite",
+      "help": {
+        "description": "Gives a link to invite TrixieBot to your own server.",
+        "usage": "\n`!invite`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "vote",
+      "help": {
+        "description": "Vote for TrixieBot on bot listing sites! Pls",
+        "usage": "\n`!vote`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "trixie",
+      "help": {
+        "description": "First command to call.",
+        "usage": "\n`!trixie`",
+        "category": "Info"
+      }
+    },
+    {
       "name": "ascii",
       "help": {
         "description": "Generates ascii art from an image",
@@ -247,7 +287,7 @@
       "name": "bank",
       "help": {
         "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
-        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank name <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank name <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
         "category": "Currency"
       }
     },
@@ -326,7 +366,7 @@
       "name": "help",
       "help": {
         "description": "Haha, very funny",
-        "usage": "\n`!help <?command>` *(alias `!trixie`, `!h`)*\n`command` - optional- The name of the command you want help for. Whole command list if omitted",
+        "usage": "\n`!help <?command>` *(alias `!h`)*\n`command` - optional- The name of the command you want help for. Whole command list if omitted",
         "category": "Info"
       }
     },
@@ -370,6 +410,14 @@
         "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
         "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\nAdmin Area:",
         "category": "Utility"
+      }
+    },
+    {
+      "name": "soundboard",
+      "help": {
+        "description": "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.",
+        "usage": "\n`!soundboard <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!sb`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\nManage Your Soundboards:Buy New Slots:",
+        "category": "Currency"
       }
     },
     {
@@ -435,7 +483,7 @@
       "name": "stopvc",
       "help": {
         "description": "Stop whatever Trixie is saying in VC",
-        "usage": "\n`!stopvc`",
+        "usage": "\n`!stopvc` *(alias `!stop`)*",
         "category": "Audio"
       }
     },
@@ -660,30 +708,6 @@
         "description": "Create a poll that users can vote on",
         "usage": "\n`!poll <duration> <option 1>, <option 2>, ..., <option n>`\n`duration` - Duration of the poll. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`option` - a comma seperated list of options to vote for",
         "category": "Misc"
-      }
-    },
-    {
-      "name": "donate",
-      "help": {
-        "description": "**TrixieBot costs $6 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤",
-        "usage": "\n`!donate`",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "version",
-      "help": {
-        "description": "Returns the currently running version of TrixieBot",
-        "usage": "\n`!version` *(alias `!v`)*",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "invite",
-      "help": {
-        "description": "Gives a link to invite TrixieBot to your own server.",
-        "usage": "\n`!invite`",
-        "category": "Info"
       }
     }
   ]

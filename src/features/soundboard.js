@@ -45,7 +45,7 @@ module.exports = async function install(cr) {
             .setUsage("<?sound name|id>", "Play a soundie of the one's available for you in this server")
             .addParameterOptional("sound name", "sound name to play. If omitted, shows list of all available soundclips")
             .addParameterOptional("id", "sound clip id to play instead of sound name"))
-        .setCategory(Category.CURRENCY);
+        .setCategory(Category.AUDIO);
 
     sbCmd.registerDefaultCommand(new class extends BaseCommand {
         async call(message, content) {

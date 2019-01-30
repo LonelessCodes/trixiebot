@@ -178,13 +178,15 @@ class CreditsManager {
             userId: user.id
         }));
 
-        const time_left = lastDaily.lastDaily.getTime() + CreditsManager.COOLDOWN - Date.now();
+        if (lastDaily) {
+            const time_left = lastDaily.lastDaily.getTime() + CreditsManager.COOLDOWN - Date.now();
 
-        if (lastDaily && time_left > 0) return {
-            time_left,
-            dailies: 0,
-            streak: 0
-        };
+            if (time_left > 0) return {
+                time_left,
+                dailies: 0,
+                streak: 0
+            };
+        }
         
         if (!lastDaily) lastDaily = {
             streak: 0

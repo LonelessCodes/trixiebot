@@ -17,7 +17,7 @@ module.exports = async function install(cr) {
                 .map(post => post.body.trim())
                 .filter(post => /\w+:/gi.test(post))
                 .map(quote => quote
-                    .replace(usernameRegExp, (match, username) => `http://${username}.tumblr.com`));
+                    .replace(usernameRegExp, (match, username) => `<http://${username}.tumblr.com>`));
         })
         .then(q => quotes = q)
         .then(() => log("mlpquotes", "loaded"))

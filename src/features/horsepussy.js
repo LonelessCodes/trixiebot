@@ -32,7 +32,7 @@ async function get(params) {
 
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "gore", "foal abuse"];
 
-const tags = ["pony", "vulva", "-penis", "nudity", "-photo", ...filter_tags.map(tag => "-" + tag), "upvotes.gte:100"];
+const tags = ["pony", "vulva", "-penis", "nudity", "-photo", ...filter_tags.map(tag => "-" + tag), "upvotes.gte:150"];
 
 const query = tags.map(t => encodeURIComponent(t)).join(",").replace(/\s+/g, "+").toLowerCase();
 

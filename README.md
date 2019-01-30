@@ -1,6 +1,6 @@
 # TrixieBot
 
-### [Add TrixieBot to your server now](https://trixie.loneless.org/invite)
+### [Add TrixieBot to your server now](https://trixie.loneless.art/invite)
 
 A feature-rich Discord Bot for pony lovers (or losers, your choice), including integration of:
 

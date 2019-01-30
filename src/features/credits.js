@@ -20,6 +20,53 @@ module.exports = async function install(cr) {
             .setUsage("", "Look at your bank account"))
         .setCategory(Category.CURRENCY);
 
+    bankCmd.registerDefaultCommand(new class extends BaseCommand {
+        async call(message) {
+            const member = message.member;
+
+            const account = await credits.getAccount(member);
+            if (!account) {
+                return await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            }
+
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+
+            embed.setAuthor(userToString(member, true) + "'s Bank Account", member.user.avatarURL);
+
+            embed.addField("Balance", "```cs\n" + credits.getBalanceString(account.balance, await credits.getName(message.guild)) + "\n```");
+
+            const trans_raw = await credits.getTransactions(member, 5);
+
+            if (trans_raw.length > 0) {
+                const transactions = trans_raw.map(trans => ({
+                    ts: moment(trans.ts).fromNow(),
+                    cost: trans.cost >= 0 ?
+                        `+${trans.cost.toLocaleString("en")}` :
+                        `${trans.cost.toLocaleString("en")}`,
+                    description: trans.description,
+                }));
+
+                const ts_length = Math.max(...transactions.map(trans => trans.ts.length));
+                const cost_length = Math.max(...transactions.map(trans => trans.cost.length));
+
+                const trans_str = ["```cs"];
+                for (const trans of transactions) {
+                    trans_str.push(
+                        trans.ts + new Array(ts_length - trans.ts.length).fill(" ").join("") + " | " +
+                        trans.cost + new Array(cost_length - trans.cost.length).fill(" ").join("") + " | " +
+                        trans.description
+                    );
+                }
+                trans_str.push("```");
+
+                embed.addField("Last Transactions", trans_str.join("\n"));
+            }
+
+            await message.channel.send({ embed });
+        }
+    });
+    bankCmd.registerSubCommandAlias("*", "show");
+
     bankCmd.registerSubCommand("create", new class extends BaseCommand {
         async call(message) {
             const user = message.author;
@@ -207,53 +254,6 @@ module.exports = async function install(cr) {
         }
     })
         .setCategory(Category.OWNER);
-
-    bankCmd.registerDefaultCommand(new class extends BaseCommand {
-        async call(message) {
-            const member = message.member;
-
-            const account = await credits.getAccount(member);
-            if (!account) {
-                return await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
-            }
-
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-
-            embed.setAuthor(userToString(member, true) + "'s Bank Account", member.user.avatarURL);
-
-            embed.addField("Balance", "```cs\n" + credits.getBalanceString(account.balance, await credits.getName(message.guild)) + "\n```");
-
-            const trans_raw = await credits.getTransactions(member, 5);
-
-            if (trans_raw.length > 0) {
-                const transactions = trans_raw.map(trans => ({
-                    ts: moment(trans.ts).fromNow(),
-                    cost: trans.cost >= 0 ?
-                        `+${trans.cost.toLocaleString("en")}` :
-                        `${trans.cost.toLocaleString("en")}`,
-                    description: trans.description,
-                }));
-
-                const ts_length = Math.max(...transactions.map(trans => trans.ts.length));
-                const cost_length = Math.max(...transactions.map(trans => trans.cost.length));
-
-                const trans_str = ["```cs"];
-                for (const trans of transactions) {
-                    trans_str.push(
-                        trans.ts + new Array(ts_length - trans.ts.length).fill(" ").join("") + " | " +
-                        trans.cost + new Array(cost_length - trans.cost.length).fill(" ").join("") + " | " +
-                        trans.description
-                    );
-                }
-                trans_str.push("```");
-
-                embed.addField("Last Transactions", trans_str.join("\n"));
-            }
-
-            await message.channel.send({ embed });
-        }
-    });
-    bankCmd.registerSubCommandAlias("*", "show");
 
     cr.register("daily", new class extends BaseCommand {
         async call(message) {

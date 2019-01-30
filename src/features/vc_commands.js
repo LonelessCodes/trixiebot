@@ -45,6 +45,8 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setDescription("Stop whatever Trixie is saying in VC"))
         .setCategory(Category.AUDIO);
+    
+    cr.registerAlias("stopvc", "stop");
 
     cr.register("joinvc", new class extends BaseCommand {
         async call(message) {

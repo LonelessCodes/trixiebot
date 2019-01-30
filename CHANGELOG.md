@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.0.1"></a>
+## [2.0.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.1...v2.0.1) (2019-01-30)
+
+
+### Bug Fixes
+
+* **daily command:** fixed bug in daily command where it would crash when not already called before ([6ec06da](https://bitbucket.org/Loneless/trixiebot/commits/6ec06da))
+* **mlpquote command:** fixed "submitted by" link ([395f13a](https://bitbucket.org/Loneless/trixiebot/commits/395f13a))
+* **poll command:** {{votesCount}} bug fixed ([87eafa4](https://bitbucket.org/Loneless/trixiebot/commits/87eafa4))
+* bigger horsepussy ([e8d21db](https://bitbucket.org/Loneless/trixiebot/commits/e8d21db))
+* change from old to new website url ([5961f4c](https://bitbucket.org/Loneless/trixiebot/commits/5961f4c))
+* soundboard moved to category audio ([1e1b266](https://bitbucket.org/Loneless/trixiebot/commits/1e1b266))
+
+
+### Features
+
+* added alias stop for stopvc command ([d2128bd](https://bitbucket.org/Loneless/trixiebot/commits/d2128bd))
+* bank trans command added ([f3d1520](https://bitbucket.org/Loneless/trixiebot/commits/f3d1520))
+* seperated trixie and help command ([887ead1](https://bitbucket.org/Loneless/trixiebot/commits/887ead1))
+* soundboard command added ([c6e50a2](https://bitbucket.org/Loneless/trixiebot/commits/c6e50a2))
+
+
+
 <a name="2.0.0"></a>
 # [2.0.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.1...v2.0.0) (2019-01-30)
 

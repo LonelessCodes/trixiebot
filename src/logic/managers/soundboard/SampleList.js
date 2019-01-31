@@ -113,7 +113,7 @@ class SampleList extends Events {
         const collector = message.createReactionCollector(
             (reaction, user) => {
                 if (user.bot) return false;
-                if (this.guild.member(user).voiceChannelID !== this.member.voiceChannelID) return false;
+                if (this.guild.me.voiceChannelID !== this.member.voiceChannelID) return false;
                 return this.map.has(reaction.emoji.name);
             },
             { time: this.timeout, max: 1 }
@@ -131,9 +131,11 @@ class SampleList extends Events {
      * @param {Message} message
      */
     async handleMessageReactionAddAction(reaction, message) {
-        const audio = AudioManager.getGuild(this.guild);
-        const connection = await audio.connect(this.member);
-        await this.map.get(reaction.emoji.name).play(connection);
+        try {
+            const audio = AudioManager.getGuild(this.guild);
+            const connection = await audio.connect(this.member);
+            await this.map.get(reaction.emoji.name).play(connection);
+        } catch (_) { _; }
 
         try {
             reaction.remove(this.user);

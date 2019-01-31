@@ -96,7 +96,7 @@ function HelpToJSON(config, name, command) {
         usage = usage.replace(/\n{2,}/g, "\n\n");
 
         if (usage !== "")
-            str += title || "" + "\n" + format(usage, { prefix });
+            str += (title ? ("**" + title + "**") : "") + "\n" + format(usage, { prefix });
     }
 
     json.usage = str;

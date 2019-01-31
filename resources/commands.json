@@ -408,7 +408,7 @@
       "name": "role",
       "help": {
         "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
-        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\nAdmin Area:",
+        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\n**Admin Area:**\n`!role config` - Configure roles that everyone can add\n\n`!role config add <role> <?category>` - Add a role to the public configuration\n\n`!role config remove <role>` - Remove a role from the public configuration\n`role` - The \"quoted\" role name of the role you want to remove\n`category` - optional- The \"quoted\" name of the category you want to add the role to. Not given will be \"Other\"",
         "category": "Utility"
       }
     },
@@ -416,8 +416,8 @@
       "name": "soundboard",
       "help": {
         "description": "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.",
-        "usage": "\n`!soundboard <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!sb`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\nManage Your Soundboards:Buy New Slots:",
-        "category": "Currency"
+        "usage": "\n`!soundboard <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!sb`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\n**Manage Your Soundboards:**\n`!soundboard upload <?scope> <sound name>` - Upload a sound clip to Trixie. Attach the audio file to the message when sending *(alias `!soundboard u`)*\n`scope` - optional- `user` or `server`\n`sound name` - Name of the new sound clip\n\n`!soundboard import <?scope> <id>` - Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `!sb info <sound name>` *(alias `!soundboard i`)*\n`id` - The unique ID of a soundclip\n\n`!soundboard delete <?scope> <sound name>` - Delete a soundclip from your or your server's soundboard. *(alias `!soundboard d`)*\n`sound name` - The name of the soundclip to delete\n\n`!soundboard info <?scope> <sound name|id>` - View info about a sound clip and get it's unique ID, for people to be able to play it as well\n`sound name` - The name of the sound clip to view more info about\n`id` - The id of the sound clip to view more info about instead of sound name\n\n**Buy New Slots:**\n`!soundboard buyslot <?scope>` - Buy additional soundboard slots with Trixie's currency *(alias `!soundboard b`)*\n\n",
+        "category": "Audio"
       }
     },
     {

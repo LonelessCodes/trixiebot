@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.0.4"></a>
+## [2.0.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.3...v2.0.4) (2019-02-03)
+
+
+### Bug Fixes
+
+* **soundboard command:** users not in vc cannot play samples from sb list anymore ([d0dd0b4](https://bitbucket.org/Loneless/trixiebot/commits/d0dd0b4))
+* **tts & soundboard command:** delay in playback ([e74dd51](https://bitbucket.org/Loneless/trixiebot/commits/e74dd51))
+
+
+
 <a name="2.0.3"></a>
 ## [2.0.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.2...v2.0.3) (2019-01-31)
 

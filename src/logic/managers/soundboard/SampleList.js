@@ -113,7 +113,7 @@ class SampleList extends Events {
         const collector = message.createReactionCollector(
             (reaction, user) => {
                 if (user.bot) return false;
-                if (this.guild.me.voiceChannelID !== this.member.voiceChannelID) return false;
+                if (this.guild.me.voiceChannelID && this.guild.me.voiceChannelID !== this.guild.member(user).voiceChannelID) return false;
                 return this.map.has(reaction.emoji.name);
             },
             { time: this.timeout, max: 1 }

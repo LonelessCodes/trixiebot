@@ -41,7 +41,10 @@ module.exports = async function install(cr) {
                 const connection = await audio.connect(message.member);
                 const request = await fetch(url);
 
-                connection.playStream(request.body);
+                const dispatcher = connection.playStream(request.body);
+                dispatcher.once("start", () => {
+                    connection.player.streamingData.pausedTime = 0;
+                });
 
                 await message.react("👍");
             } catch (err) {

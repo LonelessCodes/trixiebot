@@ -39,6 +39,9 @@ class Sample {
      */
     async play(connection) {
         const dispatcher = connection.playFile(this.file);
+        dispatcher.once("start", () => {
+            connection.player.streamingData.pausedTime = 0;
+        });
         await this.db.then(db => db.updateOne({ id: this.id }, { $inc: { plays: 1 }, $set: { last_played_at: new Date } }));
         return dispatcher;
     }
@@ -81,6 +84,9 @@ class PredefinedSample extends Sample {
      */
     async play(connection) {
         const dispatcher = connection.playFile(this.file);
+        dispatcher.once("start", () => {
+            connection.player.streamingData.pausedTime = 0;
+        });
         await this.db.then(db => db.updateOne({ name: this.name }, { $inc: { plays: 1 }, $set: { last_played_at: new Date } }));
         return dispatcher;
     }

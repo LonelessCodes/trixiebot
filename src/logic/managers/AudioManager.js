@@ -30,8 +30,8 @@ class VCGuild extends EventEmitter {
          */
         this.vc = null;
 
-        this.voiceStateChanged = this.voiceStateChanged.bind(this);
-        this.client.addListener("voiceStateUpdate", this.voiceStateChanged);
+        this.voiceStateChanged = this.voiceStateUpdate.bind(this);
+        this.client.addListener("voiceStateUpdate", this.voiceStateUpdate);
     }
 
     get connected() {
@@ -98,19 +98,25 @@ class VCGuild extends EventEmitter {
 
     async destroy() {
         await this.leave();
-        this.client.removeListener("voiceStateUpdate", this.voiceStateChanged);
+        this.client.removeListener("voiceStateUpdate", this.voiceStateUpdate);
         this.emit("destroy");
         this.removeAllListeners();
     }
 
     /**
-     * @param {GuildMember} oldMember 
+     * @param {GuildMember} oldMember
+     * @param {GuildMember} newMember
      */
-    voiceStateChanged(oldMember) {
+    voiceStateUpdate(oldMember, newMember) {
         if (!this.connected) return;
 
-        if (!oldMember.voiceChannel) return;
-        if (oldMember.voiceChannel.id !== this.vc.id) return;
+        if (oldMember.user.id === this.client.user.id) {
+            this.vc = newMember.voiceChannel;
+        } else {
+            if (!oldMember.voiceChannel) return;
+            if (oldMember.voiceChannel.id !== this.vc.id) return;
+        }
+
         if (this.vc.members.size > 1) return;
 
         this.leave();

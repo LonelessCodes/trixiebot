@@ -63,7 +63,7 @@ class CommandRegistry {
                 this.database.collection("disabled_users").findOne({
                     guildId: message.guild.id,
                     members: {
-                        $all: [message.member.id]
+                        $all: [message.author.id]
                     }
                 }),
                 this.database.collection("disabled_channels").findOne({
@@ -112,7 +112,7 @@ class CommandRegistry {
         }
 
         if (!isOwnerCommand && !CommandPermission.ADMIN.test(message.member) && command.ignore) {
-            const timeouted = await this.database.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.member.id });
+            const timeouted = await this.database.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.author.id });
             if (timeouted) return false;
         }
 

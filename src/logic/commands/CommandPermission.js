@@ -1,4 +1,5 @@
 const { isOwner } = require("../../modules/util");
+// eslint-disable-next-line no-unused-vars
 const { Permissions, GuildMember } = require("discord.js");
 
 const { FLAGS } = Permissions;

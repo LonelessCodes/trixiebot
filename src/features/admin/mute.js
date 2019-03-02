@@ -17,6 +17,8 @@ module.exports = async function install(cr, client, config, db) {
         }
 
         async beforeProcessCall(message, content) {
+            if (message.channel.type !== "text") return [];
+
             const muted_words = (await database.find({ guildId: message.guild.id }).toArray()).map(doc => doc.word);
 
             if (muted_words.length > 0 && !permission.test(message.member)) {

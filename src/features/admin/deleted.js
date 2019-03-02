@@ -16,6 +16,7 @@ module.exports = async function install(cr, client, config, db) {
         if (message.author.bot) return;
         if (message.author.id === client.user.id) return;
         if (message.content === "") return;
+        if (message.channel.type !== "text") return;
         await database.insertOne({
             guildId: message.guild.id,
             memberId: message.author.id,

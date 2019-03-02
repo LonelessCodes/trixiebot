@@ -10,10 +10,6 @@ const Core = require("./logic/core/Core");
 
 log("Running trixiebot v" + info.VERSION);
 
-Array.prototype.last = function () {
-    return this[this.length - 1];
-};
-
 new class App {
     constructor() {
         this.client = new Discord.Client({ autoReconnect: true }).setMaxListeners(Infinity);
@@ -100,7 +96,7 @@ new class App {
 
         this.client.addListener("reconnecting", () => log.debug("discord.js", "Reconnecting"));
 
-        this.client.addListener("resume", replayed => log.debug("discord.js", `Resumed ${replayed} time`));
+        this.client.addListener("resume", replayed => log.debug("discord.js", `Replayed ${replayed} events`));
     }
 };
 

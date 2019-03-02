@@ -1,4 +1,3 @@
-const log = require("../modules/log");
 const LocaleManager = require("../logic/managers/LocaleManager");
 const { parseHumanTime, toHumanTime } = require("../modules/util/time");
 const CONST = require("../modules/CONST");
@@ -82,7 +81,6 @@ class Poll {
             await this.channel.sendTranslated("{{user}} Poll ended!", {
                 user: this.creator.toString()
             }, { embed });
-            log("Poll ended. No one voted");
             return;
         }
 
@@ -103,7 +101,6 @@ class Poll {
         await this.channel.sendTranslated("{{user}} Poll ended!", {
             user: this.creator.toString()
         }, { embed });
-        log(`Poll ended. ${result[0].text} won with ${result[0].votes / total * 100}% votes`);
     }
 
     vote(member, option) {
@@ -121,7 +118,6 @@ class Poll {
                 }
             });
 
-            log(`User voted for ${option}`);
             return true;
         }
     }
@@ -193,35 +189,30 @@ module.exports = async function install(cr, client, config, db) {
 
             if (await database.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
                 await message.channel.sendTranslated("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
-                log("Gracefully aborted attempt to create poll. Poll already exists in this channel");
                 return;
             }
 
             const duration_string = content.match(/([\d.]+(d|h|m|s|ms)\s*)+/g)[0];
             if (!duration_string) {
                 await message.channel.send(await message.channel.translate("`duration` must be formated as in the example."));
-                log("Gracefully aborted attempt to create poll. Duration parsing error");
                 return;
             }
 
             const duration = parseHumanTime(duration_string);
             if (duration < 60000 || duration > 1000 * 3600 * 24 * 3) {
                 await message.channel.send(await message.channel.translate("`duration` should be at least 1m and max 3d"));
-                log("Gracefully aborted attempt to create poll. Duration out of range");
                 return;
             }
 
             content = content.substr(duration_string.length);
             if (content === "") {
                 await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from."));
-                log("Gracefully aborted attempt to create poll. Options missing");
                 return;
             }
 
             const options = content.split(/,\s*/g).sort((a, b) => b.length - a.length); // longest to shortest
             if (options.length < 2) {
                 await message.channel.send(await message.channel.translate("To create a poll you must give at least two options to choose from."));
-                log("Gracefully aborted attempt to create poll. Too little options");
                 return;
             }
 
@@ -245,7 +236,6 @@ module.exports = async function install(cr, client, config, db) {
             }) + "\n" + await message.channel.translate("You vote by simply posting {{options}} in this channel", {
                 options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``
             }));
-            log(`Poll started. ${duration}ms. ${options.join(", ")}`);
         }
     })
         .setHelp(new HelpContent()

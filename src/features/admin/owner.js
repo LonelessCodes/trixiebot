@@ -29,13 +29,11 @@ module.exports = async function install(cr, client) {
 
             if (!stat.isFile()) {
                 await message.channel.send("Not a file. Sorry :(");
-                log("Gracefully aborted attempt to read file. Not a file");
                 return;
             }
 
             if (stat.size > 1024 * 15) {
                 await message.channel.send(`File too big. Should be smaller than 15kb, but this one is freaking huuuuuge: ${stat.size / 1024}kb`);
-                log("Gracefully aborted attempt to read file. Not a file");
                 return;
             }
 

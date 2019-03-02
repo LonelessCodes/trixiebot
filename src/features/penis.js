@@ -1,4 +1,3 @@
-const log = require("../modules/log");
 const CONST = require("../modules/CONST");
 const secureRandom = require("../modules/secureRandom");
 const Discord = require("discord.js");
@@ -32,7 +31,6 @@ module.exports = async function install(cr, client, config, db) {
 
             if (message.alt_mentions.everyone) {
                 await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
-                log("Requested everyone's dicks");
                 return;
             }
 
@@ -40,7 +38,6 @@ module.exports = async function install(cr, client, config, db) {
                 const length = 20;
                 const girth = 18;
                 await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-                log("Requested Trixie's dick");
                 return;
             }
 
@@ -59,13 +56,11 @@ module.exports = async function install(cr, client, config, db) {
                 });
 
                 await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-                log(`Requested unknown dick => created new dick for user ${message.member.id} with ${girth} in girth, ${length} in length`);
                 return;
             } else {
                 const { length, girth } = doc;
 
                 await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-                log(`Requested known dick of user ${message.member.id} with ${girth} in girth, ${length} in length`);
                 return;
             }
         }
@@ -92,7 +87,6 @@ module.exports = async function install(cr, client, config, db) {
             }
 
             await message.channel.send({ embed });
-            log(`Served penis leaderboard for guild ${message.guild.id}`);
         }
     })
         .setHelp(new HelpContent()

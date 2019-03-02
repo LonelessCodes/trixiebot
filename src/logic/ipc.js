@@ -3,7 +3,6 @@ const log = require("../modules/log");
 const uuid = require("uuid");
 const ipc = require("node-ipc");
 
-ipc.config.silent = info.DEV ? false : true;
 ipc.config.silent = true;
 ipc.config.id = info.DEV ? "trixiedev" : "trixiebot";
 ipc.config.retry = 1000;

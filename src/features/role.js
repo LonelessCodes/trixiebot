@@ -1,4 +1,3 @@
-const log = require("../modules/log");
 const { findArgs } = require("../modules/util/string");
 const Discord = require("discord.js");
 
@@ -85,14 +84,12 @@ module.exports = async function install(cr, client, config, db) {
             if (members.length > 0) {
                 if (!permission) {
                     await message.channel.sendTranslated("IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles.");
-                    log("Grafully aborted attempt to remove role from somebody else without the required permissions");
                     return;
                 }
 
                 for (const member of members) {
                     if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_ROLES)) {
                         await message.channel.sendTranslated("You cannot remove roles from other users with Manage Roles permission.");
-                        log("Gracefully aborted attempt to remove role from somebody else with permission to manage roles");
                         return;
                     }
                     content = content.replace(member.toString(), "");
@@ -102,7 +99,6 @@ module.exports = async function install(cr, client, config, db) {
                 const role_obj = findRoleInServer(message.guild, content);
                 if (!role_obj) {
                     await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                    log(`Couldn't find role ${content} in server ${message.guild.name}`);
                     return;
                 }
 
@@ -110,30 +106,25 @@ module.exports = async function install(cr, client, config, db) {
                     member.removeRole(role_obj);
                 }
                 await message.channel.sendTranslated("Role removed.");
-                log(`Removed role ${role_obj.name} from users ${members.map(member => member.toString()).join(" ")}`);
             } else {
                 if (permission) {
                     const role_obj = findRoleInServer(message.guild, content);
                     if (!role_obj) {
                         await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                        log(`Couldn't find role ${content} in guild ${message.guild.name}`);
                         return;
                     }
 
                     if (!message.member.roles.has(role_obj.id)) {
-                        message.channel.sendTranslated("Can't remove a role without having it first.");
-                        log("Couldn't remove role. User didn't have role in the first place");
+                        await message.channel.sendTranslated("Can't remove a role without having it first.");
                         return;
                     }
 
                     await message.member.removeRole(role_obj);
                     await message.channel.sendTranslated("Role removed.");
-                    log(`Removed role ${role_obj.name} from user ${message.member.user.username}`);
                 } else {
                     const role_obj = findRoleInServer(message.guild, content);
                     if (!role_obj) {
                         await message.channel.send(await message.channel.translate("This role doesn't exist so you can't have it.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        log(`Couldn't find role ${content} in server ${message.guild.name}`);
                         return;
                     }
 
@@ -144,19 +135,16 @@ module.exports = async function install(cr, client, config, db) {
 
                     if (!role_query) {
                         await message.channel.send(await message.channel.translate("You don't have permission to remove this role.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        log(`Couldn't remove role ${role_obj.name}. Not in presets, aka no permission`);
                         return;
                     }
 
                     if (!message.member.roles.has(role_obj.id)) {
-                        message.channel.sendTranslated("Can't remove a role without having it first.");
-                        log("Couldn't remove role. User didn't have role in the first place");
+                        await message.channel.sendTranslated("Can't remove a role without having it first.");
                         return;
                     }
 
                     await message.member.removeRole(role_obj);
                     await message.channel.sendTranslated("Role removed.");
-                    log(`Removed role ${role_obj.name} from user ${message.member.user.username}`);
                 }
             }
         }
@@ -172,7 +160,6 @@ module.exports = async function install(cr, client, config, db) {
         }
         async call(message) {
             await message.channel.send(await rolesMessage(message.guild, message.channel, database));
-            log(`Requested available roles for guild ${message.guild.name}`);
         }
     });
     cr.register("roles", new AliasCommand("role", listRoles));
@@ -191,14 +178,12 @@ module.exports = async function install(cr, client, config, db) {
             const role_obj = findRoleInServer(message.guild, role_query);
             if (!role_obj) {
                 await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                log(`Couldn't find role ${role_query} in server ${message.guild.name}`);
                 return;
             }
 
             const compare = role_obj.comparePositionTo(message.member.highestRole);
             if (compare > 0) {
                 await message.channel.sendTranslated("Sorry, you can't add a role to the config that is more powerful than your owns.");
-                log(`Couldn't add role ${role_query} to config. Role too high`);
                 return;
             }
 
@@ -211,7 +196,6 @@ module.exports = async function install(cr, client, config, db) {
                 }
             }, { upsert: true });
             await message.channel.sendTranslated("Made the role available for everyone! It's free real estate");
-            log(`Added role ${role_query} to config of guild ${message.guild.name}`);
         }
     })
         .setHelp(new HelpContent()
@@ -224,14 +208,12 @@ module.exports = async function install(cr, client, config, db) {
             const role_obj = message.guild.roles.find("name", role);
             if (!role_obj) {
                 await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                log(`Couldn't find role ${role} in server ${message.guild.name}`);
                 return;
             }
 
             const compare = role_obj.comparePositionTo(message.member.highestRole);
             if (compare > 0) {
                 await message.channel.sendTranslated("Sorry, you can't remove a role to the config that is more powerful than your owns.");
-                log(`Couldn't remove role ${role} to config. Role too high`);
                 return;
             }
 
@@ -240,7 +222,6 @@ module.exports = async function install(cr, client, config, db) {
                 roleId: role_obj.id
             });
             await message.channel.sendTranslated("Removed the role from the config. Ouchie wouchie ;~;");
-            log(`Removed role ${role} from config of guild ${message.guild.name}`);
         }
     })
         .setHelp(new HelpContent()
@@ -265,7 +246,6 @@ module.exports = async function install(cr, client, config, db) {
                 const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
                 if (!permission) {
                     await message.channel.sendTranslated("IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles.");
-                    log("Gracefully aborted attempt to add role to another user without having the required permissions");
                     return;
                 }
 
@@ -273,7 +253,6 @@ module.exports = async function install(cr, client, config, db) {
                 for (const member of members) {
                     if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_ROLES)) {
                         await message.channel.sendTranslated("You cannot add roles to other users with Manage Roles permission.");
-                        log("Gracefully aborted attempt to add role to another user that has permissions to manage roles themselves");
                         return;
                     }
                     content = content.replace(member.toString(), "");
@@ -284,7 +263,6 @@ module.exports = async function install(cr, client, config, db) {
                 const role_obj = findRoleInServer(message.guild, content);
                 if (!role_obj) {
                     await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                    log(`Couldn't find role ${content} in guild ${message.guild.name}`);
                     return;
                 }
 
@@ -293,30 +271,25 @@ module.exports = async function install(cr, client, config, db) {
                     await member.addRole(role_obj);
                 }
                 await message.channel.sendTranslated("Role added! /)");
-                log(`Added role ${role_obj.name} to users ${members.map(member => member.toString()).join(" ")}`);
             } else {
                 if (permission) {
                     const role_obj = findRoleInServer(message.guild, content);
                     if (!role_obj) {
                         await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                        log(`Couldn't find role ${content} in server ${message.guild.name}`);
                         return;
                     }
 
                     if (message.member.roles.has(role_obj.id)) {
                         await message.channel.sendTranslated("You already have this role! Yay?");
-                        log("Couldn't add role: already has role");
                         return;
                     }
 
                     await message.member.addRole(role_obj);
                     await message.channel.sendTranslated("Role added! /)");
-                    log(`Added role ${role_obj.name} to user ${message.member.user.username}`);
                 } else {
                     const role_obj = findRoleInServer(message.guild, content);
                     if (!role_obj) {
                         await message.channel.send(await message.channel.translate("Uh apparently this server doesn't have this role available right now.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        log(`Couldn't find role ${content} in server ${message.guild.name}`);
                         return;
                     }
 
@@ -327,19 +300,16 @@ module.exports = async function install(cr, client, config, db) {
 
                     if (!role_query) {
                         await message.channel.send(await message.channel.translate("Hmm... I couldn't really find your role.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        log(`Couldn't find role ${role_obj.name} in presets`);
                         return;
                     }
 
                     if (message.member.roles.has(role_obj.id)) {
                         await message.channel.sendTranslated("You already have this role! Yay?");
-                        log("Couldn't add role: already has role");
                         return;
                     }
 
                     await message.member.addRole(role_obj);
                     await message.channel.sendTranslated("Role added! /)");
-                    log(`Added role ${content} to user ${message.member.user.username}`);
                 }
             }
         }

@@ -1,4 +1,3 @@
-const log = require("../../modules/log");
 const fliptext = require("flip-text");
 
 const BaseCommand = require("../../class/BaseCommand");
@@ -12,7 +11,6 @@ module.exports = async function install(cr) {
             if (!mention) {
                 if (content === "") {
                     await message.channel.send(`Usage: \`${message.prefix}flip <user|string>\``);
-                    log("Sent flip usage");
                     return;
                 }
                 await message.channel.send(`(╯°□°）╯︵ ${fliptext(content)}`);

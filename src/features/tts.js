@@ -24,14 +24,12 @@ module.exports = async function install(cr) {
             if (audio.playing) {
                 message.react("❌");
                 message.channel.sendTranslated("Something is already playing, don't wanna interrupt!");
-                log("Gracefully aborted attempt to call tts. Already playing audio");
                 return;
             }
 
             if (content.length > 90000) {
                 message.react("❌");
                 message.channel.sendTranslated("I'm sorry to disappoint you, but I may only use up to 100 character :/");
-                log("Gracefully aborted attempt to call tts. Text longer than 100 characters");
                 return;
             }
 

@@ -1,5 +1,4 @@
 const { userToString } = require("../../modules/util");
-const log = require("../../modules/log");
 const LocaleManager = require("../../logic/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../modules/util/time");
 const Discord = require("discord.js");
@@ -55,7 +54,7 @@ module.exports = async function install(cr, client, config, db) {
 
                     await database_messages.insertOne({
                         guildId: message.guild.id,
-                        memberId: message.member.id,
+                        memberId: message.author.id,
                         message: content,
                         timeoutEnd: timeout_entry.expiresAt
                     });
@@ -66,7 +65,6 @@ module.exports = async function install(cr, client, config, db) {
                         message: notice,
                     };
 
-                    log(`Sent timeout notice to user ${message.member.user.username} in guild ${message.guild.name} and saved their message before deletion`);
                     return;
                 } else if (timeleft <= 0) {
                     // mongodb has some problems with syncing the expiresAt index properly.
@@ -110,7 +108,6 @@ module.exports = async function install(cr, client, config, db) {
             });
 
             await Promise.all(promises);
-            log(`Removed timeout from users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name}`);
         }
     })
         .setHelp(new HelpContent()
@@ -135,7 +132,6 @@ module.exports = async function install(cr, client, config, db) {
             await database.deleteMany({ guildId: message.guild.id });
 
             await message.channel.sendTranslated("Removed all timeouts successfully");
-            log(`Removed all timeouts in guild ${message.guild.name}`);
         }
     })
         .setHelp(new HelpContent()
@@ -168,7 +164,6 @@ module.exports = async function install(cr, client, config, db) {
             }
             str += "\n```";
             await message.channel.send(str);
-            log(`Sent list of timeouts in guild ${message.guild.name}`);
         }
     })
         .setHelp(new HelpContent()
@@ -184,13 +179,11 @@ module.exports = async function install(cr, client, config, db) {
 
             if (members.has(message.member.id)) {
                 await message.channel.sendTranslated("You cannot timeout yourself, dummy!");
-                log("Gracefully aborted attempt to timeout themselves");
                 return;
             }
 
             if (members.has(message.client.user.id)) {
                 await message.channel.sendTranslated("You cannot timeout TrixieBot! I own you.");
-                log("Gracefully aborted attempt to timeout TrixieBot");
                 return;
             }
 
@@ -199,7 +192,6 @@ module.exports = async function install(cr, client, config, db) {
             for (const member of members) {
                 if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {
                     await message.channel.sendTranslated("You cannot timeout other moderators or admins. That's just rood");
-                    log("Gracefully aborted attempt to timeout other user with permissions to manage messages");
                     return;
                 }
                 msg = msg.replace(
@@ -213,7 +205,6 @@ module.exports = async function install(cr, client, config, db) {
             const ms = parseHumanTime(msg);
             if (ms < 10000 || ms > 1000 * 3600 * 24 * 3) {
                 await message.channel.sendTranslated("Timeout length should be at least 10 seconds long and shorter than 3 days");
-                log(`Gracefully aborted attempt to timeout for longer or shorter than allowed. Value: ${msg}`);
                 return;
             }
 
@@ -243,7 +234,6 @@ module.exports = async function install(cr, client, config, db) {
             }));
 
             await Promise.all(promises);
-            log(`Timeouted users ${members.map(member => member.user.username).join(" ")} in guild ${message.guild.name} with ${msg}`);
         }
     });
 };

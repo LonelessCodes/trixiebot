@@ -1,4 +1,3 @@
-const log = require("../../modules/log");
 const secureRandom = require("../../modules/secureRandom");
 const Discord = require("discord.js");
 
@@ -38,7 +37,6 @@ module.exports = async function install(cr, client) {
             const array = message.guild.members.array();
             const member = await secureRandom(array);
             await message.channel.send(`${await secureRandom(emoticons)} ***(${member.displayName})***`);
-            log(`Requested someone. Picked ${member.displayName}`);
         }
     });
 

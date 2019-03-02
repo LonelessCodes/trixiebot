@@ -1,4 +1,3 @@
-const log = require("../modules/log");
 const stats = require("../logic/stats");
 const os = require("os");
 const { toHumanTime } = require("../modules/util/time");
@@ -102,8 +101,6 @@ module.exports = async function install(cr, client) {
             await m.edit(pongText + "\n" +
                 `:stopwatch: \`Latency is     ${ping}ms\`\n` +
                 `:heartbeat: \`API Latency is ${Math.round(client.ping)}ms\``);
-            log(`Requested ping. Got ping of ${ping}ms`);
-            return;
         }
     })
         .setHelp(new HelpContent().setDescription("Ping-Pong-Ping-Pong-Ping-WEE HEEEEE."))

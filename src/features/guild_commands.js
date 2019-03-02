@@ -1,4 +1,3 @@
-const log = require("../modules/log");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 
@@ -147,7 +146,6 @@ module.exports = async function install(cr) {
             if (results[3] && results[3].timestamp.getTime() < quartal.getTime()) embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
 
             await message.channel.send({ embed });
-            log(`Gave server stats for ${message.guild.id}`);
         }
     })
         .setHelp(new HelpContent()
@@ -169,7 +167,6 @@ module.exports = async function install(cr) {
             embed.addField("Region", message.guild.region, true);
 
             await message.channel.send({ embed });
-            log(`Gave server info for ${message.guild.id}`);
         }
     })
         .setHelp(new HelpContent()

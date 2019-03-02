@@ -174,7 +174,6 @@ module.exports = async function install(cr, client, config, db) {
                 await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
                     url
                 });
-                log("Page url given is not valid. - alert");
                 return;
             }
 
@@ -185,12 +184,10 @@ module.exports = async function install(cr, client, config, db) {
                 await message.channel.sendTranslated("MMMMMMMMMMMMHHHHHHHH I don't know this... {{service}} or whatever", {
                     service: host
                 });
-                log("Service not supported - alert");
                 return;
             }
             if (!name) {
                 await message.channel.sendTranslated("You should also give me your channel page in the url instead of just the site!");
-                log("User page name not given - alert");
                 return;
             }
 
@@ -249,7 +246,6 @@ module.exports = async function install(cr, client, config, db) {
 
             if (streams.length === 0) {
                 await message.channel.sendTranslated("Hehe, nothing here lol. Time to add some.");
-                log("Sent alerts messages. None exist");
                 return;
             }
 

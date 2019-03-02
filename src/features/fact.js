@@ -1,19 +1,12 @@
 const { promisify } = require("util");
 const { timeout } = require("../modules/util");
+const { lastItem, randomItem } = require("../modules/util/array");
 const log = require("../modules/log");
-const secureRandom = require("../modules/secureRandom");
 const Twit = require("twit");
 
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
-
-Array.prototype.last = function lastItem() {
-    return this[this.length - 1];
-};
-Array.prototype.random = async function randomItem() {
-    return await secureRandom(this);
-};
 
 const twitter = new Twit(require("../../keys/twitter.json"));
 twitter.get = promisify(twitter.get);
@@ -36,7 +29,7 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
         if (!newest_id) newest_id = data[0].id_str;
         if (data.length <= 1) tweets_available = false;
         else {
-            smallest_id = data.last().id_str;
+            smallest_id = lastItem(data).id_str;
             data.filter(tweet => !tweet.entities.urls[0]).map(tweet => facts.add(tweet.text));
         }
         resolve(facts); // indicates that the set now has a few values, and then just continue fetching more
@@ -47,7 +40,7 @@ const firstSetLoaded = new Promise(async function loadTweets(resolve) {
 }).catch(log);
 
 async function getFact() {
-    return await [...facts].random();
+    return await randomItem([...facts]);
 }
 
 module.exports = async function install(cr) {
@@ -56,7 +49,6 @@ module.exports = async function install(cr) {
             await firstSetLoaded;
             const fact = await getFact();
             await message.channel.send(fact);
-            log("Fact requested");
         }
     })
         .setHelp(new HelpContent()

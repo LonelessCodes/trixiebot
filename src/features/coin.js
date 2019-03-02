@@ -1,14 +1,9 @@
-const log = require("../modules/log");
 const { timeout } = require("../modules/util");
-const secureRandom = require("../modules/secureRandom");
+const { randomItem } = require("../modules/util/array");
 
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
-
-Array.prototype.random = async function randomItem() {
-    return await secureRandom(this);
-};
 
 const coin = ["heads", "tails"];
 
@@ -25,11 +20,10 @@ module.exports = async function install(cr) {
 
             if (!coin.includes(bet)) {
                 await message.channel.send(`\`${bet}\` isn't a valid side of le coin. \`heads\` or \`tails\`?!`);
-                log(`Bet "${bet}" isn't a valid side of a coin`);
                 return;
             }
 
-            const result = await coin.random();
+            const result = await randomItem(coin);
 
             await message.channel.send("The coin flips into the air...");
             await timeout(2000);

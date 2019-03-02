@@ -22,7 +22,7 @@ class UpvotesManager extends EventEmitter {
         this.server.listen(this.port, this._emitListening.bind(this));
 
         this.on("vote", ({ id, type = "vote", timestamp, site }) => {
-            if (type === "vote") {
+            if (type !== "test") {
                 this.db.insertOne({
                     userId: id,
                     site: site,
@@ -30,7 +30,7 @@ class UpvotesManager extends EventEmitter {
                 });
             }
 
-            log(`${id} voted on ${site}`);
+            log.debug("Upvotes Manager", `${id} voted on ${site}`);
         });
     }
 

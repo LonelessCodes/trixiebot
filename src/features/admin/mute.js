@@ -1,4 +1,3 @@
-const log = require("../../modules/log");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../../class/BaseCommand");
@@ -54,8 +53,6 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.sendTranslated("Removed muted word \"{{word}}\" successfully", {
                 word
             });
-
-            log(`Removed muted word "${word}" in guild ${message.guild.name}`);
         }
     };
 
@@ -71,7 +68,6 @@ module.exports = async function install(cr, client, config, db) {
             await database.deleteMany({ guildId: message.guild.id });
 
             await message.channel.sendTranslated("Removed all muted words successfully");
-            log(`Removed all muted words in guild ${message.guild.name}`);
         }
     })
         .setHelp(new HelpContent()
@@ -88,7 +84,6 @@ module.exports = async function install(cr, client, config, db) {
             }
 
             await message.channel.send(str);
-            log(`Sent list of muted words in guild ${message.guild.name}`);
         }
     })
         .setHelp(new HelpContent()
@@ -107,7 +102,6 @@ module.exports = async function install(cr, client, config, db) {
 
             if (muted_words.includes(word)) {
                 await message.channel.sendTranslated("Already got this muted");
-                log("Word already muted");
                 return;
             }
 
@@ -116,8 +110,6 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.sendTranslated("Got it! Blacklisted use of \"{{word}}\"", {
                 word
             });
-
-            log(`Muted word "${word}" in ${message.guild.id}`);
         }
     });
 

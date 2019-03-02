@@ -1,5 +1,4 @@
 const fetch = require("node-fetch");
-const log = require("../modules/log");
 const cheerio = require("cheerio");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
@@ -19,7 +18,6 @@ module.exports = async function install(cr) {
             const searchJson = await searchRequest.json();
             if (!searchJson.items || !searchJson.items[0]) {
                 await message.channel.send("*shrug* nothing here apparently");
-                log(`No results for wikia query ${query}`);
                 return;
             }
 
@@ -107,7 +105,6 @@ module.exports = async function install(cr) {
                 embed.addField(field.key, field.value, true);
 
             await message.channel.send({ embed });
-            log(`Fulfilled wikia query for ${query} successfully.`);
         }
     })
         .setHelp(new HelpContent()

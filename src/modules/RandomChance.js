@@ -1,8 +1,4 @@
-const secureRandom = require("../modules/secureRandom");
-
-Array.prototype.random = async function randomItem() {
-    return await secureRandom(this);
-};
+const { randomItem } = require("../modules/util/array");
 
 class RandomChance {
     constructor() {
@@ -23,7 +19,7 @@ class RandomChance {
      * @returns {any}
      */
     async random() {
-        return await this.array.random();
+        return await randomItem(this.array);
     }
 }
 

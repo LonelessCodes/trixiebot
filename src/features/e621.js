@@ -1,5 +1,5 @@
 const { splitArgs } = require("../modules/util/string");
-const secureRandom = require("../modules/secureRandom");
+const { randomItem } = require("../modules/util/array");
 const fetch = require("node-fetch");
 const INFO = require("../info");
 
@@ -7,10 +7,6 @@ const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
-
-Array.prototype.random = async function randomItem() {
-    return await secureRandom(this);
-};
 
 const filter_tags = ["shota", "cub", "self_harm", "suicide", "animal_abuse", "gore", "child_abuse"];
 
@@ -111,7 +107,7 @@ async function process(message, msg, type) {
                 if (whileBreak <= 0) break;
                 whileBreak--;
 
-                const image = await result.random();
+                const image = await randomItem(result);
                 const tags = image.tags.split(/\s+/g);
                 if (filter_tags.some(tag => tags.includes(tag))) {
                     i--;

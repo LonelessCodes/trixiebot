@@ -352,10 +352,10 @@ module.exports = async function install(cr) {
         const user = message.author;
         const guild = message.guild;
         const isUser = scope === "user";
-        if (active[scope].has(isUser ? user.id : guild.id)) return;
+        if (active.has(isUser ? user.id : guild.id)) return;
 
-        if (cooldown[scope].test(isUser ? user.id : guild.id)) {
-            message.channel.send("You can only purchase 2 slots an hour! Wait " + toHumanTime(cooldown[scope].tryAgainIn(isUser ? user.id : guild.id)) + " before you can go again");
+        if (cooldown.test(isUser ? user.id : guild.id)) {
+            message.channel.send("You can only purchase 2 slots an hour! Wait " + toHumanTime(cooldown.tryAgainIn(isUser ? user.id : guild.id)) + " before you can go again");
             return;
         }
 
@@ -377,13 +377,13 @@ module.exports = async function install(cr) {
 
         await message.channel.send(`:atm: The new slot will cost you **${credits.getBalanceString(cost, name)}**. Type either \`buy\` or \`cancel\``);
 
-        active[scope].add(isUser ? user.id : guild.id);
+        active.add(isUser ? user.id : guild.id);
 
-        message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content), { max: 1, time: 60000, errors: ["time"] })
+        message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === message.author.id, { max: 1, time: 60000, errors: ["time"] })
             .then(async messages => {
                 const m = messages.first();
                 if (/^buy$/i.test(m.content)) {
-                    cooldown[scope].testAndAdd(isUser ? user.id : guild.id);
+                    cooldown.testAndAdd(isUser ? user.id : guild.id);
 
                     if (!(await credits.canPurchase(user, cost))) {
                         message.channel.send(":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
@@ -402,7 +402,7 @@ module.exports = async function install(cr) {
                 message.channel.send("Then not");
             })
             .catch(() => message.channel.send("Time's up. Try again"))
-            .then(() => active[scope].delete(isUser ? user.id : guild.id));
+            .then(() => active.delete(isUser ? user.id : guild.id));
     }
 
     sbCmd.registerSubCommand("buyslot", new class extends ChooseCommand {
@@ -419,10 +419,10 @@ module.exports = async function install(cr) {
             };
         }
         async user(message) {
-            await buyslot(this.active, this.cooldown, "user", message);
+            await buyslot(this.active.user, this.cooldown.user, "user", message);
         }
         async server(message) {
-            await buyslot(this.active, this.cooldown, "guild", message);
+            await buyslot(this.active.guild, this.cooldown.guild, "guild", message);
         }
     }).setHelp(new HelpContent()
         .setUsageTitle("Buy New Slots")

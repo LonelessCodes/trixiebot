@@ -3,6 +3,7 @@ const { splitArgs } = require("../modules/util/string");
 const { toHumanTime } = require("../modules/util/time");
 const secureRandom = require("../modules/secureRandom");
 const credits = require("../logic/managers/CreditsManager");
+const purchaseSlots = require("../logic/managers/credits/purchaseSlots");
 const CONST = require("../modules/CONST");
 const Discord = require("discord.js");
 
@@ -470,46 +471,18 @@ because bees don...`);
             const cost = prices[slots]; // slots length is pretty much also the index of the next slot
             const new_slots = slots + 1;
 
-            const name = await credits.getName(message.guild);
-
-            if (!(await credits.canPurchase(user, cost))) {
-                message.channel.send(`:atm: You don't have enough ${name.plural} to buy more slots! You need **${credits.getBalanceString(cost, name)}**.`);
-                return;
-            }
-
-            await message.channel.send(`:atm: The new slot will cost you **${credits.getBalanceString(cost, name)}**. Type either \`buy\` or \`cancel\``);
-
-            this.active.add(user.id);
-
-            message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content), { max: 1, time: 60000, errors: ["time"] })
-                .then(async messages => {
-                    const m = messages.first();
-                    if (/^buy$/i.test(m.content)) {
-                        this.cooldown_user.testAndAdd(user.id);
-
-                        if (!(await credits.canPurchase(user, cost))) {
-                            message.channel.send(":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
-                            return;
-                        }
-
-                        const [, new_balance] = await Promise.all([
-                            databaseSlots.updateOne({ waifuId: user.id }, { $set: { slots: new_slots } }, { upsert: true }),
-                            credits.makeTransaction(message.guild, user, -cost, "waifu/slot", "Bought a waifu slot")
-                        ]);
-
-                        message.channel.send(":atm: 'Aight! There you go. Who will be your new waifu? (:yen: new account balance: **" + credits.getBalanceString(new_balance, name) + "**)");
-                        return;
-                    }
-
-                    message.channel.send("Then not");
-                })
-                .catch(() => message.channel.send("Time's up. Try again"))
-                .then(() => this.active.delete(user.id));
+            await purchaseSlots(message, this.active, this.cooldown_user, user, cost, "'Aight! There you go. Who will be your new waifu?", async cost => {
+                const [, new_balance] = await Promise.all([
+                    databaseSlots.updateOne({ waifuId: user.id }, { $set: { slots: new_slots } }, { upsert: true }),
+                    credits.makeTransaction(message.guild, user, -cost, "waifu/slot", "Bought a waifu slot")
+                ]);
+                return new_balance;
+            });
         }
     }).setHelp(new HelpContent()
         .setDescription("Buy additional waifu slots with Trixie's currency"));
 
-    waifuCommand.registerSubCommand("addslot", new class extends BaseCommand {
+    waifuCommand.registerSubCommand("setslots", new class extends BaseCommand {
         async call(message, content) {
             const member = message.mentions.members.first();
             if (!member) return;

@@ -11,7 +11,7 @@ module.exports = async function install(cr, client, config, db) {
 
     const permission = new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
-    const muteCommand = cr.register("mute", new class extends TreeCommand {
+    const muteWordCommand = cr.register("muteword", new class extends TreeCommand {
         async noPermission(message) {
             await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
         }
@@ -56,14 +56,14 @@ module.exports = async function install(cr, client, config, db) {
         }
     };
 
-    muteCommand.registerSubCommand("remove", removeCommand)
+    muteWordCommand.registerSubCommand("remove", removeCommand)
         .setHelp(new HelpContent()
             .setUsage("<phrase>")
             .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
     
     cr.register("unmute", removeCommand);
 
-    muteCommand.registerSubCommand("clear", new class extends BaseCommand {
+    muteWordCommand.registerSubCommand("clear", new class extends BaseCommand {
         async call(message) {
             await database.deleteMany({ guildId: message.guild.id });
 
@@ -73,7 +73,7 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsage("", "Remove all muted words"));
 
-    muteCommand.registerSubCommand("list", new class extends BaseCommand {
+    muteWordCommand.registerSubCommand("list", new class extends BaseCommand {
         async call(message, content, muted_words) {
             let str = "";
             if (muted_words.length > 0) {
@@ -89,7 +89,7 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsage("", "list all muted words and phrases"));
 
-    muteCommand.registerDefaultCommand(new class extends BaseCommand {
+    muteWordCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, content, muted_words) {
             /**
              * @type {string}
@@ -113,5 +113,5 @@ module.exports = async function install(cr, client, config, db) {
         }
     });
 
-    muteCommand.registerSubCommandAlias("*", "add");
+    muteWordCommand.registerSubCommandAlias("*", "add");
 };

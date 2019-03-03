@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.1.0"></a>
+# [2.1.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.4...v2.1.0) (2019-03-03)
+
+
+### Bug Fixes
+
+* **audio manager:** updated voice channel reference, when trixie is moved from vc to vc ([8e35089](https://bitbucket.org/Loneless/trixiebot/commits/8e35089))
+* fixed other people having a say wether you can buy or cancel a soundboard or waifu slot purchase ([6c87511](https://bitbucket.org/Loneless/trixiebot/commits/6c87511))
+* some code typos ([5d44930](https://bitbucket.org/Loneless/trixiebot/commits/5d44930))
+* tried to fix some id of null errors. Let's see with how much success ([741f157](https://bitbucket.org/Loneless/trixiebot/commits/741f157))
+
+
+
 <a name="2.0.4"></a>
 ## [2.0.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.3...v2.0.4) (2019-02-03)
 

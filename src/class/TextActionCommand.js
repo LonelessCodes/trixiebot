@@ -19,7 +19,7 @@ class TextActionCommand extends BaseCommand {
         this.everyone = false;
     }
 
-    async run(message, content) {
+    async run(message, command_name, content) {
         const mentions = new MessageMentions(content, message.guild);
         const mention = mentions.members.first();
         if (!mention && !mentions.everyone) {

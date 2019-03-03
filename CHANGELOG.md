@@ -14,6 +14,11 @@ All notable changes to this project will be documented in this file. See [standa
 * tried to fix some id of null errors. Let's see with how much success ([741f157](https://bitbucket.org/Loneless/trixiebot/commits/741f157))
 
 
+### Features
+
+* new custom mentions approach
+
+
 
 <a name="2.0.4"></a>
 ## [2.0.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.3...v2.0.4) (2019-02-03)

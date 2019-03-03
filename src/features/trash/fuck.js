@@ -7,6 +7,7 @@ const Category = require("../../logic/commands/Category");
 const RateLimiter = require("../../logic/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
 const HelpBuilder = require("../../logic/commands/HelpBuilder");
+const MessageMentions = require("../../modules/MessageMentions");
 
 module.exports = async function install(cr, client, config, db) {
     const added_recently = new Array();
@@ -70,8 +71,8 @@ module.exports = async function install(cr, client, config, db) {
         .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 3));
 
     fuckCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message) {
-            const mention = message.alt_mentions.members.first();
+        async call(message, content) {
+            const mention = new MessageMentions(content, message.guild).members.first();
             if (!mention) {
                 await HelpBuilder.sendHelp(message, fuckCommand.name, fuckCommand);
                 return;

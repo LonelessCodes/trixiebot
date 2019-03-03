@@ -79,7 +79,7 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            const members = message.alt_mentions.members.array();
+            const members = message.mentions.members.array();
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
             if (members.length > 0) {
                 if (!permission) {
@@ -237,7 +237,7 @@ module.exports = async function install(cr, client, config, db) {
             }
 
             // get all mentions
-            const members = message.alt_mentions.members.array();
+            const members = message.mentions.members.array();
             // check permission of author
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
             // if there are mentions perform action to add roles to other users

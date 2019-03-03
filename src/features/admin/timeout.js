@@ -1,6 +1,7 @@
 const { userToString } = require("../../modules/util");
 const LocaleManager = require("../../logic/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../modules/util/time");
+const { splitArgs } = require("../../modules/util/string");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../../class/BaseCommand");
@@ -8,6 +9,7 @@ const TreeCommand = require("../../class/TreeCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const CommandPermission = require("../../logic/commands/CommandPermission");
 const Category = require("../../logic/commands/Category");
+const MessageMentions = require("../../modules/MessageMentions");
 
 /** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
 const timeout_notices = new Object;
@@ -87,8 +89,8 @@ module.exports = async function install(cr, client, config, db) {
         .setIgnore(false);
 
     timeoutCommand.registerSubCommand("remove", new class extends BaseCommand {
-        async call(message) {
-            const members = message.alt_mentions.members.array();
+        async call(message, content) {
+            const members = new MessageMentions(content, message.guild).members.array();
 
             for (const member of members) {
                 await database_messages.updateMany({
@@ -175,7 +177,13 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            let members = message.alt_mentions.members;
+            const args = splitArgs(msg, 2);
+            if (args.length > 2) {
+                await message.channel.sendTranslated("At least two arguments are required: duration and @user");
+                return;
+            }
+
+            let members = new MessageMentions(args[1], message.guild).members;
 
             if (members.has(message.member.id)) {
                 await message.channel.sendTranslated("You cannot timeout yourself, dummy!");
@@ -194,15 +202,11 @@ module.exports = async function install(cr, client, config, db) {
                     await message.channel.sendTranslated("You cannot timeout other moderators or admins. That's just rood");
                     return;
                 }
-                msg = msg.replace(
-                    new RegExp(member.toString(), "g"),
-                    ""
-                );
             }
 
-            msg = msg.trim();
+            const timestr = args[0].trim();
 
-            const ms = parseHumanTime(msg);
+            const ms = parseHumanTime(timestr);
             if (ms < 10000 || ms > 1000 * 3600 * 24 * 3) {
                 await message.channel.sendTranslated("Timeout length should be at least 10 seconds long and shorter than 3 days");
                 return;
@@ -230,7 +234,7 @@ module.exports = async function install(cr, client, config, db) {
                 .ifPlural("{{users}} are now timeouted for the next {{timeLeft}}")
                 .fetch(members.size), {
                 users: members.map(member => userToString(member)).join(" "),
-                timeLeft: msg
+                timeLeft: timestr
             }));
 
             await Promise.all(promises);

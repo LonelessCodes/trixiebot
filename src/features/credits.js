@@ -111,7 +111,7 @@ module.exports = async function install(cr) {
                 return await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
             }
 
-            const other_user = message.alt_mentions.members.first();
+            const other_user = message.mentions.members.first();
             if (!other_user) {
                 return await message.channel.send("To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`");
             }

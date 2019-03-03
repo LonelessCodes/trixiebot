@@ -9,7 +9,6 @@ const TreeCommand = require("../../class/TreeCommand");
 const Category = require("../commands/Category");
 const CommandPermission = require("../commands/CommandPermission");
 const HelpBuilder = require("../commands/HelpBuilder");
-const MessageMentions = require("../../modules/MessageMentions");
 const RateLimiter = require("../RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
 
@@ -92,8 +91,6 @@ class CommandRegistry {
                 category !== Category.MODERATION &&
                 category !== Category.OWNER) return false;
         }
-
-        message.alt_mentions = new MessageMentions(content, message.guild);
 
         const promises = new Map;
 

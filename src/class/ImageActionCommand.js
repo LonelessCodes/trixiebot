@@ -5,6 +5,7 @@ const RateLimiter = require("../logic/RateLimiter");
 const TimeUnit = require("../modules/TimeUnit");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const MessageMentions = require("../modules/MessageMentions");
 
 const { Attachment } = require("discord.js");
 
@@ -24,8 +25,8 @@ class TextActionCommand extends BaseCommand {
         this.everyone = false;
     }
 
-    async run(message) {
-        const mentions = message.alt_mentions;
+    async run(message, content) {
+        const mentions = new MessageMentions(content, message.guild);
         const mention = mentions.members.first();
         if (!mention && !mentions.everyone) {
             await message.channel.sendTranslated(this.noMentionMessage);

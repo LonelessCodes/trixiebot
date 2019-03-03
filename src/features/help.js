@@ -77,7 +77,12 @@ module.exports = async function install(cr, client, config, database) {
             }
 
             embed.setAuthor("TrixieBot Help", client.user.avatarURL);
-            embed.setDescription(`**Command list**\nTo check command usage, type \`${message.guild.config.prefix}help <command>\``);
+            embed.setDescription(`**Command list**
+Required Argument: \`<arg>\`
+Optional Argument: \`<?arg>\`
+@-Mentions can be replaced through a username and a tag or part of a username:
+\`${message.guild.config.prefix}whois @Loneless#0893 / Loneless#0893 / Lone\`
+To check command usage, type \`${message.guild.config.prefix}help <command>\``);
             embed.setFooter(`TrixieBot v${INFO.VERSION} | Commands: ${cr.commands.size}`, client.user.avatarURL);
 
             await message.channel.send({ embed });

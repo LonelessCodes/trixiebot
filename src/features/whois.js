@@ -4,13 +4,14 @@ const Discord = require("discord.js");
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const MessageMentions = require("../modules/MessageMentions");
 
 const { userToString } = require("../modules/util");
 
 module.exports = async function install(cr) {
     cr.register("whois", new class extends BaseCommand {
-        async call(message) {
-            const member = message.alt_mentions.members.first() || message.member;
+        async call(message, content) {
+            const member = new MessageMentions(content, message.guild).members.first() || message.member;
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 

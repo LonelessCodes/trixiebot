@@ -3,11 +3,12 @@ const fliptext = require("flip-text");
 const BaseCommand = require("../../class/BaseCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
+const MessageMentions = require("../../modules/MessageMentions");
 
 module.exports = async function install(cr) {
     cr.register("flip", new class extends BaseCommand {
         async call(message, content) {
-            const mention = message.alt_mentions.members.first();
+            const mention = new MessageMentions(content, message.guild).members.first();
             if (!mention) {
                 if (content === "") {
                     await message.channel.send(`Usage: \`${message.prefix}flip <user|string>\``);
@@ -24,7 +25,7 @@ module.exports = async function install(cr) {
 
     cr.register("unflip", new class extends BaseCommand {
         async call(message, content) {
-            const mention =  message.alt_mentions.members.first();
+            const mention = new MessageMentions(content, message.guild).members.first();
             if (!mention) {
                 if (content === "") {
                     await message.channel.send(`Usage: \`${message.prefix}unflip <user|string>\``);

@@ -6,6 +6,7 @@ const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const MessageMentions = require("../modules/MessageMentions");
 
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("penis");
@@ -23,13 +24,15 @@ module.exports = async function install(cr, client, config, db) {
      */
 
     penisCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message) {
+        async call(message, content) {
             const uom = message.guild.config.uom;
             const r = uom === "cm" ? 2.54 : 1;
 
-            const member = message.alt_mentions.members.first() || message.member;
+            const mentions = new MessageMentions(content, message.guild);
 
-            if (message.alt_mentions.everyone) {
+            const member = mentions.members.first() || message.member;
+
+            if (mentions.everyone) {
                 await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
                 return;
             }

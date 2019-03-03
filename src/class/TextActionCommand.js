@@ -3,6 +3,7 @@ const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../modules/secureRandom");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const MessageMentions = require("../modules/MessageMentions");
 
 class TextActionCommand extends BaseCommand {
     constructor(description, content, noMentionMessage, permissions) {
@@ -18,16 +19,17 @@ class TextActionCommand extends BaseCommand {
         this.everyone = false;
     }
 
-    async run(message) {
-        const mention = message.alt_mentions.members.first();
-        if (!mention && !message.alt_mentions.everyone) {
+    async run(message, content) {
+        const mentions = new MessageMentions(content, message.guild);
+        const mention = mentions.members.first();
+        if (!mention && !mentions.everyone) {
             await message.channel.sendTranslated(this.noMentionMessage);
             return;
         }
 
         const phrase = await secureRandom(this.texts);
 
-        if (message.alt_mentions.everyone) {
+        if (mentions.everyone) {
             await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
             return;
         }

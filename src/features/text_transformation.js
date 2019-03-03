@@ -3,11 +3,12 @@ const tinytext = require("tiny-text");
 const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const MessageMentions = require("../modules/MessageMentions");
 
 module.exports = async function install(cr) {
     cr.register("smol", new class extends BaseCommand {
         async call(message, content) {
-            const mention = message.alt_mentions.members.first();
+            const mention = new MessageMentions(content, message.guild).members.first();
             if (!mention) {
                 const text = content.replace(/[^\S\x0a\x0d]+/g, " ");
                 if (text === "") {

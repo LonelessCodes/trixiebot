@@ -13,10 +13,11 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 const RateLimiter = require("../logic/RateLimiter");
 const TimeUnit = require("../modules/TimeUnit");
+const MessageMentions = require("../modules/MessageMentions");
 
-async function getData(message, database, databaseSlots) {
-    const mentions = message.alt_mentions;
-    const mentioned_member = mentions.members.first();
+async function getData(message, content, database, databaseSlots) {
+    const mentions = content ? new MessageMentions(content, message.guild) : null;
+    const mentioned_member = mentions ? mentions.members.first() : null;
 
     const all_waifus = await database.find({ guildId: message.guild.id }).toArray();
     for (const row of all_waifus) {
@@ -76,12 +77,12 @@ module.exports = async function install(cr, client, config, db) {
      */
 
     waifuCommand.registerSubCommand("claim", new class extends BaseCommand {
-        async call(message) {
+        async call(message, content) {
             const {
                 mentioned_member,
                 owner_waifus,
                 slots
-            } = await getData(message, database, databaseSlots);
+            } = await getData(message, content, database, databaseSlots);
 
             if (!mentioned_member) {
                 await message.channel.send("must give @ mention your dream waifu!");
@@ -131,11 +132,11 @@ module.exports = async function install(cr, client, config, db) {
     }).setHelp(new HelpContent().setUsage("<@mention>", "Claim the person you mentioned if not already claimed."));
 
     waifuCommand.registerSubCommand("unclaim", new class extends BaseCommand {
-        async call(message) {
+        async call(message, content) {
             const {
                 mentioned_member,
                 owner_waifus
-            } = await getData(message, database, databaseSlots);
+            } = await getData(message, content, database, databaseSlots);
 
             if (!mentioned_member) {
                 await message.channel.send("must give @ mention!");
@@ -164,13 +165,13 @@ module.exports = async function install(cr, client, config, db) {
             this.cooldown_user = new Array;
         }
 
-        async call(message) {
+        async call(message, content) {
             const {
                 mentioned_member,
                 owner_waifus,
                 all_waifus,
                 slots
-            } = await getData(message, database, databaseSlots);
+            } = await getData(message, content, database, databaseSlots);
 
             if (slots - owner_waifus.length === 0) {
                 await message.channel.send("Stop it. Get some help. You have filled all your waifu slots already!");
@@ -286,7 +287,7 @@ module.exports = async function install(cr, client, config, db) {
         async call(message) {
             const {
                 owner_of_me
-            } = await getData(message, database, databaseSlots);
+            } = await getData(message, null, database, databaseSlots);
 
             if (!owner_of_me) {
                 await message.channel.send(`You don't... have an owner... BE FREE. FREE AS A BEE. Well..., actually, according to all known laws
@@ -353,23 +354,28 @@ because bees don...`);
         .setUsage("", "Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes"));
 
     waifuCommand.registerSubCommand("trade", new class extends BaseCommand {
-        async call(message) {
+        async call(message, content) {
             const {
                 mentions,
                 owner_waifus
-            } = await getData(message, database, databaseSlots);
+            } = await getData(message, content, database, databaseSlots);
 
-            if (message.mentions.members.size !== 2) {
+            if (mentions.members.size !== 2) {
                 await message.channel.send("Specify waifu you want to trade, and the waifu you want to have.");
                 return;
             }
 
-            // const matched = content.match(/<@!?(1|\d{17,19})>/g);
-            const matched = mentions.users;
+            const matched = mentions.members;
 
-            const my_waifu = matched.first();
+            let my_waifu = matched.first();
+            let other_waifu = matched.last();
+            let tmp_waifu = null;
 
-            const other_waifu = matched.last();
+            if (!owner_waifus.some(w => w.waifuId === my_waifu.user.id) && owner_waifus.some(w => w.waifuId === other_waifu.user.id)) {
+                tmp_waifu = my_waifu;
+                my_waifu = other_waifu;
+                other_waifu = tmp_waifu;
+            }
 
             if (message.author.id === my_waifu.user.id ||
                 message.author.id === other_waifu.user.id) {
@@ -379,7 +385,7 @@ because bees don...`);
 
             const waifu = owner_waifus.find(w => w.waifuId === my_waifu.user.id);
             if (!waifu) {
-                await message.channel.send(`${userToString(my_waifu)} can't be traded, because they don't belong to you!`);
+                await message.channel.send(`${userToString(my_waifu)} or ${userToString(other_waifu)} can't be traded, because they both don't belong to you! Trade one waifu you own with one you don't!`);
                 return;
             }
 
@@ -462,7 +468,7 @@ because bees don...`);
                 return;
             }
 
-            const { slots } = await getData(message, database, databaseSlots);
+            const { slots } = await getData(message, null, database, databaseSlots);
 
             if (slots >= MAX_SLOTS) {
                 return message.channel.send("You have reached the maximum amount of waifu slots, which is " + MAX_SLOTS + "!");
@@ -484,7 +490,7 @@ because bees don...`);
 
     waifuCommand.registerSubCommand("setslots", new class extends BaseCommand {
         async call(message, content) {
-            const member = message.mentions.members.first();
+            const member = new MessageMentions(content, message.guild).members.first();
             if (!member) return;
 
             const v = splitArgs(content, 2);
@@ -505,7 +511,7 @@ because bees don...`);
                 owner_waifus,
                 owner_of_me,
                 slots
-            } = await getData(message, database, databaseSlots);
+            } = await getData(message, null, database, databaseSlots);
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setThumbnail(message.author.avatarURL);

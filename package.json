@@ -27,6 +27,7 @@
     "cat-ascii-faces": "^2.0.0",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
+    "chevrotain": "^4.2.0",
     "cron": "^1.4.1",
     "discord.js": "^11.4.2",
     "diskusage": "^1.0.0",

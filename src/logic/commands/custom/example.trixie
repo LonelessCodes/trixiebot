@@ -10,3 +10,15 @@ func factorial(num) {
 var = $guild.members.size + 2
 
 reply "owo what's this. " + "${var} users in this server. Makes a factorial of ${factorial(var)}"
+
+###################
+
+func cuddle(user) {
+    reply "*cuddles " + user + " tightly* <3<3<3";
+}
+
+if ($mentions.members.size > 0) {
+    cuddle($mentions.users.first());
+} else {
+    cuddle($author);
+}

@@ -1,40 +1,3 @@
-function isRegExp(obj) { return obj && obj instanceof RegExp; }
-
-/** @param {string} str */
-function reEscape(str) {
-    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-}
-
-/**
- * post process the pattern
- * @param {string|string[]|RegExp} obj 
- */
-function regexpOrLiteral(obj) {
-    let flags = "g";
-    try {
-        const regexp = new RegExp("", "y");
-        if (typeof regexp.sticky === "boolean") flags = "y"; /* ECMAScript >= 2015 */
-    } catch (_) { }
-
-    if (typeof obj === "string") {
-        return new RegExp("(?:" + reEscape(obj) + ")", flags);
-
-    } if (typeof obj === "array") {
-        return new RegExp("(?:" + obj.map(s => reEscape(s)).join("|") + ")", flags);
-        
-    } else if (isRegExp(obj)) {
-        if (typeof obj.multiline === "boolean" && obj.multiline) flags += "m";
-        if (typeof obj.dotAll === "boolean" && obj.dotAll) flags += "s";
-        if (typeof obj.ignoreCase === "boolean" && obj.ignoreCase) flags += "i";
-        if (typeof obj.unicode === "boolean" && obj.unicode) flags += "u";
-
-        return new RegExp(obj.source, flags);
-
-    } else {
-        throw new Error("Not a pattern: " + obj);
-    }
-}
-
 const hex = (ch) => ch.charCodeAt(0).toString(16).toUpperCase();
 const extract = (txt, pos, len) =>
     txt.substr(pos, len)
@@ -64,7 +27,5 @@ const getExcerpt = (txt, pos) => {
 };
 
 module.exports = {
-    isRegExp,
-    regexpOrLiteral,
     getExcerpt
 };

@@ -29,13 +29,11 @@ function createToken(options) {
 // Whitespace
 const WhiteSpace = createToken({ name: "WhiteSpace", pattern: /[\t\f\v\u0020\u2028\u2029\u00A0\uFEFF]+/, group: Lexer.SKIPPED });
 
-// TERMINATORS
-const Terminator = createToken({ name: "Terminator", pattern: Lexer.NA });
-
 const LineTerminator = createToken({
     name: "LineTerminator",
     pattern: /(?:\r?\n)+/,
-    categories: Terminator,
+    // categories: WhiteSpace,
+    group: Lexer.SKIPPED,
     line_breaks: true,
 });
 
@@ -54,7 +52,7 @@ const Keyword = createToken({
 
 const keyword = (name, match, opts = {}) => createToken({ name, pattern: new RegExp("\\b" + match + "\\b"), categories: Keyword, ...opts });
 
-const VarTok = keyword("VarTok", "var");
+// const VarTok = keyword("VarTok", "var");
 const FuncTok = keyword("FuncTok", "func");
 const ReturnTok = keyword("ReturnTok", "return");
 const ForTok = keyword("ForTok", "for");
@@ -83,7 +81,7 @@ const CloseBracket = createToken({ name: "CloseBracket", pattern: "]", categorie
 
 const Dot = createToken({ name: "Dot", pattern: ".", categories: Punctuator });
 const Colon = createToken({ name: "Colon", pattern: ":", categories: Punctuator });
-const Semicolon = createToken({ name: "Semicolon", pattern: ";", categories: [Terminator, Punctuator] });
+const Semicolon = createToken({ name: "Semicolon", pattern: ";", categories: Punctuator });
 const Comma = createToken({ name: "Comma", pattern: ",", categories: Punctuator });
 const Exclamation = createToken({ name: "Exclamation", pattern: "!", categories: Punctuator });
 
@@ -113,8 +111,8 @@ const GreaterThanEqual = createToken({ name: "GreaterThanEqual", pattern: />=/, 
 
 const EqualityOperator = createToken({ name: "EqualityOperator", pattern: Lexer.NA, categories: CompareOperator });
 
-const Compare_Equal = createToken({ name: "Compare_Equal", pattern: /==/, categories: EqualityOperator });
-const Compare_NotEqual = createToken({ name: "Compare_NotEqual", pattern: /!=/, categories: EqualityOperator });
+const Compare_Equal = createToken({ name: "Compare_Equal", pattern: "==", categories: EqualityOperator });
+const Compare_NotEqual = createToken({ name: "Compare_NotEqual", pattern: "!=", categories: EqualityOperator });
 
 const AssignOperator = createToken({ name: "AssignOperator", pattern: Lexer.NA, categories: Punctuator });
 
@@ -139,57 +137,28 @@ const NumbericLiteral = createToken({ name: "NumbericLiteral", pattern: Lexer.NA
 
 const DecimalLiteral = createToken({
     categories: NumbericLiteral, name: "DecimalLiteral", pattern: /(?:[0-9]+(?:\.[0-9]+)?)(?:e[+-]?[0-9]+)?\b/i,
-    // matched: match => parseFloat(match[1]) * (match[2] ? Math.pow(10, parseInt(match[2])) : 1)
 });
 const HexLiteral = createToken({
     categories: NumbericLiteral, name: "HexLiteral", pattern: /0x([0-9a-f]+)\b/i,
-    // matched: match => parseInt(match[1], 16)
 });
 const OctalLiteral = createToken({
     categories: NumbericLiteral, name: "OctalLiteral", pattern: /0o([0-7]+)\b/i,
-    // matched: match => parseInt(match[1], 8)
 });
 const BinaryLiteral = createToken({
     categories: NumbericLiteral, name: "BinaryLiteral", pattern: /0b([01]+)\b/i,
-    // matched: match => parseInt(match[1], 2)
 });
 
 const StringLiteral = createToken({
     categories: Literal,
     name: "StringLiteral",
     pattern: /(?:"([^\n\"]*)")|(?:'([^\n\']*)')/,
-    // matched(match) {
-    //     let str = match[1].replace(/\\\\/g, "\\");
-    //     if (match[0].startsWith("'")) str = str.replace(/\\'/g, "'");
-    //     else str = str.replace(/\\"/g, "\"");
-    //     str = str.replace(/\\r/g, "\r")
-    //         .replace(/\\n/g, "\n")
-    //         .replace(/\\t/g, "\t")
-    //         .replace(/\\b/g, "\x08")
-    //         .replace(/\\f/g, "\f")
-    //         .replace(/\\[0-7]{1,3}/g, str => {
-    //             // octal escape sequence
-    //             const charCode = parseInt(str.substr(1), 8);
-    //             if (charCode > 255) throw ctx.error("Constant is out of bounds");
-    //             return String.fromCharCode(charCode);
-    //         })
-    //         .replace(/\\u[0-9a-fA-F]{4}/g, str => {
-    //             // octal escape sequence
-    //             const charCode = parseInt(str.substr(2), 16);
-    //             if (charCode > 65535) throw ctx.error("Constant is out of bounds");
-    //             return String.fromCharCode(charCode);
-    //         })
-    //         .replace(/\\/g, "");
-    //     return str;
-    // }
 });
 
 const Identifier = createToken({ name: "Identifier", pattern: /([A-Za-z_$][A-Za-z0-9_$]*)/, categories: IdentifierName });
 
 exports.ALL_TOKENS = [
     // First
-    WhiteSpace, SingleLineComment, MultiLineComment,
-    Terminator,
+    WhiteSpace, LineTerminator, SingleLineComment, MultiLineComment,
 
     Literal, StringLiteral, NullTok, BooleanLiteral, TrueTok, FalseTok,
     NumbericLiteral, HexLiteral, OctalLiteral, BinaryLiteral, DecimalLiteral,
@@ -210,18 +179,16 @@ exports.ALL_TOKENS = [
 
     IdentifierName,
     // Keywords
-    Keyword, VarTok, FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, ReplyTok,
+    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, ReplyTok,
     LogicOperator, AndTok, OrTok,
 
     // Last
-    LineTerminator,
     Identifier,
 ];
 
 exports.tokens = {
     // First
-    WhiteSpace, SingleLineComment, MultiLineComment,
-    Terminator,
+    WhiteSpace, LineTerminator, SingleLineComment, MultiLineComment,
 
     Literal, StringLiteral, NullTok, BooleanLiteral, TrueTok, FalseTok,
     NumbericLiteral, HexLiteral, OctalLiteral, BinaryLiteral, DecimalLiteral,
@@ -242,10 +209,9 @@ exports.tokens = {
 
     IdentifierName,
     // Keywords
-    Keyword, VarTok, FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, ReplyTok,
+    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, ReplyTok,
     LogicOperator, AndTok, OrTok,
 
     // Last
-    LineTerminator,
     Identifier,
 };

@@ -1,6 +1,6 @@
 const NS_PER_SEC = 1e9;
 
-module.exports = class NanoTimer {
+class NanoTimer {
     constructor() {
         this._begin = null;
         this._diff = null;
@@ -13,4 +13,7 @@ module.exports = class NanoTimer {
         this._diff = process.hrtime(this._begin);
         return this._diff[0] * NS_PER_SEC + this._diff[1];
     }
-};
+}
+NanoTimer.NS_PER_SEC = NS_PER_SEC;
+
+module.exports = NanoTimer;

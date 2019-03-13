@@ -604,7 +604,14 @@ class CCInterpreter extends BaseCstVisitor {
         } else {
             this.statementStack.push(ctx);
 
-            const varname = ctx.$key.image;
+            // const name = ctx.Identifier[0].image;
+            // const variable =
+            //     this.varsPerStatement.getVariable(name, this) ||
+            //     this.varsPerStatement.createVariable(name, ctx, this);
+            // const value = assign(this.visit(ctx.$value));
+            // return variable.update(value);
+
+            const varname = ctx.Identifier[0].image;
             const variable =
                 this.varsPerStatement.getVariable(varname, this) ||
                 this.varsPerStatement.createVariable(varname, ctx, this);

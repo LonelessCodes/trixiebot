@@ -504,7 +504,7 @@ $.RULE("ForIterationStatement", () => {
         },
         {
             ALT: () => {
-                $.CONSUME(t.Identifier, $key);
+                $.CONSUME(t.Identifier);
                 $.CONSUME(t.OfTok);
                 // maybe use PrimaryExpression
                 $.SUBRULE3($.Expression, $value);

@@ -349,7 +349,7 @@ class VariableStack extends Map {
     }
 
     getVariable(name, _this) {
-        for (let i = _this.statementStack.size; i > 0; i--) {
+        for (let i = _this.statementStack.size - 1; i > 0; i--) {
             const vars = this.get(_this.statementStack.get(i));
             if (vars) {
                 const variable = vars.get(name);

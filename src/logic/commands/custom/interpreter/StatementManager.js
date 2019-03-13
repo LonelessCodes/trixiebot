@@ -61,6 +61,10 @@ class StatementManager {
         return this._arr[this._arr.length - 1];
     }
 
+    get size() {
+        return this.currentStack.size;
+    }
+
     /**
      * @param {StatementStack} stack 
      */

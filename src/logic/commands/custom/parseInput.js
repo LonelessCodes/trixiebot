@@ -44,11 +44,22 @@ async function parseInput(text) {
 }
 
 const text = `
-obj = {
-    a: 0
-};
-obj["a"] = 4;
-reply obj.a;
+func loop () {
+    loop();
+}
+
+loop();
+
+// obj = [];
+// for (i of 10000) obj[i] = i;
+// reply obj;
+
+// func test(o) {
+//     a = 8;
+//     return o + a;
+// }
+
+// reply test(34);
 `;
 
 parseInput(text);

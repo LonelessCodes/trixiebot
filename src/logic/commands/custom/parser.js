@@ -412,6 +412,7 @@ $.RULE("Statement", () => {
             { ALT: () => $.SUBRULE($.ContinueStatement, $statement) },
             { ALT: () => $.SUBRULE($.BreakStatement, $statement) },
             { ALT: () => $.SUBRULE($.ReturnStatement, $statement) },
+            { ALT: () => $.SUBRULE($.SleepStatement, $statement) },
             { ALT: () => $.SUBRULE($.ReplyStatement, $statement) },
         ])
     );
@@ -531,6 +532,14 @@ $.RULE("BreakStatement", () => {
 
 $.RULE("ReturnStatement", () => {
     $.CONSUME(t.ReturnTok);
+    $.OPTION(() => {
+        $.SUBRULE($.Expression, $value);
+    });
+    $.CONSUME(t.Semicolon, $enableSemicolonInsertion);
+});
+
+$.RULE("SleepStatement", () => {
+    $.CONSUME(t.SleepTok);
     $.OPTION(() => {
         $.SUBRULE($.Expression, $value);
     });

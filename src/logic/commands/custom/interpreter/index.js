@@ -1,3 +1,4 @@
+const { timeout } = require("../../../../modules/util");
 const { tokens: { WhiteSpace, LineTerminator, MultiLineComment, SingleLineComment } } = require("../tokens");
 const parser = require("../parser");
 const { RuntimeError } = require("../errors");
@@ -64,7 +65,7 @@ class CCInterpreter extends BaseCstVisitor {
         };
     }
 
-    PrimaryExpression(ctx) {
+    async PrimaryExpression(ctx) {
         if (ctx.Identifier) {
             const identifier = ctx.Identifier[0];
             const name = identifier.image;
@@ -139,54 +140,54 @@ class CCInterpreter extends BaseCstVisitor {
                     return createStringLiteral(image, this);
             }
         } else if (ctx.ArrayLiteral) {
-            return this.visit(ctx.ArrayLiteral);
+            return await this.visit(ctx.ArrayLiteral);
         } else if (ctx.ObjectLiteral) {
-            return this.visit(ctx.ObjectLiteral);
+            return await this.visit(ctx.ObjectLiteral);
         } else if (ctx.FunctionExpression) {
-            return this.visit(ctx.FunctionExpression);
+            return await this.visit(ctx.FunctionExpression);
         } else if (ctx.ParenExpression) {
-            return this.visit(ctx.ParenExpression);
+            return await this.visit(ctx.ParenExpression);
         }
     }
 
-    ParenExpression(ctx) {
-        return this.visit(ctx.$body);
+    async ParenExpression(ctx) {
+        return await this.visit(ctx.$body);
     }
 
-    ArrayLiteral(ctx) {
+    async ArrayLiteral(ctx) {
         const arr = [];
         if (ctx.$elements) {
             for (const elem of ctx.$elements) {
-                arr.push(assign(this.visit(elem)));
+                arr.push(assign(await this.visit(elem)));
             }
         }
         return new ArrayLiteral(arr);
     }
 
-    ObjectLiteral(ctx) {
+    async ObjectLiteral(ctx) {
         const obj = {};
-        const list = this.visit(ctx.PropertyDefinitionList);
+        const list = await this.visit(ctx.PropertyDefinitionList);
         for (const [key, value] of list) {
             obj[key] = value;
         }
         return new ObjectLiteral(obj);
     }
 
-    PropertyDefinitionList(ctx) {
+    async PropertyDefinitionList(ctx) {
         const list = [];
         for (const elem of ctx.PropertyDefinition) {
-            list.push(this.visit(elem));
+            list.push(await this.visit(elem));
         }
         return list;
     }
 
-    PropertyDefinition(ctx) {
+    async PropertyDefinition(ctx) {
         if (ctx.PropertyName) {
-            const key = this.visit(ctx.PropertyName);
-            const value = assign(this.visit(ctx.$value));
+            const key = await this.visit(ctx.PropertyName);
+            const value = assign(await this.visit(ctx.$value));
             return [key, value];
         } else if (ctx.MethodDefinition) {
-            return this.visit(ctx.MethodDefinition);
+            return await this.visit(ctx.MethodDefinition);
         }
     }
 
@@ -198,11 +199,11 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    MethodDefinition(ctx) {
+    async MethodDefinition(ctx) {
         this.statementStack.push(ctx);
 
-        const name = this.visit(ctx.PropertyName);
-        const args = ctx.FormalParameterList ? this.visit(ctx.FormalParameterList) : [];
+        const name = await this.visit(ctx.PropertyName);
+        const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
         const func = new Func(name, args, this.statementStack.clone(), ctx.FunctionBody[0]);
 
         this.statementStack.pop();
@@ -210,32 +211,32 @@ class CCInterpreter extends BaseCstVisitor {
         return [name, func];
     }
 
-    MemberExpression(ctx) {
-        if (!ctx.$member) return this.visit(ctx.$left);
+    async MemberExpression(ctx) {
+        if (!ctx.$member) return await this.visit(ctx.$left);
 
         /** @type {Item} */
-        let val = assign(this.visit(ctx.$left));
+        let val = assign(await this.visit(ctx.$left));
         for (let i = 0; i < ctx.$member.length; i++) {
-            val = this.visit(ctx.$member[i], { val });
+            val = await this.visit(ctx.$member[i], { val });
         }
         return val;
     }
 
-    MemberExpression$member(ctx, { val }) {
+    async MemberExpression$member(ctx, { val }) {
         if (ctx.$square) {
-            val = this.visit(ctx.$square, { val });
+            val = await this.visit(ctx.$square, { val });
         } else if (ctx.$dot) {
-            val = this.visit(ctx.$dot, { val });
+            val = await this.visit(ctx.$dot, { val });
         } else if (ctx.$call) {
-            val = this.visit(ctx.$call, { val });
+            val = await this.visit(ctx.$call, { val });
         }
         return val;
     }
 
-    MemberExpression$square(ctx, { val }) {
-        const key = assign(this.visit(ctx.$key));
+    async MemberExpression$square(ctx, { val }) {
+        const key = assign(await this.visit(ctx.$key));
         if (val instanceof NullLiteral) {
-            const name = key.getProp(new StringLiteral("toString")).call(this, key);
+            const name = await key.getProp(new StringLiteral("toString")).call(this, key);
             throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx.$key);
         } else {
             val = new Member(val, key, val.getProp(key));
@@ -243,10 +244,10 @@ class CCInterpreter extends BaseCstVisitor {
         return val;
     }
 
-    MemberExpression$dot(ctx, { val }) {
+    async MemberExpression$dot(ctx, { val }) {
         const key = new StringLiteral(ctx.$key[0].image);
         if (val instanceof NullLiteral) {
-            const name = key.getProp(new StringLiteral("toString")).call(this, key);
+            const name = await key.getProp(new StringLiteral("toString")).call(this, key);
             throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx.$key);
         } else {
             val = new Member(val, key, val.getProp(key));
@@ -254,29 +255,29 @@ class CCInterpreter extends BaseCstVisitor {
         return val;
     }
 
-    MemberExpression$call(ctx, { val }) {
-        const args = this.visit(ctx.Arguments);
+    async MemberExpression$call(ctx, { val }) {
+        const args = await this.visit(ctx.Arguments);
         if (val instanceof Member) val = val.value;
         if (val instanceof Func || val instanceof NativeFunc) {
             // TODO: ???? check if this works
-            return assign(val.call(this, val, args));
+            return assign(await val.call(this, val, args));
         } else {
             throw this.error("Cannot call value of other type than Func", ctx.Arguments);
         }
     }
 
-    Arguments(ctx) {
+    async Arguments(ctx) {
         const args = [];
         for (let arg of (ctx.$args || [])) {
-            args.push(assign(this.visit(arg)));
+            args.push(assign(await this.visit(arg)));
         }
         return args;
     }
 
-    UnaryExpression(ctx) {
-        if (!ctx.$unary) return this.visit(ctx.$left);
+    async UnaryExpression(ctx) {
+        if (!ctx.$unary) return await this.visit(ctx.$left);
 
-        let val = assign(this.visit(ctx.$left));
+        let val = assign(await this.visit(ctx.$left));
         if (val instanceof Member) val = val.value;
 
         switch (ctx.$unary[0].image) {
@@ -289,10 +290,10 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    UpdateExpression(ctx) {
-        if (!ctx.$right) return this.visit(ctx.$left);
+    async UpdateExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
 
-        const right = this.visit(ctx.$right);
+        const right = await this.visit(ctx.$right);
         if (right instanceof Member) {
             switch (ctx.$prefix[0].image) {
                 case "++":
@@ -312,12 +313,12 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    MultiExpression(ctx) {
-        if (!ctx.$right) return this.visit(ctx.$left);
+    async MultiExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
 
-        let left = assign(this.visit(ctx.$left));
+        let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(this.visit(ctx.$right));
+        let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
         switch (ctx.$op[0].image) {
@@ -332,12 +333,12 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    AdditiveExpression(ctx) {
-        if (!ctx.$right) return this.visit(ctx.$left);
+    async AdditiveExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
 
-        let left = assign(this.visit(ctx.$left));
+        let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(this.visit(ctx.$right));
+        let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
         switch (ctx.$op[0].image) {
@@ -348,8 +349,8 @@ class CCInterpreter extends BaseCstVisitor {
                     const leftprop = left.getProp(new StringLiteral("toString"));
                     const rightprop = right.getProp(new StringLiteral("toString"));
                     return new StringLiteral(
-                        (leftprop ? leftprop.call(this, left).content : "[no toString func]") +
-                        (rightprop ? rightprop.call(this, right).content : "[no toString func]")
+                        (leftprop ? (await leftprop.call(this, left).content) : "[no toString func]") +
+                        (rightprop ? (await rightprop.call(this, right).content) : "[no toString func]")
                     );
                 }
             case "-":
@@ -357,12 +358,12 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    RelationalExpression(ctx) {
-        if (!ctx.$right) return this.visit(ctx.$left);
+    async RelationalExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
 
-        let left = assign(this.visit(ctx.$left));
+        let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(this.visit(ctx.$right));
+        let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
         switch (ctx.$op[0].image) {
@@ -389,12 +390,12 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    EqualityExpression(ctx) {
-        if (!ctx.$right) return this.visit(ctx.$left);
+    async EqualityExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
 
-        let left = assign(this.visit(ctx.$left));
+        let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(this.visit(ctx.$right));
+        let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
         switch (ctx.$op[0].image) {
@@ -405,51 +406,51 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    LogicalAndExpression(ctx) {
-        if (!ctx.$right) return this.visit(ctx.$left);
+    async LogicalAndExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
 
-        let left = assign(this.visit(ctx.$left));
+        let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(this.visit(ctx.$right));
+        let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
         return new BooleanLiteral(toBool(left) && toBool(right));
     }
 
-    LogicalOrExpression(ctx) {
-        if (!ctx.$right) return this.visit(ctx.$left);
+    async LogicalOrExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
 
-        let left = assign(this.visit(ctx.$left));
+        let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(this.visit(ctx.$right));
+        let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
         return new BooleanLiteral(toBool(left) || toBool(right));
     }
 
-    ConditionalExpression(ctx) {
-        if (!ctx.$then) return this.visit(ctx.$if);
+    async ConditionalExpression(ctx) {
+        if (!ctx.$then) return await this.visit(ctx.$if);
 
-        let val = assign(this.visit(ctx.$if));
+        let val = assign(await this.visit(ctx.$if));
         if (val instanceof Member) val = val.value;
 
         const expression = toBool(val);
         if (expression) {
-            return this.visit(ctx.$then);
+            return await this.visit(ctx.$then);
         } else {
-            return this.visit(ctx.$else);
+            return await this.visit(ctx.$else);
         }
     }
 
-    AssignmentExpression(ctx) {
+    async AssignmentExpression(ctx) {
         if (!ctx.$right) {
-            let left = assign(this.visit(ctx.$left));
+            let left = assign(await this.visit(ctx.$left));
             if (left instanceof Member) left = left.value;
             return left;
         }
 
-        const variable = this.visit(ctx.$left);
-        let right = assign(this.visit(ctx.$right));
+        const variable = await this.visit(ctx.$left);
+        let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
         if (variable instanceof Member || variable instanceof Variable) {
@@ -464,8 +465,8 @@ class CCInterpreter extends BaseCstVisitor {
                         const leftprop = left.getProp(new StringLiteral("toString"));
                         const rightprop = right.getProp(new StringLiteral("toString"));
                         return variable.update(new StringLiteral(
-                            (leftprop ? leftprop.call(this, left).content : "[no toString func]") +
-                            (rightprop ? rightprop.call(this, right).content : "[no toString func]")
+                            (leftprop ? (await leftprop.call(this, left).content) : "[no toString func]") +
+                            (rightprop ? (await rightprop.call(this, right).content) : "[no toString func]")
                         ));
                     }
                 case "-=":
@@ -484,28 +485,28 @@ class CCInterpreter extends BaseCstVisitor {
         }
     }
 
-    Expression(ctx) {
+    async Expression(ctx) {
         let val = new NullLiteral;
         for (const expr of ctx.$expression) {
-            val = this.visit(expr);
+            val = await this.visit(expr);
         }
         return val;
     }
 
-    Statement(ctx) {
-        return this.visit(ctx.$statement);
+    async Statement(ctx) {
+        return await this.visit(ctx.$statement);
     }
 
-    BlockStatement(ctx) {
-        if (ctx.$list) return this.visit(ctx.$list);
+    async BlockStatement(ctx) {
+        if (ctx.$list) return await this.visit(ctx.$list);
     }
 
-    StatementList(ctx) {
+    async StatementList(ctx) {
         this.statementStack.push(ctx);
 
         let value = new NullLiteral;
         for (const statement of ctx.$statement) {
-            value = this.visit(statement);
+            value = await this.visit(statement);
             if (isReturn(value)) break;
         }
 
@@ -513,19 +514,19 @@ class CCInterpreter extends BaseCstVisitor {
         return value;
     }
 
-    VariableStatement(ctx) {
+    async VariableStatement(ctx) {
         // TODO: ALL OF THIS (currently assignment expressions are treated as variable statements)
-        this.visit(ctx.VariableDeclaration);
+        await this.visit(ctx.VariableDeclaration);
     }
 
-    VariableDeclaration(ctx) {
+    async VariableDeclaration(ctx) {
         // TODO: ALL OF THIS (currently assignment expressions are treated as variable statements)
 
         const name = ctx.Identifier[0].image;
         const variable =
             this.varsPerStatement.getVariable(name, this) ||
             this.varsPerStatement.createVariable(name, ctx, this);
-        const value = assign(this.visit(ctx.$value));
+        const value = assign(await this.visit(ctx.$value));
         return variable.update(value);
     }
 
@@ -533,34 +534,34 @@ class CCInterpreter extends BaseCstVisitor {
         return;
     }
 
-    ExpressionStatement(ctx) {
-        this.visit(ctx.Expression);
+    async ExpressionStatement(ctx) {
+        await this.visit(ctx.Expression);
     }
 
-    IfStatement(ctx) {
+    async IfStatement(ctx) {
         this.statementStack.push(ctx);
 
-        const expression = this.visit(ctx.$expression);
+        const expression = await this.visit(ctx.$expression);
         const bool = toBool(assign(expression));
 
         if (bool) {
             this.statementStack.push(ctx.$then[0]);
-            this.visit(ctx.$then);
+            await this.visit(ctx.$then);
             this.statementStack.pop();
         } else if (ctx.$else) {
             this.statementStack.push(ctx.$else[0]);
-            this.visit(ctx.$else);
+            await this.visit(ctx.$else);
             this.statementStack.pop();
         }
 
         this.statementStack.pop();
     }
 
-    WhileIterationStatement(ctx) {
-        const check = () => toBool(assign(this.visit(ctx.$expression)));
-        const callBody = () => {
+    async WhileIterationStatement(ctx) {
+        const check = async () => toBool(assign(await this.visit(ctx.$expression)));
+        const callBody = async () => {
             this.statementStack.push(ctx.$body[0]);
-            const val = this.visit(ctx.$body);
+            const val = await this.visit(ctx.$body);
             this.statementStack.pop();
             return val;
         };
@@ -569,9 +570,9 @@ class CCInterpreter extends BaseCstVisitor {
 
         let itrLeft = 100000;
         let bool = false;
-        while ((bool = check()) && itrLeft > 0) {
+        while ((bool = await check()) && itrLeft > 0) {
             itrLeft--;
-            const val = callBody();
+            const val = await callBody();
             if (isBreak(val)) break;
         }
         if (itrLeft === 0 && bool) {
@@ -581,10 +582,10 @@ class CCInterpreter extends BaseCstVisitor {
         this.statementStack.pop();
     }
 
-    ForIterationStatement(ctx) {
-        const callBody = () => {
+    async ForIterationStatement(ctx) {
+        const callBody = async () => {
             this.statementStack.push(ctx.$body[0]);
-            const val = this.visit(ctx.$body);
+            const val = await this.visit(ctx.$body);
             this.statementStack.pop();
             return val;
         };
@@ -592,20 +593,20 @@ class CCInterpreter extends BaseCstVisitor {
         if (ctx.$left) {
             this.statementStack.push(ctx);
 
-            this.visit(ctx.$left);
+            await this.visit(ctx.$left);
 
             const middleRef = ctx.$middle;
             const rightRef = ctx.$right;
 
-            const checkMiddle = () => toBool(assign(this.visit(middleRef)));
-            const callRight = () => this.visit(rightRef);
+            const checkMiddle = async () => toBool(assign(await this.visit(middleRef)));
+            const callRight = async () => await this.visit(rightRef);
 
             let itrLeft = 100000;
             let bool = false;
-            while ((bool = checkMiddle()) && itrLeft > 0) {
+            while ((bool = await checkMiddle()) && itrLeft > 0) {
                 itrLeft--;
-                if (isBreak(callBody())) break;
-                callRight();
+                if (isBreak(await callBody())) break;
+                await callRight();
             }
             if (itrLeft === 0 && bool) {
                 throw this.error("For loop is iterating more than 100000", ctx.ForTok);
@@ -620,7 +621,7 @@ class CCInterpreter extends BaseCstVisitor {
                 this.varsPerStatement.getVariable(varname, this) ||
                 this.varsPerStatement.createVariable(varname, ctx, this);
 
-            const value = assign(this.visit(ctx.$value));
+            const value = assign(await this.visit(ctx.$value));
             if (value instanceof NumberLiteral) {
                 const size = value.content;
                 if (!Number.isFinite(size)) {
@@ -628,26 +629,26 @@ class CCInterpreter extends BaseCstVisitor {
                 }
                 for (let i = 0; i < size; i++) {
                     variable.update(new NumberLiteral(i));
-                    if (isBreak(callBody())) break;
+                    if (isBreak(await callBody())) break;
                 }
             } else if (value instanceof StringLiteral) {
                 const size = value.content.length;
                 const str = value.content;
                 for (let i = 0; i < size; i++) {
                     variable.update(new StringLiteral(str.charAt(i)));
-                    if (isBreak(callBody())) break;
+                    if (isBreak(await callBody())) break;
                 }
             } else if (value instanceof ArrayLiteral) {
                 const arr = value.content;
                 for (let elem of arr) {
                     variable.update(elem);
-                    if (isBreak(callBody())) break;
+                    if (isBreak(await callBody())) break;
                 }
             } else if (value instanceof ObjectLiteral) {
-                const arr = value.getProp(new StringLiteral("keys")).call(this, value).content;
+                const arr = await value.getProp(new StringLiteral("keys")).call(this, value).content;
                 for (let elem of arr) {
                     variable.update(elem);
-                    if (isBreak(callBody())) break;
+                    if (isBreak(await callBody())) break;
                 }
             } else if (value instanceof NullLiteral) {
                 throw this.error("Cannot iterate over 'null'", ctx.$value);
@@ -671,38 +672,60 @@ class CCInterpreter extends BaseCstVisitor {
         return new BreakInterrupt;
     }
 
-    ReturnStatement(ctx) {
+    async ReturnStatement(ctx) {
         if (!ctx.$value) return new ReturnInterrupt;
 
-        const value = assign(this.visit(ctx.$value));
+        const value = assign(await this.visit(ctx.$value));
         return new ReturnInterrupt(value);
     }
 
-    ReplyStatement(ctx) {
+    async SleepStatement(ctx) {
+        if (!ctx.$value) {
+            throw this.error("Missing sleeping duration", ctx.SleepTok);
+        }
+
+        // it isn't very elegant, but throwing the reply value is easiest way 
+        // to get the result straight away
+        const value = assign(await this.visit(ctx.$value));
+        
+        if (!(value instanceof NumberLiteral)) {
+            throw this.error("Sleeping duration must be a number", ctx.$value);
+        }
+        if (value.content > Number.MAX_SAFE_INTEGER) {
+            throw this.error("Cannot sleep for Infinity", ctx.$value);
+        }
+        if (value.content < 0) {
+            throw this.error("Sleeping duration must be a positive number", ctx.$value);
+        }
+        
+        await timeout(value.content);
+    }
+
+    async ReplyStatement(ctx) {
         if (!ctx.$value) return new ReplyInterrupt;
 
         // it isn't very elegant, but throwing the reply value is easiest way 
         // to get the result straight away
-        const value = assign(this.visit(ctx.$value));
+        const value = assign(await this.visit(ctx.$value));
         throw new ReplyInterrupt(value);
     }
 
-    FunctionDeclaration(ctx) {
+    async FunctionDeclaration(ctx) {
         const name = ctx.Identifier[0].image;
         if (this.varsPerStatement.checkVariable(name, this)) 
             throw this.error("Variable '" + name + "' already declared", ctx.Identifier);
 
         const variable = this.varsPerStatement.createVariable(name, ctx, this);
 
-        const args = ctx.FormalParameterList ? this.visit(ctx.FormalParameterList) : [];
+        const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
 
         const func = new Func(name, args, this.statementStack.clone(), ctx.FunctionBody[0]);
 
         return variable.update(func);
     }
 
-    FunctionExpression(ctx) {
-        const args = ctx.FormalParameterList ? this.visit(ctx.FormalParameterList) : [];
+    async FunctionExpression(ctx) {
+        const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
 
         return new Func(null, args, this.statementStack.clone(), ctx.FunctionBody[0]);
     }
@@ -721,21 +744,17 @@ class CCInterpreter extends BaseCstVisitor {
         return args;
     }
 
-    FunctionBody(ctx) {
-        if (ctx.StatementList) return this.visit(ctx.StatementList);
+    async FunctionBody(ctx) {
+        if (ctx.StatementList) return await this.visit(ctx.StatementList);
     }
 
-    Program(ctx) {
+    async Program(ctx) {
         try {
             this.statementStack.pushChange(new StatementStack([]));
             this.statementStack.push(ctx);
 
             if (ctx.StatementList) {
-                // const value = this.visit(ctx.StatementList);
-                // if (isReturn(value)) {
-                //     throw this.error("");
-                // }
-                this.visit(ctx.StatementList);
+                await this.visit(ctx.StatementList);
             }
 
             this.statementStack.pop();

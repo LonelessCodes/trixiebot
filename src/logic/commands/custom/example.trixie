@@ -1,9 +1,5 @@
-func cuddle(user) {
-    reply "*cuddles " + user + " tightly* <3<3<3";
-}
+time = now();
 
-if ($mentions.members.size > 0) {
-    cuddle($mentions.users.first());
-} else {
-    cuddle($author);
-}
+sleep 1;
+
+reply now() - time;

@@ -63,6 +63,7 @@ const ContinueTok = keyword("ContinueTok", "continue");
 const IfTok = keyword("IfTok", "if");
 const ThenTok = keyword("ThenTok", "then");
 const ElseTok = keyword("ElseTok", "else");
+const SleepTok = keyword("SleepTok", "sleep");
 const ReplyTok = keyword("ReplyTok", "reply");
 
 const LogicOperator = createToken({ name: "LogicOperator", pattern: Lexer.NA, categories: IdentifierName });
@@ -179,7 +180,7 @@ exports.ALL_TOKENS = [
 
     IdentifierName,
     // Keywords
-    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, ReplyTok,
+    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, SleepTok, ReplyTok,
     LogicOperator, AndTok, OrTok,
 
     // Last
@@ -209,7 +210,7 @@ exports.tokens = {
 
     IdentifierName,
     // Keywords
-    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, ReplyTok,
+    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, SleepTok, ReplyTok,
     LogicOperator, AndTok, OrTok,
 
     // Last

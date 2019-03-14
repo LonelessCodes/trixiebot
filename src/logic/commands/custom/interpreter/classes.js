@@ -92,7 +92,7 @@ class Func extends Item {
         this.ctx = ctx;
     }
 
-    call(interpreter, proto_parent, args = []) {
+    async call(interpreter, proto_parent, args = []) {
         interpreter.statementStack.pushChange(this.statementStack.clone());
         interpreter.statementStack.push(this.ctx);
         interpreter.statementStack.pushFunctionCall(this.ctx);
@@ -102,7 +102,7 @@ class Func extends Item {
             const variable = interpreter.varsPerStatement.createVariable(this.args[i], this.ctx, this);
             variable.update(args[i] || new NullLiteral);
         }
-        const val = interpreter.visit(this.ctx);
+        const val = await interpreter.visit(this.ctx);
 
         interpreter.statementStack.pop();
         interpreter.statementStack.popFunctionCall(this.ctx);

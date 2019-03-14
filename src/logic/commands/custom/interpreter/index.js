@@ -25,7 +25,9 @@ const {
     StatementStack,
     StatementManager,
     Member,
-} = require("./types");
+} = require("./classes");
+
+const GLOBALS = require("./globals");
 
 // ----------------- Interpreter -----------------
 // Obtains the default CstVisitor constructor to extend.
@@ -43,7 +45,12 @@ class CCInterpreter extends BaseCstVisitor {
 
         /** @type {(msg: string, item: { startOffset: number, startLine: number, startColumn: number}) => RuntimeError} */
         this.error = (msg, item) => {
-            return new RuntimeError(msg, item.startOffset, item.startLine, item.startColumn, this.text_input);
+            if (item) {
+                if (item instanceof Array) item = item[0];
+                while (!!item.children) item = item.children[Object.getOwnPropertyNames(item.children)[0]][0];
+                return new RuntimeError(msg, item.startOffset, item.startLine, item.startColumn, this.text_input);
+            }
+            return new RuntimeError(msg);
         };
 
         this.varsPerStatement = new VariableStack;
@@ -64,6 +71,8 @@ class CCInterpreter extends BaseCstVisitor {
             const variable = this.varsPerStatement.getVariable(name, this);
 
             if (variable) return variable;
+
+            if (GLOBALS[name])  return GLOBALS[name];
 
             let input = this.text_input.substr(identifier.endOffset + 1);
 
@@ -127,7 +136,7 @@ class CCInterpreter extends BaseCstVisitor {
                 case "BinaryLiteral":
                     return new NumberLiteral(parseInt(image.substr(2), 2));
                 case "StringLiteral":
-                    return createStringLiteral(image);
+                    return createStringLiteral(image, this);
             }
         } else if (ctx.ArrayLiteral) {
             return this.visit(ctx.ArrayLiteral);
@@ -185,7 +194,7 @@ class CCInterpreter extends BaseCstVisitor {
         if (ctx.IdentifierName) {
             return ctx.IdentifierName[0].image;
         } else if (ctx.StringLiteral) {
-            return createStringLiteral(ctx.StringLiteral[0].image).content;
+            return createStringLiteral(ctx.StringLiteral[0].image, this).content;
         }
     }
 
@@ -227,7 +236,7 @@ class CCInterpreter extends BaseCstVisitor {
         const key = assign(this.visit(ctx.$key));
         if (val instanceof NullLiteral) {
             const name = key.getProp(new StringLiteral("toString")).call(this, key);
-            throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx);
+            throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx.$key);
         } else {
             val = new Member(val, key, val.getProp(key));
         }
@@ -238,7 +247,7 @@ class CCInterpreter extends BaseCstVisitor {
         const key = new StringLiteral(ctx.$key[0].image);
         if (val instanceof NullLiteral) {
             const name = key.getProp(new StringLiteral("toString")).call(this, key);
-            throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx);
+            throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx.$key);
         } else {
             val = new Member(val, key, val.getProp(key));
         }
@@ -248,11 +257,11 @@ class CCInterpreter extends BaseCstVisitor {
     MemberExpression$call(ctx, { val }) {
         const args = this.visit(ctx.Arguments);
         if (val instanceof Member) val = val.value;
-        if (val instanceof Func) {
+        if (val instanceof Func || val instanceof NativeFunc) {
             // TODO: ???? check if this works
             return assign(val.call(this, val, args));
         } else {
-            throw this.error("Cannot call value of other type than Func", ctx);
+            throw this.error("Cannot call value of other type than Func", ctx.Arguments);
         }
     }
 
@@ -299,7 +308,7 @@ class CCInterpreter extends BaseCstVisitor {
                     right.value = new NumberLiteral(right.value.content - 1);
             }
         } else {
-            throw this.error("Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)", ctx);
+            throw this.error("Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)", ctx.$prefix);
         }
     }
 
@@ -471,7 +480,7 @@ class CCInterpreter extends BaseCstVisitor {
                     return variable.update(new NumberLiteral(left.content ** right.content));
             }
         } else {
-            throw this.error("Cannot assign to a static literal", ctx);
+            throw this.error("Cannot assign to a static literal", ctx.$op);
         }
     }
 
@@ -558,14 +567,15 @@ class CCInterpreter extends BaseCstVisitor {
 
         this.statementStack.push(ctx);
 
-        let itrLeft = 10000;
+        let itrLeft = 100000;
         let bool = false;
-        while (!brk && (bool = check()) && itrLeft-- > 0) {
+        while ((bool = check()) && itrLeft > 0) {
+            itrLeft--;
             const val = callBody();
             if (isBreak(val)) break;
         }
         if (itrLeft === 0 && bool) {
-            throw this.error("While loop is iterating more than 10000", ctx);
+            throw this.error("While loop is iterating more than 100000", ctx.WhileTok);
         }
 
         this.statementStack.pop();
@@ -590,26 +600,20 @@ class CCInterpreter extends BaseCstVisitor {
             const checkMiddle = () => toBool(assign(this.visit(middleRef)));
             const callRight = () => this.visit(rightRef);
 
-            let itrLeft = 10000;
+            let itrLeft = 100000;
             let bool = false;
-            while ((bool = checkMiddle()) && itrLeft-- > 0) {
+            while ((bool = checkMiddle()) && itrLeft > 0) {
+                itrLeft--;
                 if (isBreak(callBody())) break;
                 callRight();
             }
             if (itrLeft === 0 && bool) {
-                throw this.error("For loop is iterating more than 10000", ctx);
+                throw this.error("For loop is iterating more than 100000", ctx.ForTok);
             }
 
             this.statementStack.pop();
         } else {
             this.statementStack.push(ctx);
-
-            // const name = ctx.Identifier[0].image;
-            // const variable =
-            //     this.varsPerStatement.getVariable(name, this) ||
-            //     this.varsPerStatement.createVariable(name, ctx, this);
-            // const value = assign(this.visit(ctx.$value));
-            // return variable.update(value);
 
             const varname = ctx.Identifier[0].image;
             const variable =
@@ -619,6 +623,9 @@ class CCInterpreter extends BaseCstVisitor {
             const value = assign(this.visit(ctx.$value));
             if (value instanceof NumberLiteral) {
                 const size = value.content;
+                if (!Number.isFinite(size)) {
+                    throw this.error("Cannot loop over Infinity", ctx.$value);
+                }
                 for (let i = 0; i < size; i++) {
                     variable.update(new NumberLiteral(i));
                     if (isBreak(callBody())) break;
@@ -643,13 +650,13 @@ class CCInterpreter extends BaseCstVisitor {
                     if (isBreak(callBody())) break;
                 }
             } else if (value instanceof NullLiteral) {
-                throw this.error("Cannot iterate over 'null'", ctx.$value[0]);
+                throw this.error("Cannot iterate over 'null'", ctx.$value);
             } else if (value instanceof BooleanLiteral) {
-                throw this.error("Cannot iterate over a boolean value", ctx.$value[0]);
+                throw this.error("Cannot iterate over a boolean value", ctx.$value);
             } else if (value instanceof Func) {
-                throw this.error("Cannot iterate over a function reference", ctx.$value[0]);
+                throw this.error("Cannot iterate over a function reference", ctx.$value);
             } else {
-                throw this.error("Cannot iterate over unknown type", ctx.$value[0]);
+                throw this.error("Cannot iterate over unknown type", ctx.$value);
             }
 
             this.statementStack.pop();
@@ -683,7 +690,7 @@ class CCInterpreter extends BaseCstVisitor {
     FunctionDeclaration(ctx) {
         const name = ctx.Identifier[0].image;
         if (this.varsPerStatement.checkVariable(name, this)) 
-            throw this.error("Variable '" + name + "' already declared", ctx);
+            throw this.error("Variable '" + name + "' already declared", ctx.Identifier);
 
         const variable = this.varsPerStatement.createVariable(name, ctx, this);
 
@@ -704,10 +711,10 @@ class CCInterpreter extends BaseCstVisitor {
         const args = [];
         for (let arg of ctx.$args) {
             const name = arg.image;
-            if (args.some(a => a === name)) throw this.error("Argument '" + name + "' already declared in argument list!");
+            if (args.some(a => a === name)) throw this.error("Argument '" + name + "' already declared in argument list!", arg);
 
             if (this.varsPerStatement.checkVariable(name, this))
-                throw this.error("Variable '" + name + "' already declared", ctx);
+                throw this.error("Variable '" + name + "' already declared", arg);
             
             args.push(name);
         }

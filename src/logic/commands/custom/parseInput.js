@@ -31,7 +31,8 @@ async function parseInput(text) {
             const reply = await interpreter.visit(cst);
             console.log(reply);
         } catch (error) {
-            console.log(error);
+            // console.log(error);
+            console.log(error.toString());
         }
         const time = timer.end();
         times.push(time);
@@ -43,24 +44,7 @@ async function parseInput(text) {
     console.log("Avg:   " + (t / times.length / (NanoTimer.NS_PER_SEC / 1000)).toFixed(6) + " ms");
 }
 
-const text = `
-func loop () {
-    loop();
-}
-
-loop();
-
-// obj = [];
-// for (i of 10000) obj[i] = i;
-// reply obj;
-
-// func test(o) {
-//     a = 8;
-//     return o + a;
-// }
-
-// reply test(34);
-`;
+const text = require("fs-extra").readFileSync("example.trixie", "utf8");
 
 parseInput(text);
 

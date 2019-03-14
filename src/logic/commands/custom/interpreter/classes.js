@@ -14,6 +14,14 @@ function toBool(item) {
     return val;
 }
 
+function isReturn(item) {
+    return item instanceof ReturnInterrupt;
+}
+
+function isBreak(item) {
+    return item instanceof BreakInterrupt;
+}
+
 /**
  * @param {Item|Variable} item 
  * @returns {Item}
@@ -23,20 +31,12 @@ function assign(item) {
     return item;
 }
 
-function isReturn(item) {
-    return item instanceof ReturnInterrupt;
-}
-
-function isBreak(item) {
-    return item instanceof BreakInterrupt;
-}
-
 /** @param {string} str */
-function createStringLiteral(str) {
+function createStringLiteral(str, interpreter) {
     str = str
         .substr(1, str.length - 2)
         .replace(/\\\\/g, "\\");
-    
+
     if (str.startsWith("'")) str = str.replace(/\\'/g, "'");
     else str = str.replace(/\\"/g, "\"");
 
@@ -48,13 +48,13 @@ function createStringLiteral(str) {
         .replace(/\\[0-7]{1,3}/g, str => {
             // octal escape sequence
             const charCode = parseInt(str.substr(1), 8);
-            if (charCode > 255) throw ctx.error("Constant is out of bounds");
+            if (charCode > 255) throw interpreter.error("Constant is out of bounds");
             return String.fromCharCode(charCode);
         })
         .replace(/\\u[0-9a-fA-F]{4}/g, str => {
             // unicode escape sequence
             const charCode = parseInt(str.substr(2), 16);
-            if (charCode > 65535) throw ctx.error("Constant is out of bounds");
+            if (charCode > 65535) throw interpreter.error("Constant is out of bounds");
             return String.fromCharCode(charCode);
         })
         .replace(/\\/g, "");
@@ -244,13 +244,26 @@ ArrayLiteral.prototype.proto = Object.create(Literal.prototype.proto);
 ArrayLiteral.prototype.proto.toString = new NativeFunc(function toString() {
     return new StringLiteral(this.content.map(elem => {
         const func = elem.getProp(new StringLiteral("toString"));
-        if (func) return func.call(null, elem);
+        if (func instanceof Func) return func.call(null, elem).content;
+        else if (func instanceof NullLiteral) return "[no toString func]";
+        else if (func instanceof Literal) return func;
         else return "[no toString func]";
     }).join(", "));
 });
 ArrayLiteral.prototype.proto.size = new NativeFunc(function size() {
     return new NumberLiteral(this.content.length);
 });
+ArrayLiteral.prototype.proto.concat = new NativeFunc(function concat(...arrs) {
+    return new ArrayLiteral(this.content.concat(...arrs.map(a => a.content)));
+});
+ArrayLiteral.prototype.proto.fill = new NativeFunc(function (fill) {
+    this.content.fill(fill);
+    return this;
+});
+ArrayLiteral.prototype.proto.filter = new NativeFunc(function (func) {
+});
+
+// Array.prototype.
 
 class ObjectLiteral extends Literal {
     constructor(content = {}) {
@@ -287,6 +300,16 @@ ObjectLiteral.prototype.proto.keys = new NativeFunc(function toString() {
 });
 ObjectLiteral.prototype.proto.size = new NativeFunc(function size() {
     return new NumberLiteral(Object.getOwnPropertyNames(this.content).length);
+});
+
+class DateObject extends ObjectLiteral {
+    constructor(date = new Date) {
+        this.content = date;
+    }
+}
+DateObject.prototype.proto = Object.create(ObjectLiteral.prototype.proto);
+DateObject.prototype.proto.toString = new NativeFunc(function toString() {
+    return new StringLiteral(this.content.toString());
 });
 
 class Interruptor { }
@@ -361,7 +384,7 @@ class VariableStack extends Map {
 
     createVariable(name, ctx, _this) {
         if (RESERVED_KEYWORDS.includes(name)) {
-            throw _this.error("Cannot create variable: '" + name + "' is a reserved keyword", ctx);
+            throw _this.error("Cannot create variable: '" + name + "' is a reserved keyword", ctx.Identifier);
         }
         const currentStack = _this.statementStack.clone();
         const currentStatement = currentStack.current;
@@ -405,6 +428,7 @@ module.exports = {
     StringLiteral,
     ArrayLiteral,
     ObjectLiteral,
+    DateObject,
     Func,
     NativeFunc,
     Interruptor,

@@ -169,6 +169,9 @@ $.RULE("ArrayLiteral", () => {
             $.CONSUME(t.Comma);
             $.SUBRULE2($.AssignmentExpression, $elements);
         });
+        $.OPTION2(() => {
+            $.CONSUME2(t.Comma);
+        });
     });
     $.CONSUME(t.CloseBracket);
 });

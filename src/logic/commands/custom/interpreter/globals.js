@@ -175,8 +175,8 @@ const RichEmbed = new c.NativeFunc(function () {
             embed.thumbnail = { url: url.content };
             return obj;
         }),
-        setTimestamp: new c.NativeFunc(function (timestamp = new c.DateObject) {
-            embed.timestamp = timestamp.content;
+        setTimestamp: new c.NativeFunc(function (timestamp = new c.NumberLiteral(Date.now())) {
+            embed.timestamp = new Date(timestamp.content);
             return obj;
         }),
         setTitle: new c.NativeFunc(function (title = new c.StringLiteral("")) {

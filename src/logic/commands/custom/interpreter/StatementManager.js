@@ -1,21 +1,21 @@
+const Symbol = require("../Symbol");
+
 class StatementStack {
     /** @param {Symbol[]} arr */
     constructor(arr = []) {
         this._arr = arr;
     }
 
-    pushFunctionCall(ctx) {
-        if (ctx.$stackId) {
-            const id = Symbol();
-            ctx.$stackId.push(id);
-            return id;
-        }
-    }
+    // pushFunctionCall(ctx) {
+    //     if (ctx.$stackId) {
+    //         const id = Symbol();
+    //         ctx.$stackId.push(id);
+    //         return id;
+    //     }
+    // }
 
     push(ctx) {
-        const id = ctx.$stackId ?
-            ctx.$stackId[ctx.$stackId.length - 1] :
-            (ctx.$stackId = [Symbol()]);
+        const id = ctx.$stackId = Symbol();
         this._arr.push(id);
         return id;
     }
@@ -24,11 +24,11 @@ class StatementStack {
         return this._arr.pop();
     }
 
-    popFunctionCall(ctx) {
-        if (ctx.$stackId) {
-            return ctx.$stackId.pop();
-        }
-    }
+    // popFunctionCall(ctx) {
+    //     if (ctx.$stackId) {
+    //         return ctx.$stackId.pop();
+    //     }
+    // }
 
     get current() {
         return this._arr[this._arr.length - 1];
@@ -72,9 +72,9 @@ class StatementManager {
         return this._arr.push(stack);
     }
 
-    pushFunctionCall(ctx) {
-        return this.currentStack.pushFunctionCall(ctx);
-    }
+    // pushFunctionCall(ctx) {
+    //     return this.currentStack.pushFunctionCall(ctx);
+    // }
 
     push(ctx) {
         return this.currentStack.push(ctx);
@@ -84,9 +84,9 @@ class StatementManager {
         return this.currentStack.pop();
     }
 
-    popFunctionCall(ctx) {
-        return this.currentStack.popFunctionCall(ctx);
-    }
+    // popFunctionCall(ctx) {
+    //     return this.currentStack.popFunctionCall(ctx);
+    // }
 
     get current() {
         return this.currentStack.current;

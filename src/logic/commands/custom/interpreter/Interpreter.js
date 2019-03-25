@@ -26,6 +26,16 @@ const {
     StatementStack,
     StatementManager,
     Member,
+
+    RichEmbed,
+    Emoji,
+    Reaction,
+    Mentions,
+    Message,
+    Role,
+    GuildMember,
+    Channel,
+    Guild
 } = require("./classes");
 
 const GLOBALS = require("./globals");
@@ -36,34 +46,43 @@ const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
 // All our semantics go into the visitor, completly separated from the grammar.
 class CCInterpreter extends BaseCstVisitor {
-    constructor() {
+    constructor(commandId, guildId) {
         super();
         // This helper will detect any missing or redundant methods on this visitor
-        this.validateVisitor();
+        // this.validateVisitor();
+
+        this.id = commandId;
+        this.guildId = guildId;
 
         /** @type {string} */
         this.text_input = null;
 
-        /** @type {(msg: string, item: { startOffset: number, startLine: number, startColumn: number}) => RuntimeError} */
-        this.error = (msg, item) => {
-            if (item) {
-                if (item instanceof Array) item = item[0];
-                while (!!item.children) item = item.children[Object.getOwnPropertyNames(item.children)[0]][0];
-                return new RuntimeError(msg, item.startOffset, item.startLine, item.startColumn, this.text_input);
-            }
-            return new RuntimeError(msg);
-        };
-
         this.varsPerStatement = new VariableStack;
 
         this.statementStack = new StatementManager;
-
-        this.cleanup = () => {
-            this.text_input = null;
-            this.varsPerStatement.clear();
-            this.statementStack.clear();
-        };
     }
+
+    /**
+     * @param {string} msg 
+     * @param {{ startOffset: number, startLine: number, startColumn: number}} item
+     * @returns {RuntimeError}
+     */
+    error(msg, item) {
+        if (item) {
+            if (item instanceof Array) item = item[0];
+            while (!!item.children) item = item.children[Object.getOwnPropertyNames(item.children)[0]][0];
+            return new RuntimeError(msg, item.startOffset, item.startLine, item.startColumn, this.text_input);
+        }
+        return new RuntimeError(msg);
+    }
+
+    cleanup() {
+        this.text_input = null;
+        this.varsPerStatement.clear();
+        this.statementStack.clear();
+    }
+
+    ///////// Main functions //////////
 
     async PrimaryExpression(ctx) {
         if (ctx.Identifier) {
@@ -73,7 +92,7 @@ class CCInterpreter extends BaseCstVisitor {
 
             if (variable) return variable;
 
-            if (GLOBALS[name])  return GLOBALS[name];
+            if (GLOBALS[name]) return GLOBALS[name];
 
             let input = this.text_input.substr(identifier.endOffset + 1);
 
@@ -248,7 +267,7 @@ class CCInterpreter extends BaseCstVisitor {
         const key = new StringLiteral(ctx.$key[0].image);
         if (val instanceof NullLiteral) {
             const name = await key.getProp(new StringLiteral("toString")).call(this, key);
-            throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx.$key);
+            throw this.error("Cannot read property '" + (name ? name.content : "[no toString func]") + "' of null", ctx.$key);
         } else {
             val = new Member(val, key, val.getProp(key));
         }
@@ -257,10 +276,14 @@ class CCInterpreter extends BaseCstVisitor {
 
     async MemberExpression$call(ctx, { val }) {
         const args = await this.visit(ctx.Arguments);
-        if (val instanceof Member) val = val.value;
-        if (val instanceof Func || val instanceof NativeFunc) {
+        let func = val;
+        if (val instanceof Member) {
+            func = val.value;
+            val = val.parent;
+        }
+        if (func instanceof Func || func instanceof NativeFunc) {
             // TODO: ???? check if this works
-            return assign(await val.call(this, val, args));
+            return assign(await func.call(this, val, args));
         } else {
             throw this.error("Cannot call value of other type than Func", ctx.Arguments);
         }
@@ -687,7 +710,7 @@ class CCInterpreter extends BaseCstVisitor {
         // it isn't very elegant, but throwing the reply value is easiest way 
         // to get the result straight away
         const value = assign(await this.visit(ctx.$value));
-        
+
         if (!(value instanceof NumberLiteral)) {
             throw this.error("Sleeping duration must be a number", ctx.$value);
         }
@@ -697,7 +720,7 @@ class CCInterpreter extends BaseCstVisitor {
         if (value.content < 0) {
             throw this.error("Sleeping duration must be a positive number", ctx.$value);
         }
-        
+
         await timeout(value.content);
     }
 
@@ -712,7 +735,7 @@ class CCInterpreter extends BaseCstVisitor {
 
     async FunctionDeclaration(ctx) {
         const name = ctx.Identifier[0].image;
-        if (this.varsPerStatement.checkVariable(name, this)) 
+        if (this.varsPerStatement.checkVariable(name, this))
             throw this.error("Variable '" + name + "' already declared", ctx.Identifier);
 
         const variable = this.varsPerStatement.createVariable(name, ctx, this);
@@ -738,7 +761,7 @@ class CCInterpreter extends BaseCstVisitor {
 
             if (this.varsPerStatement.checkVariable(name, this))
                 throw this.error("Variable '" + name + "' already declared", arg);
-            
+
             args.push(name);
         }
         return args;
@@ -748,12 +771,42 @@ class CCInterpreter extends BaseCstVisitor {
         if (ctx.StatementList) return await this.visit(ctx.StatementList);
     }
 
-    async Program(ctx) {
-        try {
-            this.statementStack.pushChange(new StatementStack([]));
-            this.statementStack.push(ctx);
+    /**
+     * 
+     * @param {{}} ctx 
+     * @param {{ args }} message 
+     */
+    async Program(ctx, { msg, args, guild }) {
+        this.statementStack.pushChange(new StatementStack([]));
+        this.statementStack.push(ctx);
 
+        try {
             if (ctx.StatementList) {
+                const $msg = await Message(this, msg);
+                const $text = $msg.content.text;
+                const $user = $msg.content.member;
+                const $member = $msg.content.member;
+                const $channel = $msg.content.channel;
+                const $mentions = $msg.content.mentions;
+
+                const $args = new ArrayLiteral(args.map(s => new StringLiteral(s)));
+
+                const $react = new NativeFunc("$react", async function (interpreter, ...args) {
+                    return $msg.content.react.call(interpreter, $msg, args);
+                });
+
+                const $guild = await Guild(this, guild);
+
+                this.varsPerStatement.createVariable("$msg", ctx, this).update($msg);
+                this.varsPerStatement.createVariable("$text", ctx, this).update($text);
+                this.varsPerStatement.createVariable("$user", ctx, this).update($user);
+                this.varsPerStatement.createVariable("$member", ctx, this).update($member);
+                this.varsPerStatement.createVariable("$channel", ctx, this).update($channel);
+                this.varsPerStatement.createVariable("$mentions", ctx, this).update($mentions);
+                this.varsPerStatement.createVariable("$args", ctx, this).update($args);
+                this.varsPerStatement.createVariable("$react", ctx, this).update($react);
+                this.varsPerStatement.createVariable("$guild", ctx, this).update($guild);
+
                 await this.visit(ctx.StatementList);
             }
 
@@ -776,4 +829,4 @@ class CCInterpreter extends BaseCstVisitor {
     }
 }
 
-module.exports = new CCInterpreter();
+module.exports = CCInterpreter;

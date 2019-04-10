@@ -133,26 +133,24 @@ module.exports = async function install(cr, client, config) {
 
     cr.register("prefix", new class extends BaseCommand {
         async call(message, content) {
-            const args = findArgs(content);
-
             const embed = new Discord.RichEmbed;
 
             const parameter = config.parameters.find(p => p.name === "prefix");
 
-            if (args.length === 1) {
+            if (content === "") {
                 embed.setColor(CONST.COLOR.PRIMARY);
                 embed.setThumbnail(message.guild.iconURL);
                 embed.setTitle(parameter.humanName);
 
-                const value = await config.get(message.guild.id, args[0]);
+                const value = await config.get(message.guild.id, parameter.name);
                 const human_readable = parameter.human(value);
                 embed.addField("Currently:", `\`${human_readable}\``);
-                embed.addField("Update:", `\`${message.prefix}config ${parameter.name} <new value>\``);
+                embed.addField("Update:", `\`${message.prefix}${parameter.name} <new value>\``);
                 embed.addField("Allowed Types:", parameter.types.map(t => {
                     return types_human.get(t) || `\`${t}\``;
                 }).join(", ") + (parameter.allowEmpty ? " or `none`" : ""));
-            } else if (args.length === 2) {
-                if (!parameter.check(args[1])) {
+            } else {
+                if (!parameter.check(content)) {
                     embed.setColor(CONST.COLOR.ERROR);
                     embed.setDescription(await message.channel.translate("New value has a wrong format. Should be {{format}}", {
                         format: parameter.types.map(t => types_human.get(t) || `\`${t}\``).join(", ") + parameter.allowEmpty ? " or `none`" : ""
@@ -160,7 +158,7 @@ module.exports = async function install(cr, client, config) {
                 } else {
                     embed.setColor(CONST.COLOR.PRIMARY);
 
-                    const new_value = parameter.format(args[1]);
+                    const new_value = parameter.format(content);
                     const human_readable = parameter.human(new_value);
                     await config.set(message.guild.id, { [parameter.name]: new_value });
 
@@ -174,7 +172,7 @@ module.exports = async function install(cr, client, config) {
     })
         .setHelp(new HelpContent()
             .setDescription("Alias for `{{prefix}}config prefix <?value>`")
-            .setUsage("<?prefix>", "vue Trixie's prefix in this server")
+            .setUsage("<?prefix>", "view Trixie's prefix in this server")
             .addParameterOptional("prefix", "set the prefix in Trixie's config. \"default\" for default prefix `(!)`"))
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN);

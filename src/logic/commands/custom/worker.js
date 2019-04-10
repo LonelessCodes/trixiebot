@@ -57,27 +57,10 @@ cpc.answer("compile", async payload => {
 });
 
 cpc.answer("run", async ({ id, text, cst, message }) => {
-    return runCC(id, text, cst, message);
+    return await runCC(id, text, cst, message);
 });
 
-const text = `
-if ($args.size() >= 2) { // checks if the args passed to the command are 2 or more
-    channel = Channel($args[0]); // takes the first argument and turns it into a Channel object
-    // take all args from the 2nd (1st in computer math, because computers start counting from 0) element on
-    message = $args.slice(1);
-    embed = RichEmbed()
-        .setTitle("Broadcast!")
-        .setDescription(message)
-        .setColor(0xffcc00)
-        .setFooter("This broadcast was sent by " + $user.username);
-
-    channel.send(embed);
-
-    reply "Broadcast sent!";
-} else {
-    reply "Correct usage of the command: \`!bc <#channel> <message>\`"
-}
-`;
+const text = require("fs").readFileSync("./example.trixie", "utf8");
 
 const message = {
     msg: {
@@ -110,7 +93,7 @@ const message = {
             nsfw: false,
             topic: "topic is this"
         },
-        text: "!command hiyoooo nice",
+        text: "hiyoooo nice",
         createdAt: Date.now(),
         editedAt: Date.now(),
         mentions: {

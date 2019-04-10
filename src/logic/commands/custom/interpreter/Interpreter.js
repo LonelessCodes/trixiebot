@@ -1,4 +1,6 @@
 const { timeout } = require("../../../../modules/util");
+const { parseHumanTime } = require("../../../../modules/util/time");
+const { splitArgs } = require("../../../../modules/util/string");
 const { tokens: { WhiteSpace, LineTerminator, MultiLineComment, SingleLineComment } } = require("../tokens");
 const parser = require("../parser");
 const { RuntimeError } = require("../errors");
@@ -27,6 +29,9 @@ const {
     StatementManager,
     Member,
 
+    TimeLiteral,
+    DurationLiteral,
+
     RichEmbed,
     Emoji,
     Reaction,
@@ -35,7 +40,9 @@ const {
     Role,
     GuildMember,
     Channel,
-    Guild
+    Guild,
+
+    convert
 } = require("./classes");
 
 const GLOBALS = require("./globals");
@@ -318,18 +325,40 @@ class CCInterpreter extends BaseCstVisitor {
 
         const right = await this.visit(ctx.$right);
         if (right instanceof Member) {
-            switch (ctx.$prefix[0].image) {
-                case "++":
-                    right.update(new NumberLiteral(right.value.content + 1));
-                case "--":
-                    right.update(new NumberLiteral(right.value.content - 1));
+            if (ctx.$prefix) {
+                switch (ctx.$prefix[0].image) {
+                    case "++":
+                        return right.update(new NumberLiteral(right.value.content + 1));
+                    case "--":
+                        return right.update(new NumberLiteral(right.value.content - 1));
+                }
+            } else {
+                const oldval = right.value;
+                switch (ctx.$postfix[0].image) {
+                    case "++":
+                        right.update(new NumberLiteral(right.value.content + 1));
+                    case "--":
+                        right.update(new NumberLiteral(right.value.content - 1));
+                }
+                return oldval;
             }
         } else if (right instanceof Variable) {
-            switch (ctx.$prefix[0].image) {
-                case "++":
-                    right.value = new NumberLiteral(right.value.content + 1);
-                case "--":
-                    right.value = new NumberLiteral(right.value.content - 1);
+            if (ctx.$prefix) {
+                switch (ctx.$prefix[0].image) {
+                    case "++":
+                        return right.update(new NumberLiteral(right.value.content + 1));
+                    case "--":
+                        return right.update(new NumberLiteral(right.value.content - 1));
+                }
+            } else {
+                const oldval = right.value;
+                switch (ctx.$prefix[0].image) {
+                    case "++":
+                        right.update(new NumberLiteral(right.value.content + 1));
+                    case "--":
+                        right.update(new NumberLiteral(right.value.content - 1));
+                }
+                return oldval;
             }
         } else {
             throw this.error("Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)", ctx.$prefix);
@@ -346,8 +375,14 @@ class CCInterpreter extends BaseCstVisitor {
 
         switch (ctx.$op[0].image) {
             case "*":
+                if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                    return left.clone().multiply(right);
+                }
                 return new NumberLiteral(left.content * right.content);
             case "/":
+                if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                    return left.clone().multiply(1 / right);
+                }
                 return new NumberLiteral(left.content / right.content);
             case "%":
                 return new NumberLiteral(left.content % right.content);
@@ -367,6 +402,8 @@ class CCInterpreter extends BaseCstVisitor {
         switch (ctx.$op[0].image) {
             case "+":
                 if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
+                    if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral)) 
+                        return left.clone().add(right);
                     return new NumberLiteral(left.content + right.content);
                 } else {
                     const leftprop = left.getProp(new StringLiteral("toString"));
@@ -377,6 +414,10 @@ class CCInterpreter extends BaseCstVisitor {
                     );
                 }
             case "-":
+                if ((left instanceof TimeLiteral || left instanceof DurationLiteral) &&
+                    right instanceof NumberLiteral && !(right instanceof TimeLiteral)) {
+                    return left.clone().subtract(right);
+                }
                 return new NumberLiteral(left.content - right.content);
         }
     }
@@ -483,20 +524,31 @@ class CCInterpreter extends BaseCstVisitor {
                     return variable.update(right);
                 case "+=":
                     if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
+                        if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral))
+                            return left.add(right);
                         return variable.update(new NumberLiteral(left.content + right.content));
-                    } else {
-                        const leftprop = left.getProp(new StringLiteral("toString"));
-                        const rightprop = right.getProp(new StringLiteral("toString"));
-                        return variable.update(new StringLiteral(
-                            (leftprop ? (await leftprop.call(this, left).content) : "[no toString func]") +
-                            (rightprop ? (await rightprop.call(this, right).content) : "[no toString func]")
-                        ));
                     }
+                    const leftprop = left.getProp(new StringLiteral("toString"));
+                    const rightprop = right.getProp(new StringLiteral("toString"));
+                    return variable.update(new StringLiteral(
+                        (leftprop ? (await leftprop.call(this, left).content) : "[no toString func]") +
+                        (rightprop ? (await rightprop.call(this, right).content) : "[no toString func]")
+                    ));
                 case "-=":
+                    if ((left instanceof TimeLiteral || left instanceof DurationLiteral) &&
+                        right instanceof NumberLiteral && !(right instanceof TimeLiteral)) {
+                        return left.subtract(right);
+                    }
                     return variable.update(new NumberLiteral(left.content - right.content));
                 case "*=":
+                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                        return left.multiply(right);
+                    }
                     return variable.update(new NumberLiteral(left.content * right.content));
                 case "/=":
+                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                        return left.multiply(1 / right);
+                    }
                     return variable.update(new NumberLiteral(left.content / right.content));
                 case "%=":
                     return variable.update(new NumberLiteral(left.content % right.content));
@@ -790,6 +842,74 @@ class CCInterpreter extends BaseCstVisitor {
                 const $mentions = $msg.content.mentions;
 
                 const $args = new ArrayLiteral(args.map(s => new StringLiteral(s)));
+
+                /*
+                 * allowed types:
+                 * String, Number, Boolean, Duration, Time, Channel, Member, Role
+                 */
+                const parseArgs = new NativeFunc("parseArgs", function (_, ...args) {
+                    if (args.length === 0) return $args;
+                    else if (args.length === 1 && args[0] instanceof NumberLiteral) {
+                        const split = splitArgs(msg.text, args[0].content);
+                        return convert(split);
+                    }
+                    else if (args.every(arg => arg instanceof NativeFunc)) {
+                        const arr = [];
+                        const numberReg = /[0-9]+(?:\.[0-9]+)/;
+                        const whitespaceReg = /(?:(?:[\t\f\v\u0020\u2028\u2029\u00A0\uFEFF])|(?:\r?\n))+/;
+                        const strReg = /[^\s]+/;
+                        const boolReg = /\b(true|false|yes|no)\b/i;
+                        const durReg = /(?:(?:[0-9]+\.)?[0-9]+[smhdw])+/i;
+                        let str = msg.text;
+
+                        let i = 0;
+                        for (let type of args) {
+                            let match = str.match(whitespaceReg);
+                            if (match) str = str.slice(match[0].length);
+                            
+                            switch (type) {
+                                case GLOBALS.Boolean:
+                                    match = str.match(boolReg);
+                                    if (match) {
+                                        if (/true|yes/i.test(match[0])) arr.push(new BooleanLiteral(true));
+                                        else arr.push(new BooleanLiteral(false));
+                                        str = str.slice(match[0].length);
+                                        break;
+                                    }
+                                case GLOBALS.Number:
+                                    match = str.match(numberReg);
+                                    if (match) {
+                                        arr.push(new NumberLiteral(parseFloat(match[0])));
+                                        str = str.slice(match[0].length);
+                                        break;
+                                    }
+                                case GLOBALS.Duration:
+                                    match = str.match(durReg);
+                                    if (match) {
+                                        arr.push(new DurationLiteral(parseHumanTime(match[0])));
+                                        str = str.slice(match[0].length);
+                                        break;
+                                    }
+                                case GLOBALS.String:
+                                    if (i === args.length - 1) {
+                                        arr.push(new StringLiteral(str));
+                                        break;
+                                    }
+                                    match = str.match(strReg);
+                                    if (match) {
+                                        arr.push(new StringLiteral(match[0]));
+                                        str = str.slice(match[0].length);
+                                        break;
+                                    }
+                            }
+
+                            i++;
+                        }
+
+                    } else {
+                        return new NullLiteral;
+                    }
+                });
 
                 const $react = new NativeFunc("$react", async function (interpreter, ...args) {
                     return $msg.content.react.call(interpreter, $msg, args);

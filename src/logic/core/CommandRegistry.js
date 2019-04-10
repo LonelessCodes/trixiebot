@@ -11,12 +11,14 @@ const CommandPermission = require("../commands/CommandPermission");
 const HelpBuilder = require("../commands/HelpBuilder");
 const RateLimiter = require("../RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
+const CCManager = require("../managers/CCManager");
 
 class CommandRegistry {
     constructor(client, config, database) {
         this.client = client;
         this.config = config;
         this.database = database;
+        this.cc = new CCManager(client, database);
 
         /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;
@@ -34,6 +36,10 @@ class CommandRegistry {
         // only for now!!!
         if (message.channel.type !== "text") return false;
 
+        // /** @type {BaseCommand} */
+        // let command = await this.cc.get(message.guild, { commandName: command_name, prefixUsed, rawContent: message.content });
+
+        // command = this.commands.get(command_name);
         let command = this.commands.get(command_name);
 
         if (command && command instanceof AliasCommand) {

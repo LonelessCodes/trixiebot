@@ -299,12 +299,12 @@ $.RULE("UpdateExpression", () => {
         {
             ALT: () => {
                 $.SUBRULE($.MemberExpression, $left);
-                // $.OPTION(() => {
-                //     $.OR2({
-                //         { ALT: () => $.CONSUME(t.Increment, { LABEL: "$postfix" }) },
-                //         { ALT: () => $.CONSUME(t.Decrement, { LABEL: "$postfix" }) },
-                //     ]);
-                // });
+                $.OPTION(() => {
+                    $.OR2([
+                        { ALT: () => $.CONSUME(t.Increment, { LABEL: "$postfix" }) },
+                        { ALT: () => $.CONSUME(t.Decrement, { LABEL: "$postfix" }) },
+                    ]);
+                });
             }
         },
         {

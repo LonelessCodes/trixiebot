@@ -20,7 +20,7 @@ async function Emoji(interpreter, id) {
         name: new c.StringLiteral(opts.name),
         id: opts.id ? new c.StringLiteral(opts.id) : new c.NullLiteral,
         identifier: opts.id ? new c.StringLiteral(`${opts.name}:${opts.id}`) : new c.NullLiteral,
-        createdAt: opts.createdAt ? new c.DateObject(opts.createdAt) : new c.NullLiteral,
+        createdAt: opts.createdAt ? new c.TimeLiteral(opts.createdAt) : new c.NullLiteral,
         url: opts.url ? new c.StringLiteral(opts.url) : new c.NullLiteral,
 
         // methods
@@ -76,8 +76,8 @@ async function Message(interpreter, id) {
         member: await GuildMember(interpreter, opts.member),
         channel: await Channel(interpreter, opts.channel),
         text: new c.StringLiteral(opts.text),
-        createdAt: new c.DateObject(opts.createdAt),
-        editedAt: opts.editedAt ? new c.DateObject(opts.editedAt) : new c.NullLiteral,
+        createdAt: new c.TimeLiteral(opts.createdAt),
+        editedAt: opts.editedAt ? new c.TimeLiteral(opts.editedAt) : new c.NullLiteral,
         mentions: await Mentions(interpreter, opts.mentions),
         pinned: new c.BooleanLiteral(opts.pinned),
         reactions: new c.ArrayLiteral(await Promise.all(opts.reactions.map(reaction => Reaction(interpreter, { ...reaction, messageId: opts.id })))),
@@ -103,12 +103,12 @@ async function Message(interpreter, id) {
             const e = [];
             for (let emoji of emojis) {
                 if (emoji instanceof c.ObjectLiteral) {
-                    e.push(emoji.content.id.content);
+                    e.push(emoji.content.identifier.content || emoji.content.name.content);
                 } else if (emoji instanceof c.StringLiteral) {
                     e.push(emiji.content);
                 }
             }
-            await cpc.awaitAnswer("message.react", { guildId: interpreter.guildId, messageId: opts.id, emojis });
+            await cpc.awaitAnswer("message.react", { guildId: interpreter.guildId, messageId: opts.id, emojis: e });
             return new c.NullLiteral;
         })
     });
@@ -134,7 +134,7 @@ async function Role(interpreter, id) {
         position: new c.NumberLiteral(opts.position),
         color: new c.NumberLiteral(opts.color),
         hexColor: new c.StringLiteral(opts.color.toString(16)),
-        createdAt: new c.DateObject(opts.createdAt),
+        createdAt: new c.TimeLiteral(opts.createdAt),
         mentionable: new c.BooleanLiteral(opts.mentionable),
         name: new c.StringLiteral(opts.name),
 
@@ -175,12 +175,12 @@ async function GuildMember(interpreter, id) {
 
     return new c.ObjectLiteral({
         id: new c.StringLiteral(opts.id),
-        nickname: new c.StringLiteral(opts.nickname),
+        nickname: new c.StringLiteral(opts.nickname || opts.username),
         highestRole: await Role(interpreter, opts.highestRole),
-        joinedAt: new c.DateObject(opts.joinedAt),
+        joinedAt: new c.TimeLiteral(opts.joinedAt),
         avatar: new c.StringLiteral(opts.avatar),
         bot: new c.BooleanLiteral(opts.bot),
-        createdAt: new c.DateObject(opts.createdAt),
+        createdAt: new c.TimeLiteral(opts.createdAt),
         discriminator: new c.StringLiteral(opts.discriminator),
         username: new c.StringLiteral(opts.username),
         tag: new c.StringLiteral(opts.username + "#" + opts.discriminator),
@@ -219,7 +219,7 @@ async function Channel(interpreter, id) {
     return new c.ObjectLiteral({
         id: new c.StringLiteral(opts.id),
         name: new c.StringLiteral(opts.name),
-        createdAt: new c.DateObject(new Date(opts.createdAt)),
+        createdAt: new c.TimeLiteral(opts.createdAt),
         position: new c.NumberLiteral(opts.position),
         nsfw: new c.BooleanLiteral(opts.nsfw),
         topic: opts.topic ? new c.StringLiteral(opts.topic) : new c.NullLiteral,
@@ -231,7 +231,7 @@ async function Channel(interpreter, id) {
         // awaitMessage: new c.NativeFunc("awaitMessage", async function (interpreter, filter, time) {
             
         // }),
-        createInvite: new c.NativeFunc("createInvite", async function (_, opts = {}) {
+        createInvite: new c.NativeFunc("createInvite", async function (_, opts = new c.ObjectLiteral({})) {
             const options = {
                 temporary: false,
                 maxAge: 86400,
@@ -269,7 +269,7 @@ async function Guild(interpreter, opts) {
     return new c.ObjectLiteral({
         id: new c.StringLiteral(opts.id),
         name: new c.StringLiteral(opts.name),
-        createdAt: new c.DateObject(new Date(opts.createdAt)),
+        createdAt: new c.TimeLiteral(opts.createdAt),
         icon: new c.StringLiteral(opts.icon),
         memberCount: new c.NumberLiteral(opts.memberCount),
 
@@ -390,8 +390,8 @@ function RichEmbed(opts = {}) {
             embed.thumbnail = { url: url.content };
             return obj;
         }),
-        setTimestamp: new c.NativeFunc(function (_, timestamp = new c.NumberLiteral(Date.now())) {
-            embed.timestamp = new Date(timestamp.content);
+        setTimestamp: new c.NativeFunc(function (_, timestamp = new c.TimeLiteral()) {
+            embed.timestamp = new Date(timestamp.time.toISOString());
             return obj;
         }),
         setTitle: new c.NativeFunc(function (_, title = new c.StringLiteral("")) {

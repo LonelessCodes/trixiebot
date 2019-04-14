@@ -523,6 +523,32 @@ module.exports = async function install(cr, client, config, db) {
     })
         .setHelp(new HelpContent().setUsage("", "list all active streaming alerts"));
 
+    alertCommand.registerSubCommand("compact", new class extends BaseCommand {
+        async call(message) {
+            if (await manager.isCompact(message.guild)) {
+                await manager.unsetCompact(message.guild);
+                await message.channel.send("Compact online announcements are now turned off.");
+            } else {
+                await manager.setCompact(message.guild);
+                await message.channel.send("Compact online announcements are now turned on.");
+            }
+        }
+    })
+        .setHelp(new HelpContent().setUsage("", "toggle compact online announcements"));
+
+    alertCommand.registerSubCommand("cleanup", new class extends BaseCommand {
+        async call(message) {
+            if (await manager.isCleanup(message.guild)) {
+                await manager.unsetCleanup(message.guild);
+                await message.channel.send("Not deleting online announcements when going offline now.");
+            } else {
+                await manager.setCleanup(message.guild);
+                await message.channel.send("Cleaning up online announcements now.");
+            }
+        }
+    })
+        .setHelp(new HelpContent().setUsage("", "toggle cleaning up online announcements"));
+
     alertCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, content) {
             if (content === "") {

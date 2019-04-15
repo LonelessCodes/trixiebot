@@ -606,7 +606,7 @@ module.exports = async function install(cr, client, config, db) {
 
     const alertCommand = cr.register("alert", new TreeCommand)
         .setHelp(new HelpContent()
-            .setDescription("Make Trixie announce streamers when they go live.\nWorks only with Picarto at the moment.")
+            .setDescription("Make Trixie announce streamers when they go live.\nSupported are Picarto and Twitch.")
             .setUsage("<page url> <?channel>", "Subscribe Trixie to a Picarto channel!")
             .addParameter("page url", "copy the url of the stream page and paste it in here")
             .addParameterOptional("channel", "the channel to post the alert to later. If omitted will be this channel"))

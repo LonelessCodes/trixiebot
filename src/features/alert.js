@@ -9,6 +9,11 @@ const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
+const { default: TwitchClient } = require("twitch");
+const keys = {
+    twitch: require("../../keys/twitch.json")
+};
+
 class StreamProcessor extends EventEmitter {
     /**
      * @param {Manager} manager 
@@ -156,9 +161,173 @@ class Picarto extends StreamProcessor {
     get name() { return "picarto"; }
 }
 
+class Twitch extends StreamProcessor {
+    constructor(manager) {
+        super(manager);
+
+        return new Promise(async resolve => {
+            this.twitch = await TwitchClient.withCredentials(keys.twitch.client_id);
+
+            setInterval(() => this.checkChanges(), 60 * 1000);
+            this.checkChanges();
+
+            resolve(this);
+        });
+    }
+
+    testURL(url) {
+        return /^(http\:\/\/|https\:\/\/)?(www\.twitch\.tv|twitch\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
+    }
+
+    async getChannel(channel, url) {
+        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.twitch\.tv|twitch\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
+
+        const [, channel_name] = regexp.exec(url);
+
+        if (!channel_name) return new Config(this, channel);
+
+        const user = await this.twitch.helix.users.getUserByName(channel_name);
+        if (!user) return new Config(this, channel, channel_name);
+            
+        const user_id = user.id;
+        const name = user.displayName;
+
+        const savedConfig = await this.getDBEntry(channel.guild, user_id);
+        if (savedConfig) return new Config(this, channel, name, user_id, savedConfig._id);
+
+        return new Config(this, channel, name, user_id);
+    }
+
+    formatURL(channel, fat = false) {
+        if (fat) return this.url + "/" + "**" + channel.name + "**";
+        else return "https://" + this.url + "/" + channel.name;
+    }
+
+    async checkChanges() {
+        const channels = await this.manager.getConfigs(this).toArray();
+
+        const set = new Set(channels.map(c => c.userId));
+
+        const online_channels = await this.twitch.streams.getStreams(Array.from(set));
+
+        for (let config of channels) await this.checkChange(config, online_channels).catch(err => log.error(err));
+    }
+
+    async checkChange(config, online_channels) {
+        const oldChannel = this.online.find(oldChannel =>
+            config.userId === oldChannel.userId &&
+            config.channel.guild.id === oldChannel.channel.guild.id);
+
+        const channelPage = online_channels.find(channelPage => config.userId === channelPage.channel.id.toString());
+        if (!channelPage) {
+            // remove the channel from the recently online list                
+            if (config.messageId || oldChannel) this.emit("offline", oldChannel || config);
+        } else {
+            // if the channel was not recently online, set it online
+            if (oldChannel || config.messageId) return;
+
+            const stream = await this.twitch.helix.streams.getStreamByUserId(config.userId);
+
+            const onlineChannel = new OnlineChannel(config, {
+                title: stream.title,
+                followers: channelPage.channel.followers,
+                totalviews: channelPage.channel.views,
+                avatar: channelPage.channel.logo,
+                game: channelPage.game,
+                thumbnail: channelPage.getPreviewUrl("large"),
+                language: stream.language,
+                nsfw: channelPage.channel.isMature,
+            });
+
+            this.emit("online", onlineChannel);
+        }
+    }
+
+    get url() { return "twitch.tv"; }
+    get name() { return "twitch"; }
+}
+
+class ChannelQueryCursor {
+    constructor(db_cursor, manager, service) {
+        this.manager = manager;
+        this.service = service;
+        this._cursor = db_cursor;
+    }
+
+    addListener(scope, handler) {
+        switch (scope) {
+            case "data":
+                this._cursor.addListener("data", config => {
+                    const channel = this.process(config);
+                    if (!channel) return;
+
+                    handler(channel);
+                });
+                break;
+            default:
+                this._cursor.addListener(scope, handler);
+                break;
+        }
+    }
+
+    once(scope, handler) {
+        switch (scope) {
+            case "data":
+                this._cursor.once("data", config => {
+                    const channel = this.process(config);
+                    if (!channel) return;
+
+                    handler(channel);
+                });
+                break;
+            default:
+                this._cursor.once(scope, handler);
+                break;
+        }
+    }
+
+    /**
+     * @returns {Channel[]}
+     */
+    async toArray() {
+        const arr = await this._cursor.toArray();
+        return arr.map(c => this.process(c)).filter(c => !!c);
+    }
+
+    /**
+     * @param {any} config 
+     * @returns {Channel}
+     */
+    process(config) {
+        const guild = this.manager.client.guilds.get(config.guildId);
+        if (!guild) {
+            this.manager.removeChannel(new Config(this.service, null, config.name, config.userId, config._id));
+            return null;
+        }
+        if (!guild.available) return null;
+
+        const g_channel = guild.channels.get(config.channelId);
+        if (!g_channel){
+            this.manager.removeChannel(new Config(this.service, null, config.name, config.userId, config._id));
+            return null;
+        }
+
+        const online = this.manager.online.find(online =>
+            online.service === this.service.name &&
+            online.channel.id === g_channel.id &&
+            online.userId === config.userId);
+        if (online) return online;
+
+        return new Channel(this.manager, this.service, g_channel, config);
+    }
+}
+
 class Manager extends EventEmitter {
     constructor(db, client, services) {
         super();
+
+        /** @type {OnlineChannel[]} */
+        this.online = [];
 
         this.database = db.collection("alert");
         this.db_config = db.collection("alert_config");
@@ -166,97 +335,54 @@ class Manager extends EventEmitter {
 
         this.services = [];
         this.services_mapped = {};
-        for (let Service of services) {
-            const service = new Service(this);
-            service.on("offline", async oldChannel => {
-                if (!oldChannel) return;
 
-                this.online.splice(this.online.indexOf(oldChannel), 1);
+        return new Promise(async resolve => {
+            for (let Service of services) {
+                const service = await new Service(this);
+                service.on("offline", async oldChannel => {
+                    if (!oldChannel) return;
 
-                await this.database.updateOne({
-                    _id: oldChannel._id
-                }, { $set: { messageId: null } });
+                    this.online.splice(this.online.indexOf(oldChannel), 1);
 
-                if (await this.isCleanup(oldChannel.channel.guild))
-                    await oldChannel.delete();
-            });
-            service.on("online", async channel => {
-                /** @type {Discord.RichEmbed} */
-                let embed = null;
-                if (await this.isCompact(channel.channel.guild)) {
-                    embed = new Discord.RichEmbed()
-                        .setColor(CONST.COLOR.PRIMARY)
-                        .setURL(channel.url)
-                        .setAuthor(channel.name, channel.avatar)
-                        .setTitle(channel.title)
-                        .setThumbnail(channel.thumbnail)
-                        .setFooter(`${channel.nsfw ? "NSFW | " : ""}${channel.category ? `Category: ${channel.category} | ` : ""}${channel.tags ? `Tags: ${channel.tags.join(", ")}` : ""}`);
-                } else {
-                    embed = new Discord.RichEmbed()
-                        .setColor(CONST.COLOR.PRIMARY)
-                        .setURL(channel.url)
-                        .setAuthor(channel.name)
-                        .setTitle(channel.title)
-                        .addField("Followers", channel.followers, true)
-                        .addField("Total Viewers", channel.totalviews, true)
-                        .setThumbnail(channel.avatar)
-                        .setImage(channel.thumbnail)
-                        .setFooter(`${channel.nsfw ? "NSFW | " : ""}${channel.category ? `Category: ${channel.category} | ` : ""}${channel.tags ? `Tags: ${channel.tags.join(", ")}` : ""}`);
-                }
+                    await this.database.updateOne({
+                        _id: oldChannel._id
+                    }, { $set: { messageId: null } });
 
-                const onlineMessage = await channel.channel.sendTranslated("{{user}} is live!", {
-                    user: channel.name
-                }, { embed });
-
-                channel.setMessage(onlineMessage);
-
-                this.online.push(channel);
-
-                await this.database.updateOne({
-                    _id: channel._id
-                }, {
-                    $set: {
-                        name: channel.name,
-                        messageId: onlineMessage.id
-                    }
+                    if (await this.isCleanup(oldChannel.channel.guild))
+                        await oldChannel.delete();
                 });
-            });
-            this.services.push(service);
-            this.services_mapped[service.name] = service;
-        }
+                service.on("online", async channel => {
+                    const embed = await channel.getEmbed();
 
-        /** @type {OnlineChannel[]} */
-        this.online = [];
+                    const onlineMessage = await channel.channel.sendTranslated("{{user}} is live!", {
+                        user: channel.name
+                    }, { embed });
+
+                    channel.setMessage(onlineMessage);
+
+                    this.online.push(channel);
+
+                    await this.database.updateOne({
+                        _id: channel._id
+                    }, {
+                        $set: {
+                            name: channel.name,
+                            messageId: onlineMessage.id
+                        }
+                    });
+                });
+                this.services.push(service);
+                this.services_mapped[service.name] = service;
+            }
+
+            resolve(this);
+        });
     }
 
     getConfigs(service) {
         const stream = this.database.find({ service: service.name });
 
-        const custom_stream = new EventEmitter;
-
-        stream.addListener("data", config => {
-            const guild = this.client.guilds.get(config.guildId);
-            if (!guild)
-                return this.removeChannel(new Config(service, null, config.name, config.userId, config._id));
-            if (!guild.available) return;
-
-            const g_channel = guild.channels.get(config.channelId);
-            if (!g_channel)
-                return this.removeChannel(new Config(service, null, config.name, config.userId, config._id));
-
-            const online = this.online.find(online =>
-                online.service === service.name &&
-                online.channel.id === g_channel.id &&
-                online.userId === config.userId);
-            if (online) return custom_stream.emit("data", online);
-
-            custom_stream.emit("data", new Channel(this, service, g_channel, config));
-        });
-
-        stream.once("error", err => custom_stream.emit("error", err));
-        stream.once("end", () => custom_stream.emit("end"));
-
-        return custom_stream;
+        return new ChannelQueryCursor(stream, this, service);
     }
 
     /**
@@ -360,6 +486,7 @@ class Manager extends EventEmitter {
 
 class Channel {
     constructor(manager, service, channel, conf = {}) {
+        /** @type {Manager} */
         this.manager = manager;
         this.service = service;
         this.channel = channel;
@@ -405,6 +532,8 @@ class OnlineChannel extends Channel {
         this.thumbnail = conf.thumbnail;
         this.nsfw = !!conf.nsfw;
         this.category = conf.category;
+        this.game = conf.game;
+        this.language = conf.language;
         this.tags = conf.tags;
 
         this.message = null;
@@ -428,6 +557,35 @@ class OnlineChannel extends Channel {
         this.messageId = null;
         this.message = null;
     }
+
+    async getEmbed() {
+        const footer = [];
+        if (this.nsfw) footer.push("NSFW");
+        if (this.category) footer.push(`Category: ${this.category}`);
+        if (this.game) footer.push(`Game: ${this.game}`);
+        if (this.tags) footer.push(`Tags: ${this.tags.join(", ")}`);
+
+        if (await this.manager.isCompact(this.channel.guild)) {
+            return new Discord.RichEmbed()
+                .setColor(CONST.COLOR.PRIMARY)
+                .setURL(this.url)
+                .setAuthor(this.name, this.avatar)
+                .setTitle(this.title)
+                .setThumbnail(this.thumbnail)
+                .setFooter(footer.join(" | "));
+        } else {
+            return new Discord.RichEmbed()
+                .setColor(CONST.COLOR.PRIMARY)
+                .setURL(this.url)
+                .setAuthor(this.name)
+                .setTitle(this.title)
+                .addField("Followers", this.followers.toLocaleString("en"), true)
+                .addField("Total Viewers", this.totalviews.toLocaleString("en"), true)
+                .setThumbnail(this.avatar)
+                .setImage(this.thumbnail)
+                .setFooter(footer.join(" | "));
+        }
+    }
 }
 
 class Config {
@@ -441,9 +599,9 @@ class Config {
 }
 
 module.exports = async function install(cr, client, config, db) {
-    const manager = new Manager(db, client, [
+    const manager = await new Manager(db, client, [
         Picarto,
-
+        Twitch,
     ]);
 
     const alertCommand = cr.register("alert", new TreeCommand)
@@ -581,7 +739,6 @@ module.exports = async function install(cr, client, config, db) {
                 await message.channel.sendTranslated("That user does not exist!");
                 return;
             }
-            console.log(config);
             if (config._id) {
                 await message.channel.sendTranslated("This server is already subscribed to this streamer.");
                 return;

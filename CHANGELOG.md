@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.2.0"></a>
+# [2.2.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.1.1...v2.2.0) (2019-04-15)
+
+
+### Bug Fixes
+
+* **prefix command:** now works like a charm again ([9408b38](https://bitbucket.org/Loneless/trixiebot/commits/9408b38))
+
+
+### Features
+
+* **alert:** !alert compact and !alert cleanup commands added ([6e9ee6b](https://bitbucket.org/Loneless/trixiebot/commits/6e9ee6b))
+* **alert:** added Twitch support ([9d32fb4](https://bitbucket.org/Loneless/trixiebot/commits/9d32fb4))
+* **alert:** New alert system behind the scenes. ([f599e7b](https://bitbucket.org/Loneless/trixiebot/commits/f599e7b))
+
+
+
 <a name="2.1.1"></a>
 ## [2.1.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.4...v2.1.1) (2019-03-03)
 

@@ -53,9 +53,9 @@ class DocumentCache {
                 if (this._expire.has(doc[this.keyName]))
                     this._expire.get(doc[this.keyName]).stop();
 
-                if (propTime.getTime() + conf.expireAfterSeconds > Date.now()) {
+                if (propTime.getTime() + (conf.expireAfterSeconds * 1000) > Date.now()) {
                     this._expire.set(doc[this.keyName], new CronJob(
-                        new Date(propTime.getTime() + conf.expireAfterSeconds),
+                        new Date(propTime.getTime() + (conf.expireAfterSeconds * 1000)),
                         () => this.delete(doc[this.keyName]),
                         null,
                         true

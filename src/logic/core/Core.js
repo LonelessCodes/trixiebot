@@ -89,6 +89,7 @@ class Core {
         }
 
         await fs.writeFile(path.join(process.cwd(), "resources", "commands.json"), JSON.stringify(jason, null, 2));
+        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), JSON.stringify(jason, null, 2));
 
         log("Commands installed");
     }

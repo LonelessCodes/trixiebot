@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.3.0"></a>
+# [2.3.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.2.0...v2.3.0) (2019-04-16)
+
+
+### Bug Fixes
+
+* **alert help:** fixed supported website list ([8c8895d](https://bitbucket.org/Loneless/trixiebot/commits/8c8895d))
+* DocumentCache expireAfterSeconds math fixed ([3286b6b](https://bitbucket.org/Loneless/trixiebot/commits/3286b6b))
+
+
+### Features
+
+* **alert command:** added Piczel.tv support ([3b4e5d1](https://bitbucket.org/Loneless/trixiebot/commits/3b4e5d1))
+* **alert command:** added Smashcast support ([085495f](https://bitbucket.org/Loneless/trixiebot/commits/085495f))
+
+
+
 <a name="2.2.0"></a>
 # [2.2.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.1.1...v2.2.0) (2019-04-15)
 

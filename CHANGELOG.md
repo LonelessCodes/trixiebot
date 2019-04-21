@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.3.1"></a>
+## [2.3.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.0...v2.3.1) (2019-04-21)
+
+
+### Bug Fixes
+
+* **alert:** some twitch channels not working with names longer than 15 characters ([33256b4](https://bitbucket.org/Loneless/trixiebot/commits/33256b4))
+
+
+
 <a name="2.3.0"></a>
 # [2.3.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.2.0...v2.3.0) (2019-04-16)
 

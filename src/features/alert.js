@@ -180,7 +180,7 @@ class Twitch extends StreamProcessor {
     }
 
     async getChannel(channel, url) {
-        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.twitch\.tv|twitch\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,15})\b/;
+        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.twitch\.tv|twitch\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 
@@ -261,7 +261,7 @@ class Piczel extends StreamProcessor {
     }
 
     async getChannel(channel, url) {
-        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.piczel\.tv|piczel\.tv)\/watch\/([-a-zA-Z0-9@:%_+.~]{2,25})\b/;
+        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.piczel\.tv|piczel\.tv)\/watch\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 

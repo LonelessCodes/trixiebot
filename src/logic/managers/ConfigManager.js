@@ -1,5 +1,7 @@
 const { isPlainObject } = require("../../modules/util");
+// eslint-disable-next-line no-unused-vars
 const { Db } = require("mongodb");
+// eslint-disable-next-line no-unused-vars
 const { Client, TextChannel } = require("discord.js");
 const DocumentCache = require("../DocumentCache");
 

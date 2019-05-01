@@ -1,7 +1,5 @@
 const cpc = require("../../../modules/cpc")(process);
 
-const log = require("../../../modules/log");
-
 const lexer = require("./lexer");
 const parser = require("./parser");
 const Interpreter = require("./interpreter/Interpreter");
@@ -126,5 +124,5 @@ const message = {
 const cst = compileCC(text);
 cst.then(cst => {
     const reply = runCC("test", text, cst, message);
-    reply.then(reply => console.log(reply));
-});
+    reply.then(reply => console.log(reply)).catch(err => console.error("ono, ", err));
+}).catch(err => console.error("ono, ", err));

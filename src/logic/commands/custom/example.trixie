@@ -1,13 +1,8 @@
-// current goal:
-
 num = 0;
-for (ch, i of $guild.channels) {
+for (ch of $guild.getChannels()) {
     num += 1;
 }
 
 ch = Channel($msg.mentions.channels[0]);
 embed = RichEmbed().setTitle("Embed OWOWOWOWO");
-msg, err = ch.send("owo", embed);
-if (err != null) {
-    reply;
-}
+msg = ch.send("owo", embed);

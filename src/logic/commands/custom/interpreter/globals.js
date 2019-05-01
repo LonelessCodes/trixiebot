@@ -38,7 +38,7 @@ const Number = new c.NativeFunc(function (_, arg0) {
 });
 
 const String = new c.NativeFunc(function (_, arg0) {
-    return new StringLiteral(new global.String(arg0.content));
+    return new c.StringLiteral(new global.String(arg0.content));
 });
 
 const Array = new c.NativeFunc(function (_, arg0) {
@@ -70,7 +70,7 @@ const isFinite = new c.NativeFunc(function (_, number) {
 });
 const parseNumber = new c.NativeFunc(function (_, string) {
     return new c.NumberLiteral(
-        string instanceof classese.StringLiteral ?
+        string instanceof c.StringLiteral ?
             global.parseFloat(string.content) :
             global.NaN
     );
@@ -310,11 +310,11 @@ const storage = new c.NativeFunc(function (interpreter, storageId) {
 
             return new c.BooleanLiteral(true);
         }),
-        keys: new c.NativeFunc("keys", async function (_) {
+        keys: new c.NativeFunc("keys", async function () {
             const data = await database.then(db => db.findOne({ guildId: interpreter.guildId, storageId }));
             return Object.keys(data.data).map(s => new c.StringLiteral(s));
         }),
-        all: new c.NativeFunc("all", async function (_) {
+        all: new c.NativeFunc("all", async function () {
             const data = await database.then(db => db.findOne({ guildId: interpreter.guildId, storageId }));
             return c.convert(data.data);
         })

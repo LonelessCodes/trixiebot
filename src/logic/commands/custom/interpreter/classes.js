@@ -53,7 +53,7 @@ async function Mentions(interpreter, opts) {
     return new c.ObjectLiteral({
         members: new c.ArrayLiteral(await Promise.all(opts.members.map(member => GuildMember(member)))),
         channels: new c.ArrayLiteral(await Promise.all(opts.channels.map(channel => Channel(channel)))),
-        roles: new c.ArrayLiteral(await Promise.all(opts.roles.map(roles => Roles(roles)))),
+        roles: new c.ArrayLiteral(await Promise.all(opts.roles.map(role => Role(role)))),
         everyone: new c.BooleanLiteral(opts.everyone)
     });
 }
@@ -105,7 +105,7 @@ async function Message(interpreter, id) {
                 if (emoji instanceof c.ObjectLiteral) {
                     e.push(emoji.content.identifier.content || emoji.content.name.content);
                 } else if (emoji instanceof c.StringLiteral) {
-                    e.push(emiji.content);
+                    e.push(emoji.content);
                 }
             }
             await cpc.awaitAnswer("message.react", { guildId: interpreter.guildId, messageId: opts.id, emojis: e });

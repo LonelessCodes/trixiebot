@@ -23,7 +23,7 @@ function createToken(options) {
         delete options.matched;
     }
 
-    return chevrotain.createToken(options);;
+    return chevrotain.createToken(options);
 }
 
 // Whitespace
@@ -93,7 +93,7 @@ const MultiOperator = createToken({ name: "MultiOperator", pattern: Lexer.NA, ca
 
 const OP_Multiple = createToken({ name: "OP_Multiply", pattern: /\*/, categories: MultiOperator });
 const OP_Division = createToken({ name: "OP_Division", pattern: /\//, categories: MultiOperator });
-const OP_Percent = createToken({ name: "OP_Percent", pattern: /\%/, categories: MultiOperator });
+const OP_Percent = createToken({ name: "OP_Percent", pattern: /%/, categories: MultiOperator });
 const OP_Exponent = createToken({ name: "OP_Exponent", pattern: /\^/, categories: MultiOperator });
 
 const AdditiveOperator = createToken({ name: "AdditiveOperator", pattern: Lexer.NA, categories: Punctuator });
@@ -152,7 +152,7 @@ const BinaryLiteral = createToken({
 const StringLiteral = createToken({
     categories: Literal,
     name: "StringLiteral",
-    pattern: /(?:"([^\n\"]*)")|(?:'([^\n\']*)')/,
+    pattern: /(?:"([^"\n]*)")|(?:'([^'\n]*)')/,
 });
 
 const Identifier = createToken({ name: "Identifier", pattern: /([A-Za-z_$][A-Za-z0-9_$]*)/, categories: IdentifierName });

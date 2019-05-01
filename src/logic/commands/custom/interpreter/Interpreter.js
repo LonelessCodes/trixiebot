@@ -10,7 +10,6 @@ const {
     isReturn,
     isBreak,
     createStringLiteral,
-    Item,
     NullLiteral,
     BooleanLiteral,
     NumberLiteral,
@@ -32,14 +31,7 @@ const {
     TimeLiteral,
     DurationLiteral,
 
-    RichEmbed,
-    Emoji,
-    Reaction,
-    Mentions,
     Message,
-    Role,
-    GuildMember,
-    Channel,
     Guild,
 
     convert
@@ -77,7 +69,7 @@ class CCInterpreter extends BaseCstVisitor {
     error(msg, item) {
         if (item) {
             if (item instanceof Array) item = item[0];
-            while (!!item.children) item = item.children[Object.getOwnPropertyNames(item.children)[0]][0];
+            while (item.children) item = item.children[Object.getOwnPropertyNames(item.children)[0]][0];
             return new RuntimeError(msg, item.startOffset, item.startLine, item.startColumn, this.text_input);
         }
         return new RuntimeError(msg);
@@ -153,6 +145,7 @@ class CCInterpreter extends BaseCstVisitor {
                     return new BooleanLiteral(true);
                 case "FalseTok":
                     return new BooleanLiteral(false);
+                // eslint-disable-next-line no-case-declarations
                 case "DecimalLiteral":
                     const [num, exp] = image.split(/e/i);
                     return new NumberLiteral(parseFloat(num) * (exp ? Math.pow(10, parseInt(exp)) : 1));
@@ -337,6 +330,7 @@ class CCInterpreter extends BaseCstVisitor {
                 switch (ctx.$postfix[0].image) {
                     case "++":
                         right.update(new NumberLiteral(right.value.content + 1));
+                        break;
                     case "--":
                         right.update(new NumberLiteral(right.value.content - 1));
                 }
@@ -355,6 +349,7 @@ class CCInterpreter extends BaseCstVisitor {
                 switch (ctx.$prefix[0].image) {
                     case "++":
                         right.update(new NumberLiteral(right.value.content + 1));
+                        break;
                     case "--":
                         right.update(new NumberLiteral(right.value.content - 1));
                 }
@@ -522,6 +517,7 @@ class CCInterpreter extends BaseCstVisitor {
             switch (ctx.$op[0].image) {
                 case "=":
                     return variable.update(right);
+                // eslint-disable-next-line no-case-declarations
                 case "+=":
                     if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
                         if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral))
@@ -605,7 +601,7 @@ class CCInterpreter extends BaseCstVisitor {
         return variable.update(value);
     }
 
-    EmptyStatement(ctx) {
+    EmptyStatement() {
         return;
     }
 
@@ -874,22 +870,22 @@ class CCInterpreter extends BaseCstVisitor {
                                         if (/true|yes/i.test(match[0])) arr.push(new BooleanLiteral(true));
                                         else arr.push(new BooleanLiteral(false));
                                         str = str.slice(match[0].length);
-                                        break;
                                     }
+                                    break;
                                 case GLOBALS.Number:
                                     match = str.match(numberReg);
                                     if (match) {
                                         arr.push(new NumberLiteral(parseFloat(match[0])));
                                         str = str.slice(match[0].length);
-                                        break;
                                     }
+                                    break;
                                 case GLOBALS.Duration:
                                     match = str.match(durReg);
                                     if (match) {
                                         arr.push(new DurationLiteral(parseHumanTime(match[0])));
                                         str = str.slice(match[0].length);
-                                        break;
                                     }
+                                    break;
                                 case GLOBALS.String:
                                     if (i === args.length - 1) {
                                         arr.push(new StringLiteral(str));
@@ -899,8 +895,8 @@ class CCInterpreter extends BaseCstVisitor {
                                     if (match) {
                                         arr.push(new StringLiteral(match[0]));
                                         str = str.slice(match[0].length);
-                                        break;
                                     }
+                                    break;
                             }
 
                             i++;
@@ -926,6 +922,8 @@ class CCInterpreter extends BaseCstVisitor {
                 this.varsPerStatement.createVariable("$args", ctx, this).update($args);
                 this.varsPerStatement.createVariable("$react", ctx, this).update($react);
                 this.varsPerStatement.createVariable("$guild", ctx, this).update($guild);
+
+                this.varsPerStatement.createVariable("parseArgs", ctx, this).update(parseArgs);
 
                 await this.visit(ctx.StatementList);
             }

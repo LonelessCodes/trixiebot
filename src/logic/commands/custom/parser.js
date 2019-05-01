@@ -393,7 +393,7 @@ $.RULE("AssignmentExpression", () => {
 $.RULE("Expression", () => {
     $.SUBRULE($.AssignmentExpression, $expression);
     $.MANY(() => {
-        $.CONSUME(Comma);
+        $.CONSUME(t.Comma);
         $.SUBRULE2($.AssignmentExpression, $expression);
     });
 });

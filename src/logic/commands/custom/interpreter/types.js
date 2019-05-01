@@ -81,6 +81,7 @@ function convert(obj) {
                 }
                 return new ObjectLiteral(obj2);
             }
+            return;
         default:
             return new NullLiteral;
     }
@@ -148,6 +149,8 @@ class NativeFunc extends Func {
             super(null, []);
 
             this._cb = funcName;
+        } else {
+            super();
         }
     }
 
@@ -276,13 +279,13 @@ StringLiteral.prototype.proto.slice = new NativeFunc(function (_, start, end) {
 StringLiteral.prototype.proto.split = new NativeFunc(function (_, by) {
     return new ArrayLiteral(this.content.split(by.content).map(s => new StringLiteral(s)));
 });
-StringLiteral.prototype.proto.toLowerCase = new NativeFunc(function (_) {
+StringLiteral.prototype.proto.toLowerCase = new NativeFunc(function () {
     return new StringLiteral(this.content.toLowerCase());
 });
-StringLiteral.prototype.proto.toUpperCase = new NativeFunc(function (_) {
+StringLiteral.prototype.proto.toUpperCase = new NativeFunc(function () {
     return new StringLiteral(this.content.toUpperCase());
 });
-StringLiteral.prototype.proto.trim = new NativeFunc(function (_) {
+StringLiteral.prototype.proto.trim = new NativeFunc(function () {
     return new StringLiteral(this.content.trim());
 });
 
@@ -339,7 +342,8 @@ async function call(interpreter, func, args) {
         // TODO: ???? check if this works
         return assign(await func.call(interpreter, func, args));
     } else {
-        throw this.error("Cannot call value of other type than Func", ctx.Arguments);
+        // throw this.error("Cannot call value of other type than Func", ctx.Arguments);
+        throw this.error("Cannot call value of other type than Func");
     }
 }
 
@@ -375,7 +379,7 @@ ArrayLiteral.prototype.proto.find = new NativeFunc(async function (_, property, 
         }
     } else {
         for (let i = 0; i < this.content.length; i++) {
-            const val = await call(_, func, [this.content[i], i]);
+            const val = await call(_, property, [this.content[i], i]);
             if (val.content) return this.content[i];
         }
     }
@@ -785,10 +789,10 @@ TimeLiteral.prototype.proto.isBetween = new NativeFunc(function (_, after, befor
     }
     return new BooleanLiteral(this.time.isBetween(after.time, before.time));
 });
-TimeLiteral.prototype.proto.isDST = new NativeFunc(function (_) {
+TimeLiteral.prototype.proto.isDST = new NativeFunc(function () {
     return new BooleanLiteral(this.time.isDST());
 });
-TimeLiteral.prototype.proto.isLeapYear = new NativeFunc(function (_) {
+TimeLiteral.prototype.proto.isLeapYear = new NativeFunc(function () {
     return new BooleanLiteral(this.time.isLeapYear());
 });
 

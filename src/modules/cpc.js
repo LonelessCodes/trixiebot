@@ -6,11 +6,15 @@ class CPC extends EventEmitter {
     constructor(child) {
         super();
 
+        this._listeners = {};
+
         this.child = child;
 
-        this.child.on("message", ({ bus, payload }) => {
-            this.emit(bus, payload);
-        });
+        this.child.on("message", this.onMessage.bind(this));
+    }
+
+    onMessage({ bus, payload }) {
+        this.emit(bus, payload);
     }
 
     send(bus, payload) {
@@ -42,7 +46,7 @@ class CPC extends EventEmitter {
 
             if (this.child.send)
                 this.child.send({ bus: busRequest, id: idRequest, payload: payloadRequest });
-        });;
+        });
         if (opts.timeout) {
             return Promise.race([
                 p,
@@ -52,6 +56,11 @@ class CPC extends EventEmitter {
             ]);
         }
         return p;
+    }
+
+    destroy() {
+        this.removeAllListeners();
+        this.child.removeAllListeners();
     }
 }
 

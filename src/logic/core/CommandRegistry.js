@@ -6,6 +6,8 @@ const { toHumanTime } = require("../../modules/util/time");
 const BaseCommand = require("../../class/BaseCommand");
 const AliasCommand = require("../../class/AliasCommand");
 const TreeCommand = require("../../class/TreeCommand");
+// eslint-disable-next-line no-unused-vars
+const CustomCommand = require("../../class/CustomCommand");
 const Category = require("../commands/Category");
 const CommandPermission = require("../commands/CommandPermission");
 const HelpBuilder = require("../commands/HelpBuilder");
@@ -32,16 +34,85 @@ class CommandRegistry {
         await message.channel.sendTranslated(`Whoa whoa not so fast! You may only do this ${this.global_ratelimit.max} ${this.global_ratelimit.max === 1 ? "time" : "times"} every ${this.global_ratelimit.toString()}. There is still ${toHumanTime(this.global_ratelimit.tryAgainIn(message.author.id))} left to wait.`);
     }
 
-    async process(message, command_name, content, prefix, prefixUsed) {
+    async process(message, command_name, content, prefix, prefix_used) {
         // only for now!!!
         if (message.channel.type !== "text") return false;
 
-        // /** @type {BaseCommand} */
-        // let command = await this.cc.get(message.guild, { commandName: command_name, prefixUsed, rawContent: message.content });
+        /** @type {BaseCommand} */
+        let cc = await this.cc.get(message.guild, { command_name, prefix_used, rawContent: message.content });
+        if (cc) return await this.processCC(message, command_name, content, cc);
 
-        // command = this.commands.get(command_name);
-        let command = this.commands.get(command_name);
+        let command = this.commands.get(command_name); 
+        if (command) return await this.processCommand(message, command_name, content, prefix_used, command);
+    }
 
+    /**
+     * @param {Message} message 
+     * @param {string} command_name 
+     * @param {string} content 
+     * @param {CustomCommand|AliasCommand} command 
+     */
+    async processCC(message, command_name, content, command) {
+        if (command && command instanceof AliasCommand) {
+            command_name = command.parentName;
+            command = command.command;
+        }
+        
+        if (command.disabled) return false;
+        
+        const blacklistedUsers = await this.database.collection("blacklisted").findOne({ userId: message.author.id });
+        if (blacklistedUsers) {
+            await message.channel.send("You have been blacklisted from using all of Trixie's functions. " +
+                "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere.");
+            return false;
+        }
+
+        const [disabledUsers, disabledChannels] = await Promise.all([
+            this.database.collection("disabled_users").findOne({
+                guildId: message.guild.id,
+                members: {
+                    $all: [message.author.id]
+                }
+            }),
+            this.database.collection("disabled_channels").findOne({
+                guildId: message.guild.id,
+                channels: {
+                    $all: [message.channel.id]
+                }
+            })
+        ]);
+
+        if (disabledUsers) return false;
+        if (disabledChannels) return false;
+
+        const disabledCommandChannels = command.disabled_channels.includes(message.channel.id);
+        if (disabledCommandChannels) return false;
+
+        if (!message.channel.nsfw && command.explicit && !message.guild.config.explicit) return false;
+
+        if (!command.permissions.test(message.member)) {
+            await command.noPermission(message);
+            return false;
+        }
+
+        if (!CommandPermission.ADMIN.test(message.member)) {
+            const timeouted = await this.database.collection("timeout").findOne({ guildId: message.guild.id, memberId: message.author.id });
+            if (timeouted) return false;
+        }
+
+        if (this.global_ratelimit && !this.global_ratelimit.testAndAdd(message.author.id)) {
+            await this.rateLimit(message, command.id);
+            return false;
+        }
+
+        log.debug("CustomC Registry", `command:${command._id}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+
+        await command.run(message, command_name, content);
+
+        return true;
+    }
+
+    async processCommand(message, command_name, content, prefixUsed, command) {
         if (command && command instanceof AliasCommand) {
             command_name = command.parentName;
             command = command.command;

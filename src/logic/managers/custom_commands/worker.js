@@ -2,6 +2,7 @@ const cpc = require("../../../modules/cpc")(process);
 
 const lexer = require("./lexer");
 const parser = require("./parser");
+const { ObjectLiteral } = require("./interpreter/types");
 const Interpreter = require("./interpreter/Interpreter");
 
 async function compileCC(text) {
@@ -28,10 +29,11 @@ async function runCC(commandId, text, cst, message) {
         // 3. Perform semantics using a CstVisitor.
         // Note that separation of concerns between the syntactic analysis (parsing) and the semantics.
         interpreter.text_input = text;
-        // interpreter.visit(cst);
-        return {
-            reply: await interpreter.visit(cst, message)
-        };
+        const reply = await interpreter.visit(cst, message);
+        if (reply instanceof ObjectLiteral && reply.isEmbed) {
+            return { embed: reply.getEmbed() };
+        }
+        return { content: reply.native };
     } catch (error) {
         return { error };
     }
@@ -40,89 +42,25 @@ async function runCC(commandId, text, cst, message) {
 cpc.answer("compile", async payload => {
     const { text } = payload;
 
-    let errors = [];
-    let cst = undefined;
     try {
-        cst = compileCC(text);
-    } catch (errs) {
-        errors = errs;
+        return {
+            cst: await compileCC(text),
+            errors: []
+        };
+    } catch (errs) { 
+        return {
+            cst: undefined,
+            errors: errs
+        };
     }
-
-    return {
-        cst,
-        errors
-    };
 });
 
 cpc.answer("run", async ({ id, text, cst, message }) => {
-    return await runCC(id, text, cst, message);
+    try {
+        return await runCC(id, text, cst, message);
+    } catch (err) {
+        return { error: err };
+    }
 });
 
-const text = require("fs").readFileSync("./example.trixie", "utf8");
-
-const message = {
-    msg: {
-        id: "34534364",
-        member: {
-            id: "45654323456",
-            nickname: "Lone",
-            highestRole: {
-                id: "8348324242",
-                permissions: 0b101110010,
-                position: 0,
-                color: 0xffffff,
-                createdAt: Date.now(),
-                mentionable: false,
-                name: "owo"
-            },
-            joinedAt: Date.now(),
-            avatar: "https://cdn.discordapp.com/avatars/256788564078100482/a65a2147f45327fd71139cb4c094b3a0.png?size=512",
-            bot: false,
-            createdAt: Date.now(),
-            username: "Loneless",
-            discriminator: "0893",
-            permissions: 0b101110010
-        },
-        channel: {
-            id: "3456765432",
-            name: "owochannel",
-            createdAt: Date.now(),
-            position: 1,
-            nsfw: false,
-            topic: "topic is this"
-        },
-        text: "hiyoooo nice",
-        createdAt: Date.now(),
-        editedAt: Date.now(),
-        mentions: {
-            members: [],
-            channels: [],
-            roles: [],
-            everyone: false
-        },
-        pinned: false,
-        reactions: [{
-            count: 1,
-            emoji: {
-                animated: false,
-                name: "ok_hand",
-                requiresColons: true
-            }
-        }]
-    },
-    args: ["hiyoooo", "nice"],
-    guild: {
-        id: "453520653",
-        name: "The Server",
-        createdAt: Date.now(),
-        icon: "https://cdn.discordapp.com/avatars/256788564078100482/a65a2147f45327fd71139cb4c094b3a0.png?size=512",
-        memberCount: 2,
-        ownerId: "4565302345"
-    }
-};
-
-const cst = compileCC(text);
-cst.then(cst => {
-    const reply = runCC("test", text, cst, message);
-    reply.then(reply => console.log(reply)).catch(err => console.error("ono, ", err));
-}).catch(err => console.error("ono, ", err));
+cpc.send("ready");

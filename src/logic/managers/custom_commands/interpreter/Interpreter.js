@@ -257,6 +257,8 @@ class CCInterpreter extends BaseCstVisitor {
         if (val instanceof NullLiteral) {
             const name = await key.getProp(new StringLiteral("toString")).call(this, key);
             throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx.$key);
+        } else if (val instanceof Member) {
+            val = new Member(val, key, val.value.getProp(key));
         } else {
             val = new Member(val, key, val.getProp(key));
         }
@@ -268,6 +270,8 @@ class CCInterpreter extends BaseCstVisitor {
         if (val instanceof NullLiteral) {
             const name = await key.getProp(new StringLiteral("toString")).call(this, key);
             throw this.error("Cannot read property '" + (name ? name.content : "[no toString func]") + "' of null", ctx.$key);
+        } else if(val instanceof Member) {
+            val = new Member(val, key, val.value.getProp(key));
         } else {
             val = new Member(val, key, val.getProp(key));
         }

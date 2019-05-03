@@ -33,6 +33,8 @@ const defaultSleep = function (sleep) {
 
 class Monitor extends events.EventEmitter {
     constructor(command, opts) {
+        super();
+
         this.id = null; // for respawn-group
 
         this.status = "stopped";
@@ -98,7 +100,7 @@ class Monitor extends events.EventEmitter {
     }
 
     restart() {
-        if (this.status === "running") return;
+        if (this.status === "running") return this;
 
         const self = this;
         let restarts = 0;
@@ -188,6 +190,13 @@ class Monitor extends events.EventEmitter {
         loop();
 
         if (this.status === "running") this.emit("start");
+
+        return this;
+    }
+
+    send(data) {
+        if (!this.child) return;
+        this.child.send(data);
     }
 
     toJSON() {
@@ -229,6 +238,7 @@ class Monitor extends events.EventEmitter {
     }
 }
 
+/** @type {(command: string[], opts: {}) => Monitor} */
 const respawn = function (command, opts) {
     if (typeof command !== "function" && !Array.isArray(command)) return respawn(command.command, command);
     return new Monitor(command, opts || {});

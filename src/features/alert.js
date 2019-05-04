@@ -35,7 +35,7 @@ class StreamProcessor extends EventEmitter {
         });
     }
 
-    testURL(url) {
+    testURL() {
         return false;
     }
 
@@ -47,7 +47,7 @@ class StreamProcessor extends EventEmitter {
         });
     }
 
-    formatURL(channel, fat) { return ""; }
+    formatURL() { return ""; }
 
     async addChannel(config) {
         return new Channel(this.manager, this, config.channel, config);
@@ -70,11 +70,11 @@ class Picarto extends StreamProcessor {
     }
 
     testURL(url) {
-        return /^(http\:\/\/|https\:\/\/)?(www\.picarto\.tv|picarto\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,25}\b/.test(url);
+        return /^(http:\/\/|https:\/\/)?(www\.picarto\.tv|picarto\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,25}\b/.test(url);
     }
 
     async getChannel(channel, url) {
-        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.picarto\.tv|picarto\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,25})\b/;
+        const regexp = /^(?:http:\/\/|https:\/\/)?(?:www\.picarto\.tv|picarto\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,25})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 
@@ -176,11 +176,11 @@ class Twitch extends StreamProcessor {
     }
 
     testURL(url) {
-        return /^(http\:\/\/|https\:\/\/)?(www\.twitch\.tv|twitch\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
+        return /^(http:\/\/|https:\/\/)?(www\.twitch\.tv|twitch\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
     }
 
     async getChannel(channel, url) {
-        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.twitch\.tv|twitch\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
+        const regexp = /^(?:http:\/\/|https:\/\/)?(?:www\.twitch\.tv|twitch\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 
@@ -257,11 +257,11 @@ class Piczel extends StreamProcessor {
     }
 
     testURL(url) {
-        return /^(http\:\/\/|https\:\/\/)?(www\.piczel\.tv|piczel\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
+        return /^(http:\/\/|https:\/\/)?(www\.piczel\.tv|piczel\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
     }
 
     async getChannel(channel, url) {
-        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.piczel\.tv|piczel\.tv)\/watch\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
+        const regexp = /^(?:http:\/\/|https:\/\/)?(?:www\.piczel\.tv|piczel\.tv)\/watch\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 
@@ -357,7 +357,7 @@ class Smashcast extends StreamProcessor {
     }
 
     testURL(url) {
-        return /^(http\:\/\/|https\:\/\/)?(www\.smashcast\.tv|smashcast\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
+        return /^(http:\/\/|https:\/\/)?(www\.smashcast\.tv|smashcast\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
     }
 
     async request(api) {
@@ -368,7 +368,7 @@ class Smashcast extends StreamProcessor {
     }
 
     async getChannel(channel, url) {
-        const regexp = /^(?:http\:\/\/|https\:\/\/)?(?:www\.smashcast\.tv|smashcast\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
+        const regexp = /^(?:http:\/\/|https:\/\/)?(?:www\.smashcast\.tv|smashcast\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 
@@ -427,7 +427,7 @@ class Smashcast extends StreamProcessor {
 
             const onlineChannel = new OnlineChannel(config, {
                 totalviews: views.total_live_views ? parseInt(views.total_live_views) : 0,
-                title: stream.media_status || media_title,
+                title: stream.media_status || stream.media_title,
                 avatar: media_base + stream.channel.user_logo,
                 followers: parseInt(stream.channel.followers),
                 thumbnail: media_base + stream.media_thumbnail_large,

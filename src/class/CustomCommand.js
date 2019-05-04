@@ -77,11 +77,20 @@ class Reaction {
 class CustomCommand extends BaseCommand {
     /**
      * @param {*} manager 
-     * @param {{ _id: string; guildId: string; type: number; trigger: string|RegExp; case_sensitive: boolean; code: string; cst?: BSON.Binary; errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; disabled: boolean; }} row
+     * @param {{ _id: string; guildId: string; type: number; trigger: string|RegExp; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; disabled: boolean; }} row
      */
     constructor(manager, row) {
         super();
 
+        this.update(row);
+
+        this.manager = manager;
+    }
+
+    /**
+     * @param {{ _id: string; guildId: string; type: number; trigger: string|RegExp; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; disabled: boolean; }} row
+     */
+    update(row) {
         this._id = row._id;
 
         this.guildId = row.guildId;
@@ -92,7 +101,10 @@ class CustomCommand extends BaseCommand {
 
         this.code = row.code;
         this.raw_cst = row.cst;
-        this._cst = null;
+        this._cst = row._cst || null;
+
+        this.runtime_errors = row.runtime_errors;
+        this.compile_errors = row.compile_errors;
 
         this.created_at = row.created_at;
         this.modified_at = row.modified_at;
@@ -101,8 +113,30 @@ class CustomCommand extends BaseCommand {
 
         this.disabled_channels = row.disabled_channels;
         this.disabled = row.disabled;
-
-        this.manager = manager;
+    }
+    
+    async save() {
+        await this.manager.database.updateOne({
+            _id: this._id,
+        }, {
+            $set: {
+                guildId: this.guildId,
+                type: this.type,
+                trigger: this.trigger,
+                case_sensitive: this.case_sensitive,
+                code: this.code,
+                cst: this.raw_cst ?
+                    this.raw_cst.buffer : this._cst ?
+                        BSON.serialize(this._cst) : null,
+                compile_errors: this.compile_errors,
+                runtime_errors: this.runtime_errors,
+                created_at: this.created_at,
+                modified_at:this.modified_at,
+                created_by: this.created_by,
+                disabled_channels: this.disabled_channels,
+                disabled: this.disabled
+            }
+        });
     }
 
     get cst() {
@@ -111,6 +145,27 @@ class CustomCommand extends BaseCommand {
             this.raw_cst = null;
         }
         return this._cst;
+    }
+
+    async compile() {
+        const { errors, cst } = await this.manager.cpc.awaitAnswer("compile", { text: this.code });
+
+        if (errors.length > 0) {
+            this.update({
+                compile_errors: errors,
+                cst: null,
+                _cst: null 
+            });
+            await this.manager.database.updateOne({ _id: this._id }, { $set: { compile_errors: errors, cst: null } });
+            throw errors;
+        }
+
+        this.update({
+            compile_errors: [],
+            cst: null,
+            _cst: cst
+        });
+        await this.manager.database.updateOne({ _id: this._id }, { $set: { compile_errors: [], cst: BSON.serialize(cst) } });
     }
 
     /**
@@ -153,8 +208,13 @@ class CustomCommand extends BaseCommand {
 
         const { error, embed, content: cont } = await this.manager.cpc.awaitAnswer("run", { id: this._id, text: this.code, cst: this.cst, message: msg });
 
-        console.log(error, embed || cont);
-        if (!error && (embed || cont)) {
+        if (error) {
+            this.runtime_errors.push(error);
+            await this.manager.database.updateOne({ _id: this._id }, { $push: { runtime_errors: error } });
+            return;
+        }
+        
+        if (embed || cont) {
             await message.channel.send(embed ? new RichEmbed(embed) : cont.toString());
         }
     }

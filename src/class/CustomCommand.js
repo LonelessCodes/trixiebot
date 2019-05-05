@@ -77,7 +77,7 @@ class Reaction {
 class CustomCommand extends BaseCommand {
     /**
      * @param {*} manager 
-     * @param {{ _id: string; guildId: string; type: number; trigger: string|RegExp; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; disabled: boolean; }} row
+     * @param {{ _id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; enabled: boolean; }} row
      */
     constructor(manager, row) {
         super();
@@ -88,7 +88,7 @@ class CustomCommand extends BaseCommand {
     }
 
     /**
-     * @param {{ _id: string; guildId: string; type: number; trigger: string|RegExp; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; disabled: boolean; }} row
+     * @param {{ _id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; enabled: boolean; }} row
      */
     update(row) {
         this._id = row._id;
@@ -112,7 +112,7 @@ class CustomCommand extends BaseCommand {
         this.created_by = row.created_by;
 
         this.disabled_channels = row.disabled_channels;
-        this.disabled = row.disabled;
+        this.enabled = row.enabled;
     }
     
     async save() {
@@ -134,7 +134,7 @@ class CustomCommand extends BaseCommand {
                 modified_at:this.modified_at,
                 created_by: this.created_by,
                 disabled_channels: this.disabled_channels,
-                disabled: this.disabled
+                enabled: this.enabled
             }
         });
     }

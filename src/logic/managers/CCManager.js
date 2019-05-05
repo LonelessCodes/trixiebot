@@ -19,7 +19,7 @@ class Trigger {
         this.manager = manager;
         /** @type {number} */
         this.type = type;
-        /** @type {string|RegExp} */
+        /** @type {string} */
         this.trigger = trigger;
         /** @type {boolean} */
         this.case_sensitive = case_sensitive;
@@ -92,7 +92,7 @@ class CCManager {
     async get(guild, { command_name, prefix_used, rawContent: raw_content }) {
         const guildId = guild.id;
         if (!this.trigger_cache.has(guildId)) {
-            const rows = await this.database.find({ guildId, disabled: false }, { type: 1, trigger: 1, _id: 1, case_sensitive: 1 }).toArray();
+            const rows = await this.database.find({ guildId, enabled: true }, { type: 1, trigger: 1, _id: 1, case_sensitive: 1 }).toArray();
 
             const triggers = [];
             for (let row of rows) {

@@ -62,6 +62,15 @@ class WebsiteManager {
             };
         });
 
+        const getChannels = guildId => {
+            return this.client.guilds.get(guildId).channels.array().sort((a, b) =>
+                a.position - b.position
+            ).filter(c => c.type === "text").map(c => ({
+                id: c.id,
+                name: c.name
+            }));
+        };
+
         ipc.answer("commands", async guildId => {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
@@ -96,14 +105,7 @@ class WebsiteManager {
             return {
                 prefix: config.prefix,
                 commands,
-                channels: this.client.guilds.get(guildId).channels.array().sort((a, b) => {
-                    return a.position - b.position;
-                }).filter(c => c.type === "text").map(c => {
-                    return {
-                        id: c.id,
-                        name: c.name
-                    };
-                }),
+                channels: getChannels(guildId),
                 success: true
             };
         });
@@ -136,6 +138,99 @@ class WebsiteManager {
                     guildId
                 }, { $addToSet: { commands: commandName } }, { upsert: true });
                 return { success: true, enabled: false, disabled_channels };
+            }
+        });
+
+        ////// CUSTOM COMMANDS
+
+        ipc.answer("cc:get", async guildId => {
+            if (!this.client.guilds.has(guildId))
+                return { success: false };
+
+            const commands = await this.REGISTRY.cc.getCommandsForWeb(guildId);
+
+            const config = await this.config.get(guildId);
+
+            return {
+                prefix: config.prefix,
+                commands: commands.sort((a, b) => {
+                    if (a.modified_at < b.modified_at) return -1;
+                    if (a.modified_at > b.modified_at) return 1;
+                    return 0;
+                }),
+                channels: getChannels(guildId),
+                success: true
+            };
+        });
+
+        ipc.answer("cc:new", async ({ guildId, type, trigger, case_sensitive, code, disabled_channels }) => {
+            if (!this.client.guilds.has(guildId))
+                return { success: false };
+            
+            try {
+                const command = await this.REGISTRY.cc.addCommand(guildId, {
+                    type, trigger, case_sensitive, code, disabled_channels
+                });
+                return {
+                    command,
+                    success: true
+                };
+            } catch (err) {
+                return { success: false };
+            }
+        });
+
+        ipc.answer("cc:update", async ({ guildId, commandId, type, trigger, case_sensitive, code, disabled_channels }) => {
+            if (!this.client.guilds.has(guildId))
+                return { success: false };
+            
+            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+                return { success: false };
+
+            try {
+                const command = await this.REGISTRY.cc.updateCommand(guildId, commandId, {
+                    type, trigger, case_sensitive, code, disabled_channels
+                });
+                return {
+                    command,
+                    success: true
+                };
+            } catch (err) {
+                return { success: false };
+            }
+        });
+
+        ipc.answer("cc:enabled", async ({ guildId, commandId, enabled }) => {
+            if (!this.client.guilds.has(guildId))
+                return { success: false };
+
+            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+                return { success: false };
+
+            try {
+                return {
+                    success: true,
+                    enabled: await this.REGISTRY.cc.enableCommand(guildId, commandId, enabled)
+                };
+            } catch (err) {
+                return { success: false };
+            }
+        });
+
+        ipc.answer("cc:delete", async ({ guildId, commandId }) => {
+            if (!this.client.guilds.has(guildId))
+                return { success: false };
+
+            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+                return { success: false };
+
+            try {
+                await this.REGISTRY.cc.removeCommand(guildId, commandId);
+                return {
+                    success: true
+                };
+            } catch (err) {
+                return { success: false };
             }
         });
 
@@ -409,7 +504,7 @@ class WebsiteManager {
         ipc.answer("admin:verifyFuck", async ({ fuckId, verified }) => {
             await this.db.collection("fuck").updateOne({
                 _id: fuckId
-            }, { $set: { verified: !!verified }});
+            }, { $set: { verified: !!verified } });
 
             return { success: true };
         });
@@ -425,6 +520,14 @@ class WebsiteManager {
         ipc.answer("site:changelog", async () => {
             const changelog = await getChangelog();
             return { logs: changelog };
+        });
+
+        ipc.answer("cc:lint", async code => {
+            const { errors } = await this.REGISTRY.cc.cpc.awaitAnswer("lint", { code });
+            return {
+                success: true,
+                errors
+            };
         });
     }
 }

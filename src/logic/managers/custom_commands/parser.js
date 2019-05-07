@@ -1,5 +1,5 @@
-const { Parser, EOF, tokenMatcher } = require("chevrotain");
-const { ALL_TOKENS, tokens: t } = require("./tokens");
+const { Parser, EOF, tokenMatcher, tokenName, tokenLabel } = require("chevrotain");
+const { ALL_TOKENS, tokens: t } = require("./lexer/tokens");
 
 // ----------------- PARSER -----------------
 
@@ -127,12 +127,78 @@ class CCParser extends Parser {
     }
 }
 
+function hasTokenLabel(obj) {
+    return typeof obj.LABEL === "string" && obj.LABEL !== "";
+}
+
 const parser = new CCParser(ALL_TOKENS, {
     outputCst: true,
     ignoredIssues: {
         Statement: { OR: true },
         StatementList: { OR: true },
         MultiExpression: { OR: true }
+    },
+    errorMessageProvider: {
+        buildMismatchTokenMessage({ actual, expected }) {
+            const hasLabel = hasTokenLabel(expected);
+            const expectedMsg = hasLabel
+                ? `--> ${tokenLabel(expected)} <--`
+                : `token of type --> ${tokenName(expected)} <--`;
+
+            return `unexpected token: Expecting ${expectedMsg}, but found ->${actual.image}<-`;
+        },
+
+        buildNotAllInputParsedMessage({ firstRedundant }) {
+            // changing the template of the error message #1
+            return `redundant input: expecting end of file, but found ->${firstRedundant.image}<-`;
+        },
+
+        buildNoViableAltMessage({ expectedPathsPerAlt, actual, customUserDescription, }) {
+            const errPrefix = "unexpected token: ";
+            const actualText = actual[0].image;
+            const errSuffix = "\nbut found: ->" + actualText + "<-";
+
+            if (customUserDescription) {
+                return errPrefix + customUserDescription + errSuffix;
+            } else {
+                const allLookAheadPaths = expectedPathsPerAlt.reduce((result, currAltPaths) => result.concat(currAltPaths), []);
+                const nextValidTokenSequences = allLookAheadPaths.slice(0, 10).map(
+                    currPath =>
+                        `[${currPath.map(currTokenType =>
+                            tokenLabel(currTokenType)
+                        ).join(", ")}]`
+                );
+                const notRenderedSequences = allLookAheadPaths.length - nextValidTokenSequences.length;
+                const nextValidSequenceItems = nextValidTokenSequences.map((itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`);
+                if (notRenderedSequences > 0) nextValidSequenceItems.push(`    and ${notRenderedSequences} more...`);
+                const calculatedDescription =
+                    `expecting one of these possible token sequences:\n${nextValidSequenceItems.join("\n")}`;
+
+                return errPrefix + calculatedDescription + errSuffix;
+            }
+        },
+
+        buildEarlyExitMessage({ actual, customUserDescription, expectedIterationPaths }) {
+            const errPrefix = "unexpected token: ";
+            const actualText = actual[0].image;
+            const errSuffix = "\nbut found: ->" + actualText + "<-";
+
+            if (customUserDescription) {
+                return errPrefix + customUserDescription + errSuffix;
+            } else {
+                const nextValidTokenSequences = expectedIterationPaths.slice(0, 10).map(
+                    currPath => `[${currPath.map(
+                        currTokenType => tokenLabel(currTokenType)
+                    ).join(", ")}]`
+                );
+                const notRenderedSequences = expectedIterationPaths.length - nextValidTokenSequences.length;
+                if (notRenderedSequences > 0) nextValidTokenSequences.push(`[and ${notRenderedSequences} more...]`);
+                const calculatedDescription =
+                    `expecting at least one of these possible token sequences:\n  <${nextValidTokenSequences.join(", ")}>`;
+
+                return errPrefix + calculatedDescription + errSuffix;
+            } 
+        }
     }
 });
 

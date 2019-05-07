@@ -1,4 +1,4 @@
-const Symbol = require("../Symbol");
+const Symbol = require("../../../../modules/Symbol");
 
 class StatementStack {
     /** @param {Symbol[]} arr */

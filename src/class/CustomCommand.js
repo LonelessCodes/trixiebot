@@ -77,7 +77,7 @@ class Reaction {
 class CustomCommand extends BaseCommand {
     /**
      * @param {*} manager 
-     * @param {{ _id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; enabled: boolean; }} row
+     * @param {{ id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; disabled_channels: string[]; enabled: boolean; }} row
      */
     constructor(manager, row) {
         super();
@@ -88,10 +88,10 @@ class CustomCommand extends BaseCommand {
     }
 
     /**
-     * @param {{ _id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; created_by: string; disabled_channels: string[]; enabled: boolean; }} row
+     * @param {{ id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; runtime_errors: any[]; created_at: Date; modified_at: Date; disabled_channels: string[]; enabled: boolean; }} row
      */
     update(row) {
-        this._id = row._id;
+        this.id = row.id;
 
         this.guildId = row.guildId;
 
@@ -109,15 +109,13 @@ class CustomCommand extends BaseCommand {
         this.created_at = row.created_at;
         this.modified_at = row.modified_at;
 
-        this.created_by = row.created_by;
-
         this.disabled_channels = row.disabled_channels;
         this.enabled = row.enabled;
     }
     
     async save() {
         await this.manager.database.updateOne({
-            _id: this._id,
+            id: this.id,
         }, {
             $set: {
                 guildId: this.guildId,
@@ -132,7 +130,6 @@ class CustomCommand extends BaseCommand {
                 runtime_errors: this.runtime_errors,
                 created_at: this.created_at,
                 modified_at:this.modified_at,
-                created_by: this.created_by,
                 disabled_channels: this.disabled_channels,
                 enabled: this.enabled
             }
@@ -148,7 +145,7 @@ class CustomCommand extends BaseCommand {
     }
 
     async compile() {
-        const { errors, cst } = await this.manager.cpc.awaitAnswer("compile", { text: this.code });
+        const { errors, cst } = await this.manager.compile(this.code);
 
         if (errors.length > 0) {
             this.update({
@@ -156,7 +153,7 @@ class CustomCommand extends BaseCommand {
                 cst: null,
                 _cst: null 
             });
-            await this.manager.database.updateOne({ _id: this._id }, { $set: { compile_errors: errors, cst: null } });
+            await this.manager.database.updateOne({ id: this.id }, { $set: { compile_errors: errors, cst: null } });
             throw errors;
         }
 
@@ -165,7 +162,7 @@ class CustomCommand extends BaseCommand {
             cst: null,
             _cst: cst
         });
-        await this.manager.database.updateOne({ _id: this._id }, { $set: { compile_errors: [], cst: BSON.serialize(cst) } });
+        await this.manager.database.updateOne({ id: this.id }, { $set: { compile_errors: [], cst: BSON.serialize(cst) } });
     }
 
     /**
@@ -206,11 +203,11 @@ class CustomCommand extends BaseCommand {
             }
         };
 
-        const { error, embed, content: cont } = await this.manager.cpc.awaitAnswer("run", { id: this._id, text: this.code, cst: this.cst, message: msg });
+        const { error, embed, content: cont } = await this.manager.cpc.awaitAnswer("run", { id: this.id, code: this.code, cst: this.cst, message: msg });
 
         if (error) {
             this.runtime_errors.push(error);
-            await this.manager.database.updateOne({ _id: this._id }, { $push: { runtime_errors: error } });
+            await this.manager.database.updateOne({ id: this.id }, { $push: { runtime_errors: error } });
             return;
         }
         

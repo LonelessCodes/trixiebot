@@ -1,7 +1,7 @@
 const { timeout } = require("../../../../modules/util");
 const { parseHumanTime } = require("../../../../modules/util/time");
 const { splitArgs } = require("../../../../modules/util/string");
-const { tokens: { WhiteSpace, LineTerminator, MultiLineComment, SingleLineComment } } = require("../tokens");
+const { tokens: { WhiteSpace, LineTerminator, MultiLineComment, SingleLineComment } } = require("../lexer/tokens");
 const parser = require("../parser");
 const { RuntimeError } = require("../errors");
 const {

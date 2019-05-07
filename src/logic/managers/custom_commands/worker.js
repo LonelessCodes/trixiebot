@@ -1,34 +1,42 @@
 const cpc = require("../../../modules/cpc")(process);
 
-const lexer = require("./lexer");
+const lexer = require("./lexer/lexer");
 const parser = require("./parser");
-const { ObjectLiteral } = require("./interpreter/types");
 const Interpreter = require("./interpreter/Interpreter");
+const { ObjectLiteral } = require("./interpreter/types");
+const { ParserError, TokenizerError } = require("./errors");
 
-async function compileCC(text) {
+function parseTokenizerErrors(errors) {
+    return errors.map(err => new TokenizerError(err));
+}
+function parseParserErrors(errors) {
+    return errors.map(err => new ParserError(err));
+}
+
+async function compileCC(code) {
     // Tokenize the input
-    const lexer_result = lexer.tokenize(text);
+    const lexer_result = lexer.tokenize(code);
     if (lexer_result.errors.length > 0)
-        throw lexer_result.errors;
+        throw parseTokenizerErrors(lexer_result.errors);
     
     // 2. Parse the Tokens vector.
     parser.input = lexer_result.tokens;
-    parser.text_input = text;
+    parser.text_input = code;
     const cst = parser.Program();
 
     if (parser.errors.length > 0)
-        throw parser.errors;
+        throw parseParserErrors(parser.errors);
     
     return cst; 
 }
 
-async function runCC(commandId, text, cst, message) {
+async function runCC(commandId, code, cst, message) {
     const interpreter = new Interpreter(commandId, message.guild.id);
 
     try {
         // 3. Perform semantics using a CstVisitor.
         // Note that separation of concerns between the syntactic analysis (parsing) and the semantics.
-        interpreter.text_input = text;
+        interpreter.text_input = code;
         const reply = await interpreter.visit(cst, message);
         if (reply instanceof ObjectLiteral && reply.isEmbed) {
             return { embed: reply.getEmbed() };
@@ -39,12 +47,25 @@ async function runCC(commandId, text, cst, message) {
     }
 }
 
+cpc.answer("lint", async ({ code }) => {
+    try {
+        await compileCC(code);
+        return {
+            errors: []
+        };
+    } catch (errs) {
+        return {
+            errors: errs
+        };
+    }
+});
+
 cpc.answer("compile", async payload => {
-    const { text } = payload;
+    const { code } = payload;
 
     try {
         return {
-            cst: await compileCC(text),
+            cst: await compileCC(code),
             errors: []
         };
     } catch (errs) { 
@@ -55,9 +76,9 @@ cpc.answer("compile", async payload => {
     }
 });
 
-cpc.answer("run", async ({ id, text, cst, message }) => {
+cpc.answer("run", async ({ id, code, cst, message }) => {
     try {
-        return await runCC(id, text, cst, message);
+        return await runCC(id, code, cst, message);
     } catch (err) {
         return { error: err };
     }

@@ -52,14 +52,9 @@ class CommandRegistry {
      * @param {string} content 
      * @param {CustomCommand|AliasCommand} command 
      */
-    async processCC(message, command_name, content, command) {
-        if (command && command instanceof AliasCommand) {
-            command_name = command.parentName;
-            command = command.command;
-        }
-        
-        if (command.disabled) return false;
-        
+    async processCC(message, command_name, content, command) {        
+        if (!command.enabled) return false;
+
         const blacklistedUsers = await this.database.collection("blacklisted").findOne({ userId: message.author.id });
         if (blacklistedUsers) {
             await message.channel.send("You have been blacklisted from using all of Trixie's functions. " +
@@ -105,7 +100,7 @@ class CommandRegistry {
             return false;
         }
 
-        log.debug("CustomC Registry", `command:${command._id}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+        log.debug("CustomC Registry", `command:${command.id}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
 
         await command.run(message, command_name, content);
 

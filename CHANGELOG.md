@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.0"></a>
+# [2.4.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.2...v2.4.0) (2019-05-12)
+
+
+### Bug Fixes
+
+* **naughty command:** remove image upon artist' request ([275e923](https://bitbucket.org/Loneless/trixiebot/commits/275e923))
+
+
+### Features
+
+* Custom Commands have been added. Get more information about this feature at https://docs.trixie.loneless.art ([293669d](https://bitbucket.org/Loneless/trixiebot/commits/293669d))
+
+
+
 <a name="2.3.2"></a>
 ## [2.3.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.1...v2.3.2) (2019-05-04)
 

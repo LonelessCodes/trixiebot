@@ -93,7 +93,7 @@ class CCManager {
 
         this.database = database.collection("custom_commands");
         this.database.createIndex({ id: 1 }, { unique: true });
-        this.database.createIndex({ type: 1, trigger: 1, case_sensitive: 1 }, { unique: true });
+        this.database.createIndex({ guildId: 1, type: 1, trigger: 1, case_sensitive: 1 }, { unique: true });
 
         this.errors_db = database.collection("cc_errors");
         this.errors_db.createIndex({ ts: 1 });

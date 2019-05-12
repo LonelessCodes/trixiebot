@@ -344,10 +344,9 @@ ArrayLiteral.prototype.proto.size = new NativeFunc(function size() {
 
 async function call(context, func, args) {
     if (func instanceof Func || func instanceof NativeFunc) {
-        // TODO: ???? check if this works
         return assign(await func.call(context, func, args));
     } else {
-        throw context.error("Cannot call value of other type than Func", { val: func.native }, context.pos);
+        throw context.error("Cannot call value of other type than Func", context.pos);
     }
 }
 

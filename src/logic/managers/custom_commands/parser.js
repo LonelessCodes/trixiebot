@@ -458,10 +458,10 @@ $.RULE("AssignmentExpression", () => {
 
 $.RULE("Expression", () => {
     $.SUBRULE($.AssignmentExpression, $expression);
-    $.MANY(() => {
-        $.CONSUME(t.Comma);
-        $.SUBRULE2($.AssignmentExpression, $expression);
-    });
+    // $.MANY(() => {
+    //     $.CONSUME(t.Comma);
+    //     $.SUBRULE2($.AssignmentExpression, $expression);
+    // });
 });
 
 $.RULE("Statement", () => {
@@ -469,7 +469,6 @@ $.RULE("Statement", () => {
         $.c2 ||
         ($.c2 = [
             { ALT: () => $.SUBRULE($.BlockStatement, $statement) },
-            // { ALT: () => $.SUBRULE($.VariableStatement, statement) },
             { ALT: () => $.SUBRULE($.EmptyStatement, $empty) },
             { ALT: () => $.SUBRULE($.ExpressionStatement, $statement) },
             { ALT: () => $.SUBRULE($.IfStatement, $statement) },
@@ -500,12 +499,6 @@ $.RULE("StatementList", () => {
             { ALT: () => $.SUBRULE($.Statement, $statement) },
         ]);
     });
-});
-
-$.RULE("VariableStatement", () => {
-    // $.CONSUME(t.VarTok);
-    $.SUBRULE($.VariableDeclaration);
-    $.CONSUME(t.Semicolon, $enableSemicolonInsertion);
 });
 
 $.RULE("VariableDeclaration", () => {

@@ -7,12 +7,15 @@ class StatementStack {
     }
 
     push(ctx) {
-        const id = ctx.$stackId = Symbol();
-        this._arr.push(id);
-        return id;
+        const symbol = Symbol();
+        if (!ctx.$stackId) ctx.$stackId = [];
+        ctx.$stackId.push(symbol);
+        this._arr.push(symbol);
+        return symbol;
     }
 
-    pop() {
+    pop(ctx) {
+        if (ctx.$stackId) ctx.$stackId.pop();
         return this._arr.pop();
     }
 
@@ -62,8 +65,8 @@ class StatementManager {
         return this.currentStack.push(ctx);
     }
 
-    pop() {
-        return this.currentStack.pop();
+    pop(ctx) {
+        return this.currentStack.pop(ctx);
     }
 
     get current() {

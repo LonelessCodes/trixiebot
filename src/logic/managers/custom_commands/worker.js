@@ -41,7 +41,7 @@ async function runCC(commandId, code, cst, message) {
         if (reply instanceof ObjectLiteral && reply.isEmbed) {
             return { embed: reply.getEmbed() };
         }
-        return { content: reply.native };
+        return { content: reply ? reply.native : null };
     } catch (error) {
         return { error };
     }
@@ -77,11 +77,7 @@ cpc.answer("compile", async payload => {
 });
 
 cpc.answer("run", async ({ id, code, cst, message }) => {
-    try {
-        return await runCC(id, code, cst, message);
-    } catch (err) {
-        return { error: err };
-    }
+    return await runCC(id, code, cst, message);
 });
 
 cpc.send("ready");

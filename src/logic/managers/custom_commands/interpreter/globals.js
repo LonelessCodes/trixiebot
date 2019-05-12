@@ -1,5 +1,6 @@
 const _log = require("../../../../modules/log");
 const { parseHumanTime: _parseHumanTime, toHumanTime: _toHumanTime } = require("../../../../modules/util/time");
+const Context = require("./Context");
 const c = require("./classes");
 const moment = require("moment");
 const database = require("../../../../modules/getDatabase")()
@@ -231,102 +232,144 @@ const random = new c.NativeFunc(function (_, ...args) {
 const RichEmbed = new c.NativeFunc(async function () {
     return await c.RichEmbed();
 });
-const Emoji = new c.NativeFunc(async function (interpreter, id) {
+const Emoji = new c.NativeFunc(async function (context, id) {
     if (id instanceof c.StringLiteral)
-        return await c.Emoji(interpreter, id);
+        return await c.Emoji(context, id);
     return new c.NullLiteral;
 });
-const Message = new c.NativeFunc(async function (interpreter, id) {
+const Message = new c.NativeFunc(async function (context, id) {
     if (id instanceof c.StringLiteral)
-        return await c.Message(interpreter, id);
+        return await c.Message(context, id);
     return new c.NullLiteral;
 });
-const Role = new c.NativeFunc(async function (interpreter, id) {
+const Role = new c.NativeFunc(async function (context, id) {
     if (id instanceof c.StringLiteral)
-        return await c.Role(interpreter, id);
+        return await c.Role(context, id);
     return new c.NullLiteral;
 });
-const Member = new c.NativeFunc(async function (interpreter, id) {
+const Member = new c.NativeFunc(async function (context, id) {
     if (id instanceof c.StringLiteral)
-        return await c.GuildMember(interpreter, id);
+        return await c.GuildMember(context, id);
     return new c.NullLiteral;
 });
-const Channel = new c.NativeFunc(async function (interpreter, id) {
+const Channel = new c.NativeFunc(async function (context, id) {
     if (id instanceof c.StringLiteral)
-        return await c.Channel(interpreter, id);
+        return await c.Channel(context, id);
     return new c.NullLiteral;
 });
 
 // storage
 
-const storage = new c.NativeFunc(function (interpreter, storageId) {
+const storage = new c.NativeFunc(function (context, storageId) {
     if (!(storageId instanceof c.StringLiteral)) return new c.NullLiteral;
 
     storageId = storageId.content;
 
     return new c.ObjectLiteral({
-        get: new c.NativeFunc("get", async function (_, key) {
+        get: new c.NativeFunc("get", async function (context, key) {
             if (!(key instanceof c.NumberLiteral || key instanceof c.StringLiteral)) return new c.NullLiteral;
             key = key.native;
 
-            const data = await database.then(db => db.findOne({ guildId: interpreter.guildId, storageId }));
+            const data = await database.then(db => db.findOne({ guildId: context.guildId, storageId }))
+                .catch(() => { throw context.error("Couldn't get data from database"); });
             if (!data) return new c.NullLiteral;
 
-            const value = c.convert(data.data[key]);
+            const json = BSON.deserialize(data.data.buffer);
+
+            const value = c.convert(json[key]);
             return value;
         }),
-        set: new c.NativeFunc("set", async function (_, key, value) {
-            if (!(key instanceof c.NumberLiteral || key instanceof c.StringLiteral)) throw interpreter.error("A storage key may only be a String or a Number");
+        has: new c.NativeFunc("has", async function (context, key) {
+            if (!(key instanceof c.NumberLiteral || key instanceof c.StringLiteral)) return new c.NullLiteral;
+            key = key.native;
+
+            const data = await database.then(db => db.findOne({ guildId: context.guildId, storageId }))
+                .catch(() => { throw context.error("Couldn't get data from database"); });
+            if (!data) return new c.BooleanLiteral(false);
+
+            const json = BSON.deserialize(data.data.buffer);
+            if (!json[key]) return new c.BooleanLiteral(false);
+
+            return new c.BooleanLiteral(true);
+        }),
+        set: new c.NativeFunc("set", async function (context, key, value) {
+            if (!(key instanceof c.NumberLiteral || key instanceof c.StringLiteral)) throw context.error("A storage key may only be a String or a Number", context.args[0]);
             key = key.native;
             
-            if (!(value instanceof c.Literal)) throw interpreter.error("A storage value can only be a literal, not a func");
+            if (!(value instanceof c.Literal)) throw context.error("A storage value can only be a literal, not a func", context.args[1]);
             value = value.native;
 
             // calculate doc size
             const cursor = await database
-                .then(db => db.find({ guildId: interpreter.guildId }).toArray());
+                .then(db => db.find({ guildId: context.guildId }).toArray())
+                .catch(() => { throw context.error("Couldn't get data from database"); });
+            
             const relevantDocs = [];
             for (let doc of cursor) relevantDocs.push({ storageId: doc.storageId, data: doc.data });
             const storageDoc = relevantDocs.find(doc => doc.storageId === storageId);
-            if (storageDoc) storageDoc.data[key] = value;
-            else relevantDocs.push({ storageId: storageId, data: { [key]: value } });
+            let json = {};
+            let data;
+            if (storageDoc) {
+                json = BSON.deserialize(storageDoc.data.buffer);
+                json[key] = value;
+                storageDoc.data = new BSON.Binary(BSON.serialize(json));
+                data = storageDoc.data;
+            }
+            else {
+                json[key] = value;
+                data = new BSON.Binary(BSON.serialize(json));
+                relevantDocs.push({ storageId: storageId, data });
+            }
 
             let docsSize = 0;
             for (let doc of relevantDocs) docsSize += BSON.calculateObjectSize(doc);
 
             if (docsSize > 1024 * 500) {
-                throw interpreter.error("Storage per guild cannot exceed 500kb!");
+                throw context.error("Storage per guild cannot exceed 500kb!");
             }
 
-            await database.then(db => db.updateOne({ guildId: interpreter.guildId, storageId }, { $set: { [`data.${key}`]: value } }, { upsert: true }));
+            await database.then(db => db.updateOne({ guildId: context.guildId, storageId }, { $set: { data } }, { upsert: true }))
+                .catch(() => { throw context.error("Couldn't update data in database"); });
 
             return value;
         }),
-        delete: new c.NativeFunc("delete", async function (_, key) {
+        delete: new c.NativeFunc("delete", async function (context, key) {
             if (!(key instanceof c.NumberLiteral || key instanceof c.StringLiteral)) return new c.BooleanLiteral(false);
             key = key.native;
 
-            await database.then(db => db.updateOne({ guildId: interpreter.guildId, storageId }, { $unset: { [`data.${key}`]: "" } }));
+            const data = await database.then(db => db.findOne({ guildId: context.guildId, storageId }))
+                .catch(() => { throw context.error("Couldn't get data from database"); });
+            if (!data)  return new c.BooleanLiteral(true);
+
+            const json = BSON.deserialize(data.data.buffer);
+            delete json[key];
+
+            await database.then(db => db.updateOne({ guildId: context.guildId, storageId }, { $set: { data: new BSON.Binary(BSON.serialize(json)) } }))
+                .catch(() => { throw context.error("Couldn't update data in database"); });
 
             return new c.BooleanLiteral(true);
         }),
-        keys: new c.NativeFunc("keys", async function () {
-            const data = await database.then(db => db.findOne({ guildId: interpreter.guildId, storageId }));
-            return Object.keys(data.data).map(s => new c.StringLiteral(s));
+        keys: new c.NativeFunc("keys", async function (context) {
+            const data = await database.then(db => db.findOne({ guildId: context.guildId, storageId }))
+                .catch(() => { throw context.error("Couldn't get data from database"); });
+            const json = BSON.deserialize(data.data.buffer);
+            return Object.keys(json).map(s => new c.StringLiteral(s));
         }),
-        all: new c.NativeFunc("all", async function () {
-            const data = await database.then(db => db.findOne({ guildId: interpreter.guildId, storageId }));
-            return c.convert(data.data);
+        all: new c.NativeFunc("all", async function (context) {
+            const data = await database.then(db => db.findOne({ guildId: context.guildId, storageId }))
+                .catch(() => { throw context.error("Couldn't get data from database"); });
+            const json = BSON.deserialize(data.data.buffer);
+            return c.convert(json);
         })
     });
 });
 
-const pad = new c.NativeFunc("pad", function (_, value, width, fill = new c.StringLiteral("0")) {
-    if (!(width instanceof c.NumberLiteral)) throw _.error("parameter >length< must be a Number");
+const pad = new c.NativeFunc("pad", function (context, value, width, fill = new c.StringLiteral("0")) {
+    if (!(width instanceof c.NumberLiteral)) throw context.error("parameter >length< must be a Number", context.args[1]);
 
     width = width.content;
-    value = value.getProp(new c.StringLiteral("toString")).call(_, value).content;
-    fill = fill.getProp(new c.StringLiteral("toString")).call(_, fill).content;
+    value = value.getProp(new c.StringLiteral("toString")).call(new Context(context.interpreter, context.args[0]), value).content;
+    fill = fill.getProp(new c.StringLiteral("toString")).call(new Context(context.interpreter, context.args[2]), fill).content;
 
     const str = value.length >= width ? value : new global.Array(width - value.length + 1).join(fill) + value;
     

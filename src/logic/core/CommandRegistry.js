@@ -39,7 +39,7 @@ class CommandRegistry {
         if (message.channel.type !== "text") return false;
 
         /** @type {BaseCommand} */
-        let cc = await this.cc.get(message.guild, { command_name, prefix_used, rawContent: message.content });
+        let cc = await this.cc.get(message.guild, { command_name, prefix_used, raw_content: message.content });
         if (cc) return await this.processCC(message, command_name, content, cc);
 
         let command = this.commands.get(command_name); 

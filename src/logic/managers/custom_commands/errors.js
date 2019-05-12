@@ -43,27 +43,23 @@ class ParserError extends SyntaxError {
  */
 
 /**  internal helper class for tokenization error reporting  */
-class RuntimeError extends Error {
+class RuntimeError {
     /*  construct and initialize object  */
-    constructor(message, offset, line, column, input) {
-        super(message);
+    constructor(input, message, vals, stack) {
         this.name = "RuntimeError";
         this.message = message;
-        this.offset = offset;
-        this.line = line;
-        this.column = column;
-        this.input = input;
-    }
-
-    /**  render a useful string representation  */
-    toString() {
-        const excerpt = getExcerpt(this.input, this.offset);
-        const prefix1 = `line ${this.line} (column ${this.column}): `;
-        const prefix2 = new Array(prefix1.length + excerpt.prologText.length).fill(" ").join("");
-        let msg = "Runtime Error: " + this.message + "\n" +
-            prefix1 + excerpt.prologText + excerpt.tokenText + excerpt.epilogText + "\n" +
+        this.vals = vals;
+        this.stack = stack;
+        
+        if (stack[0].pos.offset == null) return this;
+        /**  render a useful string representation  */
+        const excerpt = getExcerpt(input, stack[0].pos.offset);
+        const prefix2 = new Array(excerpt.prologText.length).fill(" ").join("");
+        const msg =
+            excerpt.prologText + excerpt.tokenText + excerpt.epilogText + "\n" +
             prefix2 + "^";
-        return msg;
+
+        this.excerpt = msg;
     }
 }
 

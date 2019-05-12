@@ -2,15 +2,15 @@ const cpc = require("../../../../modules/cpc")(process);
 const { Permissions: DiscordPermissions } = require("discord.js");
 const c = require("./types");
 
-async function Emoji(interpreter, id) {
+async function Emoji(context, id) {
     if (id instanceof c.StringLiteral) {
-        const id = id.content;
+        id = id.content;
 
         const emoji = await cpc.awaitAnswer("getEmoji", {
             emojiId: id,
-            guildId: interpreter.guildId
-        }, { timeout: 3000 });
-        if (emoji) return await Emoji(interpreter, emoji);
+            guildId: context.guildId
+        }, { timeout: 5000 }).catch(() => { throw context.error("Couldn't get emoji. Timed-out"); });
+        if (emoji) return await Emoji(context, emoji);
         return new c.NullLiteral;
     }
     const opts = id;
@@ -33,73 +33,86 @@ async function Emoji(interpreter, id) {
     });
 }
 
-async function Reaction(interpreter, opts) {
+async function Reaction(context, opts) {
     return new c.ObjectLiteral({
         count: new c.NumberLiteral(opts.count),
-        emoji: await Emoji(interpreter, opts.emoji),
+        emoji: await Emoji(context, opts.emoji),
+        id: new c.StringLiteral(opts.id),
 
         // methods
-        getMembers: new c.NativeFunc("getMembers", async function () {
-            const members = await cpc.awaitAnswer("reaction.getMembers", { guildId: interpreter.guildId, messageId: opts.messageId, emojiId: opts.emoji.id });
+        getMembers: new c.NativeFunc("getMembers", async function (context) {
+            const members = await cpc.awaitAnswer("reaction.getMembers", {
+                guildId: context.guildId, messageId: opts.messageId, reactionId: opts.id
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't get members for reaction. Timed-out"); });
             for (let i = 0; i < members.length; i++) {
-                members[i] = await GuildMember(interpreter, members[i]);
+                members[i] = await GuildMember(context, members[i]);
             }
             return members;
         })
     });
 }
 
-async function Mentions(interpreter, opts) {
+async function Mentions(context, opts) {
     return new c.ObjectLiteral({
-        members: new c.ArrayLiteral(await Promise.all(opts.members.map(member => GuildMember(member)))),
-        channels: new c.ArrayLiteral(await Promise.all(opts.channels.map(channel => Channel(channel)))),
-        roles: new c.ArrayLiteral(await Promise.all(opts.roles.map(role => Role(role)))),
+        members: new c.ArrayLiteral(await Promise.all(opts.members.map(member => GuildMember(context, member)))),
+        channels: new c.ArrayLiteral(await Promise.all(opts.channels.map(channel => Channel(context, channel)))),
+        roles: new c.ArrayLiteral(await Promise.all(opts.roles.map(role => Role(context, role)))),
         everyone: new c.BooleanLiteral(opts.everyone)
     });
 }
 
-async function Message(interpreter, id) {
+async function Message(context, id) {
     if (id instanceof c.StringLiteral) {
-        const id = id.content;
+        id = id.content;
 
         const message = await cpc.awaitAnswer("getMessage", {
             messageId: id,
-            guildId: interpreter.guildId
-        }, { timeout: 3000 });
-        if (message) return await Message(interpreter, message);
+            guildId: context.guildId
+        }, { timeout: 5000 }).catch(() => { throw context.error("Couldn't get message. Timed-out"); });
+        if (message) return await Message(context, message);
         return new c.NullLiteral;
     }
     const opts = id;
 
     return new c.ObjectLiteral({
         id: new c.StringLiteral(opts.id),
-        member: await GuildMember(interpreter, opts.member),
-        channel: await Channel(interpreter, opts.channel),
+        member: await GuildMember(context, opts.member),
+        channel: await Channel(context, opts.channel),
         text: new c.StringLiteral(opts.text),
         createdAt: new c.TimeLiteral(opts.createdAt),
         editedAt: opts.editedAt ? new c.TimeLiteral(opts.editedAt) : new c.NullLiteral,
-        mentions: await Mentions(interpreter, opts.mentions),
+        mentions: await Mentions(context, opts.mentions),
         pinned: new c.BooleanLiteral(opts.pinned),
-        reactions: new c.ArrayLiteral(await Promise.all(opts.reactions.map(reaction => Reaction(interpreter, { ...reaction, messageId: opts.id })))),
+        reactions: new c.ArrayLiteral(await Promise.all(opts.reactions.map(reaction => Reaction(context, { ...reaction, messageId: opts.id })))),
 
         // methods
         toString: new c.NativeFunc("toString", function () {
             return new c.StringLiteral(opts.text);
         }),
-        delete: new c.NativeFunc("delete", async function () {
-            await cpc.awaitAnswer("message.delete", { guildId: interpreter.guildId, messageId: opts.id });
+        delete: new c.NativeFunc("delete", async function (context) {
+            await cpc.awaitAnswer("message.delete", {
+                guildId: context.guildId, messageId: opts.id
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't delete message. Timed-out"); });
             return new c.NullLiteral;
         }),
-        edit: new c.NativeFunc("edit", async function (_, content, embed) {
+        edit: new c.NativeFunc("edit", async function (context, content, embed) {
             let message;
             if (content instanceof c.StringLiteral) {
-                message = await cpc.awaitAnswer("message.edit", { messageId: opts.id, guildId: interpreter.guildId, content, embed });
-            } else {
-                message = await cpc.awaitAnswer("channel.send", { messageId: opts.id, guildId: interpreter.guildId, embed: content });
+                message = await cpc.awaitAnswer("message.edit", {
+                    messageId: opts.id, guildId: context.guildId, content: content.content, embed: embed ? embed.isEmbed ? embed.getEmbed() : null : null
+                }, { timeout: 5000 })
+                    .catch(() => { throw context.error("Couldn't edit message. Timed-out"); });
+            } else if (content ? content.isEmbed : false) {
+                message = await cpc.awaitAnswer("message.edit", {
+                    messageId: opts.id, guildId: context.guildId, embed: embed.getEmbed()
+                }, { timeout: 5000 })
+                    .catch(() => { throw context.error("Couldn't edit message. Timed-out"); });
             }
-            if (message) return await Message(interpreter, message);
+            if (message) return await Message(context, message);
         }),
-        react: new c.NativeFunc("react", async function (_, ...emojis) {
+        react: new c.NativeFunc("react", async function (context, ...emojis) {
             const e = [];
             for (let emoji of emojis) {
                 if (emoji instanceof c.ObjectLiteral) {
@@ -108,21 +121,25 @@ async function Message(interpreter, id) {
                     e.push(emoji.content);
                 }
             }
-            await cpc.awaitAnswer("message.react", { guildId: interpreter.guildId, messageId: opts.id, emojis: e });
+            await cpc.awaitAnswer("message.react", {
+                guildId: context.guildId, messageId: opts.id, emojis: e
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't react to message. Timed-out"); });
             return new c.NullLiteral;
         })
     });
 }
 
-async function Role(interpreter, id) {
+async function Role(context, id) {
     if (id instanceof c.StringLiteral) {
-        const id = id.content;
+        id = id.content;
 
         const member = await cpc.awaitAnswer("getRole", {
             roleId: id,
-            guildId: interpreter.guildId
-        }, { timeout: 3000 });
-        if (member) return await Role(interpreter, member);
+            guildId: context.guildId
+        }, { timeout: 5000 })
+            .catch(() => { throw context.error("Couldn't get role. Timed-out"); });
+        if (member) return await Role(context, member);
         return new c.NullLiteral;
     }
     const opts = id;
@@ -142,10 +159,13 @@ async function Role(interpreter, id) {
         toString: new c.NativeFunc("toString", function () {
             return new c.StringLiteral(`<@&${opts.id}>`);
         }),
-        getMembers: new c.NativeFunc("getMembers", async function () {
-            const members = await cpc.awaitAnswer("role.getMembers", { guildId: interpreter.guildId, roleId: opts.id });
+        getMembers: new c.NativeFunc("getMembers", async function (context) {
+            const members = await cpc.awaitAnswer("role.getMembers", {
+                guildId: context.guildId, roleId: opts.id
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't get members of role. Timed-out"); });
             for (let i = 0; i < members.length; i++) {
-                members[i] = await GuildMember(interpreter, members[i]);
+                members[i] = await GuildMember(context, members[i]);
             }
             return members;
         }),
@@ -155,18 +175,18 @@ async function Role(interpreter, id) {
     });
 }
 
-async function GuildMember(interpreter, id) {
+async function GuildMember(context, id) {
     if (id instanceof c.StringLiteral) {
-        const str = id.content;
-        let id = "";
-        const match = /<@!?([0-9])+>/.exec(str);
+        id = id.content;
+        const match = /<@!?([0-9]+)>/.exec(id);
         if (match) id = match[1];
 
         const member = await cpc.awaitAnswer("getMember", {
             memberId: id,
-            guildId: interpreter.guildId
-        }, { timeout: 3000 });
-        if (member) return await GuildMember(interpreter, member);
+            guildId: context.guildId
+        }, { timeout: 5000 })
+            .catch(() => { throw context.error("Couldn't get member. Timed-out"); });
+        if (member) return await GuildMember(context, member);
         return new c.NullLiteral;
     }
     const opts = id;
@@ -176,7 +196,7 @@ async function GuildMember(interpreter, id) {
     return new c.ObjectLiteral({
         id: new c.StringLiteral(opts.id),
         nickname: new c.StringLiteral(opts.nickname || opts.username),
-        highestRole: await Role(interpreter, opts.highestRole),
+        highestRole: await Role(context, opts.highestRole),
         joinedAt: new c.TimeLiteral(opts.joinedAt),
         avatar: new c.StringLiteral(opts.avatar),
         bot: new c.BooleanLiteral(opts.bot),
@@ -189,10 +209,13 @@ async function GuildMember(interpreter, id) {
         toString: new c.NativeFunc("toString", function () {
             return new c.StringLiteral(`<@${opts.id}>`);
         }),
-        getRoles: new c.NativeFunc("getRoles", async function () {
-            const roles = await cpc.awaitAnswer("member.getRoles", { guildId: interpreter.guildId, memberId: opts.id });
+        getRoles: new c.NativeFunc("getRoles", async function (context) {
+            const roles = await cpc.awaitAnswer("member.getRoles", {
+                guildId: context.guildId, memberId: opts.id
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't get roles of member. Timed-out"); });
             for (let i = 0; i < roles.length; i++) {
-                roles[i] = await Role(interpreter, roles[i]);
+                roles[i] = await Role(context, roles[i]);
             }
             return roles;
         }),
@@ -202,16 +225,17 @@ async function GuildMember(interpreter, id) {
     });
 }
 
-async function Channel(interpreter, id) {
+async function Channel(context, id) {
     if (id instanceof c.StringLiteral) {
-        const str = id.content;
-        if (/<#[0-9]+>/.test(str)) id = str.substr(2, str.length - 3);
+        id = id.content;
+        if (/<#[0-9]+>/.test(id)) id = id.substr(2, id.length - 3);
 
         const channel = await cpc.awaitAnswer("getChannel", {
             channelId: id,
-            guildId: interpreter.guildId
-        }, { timeout: 3000 });
-        if (channel) return await Channel(interpreter, channel);
+            guildId: context.guildId
+        }, { timeout: 5000 })
+            .catch(() => { throw context.error("Couldn't get channel. Timed-out"); });
+        if (channel) return await Channel(context, channel);
         return new c.NullLiteral;
     }
     const opts = id;
@@ -231,7 +255,7 @@ async function Channel(interpreter, id) {
         // awaitMessage: new c.NativeFunc("awaitMessage", async function (interpreter, filter, time) {
             
         // }),
-        createInvite: new c.NativeFunc("createInvite", async function (_, opts = new c.ObjectLiteral({})) {
+        createInvite: new c.NativeFunc("createInvite", async function (context, opts = new c.ObjectLiteral({})) {
             const options = {
                 temporary: false,
                 maxAge: 86400,
@@ -243,21 +267,31 @@ async function Channel(interpreter, id) {
             if (opts.maxUses) options.maxUses = opts.maxUses.content;
             if (opts.unique) options.unique = opts.unique.content;
 
-            const invite = await cpc.awaitAnswer("channel.createInvite", { channelId: opts.id, guildId: interpreter.guildId, options });
+            const invite = await cpc.awaitAnswer("channel.createInvite", {
+                channelId: opts.id, guildId: context.guildId, options
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't create invite. Timed-out"); });
             if (invite) return new c.StringLiteral(invite);
             return new c.NullLiteral;
         }),
         // fetchMessages: new c.NativeFunc("fetchMessages", async function (_) {
 
         // }),
-        send: new c.NativeFunc("send", async function (_, content, embed) {
-            let message; 
+        send: new c.NativeFunc("send", async function (context, content, embed) {
+            let message;
             if (content instanceof c.StringLiteral) {
-                message = await cpc.awaitAnswer("channel.send", { channelId: opts.id, guildId: interpreter.guildId, content, embed });
-            } else {
-                message = await cpc.awaitAnswer("channel.send", { channelId: opts.id, guildId: interpreter.guildId, embed: content });
+                message = await cpc.awaitAnswer("channel.send", {
+                    channelId: opts.id, guildId: context.guildId, content: content.content, embed: embed ? embed.isEmbed ? embed.getEmbed() : null : null
+                }, { timeout: 5000 })
+                    .catch(() => { throw context.error("Couldn't send message. Timed-out"); });
+            } else if (content ? content.isEmbed : false) {
+                message = await cpc.awaitAnswer("channel.send", {
+                    channelId: opts.id, guildId: context.guildId, embed: content.getEmbed()
+                }, { timeout: 5000 })
+                    .catch(() => { throw context.error("Couldn't send message. Timed-out"); });
             }
-            if (message) return await Message(interpreter, message);
+            if (message) return await Message(context, message);
+            else return new c.NullLiteral;
         })
     });
 }
@@ -265,7 +299,7 @@ async function Channel(interpreter, id) {
 // this one should not have a constructor implementation in the runtime
 // cause we want everything to be kept internally, inside the guild
 
-async function Guild(interpreter, opts) {
+async function Guild(context, opts) {
     return new c.ObjectLiteral({
         id: new c.StringLiteral(opts.id),
         name: new c.StringLiteral(opts.name),
@@ -277,34 +311,38 @@ async function Guild(interpreter, opts) {
         toString: new c.NativeFunc("toString", function () {
             return new c.StringLiteral(opts.name);
         }),
-        getMembers: new c.NativeFunc("getMembers", async function () {
-            const members = await cpc.awaitAnswer("guild.getMembers", { guildId: opts.id });
+        getMembers: new c.NativeFunc("getMembers", async function (context) {
+            const members = await cpc.awaitAnswer("guild.getMembers", { guildId: opts.id }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't get members of guild. Timed-out"); });
             for (let i = 0; i < members.length; i++) {
-                members[i] = await GuildMember(interpreter, members[i]);
+                members[i] = await GuildMember(context, members[i]);
             }
             return members;
         }),
-        getOwner: new c.NativeFunc("getOwner", async function () {
-            return await GuildMember(interpreter, opts.ownerId);
+        getOwner: new c.NativeFunc("getOwner", async function (context) {
+            return await GuildMember(context, opts.ownerId);
         }),
-        getRoles: new c.NativeFunc("getRoles", async function () {
-            const roles = await cpc.awaitAnswer("guild.getRoles", { guildId: opts.id });
+        getRoles: new c.NativeFunc("getRoles", async function (context) {
+            const roles = await cpc.awaitAnswer("guild.getRoles", { guildId: opts.id }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't get roles of guild. Timed-out"); });
             for (let i = 0; i < roles.length; i++) {
-                roles[i] = await Role(interpreter, roles[i]);
+                roles[i] = await Role(context, roles[i]);
             }
             return roles;
         }),
-        getChannels: new c.NativeFunc("getChannels", async function () {
-            const channels = await cpc.awaitAnswer("guild.getChannels", { guildId: opts.id });
+        getChannels: new c.NativeFunc("getChannels", async function (context) {
+            const channels = await cpc.awaitAnswer("guild.getChannels", { guildId: opts.id }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't get channels of guild. Timed-out"); });
             for (let i = 0; i < channels.length; i++) {
-                channels[i] = await Channel(interpreter, channels[i]);
+                channels[i] = await Channel(context, channels[i]);
             }
             return channels;
         }),
-        getEmojis: new c.NativeFunc("getEmojis", async function () {
-            const emojis = await cpc.awaitAnswer("guild.getEmojis", { guildId: opts.id });
+        getEmojis: new c.NativeFunc("getEmojis", async function (context) {
+            const emojis = await cpc.awaitAnswer("guild.getEmojis", { guildId: opts.id }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't get emojis of guild. Timed-out"); });
             for (let i = 0; i < emojis.length; i++) {
-                emojis[i] = await Emoji(interpreter, emojis[i]);
+                emojis[i] = await Emoji(context, emojis[i]);
             }
             return emojis;
         })
@@ -391,7 +429,8 @@ function RichEmbed(opts = {}) {
             return obj;
         }),
         setTimestamp: new c.NativeFunc(function (_, timestamp = new c.TimeLiteral()) {
-            embed.timestamp = new Date(timestamp.time.toISOString());
+            if (timestamp instanceof c.NumberLiteral) timestamp = new c.TimeLiteral(timestamp);
+            embed.timestamp = timestamp.time.toDate();
             return obj;
         }),
         setTitle: new c.NativeFunc(function (_, title = new c.StringLiteral("")) {

@@ -1,9 +1,13 @@
 const cpc = require("../../modules/cpc");
 const respawn = require("../../modules/respawn");
+const log = require("../../modules/log");
 const path = require("path");
 const uuid = require("uuid/v1");
 const BSON = require("bson");
 const CustomCommand = require("../../class/CustomCommand");
+const Discord = require("discord.js");
+const toEmoji = require("emoji-name-map");
+const { Member, Channel, Emoji, Role, Message } = require("../cc_classes.js");
 
 const TYPE = Object.freeze({
     COMMAND: 0,
@@ -68,7 +72,7 @@ class Trigger {
 }
 
 class WebCommand {
-    constructor(row) {
+    constructor(row, unread_errors = 0) {
         return {
             id: row.id,
             enabled: row.enabled,
@@ -77,10 +81,8 @@ class WebCommand {
             case_sensitive: row.case_sensitive,
             code: row.code,
             compile_errors: row.compile_errors,
-            runtime_errors: row.runtime_errors,
-            disabled_channels: row.disabled_channels,
-            created_at: row.created_at,
-            modified_at: row.modified_at
+            unread_errors,
+            disabled_channels: row.disabled_channels
         };
     }
 }
@@ -88,22 +90,258 @@ class WebCommand {
 class CCManager {
     constructor(client, database) {
         this.client = client;
+
         this.database = database.collection("custom_commands");
         this.database.createIndex({ id: 1 }, { unique: true });
+        this.database.createIndex({ type: 1, trigger: 1, case_sensitive: 1 }, { unique: true });
 
+        this.errors_db = database.collection("cc_errors");
+        this.errors_db.createIndex({ ts: 1 });
+
+        log.debug("CustomC Registry", "Starting worker");
         const dir = path.join(__dirname, "custom_commands");
         const file = path.join(dir, "worker.js");
         this.fork = respawn([file], { cwd: dir, fork: true, env: process.env }).restart();
         this.cpc = cpc(this.fork);
-        this.cpc.addListener("ready", () => {
-            console.log("custom commands ready");
-        });
+        this.cpc.addListener("ready", () => log.debug("CustomC Registry", "Worker ready"));
+
+        this.attachListeners();
 
         /** @type {Map<string, Trigger[]} */
         this.trigger_cache = new Map;
+        this.message_cache = new Map;
     }
 
-    async get(guild, { command_name, prefix_used, rawContent: raw_content }) {
+    attachListeners() {
+        this.cpc.answer("getEmoji", ({ emojiId, guildId }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+            if (!guild.emojis.has(emojiId)) return;
+            return new Emoji(guild.emojis.get(emojiId));
+        });
+
+        this.cpc.answer("reaction.getMembers", async ({ messageId, reactionId, guildId }) => {
+            if (!this.client.guilds.has(guildId)) return [];
+            const guild = this.client.guilds.get(guildId);
+
+            const m = await this.getMessage(guild, messageId);
+            if (!m) return [];
+
+            if (!m.reactions.has(reactionId)) return [];
+            const members = m.reactions.get(reactionId).members.array();
+
+            return members.map(m => new Member(m));
+        });
+
+        this.cpc.answer("getMessage", async ({ messageId, guildId }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            const m = await this.getMessage(guild, messageId);
+            if (!m) return;
+
+            return new Message(m);
+        });
+
+        this.cpc.answer("message.delete", async ({ messageId, guildId }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            const m = await this.getMessage(guild, messageId);
+            if (!m) return;
+
+            await m.delete();
+        });
+
+        this.cpc.answer("message.edit", async ({ messageId, guildId, embed, content }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            const m = await this.getMessage(guild, messageId);
+            if (!m) return;
+
+            let message;
+            if (embed && content) {
+                message = await m.edit(content, { embed: new Discord.RichEmbed(embed) });
+            } else if (embed) {
+                message = await m.edit({ embed: new Discord.RichEmbed(embed) });
+            } else if (content) {
+                message = await m.edit(content);
+            }
+            else message = m;
+
+            this.setMessage(message);
+
+            return new Message(message);
+        });
+
+        this.cpc.answer("message.react", async ({ messageId, guildId, emojis }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            const m = await this.getMessage(guild, messageId);
+            if (!m) return;
+
+            for (let emoji of emojis) {
+                if (guild.emojis.has(emoji)) {
+                    await m.react(guild.emojis.get(emoji)).catch(() => { });
+                } else {
+                    const e = toEmoji.get(emoji);
+                    if (e) await m.react(e).catch(() => { });
+                    else await m.react(emoji).catch(() => { });
+                }
+            }
+        });
+
+        this.cpc.answer("getRole", async ({ guildId, roleId }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            if (!guild.roles.has(roleId)) return;
+            return new Role(guild.roles.get(roleId));
+        });
+
+        this.cpc.answer("role.getMembers", async ({ guildId, roleId }) => {
+            if (!this.client.guilds.has(guildId)) return [];
+            const guild = this.client.guilds.get(guildId);
+
+            if (!guild.roles.has(roleId)) return [];
+            const role = guild.roles.get(roleId);
+            const members = role.members.array();
+
+            return members.map(m => new Member(m));
+        });
+
+        this.cpc.answer("getMember", async ({ guildId, memberId }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            if (!guild.members.has(memberId)) return;
+            const member = guild.members.get(memberId);
+
+            return new Member(member);
+        });
+
+        this.cpc.answer("member.getRoles", async ({ guildId, memberId }) => {
+            if (!this.client.guilds.has(guildId)) return [];
+            const guild = this.client.guilds.get(guildId);
+
+            if (!guild.members.has(memberId)) return [];
+            const member = guild.members.get(memberId);
+            const roles = member.roles.array();
+
+            return roles.map(m => new Role(m));
+        });
+
+        this.cpc.answer("getChannel", async ({ guildId, channelId }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            if (!guild.channels.has(channelId)) return;
+            const channel = guild.channels.get(channelId);
+
+            return new Channel(channel);
+        });
+
+        this.cpc.answer("channel.createInvite", async ({ guildId, channelId, options }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            if (!guild.channels.has(channelId)) return;
+            const channel = guild.channels.get(channelId);
+
+            try {
+                const invite = await channel.createInvite(options);
+                if (!invite) return;
+
+                return invite.url;
+            } catch (_) {
+                return;
+            }
+        });
+
+        this.cpc.answer("channel.send", async ({ guildId, channelId, content, embed }) => {
+            if (!this.client.guilds.has(guildId)) return;
+            const guild = this.client.guilds.get(guildId);
+
+            if (!guild.channels.has(channelId)) return;
+            const channel = guild.channels.get(channelId);
+
+            let message;
+            if (embed && content) {
+                message = await channel.send(content, { embed: new Discord.RichEmbed(embed) });
+            } else if (embed) {
+                message = await channel.send({ embed: new Discord.RichEmbed(embed) });
+            } else if (content) {
+                message = await channel.send(content);
+            }
+
+            if (message) {
+                this.setMessage(message);
+                return new Message(message);
+            }
+
+            return;
+        });
+
+        this.cpc.answer("guild.getMembers", async ({ guildId }) => {
+            if (!this.client.guilds.has(guildId)) return [];
+            const guild = this.client.guilds.get(guildId);
+            const members = guild.members.array();
+
+            return members.map(m => new Member(m));
+        });
+
+        this.cpc.answer("guild.getRoles", async ({ guildId }) => {
+            if (!this.client.guilds.has(guildId)) return [];
+            const guild = this.client.guilds.get(guildId);
+
+            const roles = guild.roles.array();
+
+            return roles.map(m => new Role(m));
+        });
+
+        this.cpc.answer("guild.getChannels", async ({ guildId }) => {
+            if (!this.client.guilds.has(guildId)) return [];
+            const guild = this.client.guilds.get(guildId);
+
+            const channels = guild.channels.array().filter(c => c.type === "text");
+
+            return channels.map(m => new Channel(m));
+        });
+
+        this.cpc.answer("guild.getEmojis", async ({ guildId }) => {
+            if (!this.client.guilds.has(guildId)) return [];
+            const guild = this.client.guilds.get(guildId);
+
+            const emojis = guild.emojis.array();
+
+            return emojis.map(m => new Emoji(m));
+        });
+    }
+
+    setMessage(message) {
+        const guild = message.guild;
+        if (!this.message_cache.has(guild.id)) this.message_cache.set(guild.id, new Map);
+        this.message_cache.get(guild.id).set(message.id, message);
+    }
+
+    async getMessage(guild, messageId) {
+        if (this.message_cache.has(guild.id) && this.message_cache.get(guild.id).has(messageId)) {
+            return this.message_cache.get(guild.id).get(messageId);
+        }
+
+        let channels = guild.channels.filter(c => c.type == "text").array();
+        for (let current of channels) {
+            let target = await current.fetchMessage(messageId);
+            if (target) {
+                this.setMessage(target);
+                return target;
+            }
+        }
+    }
+
+    async get(guild, { command_name, prefix_used, raw_content }) {
         const guildId = guild.id;
         if (!this.trigger_cache.has(guildId)) {
             const rows = await this.database.find({ guildId, enabled: true }, { type: 1, trigger: 1, id: 1, case_sensitive: 1 }).toArray();
@@ -123,28 +361,47 @@ class CCManager {
         }
     }
 
+    async run(message, opts) {
+        this.setMessage(message);
+
+        let response;
+        let error;
+        try {
+            response = await this.cpc.awaitAnswer("run", opts);
+        } catch (err) {
+            error = err;
+        }
+
+        this.message_cache.delete(message.guild.id);
+
+        if (error) throw error;
+        return response;
+    }
+
     async compile(code) {
         const { errors, cst } = await this.cpc.awaitAnswer("compile", { code });
         return { errors, cst };
     }
 
     async getCommandsForWeb(guildId) {
-        const rows = await this.database.find({ guildId }, {
-            id: 1, enabled: 1, type: 1, trigger: 1, case_sensitive: 1, code: 1, disabled_channels: 1, created_at: 1, modified_at: 1, compile_errors: 1, runtime_errors: 1
-        }).toArray();
+        const rows = await this.database.find({ guildId }).toArray();
+        const errors = new Map;
+        for (let row of rows) {
+            const err = await this.errors_db.find({ commandId: row.id, ts: { $gt: row.last_read } }).count().catch(() => 0);
+            errors.set(row.id, err);
+        }
 
-        return rows.map(row => new WebCommand(row));
+        return rows.sort((a, b) => {
+            const bmod = b.modified_at || b.created_at;
+            const amod = a.modified_at || a.created_at;
+            if (bmod < amod) return -1;
+            if (bmod > amod) return 1;
+            return 0;
+        }).map(row => new WebCommand(row, errors.get(row.id)));
     }
 
     async addCommand(guildId, conf = { type: 0, trigger: "", case_sensitive: false, code: "", disabled_channels: [] }) {
         const { type, trigger, case_sensitive, code, disabled_channels } = conf;
-
-        // TODO: outsource these checks to the website instance
-        if (typeof type !== "number" || type < 0 || type >= Object.getOwnPropertyNames(TYPE).length) throw "Trigger type out of range";
-        if (typeof trigger !== "string" || trigger.length === 0 || trigger.length > 128) throw "Trigger out of range";
-        if (typeof case_sensitive !== "boolean") throw "case_sensitive not a boolean";
-        if (typeof code !== "string" || code.length === 0 || code.length > 10000) throw "Code out of range";
-        if (!Array.isArray(disabled_channels) || disabled_channels.some(c => typeof c !== "string")) throw "Disabled channels out of range";
 
         const { errors: compile_errors, cst } = await this.compile(code);
 
@@ -156,7 +413,11 @@ class CCManager {
             id,
             guildId,
             type, trigger, case_sensitive,
-            code, cst: cst ? BSON.serialize(cst) : null, compile_errors, runtime_errors: [],
+            use_trixiescript: true,
+            replies: [],
+            code, cst: cst ? BSON.serialize(cst) : null,
+            compile_errors,
+            last_read: new Date,
             disabled_channels,
             enabled,
             created_at, modified_at: null,
@@ -173,7 +434,7 @@ class CCManager {
             this.trigger_cache.get(guildId).push(trig);
         }
 
-        return new WebCommand(row);
+        return new WebCommand(row, 0);
     }
 
     async hasCommand(guildId, commandId) {
@@ -196,8 +457,8 @@ class CCManager {
         doc.modified_at = new Date;
 
         const row = await this.database.findOneAndUpdate({ guildId, id }, { $set: doc });
-
         doc = Object.assign(row.value, doc);
+        const errs = await this.errors_db.find({ commandId: doc.id, ts: { $gt: doc.last_read } }).count().catch(() => 0);
 
         if (this.trigger_cache.has(guildId)) {
             const trig = this.trigger_cache.get(guildId).find(trig => trig.id === id);
@@ -207,15 +468,15 @@ class CCManager {
             if (trig._command) {
                 doc.cst = new BSON.Binary(doc.cst);
                 trig._command.update(doc);
-                return new WebCommand(trig._command);
+                return new WebCommand(trig._command, errs);
             }
         }
 
-        return new WebCommand(doc);
+        return new WebCommand(doc, errs);
     }
 
     async enableCommand(guildId, id, enabled) {
-        await this.database.updateOne({ guildId, id }, { $set: { enabled } });
+        const { value: row } = await this.database.findOneAndUpdate({ guildId, id }, { $set: { enabled } });
 
         if (this.trigger_cache.has(guildId)) {
             const triggers = this.trigger_cache.get(guildId);
@@ -223,7 +484,6 @@ class CCManager {
                 const index = triggers.findIndex(trig => trig.id === id);
                 if (index >= 0) triggers.splice(index, 1);
             } else if (!triggers.some(trig => trig.id === id)) {
-                const row = await this.database.findOne({ guildId, id }, { type: 1, trigger: 1, id: 1, case_sensitive: 1 });
                 triggers.push(new Trigger(this, row.type, row.trigger, row.case_sensitive, row.id));
             }
         }
@@ -233,12 +493,26 @@ class CCManager {
 
     async removeCommand(guildId, id) {
         await this.database.deleteOne({ guildId, id });
+        await this.errors_db.deleteMany({ guildId, commandId: id });
 
         if (this.trigger_cache.has(guildId)) {
             const triggers = this.trigger_cache.get(guildId);
             const index = triggers.findIndex(trig => trig.id === id);
             if (index >= 0) triggers.splice(index, 1);
         }
+    }
+
+    async getErrors(guildId, id) {
+        const row = await this.database.findOneAndUpdate({ guildId, id }, { $set: { last_read: new Date } });
+        if (!row) return;
+        const errs = await this.errors_db.find({ commandId: id }, { _id: 0 }).toArray();
+        return errs.sort((a, b) => {
+            const bts = b.ts;
+            const ats = a.ts;
+            if (bts < ats) return -1;
+            if (bts > ats) return 1;
+            return 0;
+        });
     }
 }
 

@@ -1,4 +1,5 @@
 const moment = require("moment");
+const Context = require("./Context");
 const { StatementStack, StatementManager } = require("./StatementManager");
 
 const RESERVED_KEYWORDS = [
@@ -33,7 +34,7 @@ function assign(item) {
 }
 
 /** @param {string} str */
-function createStringLiteral(str, interpreter) {
+function createStringLiteral(str, context) {
     str = str
         .substr(1, str.length - 2)
         .replace(/\\\\/g, "\\");
@@ -46,16 +47,16 @@ function createStringLiteral(str, interpreter) {
         .replace(/\\t/g, "\t")
         .replace(/\\b/g, "\x08")
         .replace(/\\f/g, "\f")
-        .replace(/\\[0-7]{1,3}/g, str => {
+        .replace(/\\[0-7]{1,3}/g, (str, offset) => {
             // octal escape sequence
             const charCode = parseInt(str.substr(1), 8);
-            if (charCode > 255) throw interpreter.error("Constant is out of bounds");
+            if (charCode > 255) throw context.error("Constant is out of bounds", context.plus(offset));
             return String.fromCharCode(charCode);
         })
-        .replace(/\\u[0-9a-fA-F]{4}/g, str => {
+        .replace(/\\u[0-9a-fA-F]{4}/g, (str, offset) => {
             // unicode escape sequence
             const charCode = parseInt(str.substr(2), 16);
-            if (charCode > 65535) throw interpreter.error("Constant is out of bounds");
+            if (charCode > 65535) throw context.error("Constant is out of bounds", context.plus(offset));
             return String.fromCharCode(charCode);
         })
         .replace(/\\/g, "");
@@ -118,7 +119,9 @@ class Func extends Item {
         this.ctx = ctx;
     }
 
-    async call(interpreter, proto_parent, args = []) {
+    async call(context, proto_parent, args = []) {
+        const interpreter = context.interpreter;
+
         interpreter.statementStack.pushChange(this.statementStack.clone());
         interpreter.statementStack.push(this.ctx);
 
@@ -128,7 +131,7 @@ class Func extends Item {
         }
         const val = await interpreter.visit(this.ctx);
 
-        interpreter.statementStack.pop();
+        interpreter.statementStack.pop(this.ctx);
         interpreter.statementStack.popChange();
 
         if (val instanceof ReturnInterrupt) {
@@ -154,8 +157,8 @@ class NativeFunc extends Func {
         }
     }
 
-    call(interpreter, proto_parent, args = []) {
-        return this._cb.apply(proto_parent, [interpreter, ...args]);
+    call(context, proto_parent, args = []) {
+        return this._cb.apply(proto_parent, [context, ...args]);
     }
 }
 Func.prototype.proto.toString = new NativeFunc(function toString() {
@@ -324,37 +327,30 @@ class ArrayLiteral extends Literal {
     }
 }
 ArrayLiteral.prototype.proto = Object.create(Literal.prototype.proto);
-ArrayLiteral.prototype.proto.toString = new NativeFunc(function toString(interpreter) {
-    return new StringLiteral(this.content.map(elem => {
+ArrayLiteral.prototype.proto.toString = new NativeFunc(async function toString(context) {
+    const str = [];
+    for (let elem of this.content) {
         const func = elem.getProp(new StringLiteral("toString"));
-        if (func instanceof Func) return func.call(interpreter, elem).content;
-        else if (func instanceof NullLiteral) return "[no toString func]";
-        else if (func instanceof Literal) return func;
-        else return "[no toString func]";
-    }).join(", "));
+        if (func instanceof Func) str.push(await func.call(context, elem).content);
+        else if (func instanceof NullLiteral) str.push("[no toString func]");
+        else if (func instanceof Literal) str.push(func);
+        else str.push("[no toString func]");
+    }
+    return new StringLiteral(str.join(", "));
 });
 ArrayLiteral.prototype.proto.size = new NativeFunc(function size() {
     return new NumberLiteral(this.content.length);
 });
 
-async function call(interpreter, func, args) {
+async function call(context, func, args) {
     if (func instanceof Func || func instanceof NativeFunc) {
         // TODO: ???? check if this works
-        return assign(await func.call(interpreter, func, args));
+        return assign(await func.call(context, func, args));
     } else {
-        // throw this.error("Cannot call value of other type than Func", ctx.Arguments);
-        throw this.error("Cannot call value of other type than Func");
+        throw context.error("Cannot call value of other type than Func", { val: func.native }, context.pos);
     }
 }
 
-ArrayLiteral.prototype.proto.every = new NativeFunc(async function (_, func) {
-    for (let i = 0; i < this.content.length; i++) {
-        const val = await call(_, func, [this.content[i], i]);
-        if (!val.content)
-            return new BooleanLiteral(false);
-    }
-    return new BooleanLiteral(true);
-});
 ArrayLiteral.prototype.proto.concat = new NativeFunc(function concat(_, ...arrs) {
     return new ArrayLiteral(this.content.concat(...arrs.map(a => a.content)));
 });
@@ -362,15 +358,15 @@ ArrayLiteral.prototype.proto.fill = new NativeFunc(async function (_, val) {
     this.content.fill(val);
     return this;
 });
-ArrayLiteral.prototype.proto.filter = new NativeFunc(async function (_, func) {
+ArrayLiteral.prototype.proto.filter = new NativeFunc(async function (context, func) {
     const newArr = [];
     for (let i = 0; i < this.content.length; i++) {
-        const val = await call(_, func, [this.content[i], i]);
+        const val = await call(new Context(context.interpreter, context.args[0]), func, [this.content[i], new NumberLiteral(i)]);
         if (val.content) newArr.push(this.content[i]);
     }
     return new ArrayLiteral(newArr);
 });
-ArrayLiteral.prototype.proto.find = new NativeFunc(async function (_, property, value) {
+ArrayLiteral.prototype.proto.find = new NativeFunc(async function (context, property, value) {
     if (property && value) {
         value = value.content;
         for (let i = 0; i < this.content.length; i++) {
@@ -379,7 +375,7 @@ ArrayLiteral.prototype.proto.find = new NativeFunc(async function (_, property, 
         }
     } else {
         for (let i = 0; i < this.content.length; i++) {
-            const val = await call(_, property, [this.content[i], i]);
+            const val = await call(context, property, [this.content[i], new NumberLiteral(i)]);
             if (val.content) return this.content[i];
         }
     }
@@ -392,24 +388,24 @@ ArrayLiteral.prototype.proto.includes = new NativeFunc(async function (_, value)
     }
     return new BooleanLiteral(false);
 });
-ArrayLiteral.prototype.proto.join = new NativeFunc(async function (_, seperator = new StringLiteral("")) {
-    seperator = await seperator.getProp(new StringLiteral("toString")).call(_, seperator);
+ArrayLiteral.prototype.proto.join = new NativeFunc(async function (context, seperator = new StringLiteral("")) {
+    seperator = await seperator.getProp(new StringLiteral("toString")).call(new Context(context.interpreter, context.args[0]), seperator);
     seperator = seperator.content || "";
     let str = "";
     let i = 0;
 
     for (let item of this.content) {
         if (i > 0) str += seperator;
-        str += (await item.getProp(new StringLiteral("toString")).call(_, item)).content || "";
+        str += (await item.getProp(new StringLiteral("toString")).call(context, item)).content || "";
         i++;
     }
     
     return new StringLiteral(str);
 });
-ArrayLiteral.prototype.proto.map = new NativeFunc(async function (_, func) {
+ArrayLiteral.prototype.proto.map = new NativeFunc(async function (context, func) {
     const newArr = [];
     for (let i = 0; i < this.content.length; i++) {
-        newArr.push(await call(_, func, [this.content[i], i]));
+        newArr.push(await call(new Context(context.interpreter, context.args[0]), func, [this.content[i], new NumberLiteral(i)]));
     }
     return new ArrayLiteral(newArr);
 });
@@ -446,9 +442,9 @@ ArrayLiteral.prototype.proto.slice = new NativeFunc(async function (_, first, le
     if (length) args.push(length.content);
     return new ArrayLiteral(this.content.slice(...args));
 });
-ArrayLiteral.prototype.proto.every = new NativeFunc(async function (_, func) {
+ArrayLiteral.prototype.proto.every = new NativeFunc(async function (context, func) {
     for (let i = 0; i < this.content.length; i++) {
-        const val = await call(_, func, [this.content[i], i]);
+        const val = await call(new Context(context.interpreter, context.args[0]), func, [this.content[i], new NumberLiteral(i)]);
         if (val.content)
             return new BooleanLiteral(true);
     }
@@ -474,34 +470,32 @@ ArrayLiteral.prototype.proto.unshift = new NativeFunc(function (_, ...items) {
     this.content.unshift(...items);
     return new NumberLiteral(this.content.length);
 });
-ArrayLiteral.prototype.proto.joinFrom = new NativeFunc(async function (_, from, seperator = new StringLiteral(" ")) {
-    seperator = await seperator.getProp(new StringLiteral("toString")).call(_, seperator);
+ArrayLiteral.prototype.proto.joinFrom = new NativeFunc(async function (context, from, seperator = new StringLiteral(" ")) {
+    seperator = await seperator.getProp(new StringLiteral("toString")).call(new Context(context.interpreter, context.args[1]), seperator);
     seperator = seperator.content || "";
     let str = "";
 
     for (let i = from.content; i < this.content.length; i++) {
         let item = this.content[i];
         if (i > from.content) str += seperator;
-        str += (await item.getProp(new StringLiteral("toString")).call(_, item)).content || "";
+        str += (await item.getProp(new StringLiteral("toString")).call(context, item)).content || "";
     }
 
     return new StringLiteral(str);
 });
-ArrayLiteral.prototype.proto.joinTo = new NativeFunc(async function (_, to, seperator = new StringLiteral(" ")) {
-    seperator = await seperator.getProp(new StringLiteral("toString")).call(_, seperator);
+ArrayLiteral.prototype.proto.joinTo = new NativeFunc(async function (context, to, seperator = new StringLiteral(" ")) {
+    seperator = await seperator.getProp(new StringLiteral("toString")).call(new Context(context.interpreter, context.args[1]), seperator);
     seperator = seperator.content || "";
     let str = "";
 
     for (let i = 0; i < to.content >= 0 ? to.content : this.content.length + to.content; i++) {
         let item = this.content[i];
         if (i > 0) str += seperator;
-        str += (await item.getProp(new StringLiteral("toString")).call(_, item)).content || "";
+        str += (await item.getProp(new StringLiteral("toString")).call(context, item)).content || "";
     }
 
     return new StringLiteral(str);
 });
-
-// Array.prototype.
 
 class ObjectLiteral extends Literal {
     constructor(content = {}) {
@@ -730,15 +724,15 @@ TimeLiteral.prototype.proto.humanize = new NativeFunc(function () {
 TimeLiteral.prototype.proto.fromNow = new NativeFunc(function (_, postfix) {
     return new StringLiteral(this.time.fromNow(!!postfix));
 });
-TimeLiteral.prototype.proto.from = new NativeFunc(function (_, time, postfix) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.from = new NativeFunc(function (context, time, postfix) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     return new StringLiteral(this.time.from(time.time, !!postfix));
 });
 TimeLiteral.prototype.proto.toNow = new NativeFunc(function (_, postfix) {
     return new StringLiteral(this.time.toNow(!!postfix));
 });
-TimeLiteral.prototype.proto.to = new NativeFunc(function (_, time, postfix) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.to = new NativeFunc(function (context, time, postfix) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     return new StringLiteral(this.time.to(time.time, !!postfix));
 });
 
@@ -748,41 +742,41 @@ TimeLiteral.prototype.proto.toISOString = new NativeFunc(function () {
 
 // DIFFERENCE
 
-TimeLiteral.prototype.proto.diff = new NativeFunc(function (_, time) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.diff = new NativeFunc(function (context, time) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     return new DurationLiteral(moment.duration(this.time.diff(time.time)));
 });
 
 // QUERY
 
-TimeLiteral.prototype.proto.isBefore = new NativeFunc(function (_, time, scope) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.isBefore = new NativeFunc(function (context, time, scope) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isBefore(time.time, scope.content));
     return new BooleanLiteral(this.time.isBefore(time.time));
 });
-TimeLiteral.prototype.proto.isSame = new NativeFunc(function (_, time, scope) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.isSame = new NativeFunc(function (context, time, scope) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isSame(time.time, scope.content));
     return new BooleanLiteral(this.time.isSame(time.time));
 });
-TimeLiteral.prototype.proto.isAfter = new NativeFunc(function (_, time, scope) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.isAfter = new NativeFunc(function (context, time, scope) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isAfter(time.time, scope.content));
     return new BooleanLiteral(this.time.isAfter(time.time));
 });
-TimeLiteral.prototype.proto.isSameOrBefore = new NativeFunc(function (_, time, scope) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.isSameOrBefore = new NativeFunc(function (context, time, scope) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isSameOrBefore(time.time, scope.content));
     return new BooleanLiteral(this.time.isSameOrBefore(time.time));
 });
-TimeLiteral.prototype.proto.isSameOrAfter = new NativeFunc(function (_, time, scope) {
-    if (!(time instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
+TimeLiteral.prototype.proto.isSameOrAfter = new NativeFunc(function (context, time, scope) {
+    if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isSameOrAfter(time.time, scope.content));
     return new BooleanLiteral(this.time.isSameOrAfter(time.time));
 });
-TimeLiteral.prototype.proto.isBetween = new NativeFunc(function (_, after, before, scope, inclusivity) {
-    if (!(after instanceof TimeLiteral)) throw _.error("First parameter should be a Time object");
-    if (!(before instanceof TimeLiteral)) throw _.error("Second parameter should be a Time object");
+TimeLiteral.prototype.proto.isBetween = new NativeFunc(function (context, after, before, scope, inclusivity) {
+    if (!(after instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
+    if (!(before instanceof TimeLiteral)) throw context.error("Second parameter should be a Time object", context.args[1]);
     if (scope instanceof StringLiteral) {
         if (inclusivity instanceof StringLiteral) return new BooleanLiteral(this.time.isBetween(after.time, before.time, scope.content, inclusivity.content));
         return new BooleanLiteral(this.time.isBetween(after.time, before.time, scope.content));
@@ -843,7 +837,7 @@ class DurationLiteral extends NumberLiteral {
 }
 DurationLiteral.prototype.proto = Object.create(NumberLiteral.prototype.proto);
 DurationLiteral.prototype.proto.toString = new NativeFunc(function toString() {
-    return new StringLiteral(this.duration.toString());
+    return new StringLiteral(this.duration.humanize(false));
 });
 
 DurationLiteral.prototype.proto.humanize = new NativeFunc(function (_, suffix) {

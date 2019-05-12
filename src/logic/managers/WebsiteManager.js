@@ -153,11 +153,7 @@ class WebsiteManager {
 
             return {
                 prefix: config.prefix,
-                commands: commands.sort((a, b) => {
-                    if (a.modified_at < b.modified_at) return -1;
-                    if (a.modified_at > b.modified_at) return 1;
-                    return 0;
-                }),
+                commands: commands,
                 channels: getChannels(guildId),
                 success: true
             };
@@ -231,6 +227,24 @@ class WebsiteManager {
                 };
             } catch (err) {
                 return { success: false };
+            }
+        });
+
+        ipc.answer("cc:geterrors", async ({ guildId, commandId }) => {
+            if (!this.client.guilds.has(guildId))
+                return { errors: [], success: false };
+
+            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+                return { errors: [], success: false };
+
+            try {
+                const errors = await this.REGISTRY.cc.getErrors(guildId, commandId);
+                return {
+                    errors: errors || [],
+                    success: errors ? true : false
+                };
+            } catch (err) {
+                return { errors: [], success: false };
             }
         });
 

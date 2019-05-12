@@ -3,6 +3,8 @@ const { parseHumanTime } = require("../../../../modules/util/time");
 const { splitArgs } = require("../../../../modules/util/string");
 const { tokens: { WhiteSpace, LineTerminator, MultiLineComment, SingleLineComment } } = require("../lexer/tokens");
 const parser = require("../parser");
+const Context = require("./Context");
+const { CallStack, CallTrace, Position } = require("./CallStack");
 const { RuntimeError } = require("../errors");
 const {
     toBool,
@@ -33,6 +35,9 @@ const {
 
     Message,
     Guild,
+    GuildMember,
+    Channel,
+    Role,
 
     convert
 } = require("./classes");
@@ -40,11 +45,9 @@ const {
 const GLOBALS = require("./globals");
 
 // ----------------- Interpreter -----------------
-// Obtains the default CstVisitor constructor to extend.
-const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 
 // All our semantics go into the visitor, completly separated from the grammar.
-class CCInterpreter extends BaseCstVisitor {
+class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
     constructor(commandId, guildId) {
         super();
         // This helper will detect any missing or redundant methods on this visitor
@@ -59,26 +62,36 @@ class CCInterpreter extends BaseCstVisitor {
         this.varsPerStatement = new VariableStack;
 
         this.statementStack = new StatementManager;
+
+        this.callStack = new CallStack;
     }
 
     /**
-     * @param {string} msg 
-     * @param {{ startOffset: number, startLine: number, startColumn: number}} item
+     * @param {string} msg
+     * @param {{ [key: string]: any }} vals
+     * @param {{ startOffset: number, startLine: number, startColumn: number }} item
      * @returns {RuntimeError}
      */
-    error(msg, item) {
-        if (item) {
-            if (item instanceof Array) item = item[0];
-            while (item.children) item = item.children[Object.getOwnPropertyNames(item.children)[0]][0];
-            return new RuntimeError(msg, item.startOffset, item.startLine, item.startColumn, this.text_input);
+    error(msg, vals, item) {
+        if (arguments.length === 1) {
+            item = { startOffset: null, startLine: null, startColumn: null };
+            vals = {};
+        } else if (arguments.length === 2) {
+            item = vals;
+            vals = {};
         }
-        return new RuntimeError(msg);
+        if (!(item instanceof Position)) {
+            item = Position.fromCST(item);
+        }
+        this.callStack.push(new CallTrace(item));
+        return new RuntimeError(this.text_input, msg, vals, this.callStack.getStackTrace());
     }
 
     cleanup() {
         this.text_input = null;
         this.varsPerStatement.clear();
         this.statementStack.clear();
+        this.callStack.clear();
     }
 
     ///////// Main functions //////////
@@ -145,10 +158,10 @@ class CCInterpreter extends BaseCstVisitor {
                     return new BooleanLiteral(true);
                 case "FalseTok":
                     return new BooleanLiteral(false);
-                // eslint-disable-next-line no-case-declarations
-                case "DecimalLiteral":
+                case "DecimalLiteral": {
                     const [num, exp] = image.split(/e/i);
                     return new NumberLiteral(parseFloat(num) * (exp ? Math.pow(10, parseInt(exp)) : 1));
+                }
                 case "HexLiteral":
                     return new NumberLiteral(parseInt(image.substr(2), 16));
                 case "OctalLiteral":
@@ -156,7 +169,7 @@ class CCInterpreter extends BaseCstVisitor {
                 case "BinaryLiteral":
                     return new NumberLiteral(parseInt(image.substr(2), 2));
                 case "StringLiteral":
-                    return createStringLiteral(image, this);
+                    return createStringLiteral(image, new Context(this, Literal));
             }
         } else if (ctx.ArrayLiteral) {
             return await this.visit(ctx.ArrayLiteral);
@@ -225,7 +238,7 @@ class CCInterpreter extends BaseCstVisitor {
         const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
         const func = new Func(name, args, this.statementStack.clone(), ctx.FunctionBody[0]);
 
-        this.statementStack.pop();
+        this.statementStack.pop(ctx);
 
         return [name, func];
     }
@@ -255,8 +268,8 @@ class CCInterpreter extends BaseCstVisitor {
     async MemberExpression$square(ctx, { val }) {
         const key = assign(await this.visit(ctx.$key));
         if (val instanceof NullLiteral) {
-            const name = await key.getProp(new StringLiteral("toString")).call(this, key);
-            throw this.error("Cannot read property '" + name ? name.content : "[no toString func]" + "' of null", ctx.$key);
+            const name = await key.getProp(new StringLiteral("toString")).call(new Context(this, ctx.$key), key);
+            throw this.error("Cannot read property '" + (name ? name.content : "[no toString func]") + "' of null", ctx.$key);
         } else if (val instanceof Member) {
             val = new Member(val, key, val.value.getProp(key));
         } else {
@@ -268,7 +281,7 @@ class CCInterpreter extends BaseCstVisitor {
     async MemberExpression$dot(ctx, { val }) {
         const key = new StringLiteral(ctx.$key[0].image);
         if (val instanceof NullLiteral) {
-            const name = await key.getProp(new StringLiteral("toString")).call(this, key);
+            const name = await key.getProp(new StringLiteral("toString")).call(new Context(this, ctx.$key), key);
             throw this.error("Cannot read property '" + (name ? name.content : "[no toString func]") + "' of null", ctx.$key);
         } else if(val instanceof Member) {
             val = new Member(val, key, val.value.getProp(key));
@@ -287,18 +300,29 @@ class CCInterpreter extends BaseCstVisitor {
         }
         if (func instanceof Func || func instanceof NativeFunc) {
             // TODO: ???? check if this works
-            return assign(await func.call(this, val, args));
+            this.callStack.push(new CallTrace(Position.fromCST(ctx.Arguments)));
+            this.callStack.pushFunc(func.funcName);
+            const retrn = assign(await func.call(new Context(this, ctx.Arguments, args.pos), val, args.args));
+            this.callStack.pop();
+            this.callStack.popFunc();
+            return retrn;
         } else {
-            throw this.error("Cannot call value of other type than Func", ctx.Arguments);
+            throw this.error("Cannot call value of other type than Func", { val: func.native }, ctx.Arguments);
         }
     }
 
     async Arguments(ctx) {
         const args = [];
+        const pos = [];
         for (let arg of (ctx.$args || [])) {
-            args.push(assign(await this.visit(arg)));
+            const val = assign(await this.visit(arg));
+            args.push(val);
+            pos.push(arg);
         }
-        return args;
+        return {
+            args,
+            pos
+        };
     }
 
     async UnaryExpression(ctx) {
@@ -318,50 +342,55 @@ class CCInterpreter extends BaseCstVisitor {
     }
 
     async UpdateExpression(ctx) {
-        if (!ctx.$right) return await this.visit(ctx.$left);
+        if (ctx.$left && !ctx.$postfix)  return await this.visit(ctx.$left);
 
-        const right = await this.visit(ctx.$right);
-        if (right instanceof Member) {
-            if (ctx.$prefix) {
+        if (ctx.$right && ctx.$prefix) {
+            const right = await this.visit(ctx.$right);
+            if (right instanceof Member) {
                 switch (ctx.$prefix[0].image) {
                     case "++":
                         return right.update(new NumberLiteral(right.value.content + 1));
                     case "--":
                         return right.update(new NumberLiteral(right.value.content - 1));
                 }
-            } else {
-                const oldval = right.value;
+            } else if (right instanceof Variable) {
+                switch (ctx.$prefix[0].image) {
+                    case "++":
+                        return right.update(new NumberLiteral(right.value.content + 1));
+                    case "--":
+                        return right.update(new NumberLiteral(right.value.content - 1));
+                }
+            } else if (right instanceof Func) {
+                throw this.error("Cannot increment/decrement a func", ctx.$prefix);
+            }
+        } else if (ctx.$left && ctx.$postfix) {
+            const left = await this.visit(ctx.$left);
+            if (left instanceof Member) {
+                const oldval = left.value;
                 switch (ctx.$postfix[0].image) {
                     case "++":
-                        right.update(new NumberLiteral(right.value.content + 1));
+                        left.update(new NumberLiteral(left.value.content + 1));
                         break;
                     case "--":
-                        right.update(new NumberLiteral(right.value.content - 1));
+                        left.update(new NumberLiteral(left.value.content - 1));
                 }
                 return oldval;
-            }
-        } else if (right instanceof Variable) {
-            if (ctx.$prefix) {
-                switch (ctx.$prefix[0].image) {
+            } else if (left instanceof Variable) {
+                const oldval = left.value;
+                switch (ctx.$postfix[0].image) {
                     case "++":
-                        return right.update(new NumberLiteral(right.value.content + 1));
-                    case "--":
-                        return right.update(new NumberLiteral(right.value.content - 1));
-                }
-            } else {
-                const oldval = right.value;
-                switch (ctx.$prefix[0].image) {
-                    case "++":
-                        right.update(new NumberLiteral(right.value.content + 1));
+                        left.update(new NumberLiteral(left.value.content + 1));
                         break;
                     case "--":
-                        right.update(new NumberLiteral(right.value.content - 1));
+                        left.update(new NumberLiteral(left.value.content - 1));
                 }
                 return oldval;
+            } else if (left instanceof Func) {
+                throw this.error("Cannot increment/decrement a func", ctx.$postfix);
             }
-        } else {
-            throw this.error("Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)", ctx.$prefix);
         }
+
+        throw this.error("Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)", ctx.$postfix || ctx.$prefix);
     }
 
     async MultiExpression(ctx) {
@@ -408,8 +437,8 @@ class CCInterpreter extends BaseCstVisitor {
                     const leftprop = left.getProp(new StringLiteral("toString"));
                     const rightprop = right.getProp(new StringLiteral("toString"));
                     return new StringLiteral(
-                        (leftprop ? (await leftprop.call(this, left).content) : "[no toString func]") +
-                        (rightprop ? (await rightprop.call(this, right).content) : "[no toString func]")
+                        (leftprop ? (await leftprop.call(new Context(this, ctx.$left), left).content) : "[no toString func]") +
+                        (rightprop ? (await rightprop.call(new Context(this, ctx.$right), right).content) : "[no toString func]")
                     );
                 }
             case "-":
@@ -531,8 +560,8 @@ class CCInterpreter extends BaseCstVisitor {
                     const leftprop = left.getProp(new StringLiteral("toString"));
                     const rightprop = right.getProp(new StringLiteral("toString"));
                     return variable.update(new StringLiteral(
-                        (leftprop ? (await leftprop.call(this, left).content) : "[no toString func]") +
-                        (rightprop ? (await rightprop.call(this, right).content) : "[no toString func]")
+                        (leftprop ? (await leftprop.call(new Context(this, ctx.$left), left).content) : "[no toString func]") +
+                        (rightprop ? (await rightprop.call(new Context(this, ctx.$right), right).content) : "[no toString func]")
                     ));
                 case "-=":
                     if ((left instanceof TimeLiteral || left instanceof DurationLiteral) &&
@@ -555,6 +584,8 @@ class CCInterpreter extends BaseCstVisitor {
                 case "^=":
                     return variable.update(new NumberLiteral(left.content ** right.content));
             }
+        } else if (variable instanceof Func) {
+            throw this.error("Cannot assign to a func", ctx.$op);
         } else {
             throw this.error("Cannot assign to a static literal", ctx.$op);
         }
@@ -585,14 +616,10 @@ class CCInterpreter extends BaseCstVisitor {
             if (isReturn(value)) break;
         }
 
-        this.statementStack.pop();
+        this.statementStack.pop(ctx);
         return value;
     }
 
-    async VariableStatement(ctx) {
-        // TODO: ALL OF THIS (currently assignment expressions are treated as variable statements)
-        await this.visit(ctx.VariableDeclaration);
-    }
 
     async VariableDeclaration(ctx) {
         // TODO: ALL OF THIS (currently assignment expressions are treated as variable statements)
@@ -622,14 +649,14 @@ class CCInterpreter extends BaseCstVisitor {
         if (bool) {
             this.statementStack.push(ctx.$then[0]);
             await this.visit(ctx.$then);
-            this.statementStack.pop();
+            this.statementStack.pop(ctx.$then[0]);
         } else if (ctx.$else) {
             this.statementStack.push(ctx.$else[0]);
             await this.visit(ctx.$else);
-            this.statementStack.pop();
+            this.statementStack.pop(ctx.$then[0]);
         }
 
-        this.statementStack.pop();
+        this.statementStack.pop(ctx);
     }
 
     async WhileIterationStatement(ctx) {
@@ -637,7 +664,7 @@ class CCInterpreter extends BaseCstVisitor {
         const callBody = async () => {
             this.statementStack.push(ctx.$body[0]);
             const val = await this.visit(ctx.$body);
-            this.statementStack.pop();
+            this.statementStack.pop(ctx.$body[0]);
             return val;
         };
 
@@ -654,14 +681,14 @@ class CCInterpreter extends BaseCstVisitor {
             throw this.error("While loop is iterating more than 100000", ctx.WhileTok);
         }
 
-        this.statementStack.pop();
+        this.statementStack.pop(ctx);
     }
 
     async ForIterationStatement(ctx) {
         const callBody = async () => {
             this.statementStack.push(ctx.$body[0]);
             const val = await this.visit(ctx.$body);
-            this.statementStack.pop();
+            this.statementStack.pop(ctx.$body[0]);
             return val;
         };
 
@@ -687,7 +714,7 @@ class CCInterpreter extends BaseCstVisitor {
                 throw this.error("For loop is iterating more than 100000", ctx.ForTok);
             }
 
-            this.statementStack.pop();
+            this.statementStack.pop(ctx);
         } else {
             this.statementStack.push(ctx);
 
@@ -720,7 +747,7 @@ class CCInterpreter extends BaseCstVisitor {
                     if (isBreak(await callBody())) break;
                 }
             } else if (value instanceof ObjectLiteral) {
-                const arr = await value.getProp(new StringLiteral("keys")).call(this, value).content;
+                const arr = await value.getProp(new StringLiteral("keys")).call(new Context(this, ctx.$value), value).content;
                 for (let elem of arr) {
                     variable.update(elem);
                     if (isBreak(await callBody())) break;
@@ -735,7 +762,7 @@ class CCInterpreter extends BaseCstVisitor {
                 throw this.error("Cannot iterate over unknown type", ctx.$value);
             }
 
-            this.statementStack.pop();
+            this.statementStack.pop(ctx);
         }
     }
 
@@ -764,13 +791,13 @@ class CCInterpreter extends BaseCstVisitor {
         const value = assign(await this.visit(ctx.$value));
 
         if (!(value instanceof NumberLiteral)) {
-            throw this.error("Sleeping duration must be a number", ctx.$value);
+            throw this.error("Sleeping duration must be a number", { val: value.native }, ctx.$value);
         }
         if (value.content > Number.MAX_SAFE_INTEGER) {
             throw this.error("Cannot sleep for Infinity", ctx.$value);
         }
         if (value.content < 0) {
-            throw this.error("Sleeping duration must be a positive number", ctx.$value);
+            throw this.error("Sleeping duration must be a positive number", { val: value.native }, ctx.$value);
         }
 
         await timeout(value.content);
@@ -824,16 +851,17 @@ class CCInterpreter extends BaseCstVisitor {
     }
 
     /**
-     * 
      * @param {{}} ctx 
      * @param {{ args }} message 
      */
-    async Program(ctx, { msg, args, guild }) {
+    async Program(ctx, { msg, args, guild, content, command_name }) {
         this.statementStack.pushChange(new StatementStack([]));
         this.statementStack.push(ctx);
 
         try {
             if (ctx.StatementList) {
+                const $command_name = command_name ? new StringLiteral(command_name) : new NullLiteral;
+
                 const $msg = await Message(this, msg);
                 const $text = $msg.content.text;
                 const $user = $msg.content.member;
@@ -842,12 +870,13 @@ class CCInterpreter extends BaseCstVisitor {
                 const $mentions = $msg.content.mentions;
 
                 const $args = new ArrayLiteral(args.map(s => new StringLiteral(s)));
+                const $content = new StringLiteral(content);
 
                 /*
                  * allowed types:
-                 * String, Number, Boolean, Duration, Time, Channel, Member, Role
+                 * String, Number, Boolean, Duration, Channel, Member, Role
                  */
-                const parseArgs = new NativeFunc("parseArgs", function (_, ...args) {
+                const parseArgs = new NativeFunc("parseArgs", async (_, ...args) => {
                     if (args.length === 0) return $args;
                     else if (args.length === 1 && args[0] instanceof NumberLiteral) {
                         const split = splitArgs(msg.text, args[0].content);
@@ -855,68 +884,100 @@ class CCInterpreter extends BaseCstVisitor {
                     }
                     else if (args.every(arg => arg instanceof NativeFunc)) {
                         const arr = [];
-                        const numberReg = /[0-9]+(?:\.[0-9]+)/;
-                        const whitespaceReg = /(?:(?:[\t\f\v\u0020\u2028\u2029\u00A0\uFEFF])|(?:\r?\n))+/;
+                        const numberReg = /[0-9]+(?:\.[0-9]+)?/;
+                        const whitespaceReg = /^(?:(?:[\t\f\v\u0020\u2028\u2029\u00A0\uFEFF])|(?:\r?\n))+/;
                         const strReg = /[^\s]+/;
+                        const memberReg = /(?:<@!?[0-9]+>|[0-9]+)/;
+                        const channelReg = /(?:<#[0-9]+>|[0-9]+)/;
+                        const roleReg = /(?:<@&[0-9]+>|[0-9]+)/;
                         const boolReg = /\b(true|false|yes|no)\b/i;
                         const durReg = /(?:(?:[0-9]+\.)?[0-9]+[smhdw])+/i;
-                        let str = msg.text;
+                        let str = content;
 
                         let i = 0;
                         for (let type of args) {
                             let match = str.match(whitespaceReg);
                             if (match) str = str.slice(match[0].length);
+
+                            if (str === "") break;
                             
+                            let item = new NullLiteral;
                             switch (type) {
                                 case GLOBALS.Boolean:
                                     match = str.match(boolReg);
                                     if (match) {
-                                        if (/true|yes/i.test(match[0])) arr.push(new BooleanLiteral(true));
-                                        else arr.push(new BooleanLiteral(false));
+                                        if (/true|yes/i.test(match[0])) item = new BooleanLiteral(true);
+                                        else item = new BooleanLiteral(false);
                                         str = str.slice(match[0].length);
                                     }
                                     break;
                                 case GLOBALS.Number:
                                     match = str.match(numberReg);
                                     if (match) {
-                                        arr.push(new NumberLiteral(parseFloat(match[0])));
+                                        item = new NumberLiteral(parseFloat(match[0]));
                                         str = str.slice(match[0].length);
                                     }
                                     break;
                                 case GLOBALS.Duration:
                                     match = str.match(durReg);
                                     if (match) {
-                                        arr.push(new DurationLiteral(parseHumanTime(match[0])));
+                                        item = new DurationLiteral(parseHumanTime(match[0]));
+                                        str = str.slice(match[0].length);
+                                    }
+                                    break;
+                                case GLOBALS.Member:
+                                    match = str.match(memberReg);
+                                    if (match) {
+                                        item = await GuildMember(this, new StringLiteral(match[0]));
+                                        str = str.slice(match[0].length);
+                                    }
+                                    break;
+                                case GLOBALS.Role:
+                                    match = str.match(roleReg);
+                                    if (match) {
+                                        item = await Role(this, new StringLiteral(match[1]));
+                                        str = str.slice(match[0].length);
+                                    }
+                                    break;
+                                case GLOBALS.Channel:
+                                    match = str.match(channelReg);
+                                    if (match) {
+                                        item = await Channel(this, new StringLiteral(match[0]));
                                         str = str.slice(match[0].length);
                                     }
                                     break;
                                 case GLOBALS.String:
                                     if (i === args.length - 1) {
-                                        arr.push(new StringLiteral(str));
+                                        item = new StringLiteral(str);
                                         break;
                                     }
                                     match = str.match(strReg);
                                     if (match) {
-                                        arr.push(new StringLiteral(match[0]));
+                                        item = new StringLiteral(match[0]);
                                         str = str.slice(match[0].length);
                                     }
                                     break;
                             }
 
+                            arr.push(item);
+
                             i++;
                         }
+
+                        return new ArrayLiteral(arr);
 
                     } else {
                         return new NullLiteral;
                     }
                 });
 
-                const $react = new NativeFunc("$react", async function (interpreter, ...args) {
-                    return $msg.content.react.call(interpreter, $msg, args);
+                const $react = new NativeFunc("$react", async function (context, ...args) {
+                    return $msg.content.react.call(context, $msg, args);
                 });
 
                 const $guild = await Guild(this, guild);
 
+                this.varsPerStatement.createVariable("$command_name", ctx, this).update($command_name);
                 this.varsPerStatement.createVariable("$msg", ctx, this).update($msg);
                 this.varsPerStatement.createVariable("$text", ctx, this).update($text);
                 this.varsPerStatement.createVariable("$user", ctx, this).update($user);
@@ -924,6 +985,7 @@ class CCInterpreter extends BaseCstVisitor {
                 this.varsPerStatement.createVariable("$channel", ctx, this).update($channel);
                 this.varsPerStatement.createVariable("$mentions", ctx, this).update($mentions);
                 this.varsPerStatement.createVariable("$args", ctx, this).update($args);
+                this.varsPerStatement.createVariable("$content", ctx, this).update($content);
                 this.varsPerStatement.createVariable("$react", ctx, this).update($react);
                 this.varsPerStatement.createVariable("$guild", ctx, this).update($guild);
 
@@ -932,12 +994,12 @@ class CCInterpreter extends BaseCstVisitor {
                 await this.visit(ctx.StatementList);
             }
 
-            this.statementStack.pop();
+            this.statementStack.pop(ctx);
             this.statementStack.popChange();
 
             this.cleanup();
         } catch (reply) {
-            this.statementStack.pop();
+            this.statementStack.pop(ctx);
             this.statementStack.popChange();
 
             this.cleanup();

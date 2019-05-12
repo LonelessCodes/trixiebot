@@ -54,7 +54,7 @@ class Logger extends Function {
     }
 
     debug(file, ...messages) {
-        console.debug(getTimeString(), chalk.cyan.bold(file), ...messages);
+        console.debug(getTimeString(), chalk.cyan.bold(file + ":"), ...messages);
     }
 }
 

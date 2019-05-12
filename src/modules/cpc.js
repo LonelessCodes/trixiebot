@@ -6,9 +6,12 @@ class CPC extends EventEmitter {
     constructor(child) {
         super();
 
+        this.setMaxListeners(0);
+
         this._listeners = {};
 
         this.child = child;
+        this.child.setMaxListeners(0);
 
         this.child.on("message", this.onMessage.bind(this));
     }

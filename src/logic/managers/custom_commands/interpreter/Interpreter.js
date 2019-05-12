@@ -299,7 +299,6 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
             val = val.parent;
         }
         if (func instanceof Func || func instanceof NativeFunc) {
-            // TODO: ???? check if this works
             this.callStack.push(new CallTrace(Position.fromCST(ctx.Arguments)));
             this.callStack.pushFunc(func.funcName);
             const retrn = assign(await func.call(new Context(this, ctx.Arguments, args.pos), val, args.args));
@@ -622,8 +621,6 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
 
     async VariableDeclaration(ctx) {
-        // TODO: ALL OF THIS (currently assignment expressions are treated as variable statements)
-
         const name = ctx.Identifier[0].image;
         const variable =
             this.varsPerStatement.getVariable(name, this) ||

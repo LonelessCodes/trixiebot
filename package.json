@@ -8,6 +8,7 @@
     "dev": "NODE_ENV=development node index.js",
     "setup": "chmod +x install.sh && ./install.sh",
     "release": "standard-version",
+    "releasemajor": "standard-version --release-as major",
     "releaseminor": "standard-version --release-as minor",
     "releasepatch": "standard-version --release-as patch"
   },
@@ -24,13 +25,16 @@
   "license": "MIT",
   "dependencies": {
     "asciify-image": "^0.1.3",
+    "bson": "^4.0.2",
     "cat-ascii-faces": "^2.0.0",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
+    "chevrotain": "^4.2.0",
     "cron": "^1.4.1",
     "discord.js": "^11.4.2",
     "diskusage": "^1.0.0",
     "dog-ascii-faces": "^2.1.3",
+    "emoji-name-map": "^1.2.8",
     "figlet": "^1.2.1",
     "file-type": "^10.7.1",
     "flip-text": "^1.1.0",
@@ -48,6 +52,7 @@
     "node-gettext": "^2.0.0",
     "node-ipc": "^9.1.1",
     "node-opus": "^0.2.9",
+    "ps-tree": "^1.2.0",
     "random-number-csprng": "^1.0.2",
     "read-chunk": "^3.0.0",
     "request": "^2.88.0",
@@ -64,5 +69,9 @@
     "@types/node-fetch": "^1.6.9",
     "eslint": "^4.19.1",
     "standard-version": "^4.4.0"
+  },
+  "engines": {
+    "node": ">= 10.15.1",
+    "npm": ">= 6.9.0"
   }
 }

@@ -380,18 +380,18 @@
       }
     },
     {
-      "name": "mlpquote",
-      "help": {
-        "description": "Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com",
-        "usage": "\n`!mlpquote` *(alias `!mlpquotes`)*",
-        "category": "My Little Pony"
-      }
-    },
-    {
       "name": "mlp",
       "help": {
         "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
         "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
+        "category": "My Little Pony"
+      }
+    },
+    {
+      "name": "mlpquote",
+      "help": {
+        "description": "Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com",
+        "usage": "\n`!mlpquote` *(alias `!mlpquotes`)*",
         "category": "My Little Pony"
       }
     },
@@ -512,6 +512,14 @@
       }
     },
     {
+      "name": "naughty",
+      "help": {
+        "description": "It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!",
+        "usage": "\n`!naughty` *(alias `!nice`)*",
+        "category": "Analysis"
+      }
+    },
+    {
       "name": "autoban",
       "help": {
         "description": "Autoban allows admins to make sure to keep specific users out of the server, even if they create a new account*\nPatterns use the glob pattern documentation. It is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.\n\n* If in the pattern it's been made sure it would match these new similar accounts",
@@ -574,11 +582,11 @@
       }
     },
     {
-      "name": "mute",
+      "name": "muteword",
       "help": {
         "description": "Mute/Blacklist specific words in this server",
         "permissions": "Manage Messages",
-        "usage": "\n`!mute <phrase>` *(alias `!mute add`)*\n`phrase` - Word or phrase to be muted/blacklisted\n\n`!mute remove <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted\n\n`!mute clear` - Remove all muted words\n\n`!mute list` - list all muted words and phrases",
+        "usage": "\n`!muteword <phrase>` *(alias `!muteword add`)*\n`phrase` - Word or phrase to be muted/blacklisted\n\n`!muteword remove <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted\n\n`!muteword clear` - Remove all muted words\n\n`!muteword list` - list all muted words and phrases",
         "category": "Moderation"
       }
     },
@@ -595,14 +603,6 @@
         "permissions": "Manage Messages",
         "usage": "\n`!timeout <time> <user mention 1> <user mention 2> ...`\n`time` - timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`user mention` - user to timeout. Multiple users possible\n\n`!timeout remove <user mention 1> <user mention 2> ...`\n`user mention` - user to remove timeout from. Multiple users possible\n\n`!timeout clear` - remove all timeouts\n\n`!timeout list` - list all timeouts present at the moment",
         "category": "Moderation"
-      }
-    },
-    {
-      "name": "naughty",
-      "help": {
-        "description": "It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!",
-        "usage": "\n`!naughty` *(alias `!nice`)*",
-        "category": "Analysis"
       }
     },
     {

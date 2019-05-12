@@ -1,6 +1,7 @@
+const moment = require("moment");
 const TimeUnit = require("../TimeUnit");
 
-const names = ["d", "h", "m", "s"];
+const names = ["w", "d", "h", "m", "s"];
 
 function pad(num, size) {
     const s = "00" + num;
@@ -8,11 +9,11 @@ function pad(num, size) {
 }
 
 const multiplier = {
+    "w": TimeUnit.WEEK.toMillis(1),
     "d": TimeUnit.DAY.toMillis(1),
     "h": TimeUnit.HOUR.toMillis(1),
     "m": TimeUnit.MINUTE.toMillis(1),
     "s": TimeUnit.SECOND.toMillis(1),
-    "ms": TimeUnit.MILLISECOND.toMillis(1)
 };
 
 module.exports = new class TimeUtils {
@@ -21,12 +22,13 @@ module.exports = new class TimeUtils {
      * @returns {string}
      */
     toHumanTime(ms) {
-        const d = new Date(ms);
+        const d = moment.duration(ms);
         const arr = [
-            d.getDate() - 1,
-            d.getHours(),
-            d.getMinutes(),
-            d.getSeconds()
+            d.weeks(),
+            d.days(),
+            d.hours(),
+            d.minutes(),
+            d.seconds()
         ];
         for (let i = 0; i < arr.length; i++) {
             if (arr[i]) // 0 is short for false, so if not 0, go on
@@ -43,7 +45,7 @@ module.exports = new class TimeUtils {
         let ms = 0;
         let number = "0";
 
-        const matches = string.match(/[0-9.]+|\w+/g);
+        const matches = string.match(/[0-9.]+|[dhms]/g);
         for (const match of matches) {
             if (/[0-9.]+/.test(match)) {
                 number += match;

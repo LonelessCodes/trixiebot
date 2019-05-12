@@ -60,7 +60,7 @@ class CustomCommand extends BaseCommand {
             this.update({
                 compile_errors: errors,
                 cst: null,
-                _cst: null 
+                _cst: null
             });
             await this.manager.database.updateOne({ id: this.id }, { $set: { compile_errors: errors, cst: null } });
             throw errors;
@@ -110,7 +110,7 @@ class CustomCommand extends BaseCommand {
             await this.manager.errors_db.insertOne(error);
             return;
         }
-        
+
         if (embed || cont) {
             await message.channel.send(embed ? new RichEmbed(embed) : cont.toString());
         }

@@ -150,6 +150,9 @@ class CCManager {
             const m = await this.getMessage(guild, messageId);
             if (!m) return;
 
+            if (m.author.id !== this.client.user.id || !m.channel.memberPermissions(guild.me).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES))
+                return;
+
             await m.delete();
         });
 
@@ -159,6 +162,8 @@ class CCManager {
 
             const m = await this.getMessage(guild, messageId);
             if (!m) return;
+
+            if (m.author.id !== this.client.user.id) return;
 
             let message;
             if (embed && content) {
@@ -249,6 +254,9 @@ class CCManager {
 
             if (!guild.channels.has(channelId)) return;
             const channel = guild.channels.get(channelId);
+
+            if (!channel.memberPermissions(guild.me).has(Discord.Permissions.FLAGS.CREATE_INSTANT_INVITE))
+                return;
 
             try {
                 const invite = await channel.createInvite(options);

@@ -124,6 +124,7 @@ class Func extends Item {
 
         interpreter.statementStack.pushChange(this.statementStack.clone());
         interpreter.statementStack.push(this.ctx);
+        interpreter.statementStack.pushFunc(this.ctx);
 
         for (let i = 0; i < this.args.length; i++) {
             const variable = interpreter.varsPerStatement.createVariable(this.args[i], this.ctx, this);
@@ -131,7 +132,8 @@ class Func extends Item {
         }
         const val = await interpreter.visit(this.ctx);
 
-        interpreter.statementStack.pop(this.ctx);
+        interpreter.statementStack.popFunc(this.ctx);
+        interpreter.statementStack.pop();
         interpreter.statementStack.popChange();
 
         if (val instanceof ReturnInterrupt) {

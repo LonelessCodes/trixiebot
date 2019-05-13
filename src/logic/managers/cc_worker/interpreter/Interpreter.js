@@ -238,7 +238,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
         const func = new Func(name, args, this.statementStack.clone(), ctx.FunctionBody[0]);
 
-        this.statementStack.pop(ctx);
+        this.statementStack.pop();
 
         return [name, func];
     }
@@ -677,7 +677,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
             if (isReturn(value)) break;
         }
 
-        this.statementStack.pop(ctx);
+        this.statementStack.pop();
         return value;
     }
 
@@ -696,7 +696,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
     }
 
     async ExpressionStatement(ctx) {
-        await this.visit(ctx.Expression);
+        await this.visit(ctx.AssignmentExpression);
     }
 
     async IfStatement(ctx) {
@@ -708,14 +708,14 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         if (bool) {
             this.statementStack.push(ctx.$then[0]);
             await this.visit(ctx.$then);
-            this.statementStack.pop(ctx.$then[0]);
+            this.statementStack.pop();
         } else if (ctx.$else) {
             this.statementStack.push(ctx.$else[0]);
             await this.visit(ctx.$else);
-            this.statementStack.pop(ctx.$then[0]);
+            this.statementStack.pop();
         }
 
-        this.statementStack.pop(ctx);
+        this.statementStack.pop();
     }
 
     async WhileIterationStatement(ctx) {
@@ -723,7 +723,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         const callBody = async () => {
             this.statementStack.push(ctx.$body[0]);
             const val = await this.visit(ctx.$body);
-            this.statementStack.pop(ctx.$body[0]);
+            this.statementStack.pop();
             return val;
         };
 
@@ -740,14 +740,14 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
             throw this.error("While loop is iterating more than 100000", ctx.WhileTok);
         }
 
-        this.statementStack.pop(ctx);
+        this.statementStack.pop();
     }
 
     async ForIterationStatement(ctx) {
         const callBody = async () => {
             this.statementStack.push(ctx.$body[0]);
             const val = await this.visit(ctx.$body);
-            this.statementStack.pop(ctx.$body[0]);
+            this.statementStack.pop();
             return val;
         };
 
@@ -773,7 +773,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                 throw this.error("For loop is iterating more than 100000", ctx.ForTok);
             }
 
-            this.statementStack.pop(ctx);
+            this.statementStack.pop();
         } else {
             this.statementStack.push(ctx);
 
@@ -821,7 +821,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                 throw this.error("Cannot iterate over unknown type", ctx.$value);
             }
 
-            this.statementStack.pop(ctx);
+            this.statementStack.pop();
         }
     }
 
@@ -1053,12 +1053,12 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                 await this.visit(ctx.StatementList);
             }
 
-            this.statementStack.pop(ctx);
+            this.statementStack.pop();
             this.statementStack.popChange();
 
             this.cleanup();
         } catch (reply) {
-            this.statementStack.pop(ctx);
+            this.statementStack.pop();
             this.statementStack.popChange();
 
             this.cleanup();

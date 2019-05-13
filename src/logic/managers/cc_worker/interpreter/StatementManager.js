@@ -7,6 +7,13 @@ class StatementStack {
     }
 
     push(ctx) {
+        const symbol = ctx.$stackId ? ctx.$stackId[ctx.$stackId.length - 1] : Symbol();
+        if (!ctx.$stackId) ctx.$stackId = [symbol];
+        this._arr.push(symbol);
+        return symbol;
+    }
+
+    pushFunc(ctx) {
         const symbol = Symbol();
         if (!ctx.$stackId) ctx.$stackId = [];
         ctx.$stackId.push(symbol);
@@ -14,7 +21,11 @@ class StatementStack {
         return symbol;
     }
 
-    pop(ctx) {
+    pop() {
+        return this._arr.pop();
+    }
+
+    popFunc(ctx) {
         if (ctx.$stackId) ctx.$stackId.pop();
         return this._arr.pop();
     }

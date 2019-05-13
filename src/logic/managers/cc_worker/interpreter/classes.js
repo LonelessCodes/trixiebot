@@ -48,7 +48,7 @@ async function Reaction(context, opts) {
             for (let i = 0; i < members.length; i++) {
                 members[i] = await GuildMember(context, members[i]);
             }
-            return members;
+            return new c.ArrayLiteral(members);
         })
     });
 }
@@ -167,7 +167,7 @@ async function Role(context, id) {
             for (let i = 0; i < members.length; i++) {
                 members[i] = await GuildMember(context, members[i]);
             }
-            return members;
+            return new c.ArrayLiteral(members);
         }),
         hasPermission: new c.NativeFunc("hasPermission", function (_, permission) {
             return new c.BooleanLiteral(perm.has(permission.content, true));
@@ -217,7 +217,7 @@ async function GuildMember(context, id) {
             for (let i = 0; i < roles.length; i++) {
                 roles[i] = await Role(context, roles[i]);
             }
-            return roles;
+            return new c.ArrayLiteral(roles);
         }),
         hasPermission: new c.NativeFunc("hasPermission", function (_, permission) {
             return new c.BooleanLiteral(perm.has(permission.content, true));
@@ -317,7 +317,7 @@ async function Guild(context, opts) {
             for (let i = 0; i < members.length; i++) {
                 members[i] = await GuildMember(context, members[i]);
             }
-            return members;
+            return new c.ArrayLiteral(members);
         }),
         getOwner: new c.NativeFunc("getOwner", async function (context) {
             return await GuildMember(context, opts.ownerId);
@@ -328,7 +328,7 @@ async function Guild(context, opts) {
             for (let i = 0; i < roles.length; i++) {
                 roles[i] = await Role(context, roles[i]);
             }
-            return roles;
+            return new c.ArrayLiteral(roles);
         }),
         getChannels: new c.NativeFunc("getChannels", async function (context) {
             const channels = await cpc.awaitAnswer("guild.getChannels", { guildId: opts.id }, { timeout: 5000 })
@@ -336,7 +336,7 @@ async function Guild(context, opts) {
             for (let i = 0; i < channels.length; i++) {
                 channels[i] = await Channel(context, channels[i]);
             }
-            return channels;
+            return new c.ArrayLiteral(channels);
         }),
         getEmojis: new c.NativeFunc("getEmojis", async function (context) {
             const emojis = await cpc.awaitAnswer("guild.getEmojis", { guildId: opts.id }, { timeout: 5000 })
@@ -344,7 +344,7 @@ async function Guild(context, opts) {
             for (let i = 0; i < emojis.length; i++) {
                 emojis[i] = await Emoji(context, emojis[i]);
             }
-            return emojis;
+            return new c.ArrayLiteral(emojis);
         })
     });
 }

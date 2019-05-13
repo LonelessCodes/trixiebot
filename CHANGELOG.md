@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.2"></a>
+## [2.4.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.1...v2.4.2) (2019-05-13)
+
+
+### Bug Fixes
+
+* **cc communication:** fixed some problems that could lead to unexpected errors ([188564e](https://bitbucket.org/Loneless/trixiebot/commits/188564e))
+* **cc grammar:** fixed some crutial grammar problems in TrixieScript parser regarding chained multiply and additive operations ([606eae4](https://bitbucket.org/Loneless/trixiebot/commits/606eae4))
+
+
+
 <a name="2.4.1"></a>
 ## [2.4.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.0...v2.4.1) (2019-05-12)
 

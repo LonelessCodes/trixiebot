@@ -99,7 +99,7 @@ class CCManager {
         this.errors_db.createIndex({ ts: 1 });
 
         log.debug("CustomC Registry", "Starting worker");
-        const dir = path.join(__dirname, "custom_commands");
+        const dir = path.join(__dirname, "cc_worker");
         const file = path.join(dir, "worker.js");
         this.fork = respawn([file], { cwd: dir, fork: true, env: process.env }).restart();
         this.cpc = cpc(this.fork);

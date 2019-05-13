@@ -91,24 +91,26 @@ const Increment = createToken({ name: "Increment", pattern: "++", categories: Pu
 
 const MultiOperator = createToken({ name: "MultiOperator", pattern: Lexer.NA, categories: Punctuator });
 
-const OP_Multiple = createToken({ name: "OP_Multiply", pattern: /\*/, categories: MultiOperator });
-const OP_Division = createToken({ name: "OP_Division", pattern: /\//, categories: MultiOperator });
-const OP_Percent = createToken({ name: "OP_Percent", pattern: /%/, categories: MultiOperator });
-const OP_Exponent = createToken({ name: "OP_Exponent", pattern: /\^/, categories: MultiOperator });
+const OP_Multiple = createToken({ name: "OP_Multiply", pattern: "*", categories: MultiOperator });
+const OP_Division = createToken({ name: "OP_Division", pattern: "/", categories: MultiOperator });
+const OP_Percent = createToken({ name: "OP_Percent", pattern: "%", categories: MultiOperator });
+
+const ExponentiationOperator = createToken({ name: "ExponentiationOperator", pattern: Lexer.NA, categories: Punctuator });
+const OP_Exponent = createToken({ name: "OP_Exponent", pattern: "^", categories: ExponentiationOperator });
 
 const AdditiveOperator = createToken({ name: "AdditiveOperator", pattern: Lexer.NA, categories: Punctuator });
 
-const OP_Plus = createToken({ name: "OP_Plus", pattern: /\+/, categories: AdditiveOperator });
-const OP_Minus = createToken({ name: "OP_Minus", pattern: /-/, categories: AdditiveOperator });
+const OP_Plus = createToken({ name: "OP_Plus", pattern: "+", categories: AdditiveOperator });
+const OP_Minus = createToken({ name: "OP_Minus", pattern: "-", categories: AdditiveOperator });
 
 const CompareOperator = createToken({ name: "CompareOperator", pattern: Lexer.NA, categories: Punctuator });
 
 const RelationOperator = createToken({ name: "RelationOperator", pattern: Lexer.NA, categories: CompareOperator });
 
-const LessThan = createToken({ name: "LessThan", pattern: /</, categories: RelationOperator });
-const GreaterThan = createToken({ name: "GreaterThan", pattern: />/, categories: RelationOperator });
-const LessThanEqual = createToken({ name: "LessThanEqual", pattern: /<=/, categories: RelationOperator });
-const GreaterThanEqual = createToken({ name: "GreaterThanEqual", pattern: />=/, categories: RelationOperator });
+const LessThan = createToken({ name: "LessThan", pattern: "<", categories: RelationOperator });
+const GreaterThan = createToken({ name: "GreaterThan", pattern: ">", categories: RelationOperator });
+const LessThanEqual = createToken({ name: "LessThanEqual", pattern: "<=", categories: RelationOperator });
+const GreaterThanEqual = createToken({ name: "GreaterThanEqual", pattern: ">=", categories: RelationOperator });
 
 const EqualityOperator = createToken({ name: "EqualityOperator", pattern: Lexer.NA, categories: CompareOperator });
 
@@ -172,7 +174,8 @@ exports.ALL_TOKENS = [
     AssignOperator, Equal, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision, OP_AssignPercent, OP_AssignExponent,
 
     AdditiveOperator, OP_Plus, OP_Minus,
-    MultiOperator, OP_Multiple, OP_Division, OP_Percent, OP_Exponent,
+    MultiOperator, OP_Multiple, OP_Division, OP_Percent,
+    ExponentiationOperator, OP_Exponent,
 
     CompareOperator,
     RelationOperator, LessThanEqual, GreaterThanEqual, LessThan, GreaterThan,
@@ -202,7 +205,8 @@ exports.tokens = {
     AssignOperator, Equal, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision, OP_AssignPercent, OP_AssignExponent,
 
     AdditiveOperator, OP_Plus, OP_Minus,
-    MultiOperator, OP_Multiple, OP_Division, OP_Percent, OP_Exponent,
+    MultiOperator, OP_Multiple, OP_Division, OP_Percent,
+    ExponentiationOperator, OP_Exponent,
 
     CompareOperator,
     RelationOperator, LessThanEqual, GreaterThanEqual, LessThan, GreaterThan,

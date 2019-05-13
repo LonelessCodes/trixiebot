@@ -136,7 +136,8 @@ const parser = new CCParser(ALL_TOKENS, {
     ignoredIssues: {
         Statement: { OR: true },
         StatementList: { OR: true },
-        MultiExpression: { OR: true }
+        MultiExpression: { OR: true },
+        ExponentiationExpression: { OR: true },
     },
     errorMessageProvider: {
         buildMismatchTokenMessage({ actual, expected }) {
@@ -221,7 +222,7 @@ $.RULE("PrimaryExpression", () => {
 
 $.RULE("ParenExpression", () => {
     $.CONSUME(t.OpenParen);
-    $.SUBRULE($.Expression, $body);
+    $.SUBRULE($.AssignmentExpression, $body);
     $.CONSUME(t.CloseParen);
 });
 
@@ -312,7 +313,7 @@ $.RULE("MemberExpression", () => {
                 {
                     NAME: "$square", ALT: () => {
                         $.CONSUME(t.OpenBracket);
-                        $.SUBRULE($.Expression, $key);
+                        $.SUBRULE($.AssignmentExpression, $key);
                         $.CONSUME(t.CloseBracket);
                     }
                 },
@@ -344,22 +345,6 @@ $.RULE("Arguments", () => {
     $.CONSUME(t.CloseParen);
 });
 
-$.RULE("UnaryExpression", () => {
-    $.OR([
-        { ALT: () => $.SUBRULE($.UpdateExpression, $left) },
-        {
-            ALT: () => {
-                $.OR2([
-                    { ALT: () => $.CONSUME(t.OP_Plus, { LABEL: "$unary" }) },
-                    { ALT: () => $.CONSUME(t.OP_Minus, { LABEL: "$unary" }) },
-                    { ALT: () => $.CONSUME(t.Exclamation, { LABEL: "$unary" }) }
-                ]);
-                $.SUBRULE($.UnaryExpression, $left);
-            }
-        }
-    ]);
-});
-
 $.RULE("UpdateExpression", () => {
     $.OR([
         {
@@ -385,56 +370,80 @@ $.RULE("UpdateExpression", () => {
     ]);
 });
 
-$.RULE("MultiExpression", () => {
+$.RULE("UnaryExpression", () => {
     $.OR([
-        { ALT: () => $.SUBRULE($.UnaryExpression, $left) },
+        { ALT: () => $.SUBRULE($.UpdateExpression, $left) },
         {
             ALT: () => {
-                $.SUBRULE($.UpdateExpression, $left);
-                $.CONSUME(t.MultiOperator, $operator);
-                $.SUBRULE($.MultiExpression, $right);
+                $.OR2([
+                    { ALT: () => $.CONSUME(t.OP_Plus, { LABEL: "$unary" }) },
+                    { ALT: () => $.CONSUME(t.OP_Minus, { LABEL: "$unary" }) },
+                    { ALT: () => $.CONSUME(t.Exclamation, { LABEL: "$unary" }) }
+                ]);
+                $.SUBRULE($.UnaryExpression, $left);
             }
         }
     ]);
 });
 
+$.RULE("ExponentiationExpression", () => {
+    $.OR([
+        { ALT: () => $.SUBRULE($.UnaryExpression, $left) },
+        {
+            ALT: () => {
+                $.SUBRULE($.UpdateExpression, $left);
+                $.CONSUME(t.OP_Exponent, $operator);
+                $.SUBRULE($.ExponentiationExpression, $right);
+            }
+        }
+    ]);
+});
+
+$.RULE("MultiExpression", () => {
+    $.SUBRULE1($.ExponentiationExpression, $left);
+    $.MANY(() => {
+        $.CONSUME(t.MultiOperator, $operator);
+        $.SUBRULE2($.ExponentiationExpression, $right);
+    });
+});
+
 $.RULE("AdditiveExpression", () => {
-    $.SUBRULE($.MultiExpression, $left);
-    $.OPTION(() => {
+    $.SUBRULE1($.MultiExpression, $left);
+    $.MANY(() => {
         $.CONSUME(t.AdditiveOperator, $operator);
-        $.SUBRULE($.AdditiveExpression, $right);
+        $.SUBRULE2($.MultiExpression, $right);
     });
 });
 
 $.RULE("RelationalExpression", () => {
-    $.SUBRULE($.AdditiveExpression, $left);
-    $.OPTION(() => {
+    $.SUBRULE1($.AdditiveExpression, $left);
+    $.MANY(() => {
         $.CONSUME(t.RelationOperator, $operator);
-        $.SUBRULE($.RelationalExpression, $right);
+        $.SUBRULE2($.AdditiveExpression, $right);
     });
 });
 
 $.RULE("EqualityExpression", () => {
-    $.SUBRULE($.RelationalExpression, $left);
-    $.OPTION(() => {
+    $.SUBRULE1($.RelationalExpression, $left);
+    $.MANY(() => {
         $.CONSUME(t.EqualityOperator, $operator);
-        $.SUBRULE($.EqualityExpression, $right);
+        $.SUBRULE2($.RelationalExpression, $right);
     });
 });
 
 $.RULE("LogicalAndExpression", () => {
-    $.SUBRULE($.EqualityExpression, $left);
-    $.OPTION(() => {
+    $.SUBRULE1($.EqualityExpression, $left);
+    $.MANY(() => {
         $.CONSUME(t.AndTok, $operator);
-        $.SUBRULE($.LogicalAndExpression, $right);
+        $.SUBRULE2($.EqualityExpression, $right);
     });
 });
 
 $.RULE("LogicalOrExpression", () => {
-    $.SUBRULE($.LogicalAndExpression, $left);
-    $.OPTION(() => {
+    $.SUBRULE1($.LogicalAndExpression, $left);
+    $.MANY(() => {
         $.CONSUME(t.OrTok, $operator);
-        $.SUBRULE2($.LogicalOrExpression, $right);
+        $.SUBRULE2($.LogicalAndExpression, $right);
     });
 });
 
@@ -454,14 +463,6 @@ $.RULE("AssignmentExpression", () => {
         $.CONSUME(t.AssignOperator, $operator);
         $.SUBRULE($.AssignmentExpression, $right);
     });
-});
-
-$.RULE("Expression", () => {
-    $.SUBRULE($.AssignmentExpression, $expression);
-    // $.MANY(() => {
-    //     $.CONSUME(t.Comma);
-    //     $.SUBRULE2($.AssignmentExpression, $expression);
-    // });
 });
 
 $.RULE("Statement", () => {
@@ -517,14 +518,14 @@ $.RULE("ExpressionStatement", () => {
     // because in a BNF grammar there is no priority between alternatives. This implementation however, is deterministic
     // the first alternative found to match will be taken. thus these ambiguities can be resolved
     // by ordering the alternatives
-    $.SUBRULE($.Expression);
+    $.SUBRULE($.AssignmentExpression);
     $.CONSUME(t.Semicolon, $enableSemicolonInsertion);
 });
 
 $.RULE("IfStatement", () => {
     $.CONSUME(t.IfTok);
     $.CONSUME(t.OpenParen);
-    $.SUBRULE($.Expression, $expression);
+    $.SUBRULE($.AssignmentExpression, $expression);
     $.CONSUME(t.CloseParen);
     $.SUBRULE($.Statement, { LABEL: "$then" });
     // refactoring spec to use an OPTION production for the 'else'
@@ -538,7 +539,7 @@ $.RULE("IfStatement", () => {
 $.RULE("WhileIterationStatement", () => {
     $.CONSUME(t.WhileTok);
     $.CONSUME(t.OpenParen);
-    $.SUBRULE($.Expression, $expression);
+    $.SUBRULE($.AssignmentExpression, $expression);
     $.CONSUME(t.CloseParen);
     $.SUBRULE($.Statement, $body);
 });
@@ -546,9 +547,6 @@ $.RULE("WhileIterationStatement", () => {
 $.RULE("ForIterationStatement", () => {
     $.CONSUME(t.ForTok);
     $.CONSUME(t.OpenParen);
-    // $.OPTION(() => {
-    //     $.CONSUME(t.VarTok);
-    // });
     $.OR([
         {
             ALT: () => {
@@ -556,12 +554,12 @@ $.RULE("ForIterationStatement", () => {
                 // no semicolon insertion in for header
                 $.CONSUME(t.Semicolon, $disableSemicolonInsertion);
                 $.OPTION2(() => {
-                    $.SUBRULE($.Expression, $middle);
+                    $.SUBRULE($.AssignmentExpression, $middle);
                 });
                 // no semicolon insertion in for header
                 $.CONSUME2(t.Semicolon, $disableSemicolonInsertion);
                 $.OPTION3(() => {
-                    $.SUBRULE2($.Expression, $right);
+                    $.SUBRULE2($.AssignmentExpression, $right);
                 });
             }
         },
@@ -570,7 +568,7 @@ $.RULE("ForIterationStatement", () => {
                 $.CONSUME(t.Identifier);
                 $.CONSUME(t.OfTok);
                 // maybe use PrimaryExpression
-                $.SUBRULE3($.Expression, $value);
+                $.SUBRULE3($.AssignmentExpression, $value);
             }
         }
     ]);
@@ -592,7 +590,7 @@ $.RULE("BreakStatement", () => {
 $.RULE("ReturnStatement", () => {
     $.CONSUME(t.ReturnTok);
     $.OPTION(() => {
-        $.SUBRULE($.Expression, $value);
+        $.SUBRULE($.AssignmentExpression, $value);
     });
     $.CONSUME(t.Semicolon, $enableSemicolonInsertion);
 });
@@ -600,7 +598,7 @@ $.RULE("ReturnStatement", () => {
 $.RULE("SleepStatement", () => {
     $.CONSUME(t.SleepTok);
     $.OPTION(() => {
-        $.SUBRULE($.Expression, $value);
+        $.SUBRULE($.AssignmentExpression, $value);
     });
     $.CONSUME(t.Semicolon, $enableSemicolonInsertion);
 });
@@ -608,7 +606,7 @@ $.RULE("SleepStatement", () => {
 $.RULE("ReplyStatement", () => {
     $.CONSUME(t.ReplyTok);
     $.OPTION(() => {
-        $.SUBRULE($.Expression, $value);
+        $.SUBRULE($.AssignmentExpression, $value);
     });
     $.CONSUME(t.Semicolon, $enableSemicolonInsertion);
 });

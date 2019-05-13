@@ -324,22 +324,6 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         };
     }
 
-    async UnaryExpression(ctx) {
-        if (!ctx.$unary) return await this.visit(ctx.$left);
-
-        let val = assign(await this.visit(ctx.$left));
-        if (val instanceof Member) val = val.value;
-
-        switch (ctx.$unary[0].image) {
-            case "+":
-                return new NumberLiteral(+val.content);
-            case "-":
-                return new NumberLiteral(-val.content);
-            case "!":
-                return new BooleanLiteral(!val.content);
-        }
-    }
-
     async UpdateExpression(ctx) {
         if (ctx.$left && !ctx.$postfix)  return await this.visit(ctx.$left);
 
@@ -392,7 +376,23 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         throw this.error("Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)", ctx.$postfix || ctx.$prefix);
     }
 
-    async MultiExpression(ctx) {
+    async UnaryExpression(ctx) {
+        if (!ctx.$unary) return await this.visit(ctx.$left);
+
+        let val = assign(await this.visit(ctx.$left));
+        if (val instanceof Member) val = val.value;
+
+        switch (ctx.$unary[0].image) {
+            case "+":
+                return new NumberLiteral(+val.content);
+            case "-":
+                return new NumberLiteral(-val.content);
+            case "!":
+                return new BooleanLiteral(!val.content);
+        }
+    }
+
+    async ExponentiationExpression(ctx) {
         if (!ctx.$right) return await this.visit(ctx.$left);
 
         let left = assign(await this.visit(ctx.$left));
@@ -400,22 +400,45 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         let right = assign(await this.visit(ctx.$right));
         if (right instanceof Member) right = right.value;
 
-        switch (ctx.$op[0].image) {
-            case "*":
-                if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
-                    return left.clone().multiply(right);
-                }
-                return new NumberLiteral(left.content * right.content);
-            case "/":
-                if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
-                    return left.clone().multiply(1 / right);
-                }
-                return new NumberLiteral(left.content / right.content);
-            case "%":
-                return new NumberLiteral(left.content % right.content);
-            case "^":
-                return new NumberLiteral(left.content ** right.content);
+        
+        return new NumberLiteral(left.content ** right.content);
+    }
+
+    async MultiExpression(ctx) {
+        if (!ctx.$right) return await this.visit(ctx.$left);
+
+        let left = assign(await this.visit(ctx.$left));
+        if (left instanceof Member) left = left.value;
+
+        for (let i = 0; i < ctx.$right.length; i++) {
+            let right = assign(await this.visit(ctx.$right[i]));
+            if (right instanceof Member) right = right.value;
+
+            switch (ctx.$op[i].image) {
+                case "*":
+                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                        left = left.clone().multiply(right);
+                        break;
+                    }
+                    left = new NumberLiteral(left.content * right.content);
+                    break;
+                case "/":
+                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                        left = left.clone().multiply(1 / right);
+                        break;
+                    }
+                    left = new NumberLiteral(left.content / right.content);
+                    break;
+                case "%":
+                    left = new NumberLiteral(left.content % right.content);
+                    break;
+                case "^":
+                    left = new NumberLiteral(left.content ** right.content);
+                    break;
+            }
         }
+
+        return left;
     }
 
     async AdditiveExpression(ctx) {
@@ -423,30 +446,40 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
         let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(await this.visit(ctx.$right));
-        if (right instanceof Member) right = right.value;
 
-        switch (ctx.$op[0].image) {
-            case "+":
-                if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
-                    if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral)) 
-                        return left.clone().add(right);
-                    return new NumberLiteral(left.content + right.content);
-                } else {
-                    const leftprop = left.getProp(new StringLiteral("toString"));
-                    const rightprop = right.getProp(new StringLiteral("toString"));
-                    return new StringLiteral(
-                        (leftprop ? (await leftprop.call(new Context(this, ctx.$left), left).content) : "[no toString func]") +
-                        (rightprop ? (await rightprop.call(new Context(this, ctx.$right), right).content) : "[no toString func]")
-                    );
-                }
-            case "-":
-                if ((left instanceof TimeLiteral || left instanceof DurationLiteral) &&
-                    right instanceof NumberLiteral && !(right instanceof TimeLiteral)) {
-                    return left.clone().subtract(right);
-                }
-                return new NumberLiteral(left.content - right.content);
+        for (let i = 0; i < ctx.$right.length; i++) {
+            let right = assign(await this.visit(ctx.$right[i]));
+            if (right instanceof Member) right = right.value;
+
+            switch (ctx.$op[i].image) {
+                case "+":
+                    if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
+                        if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral)){
+                            left = left.clone().add(right);
+                            break;
+                        }
+                        left = new NumberLiteral(left.content + right.content);
+                    } else {
+                        const leftprop = left.getProp(new StringLiteral("toString"));
+                        const rightprop = right.getProp(new StringLiteral("toString"));
+                        left = new StringLiteral(
+                            (leftprop ? (await leftprop.call(new Context(this, ctx.$left), left).content) : "[no toString func]") +
+                            (rightprop ? (await rightprop.call(new Context(this, ctx.$right), right).content) : "[no toString func]")
+                        );
+                    }
+                    break;
+                case "-":
+                    if ((left instanceof TimeLiteral || left instanceof DurationLiteral) &&
+                        right instanceof NumberLiteral && !(right instanceof TimeLiteral)) {
+                        left = left.clone().subtract(right);
+                        break;
+                    }
+                    left = new NumberLiteral(left.content - right.content);
+                    break;
+            }
         }
+
+        return left;
     }
 
     async RelationalExpression(ctx) {
@@ -454,31 +487,45 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
         let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(await this.visit(ctx.$right));
-        if (right instanceof Member) right = right.value;
+        let value = false;
 
-        switch (ctx.$op[0].image) {
-            case "<":
-                if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
-                    return new BooleanLiteral(left.content < right.content);
-                }
-                return new BooleanLiteral(false);
-            case ">":
-                if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
-                    return new BooleanLiteral(left.content > right.content);
-                }
-                return new BooleanLiteral(false);
-            case "<=":
-                if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
-                    return new BooleanLiteral(left.content <= right.content);
-                }
-                return new BooleanLiteral(false);
-            case ">=":
-                if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
-                    return new BooleanLiteral(left.content >= right.content);
-                }
-                return new BooleanLiteral(false);
+        for (let i = 0; i < ctx.$right.length; i++) {
+            let right = assign(await this.visit(ctx.$right[i]));
+            if (right instanceof Member) right = right.value;
+
+            switch (ctx.$op[i].image) {
+                case "<":
+                    if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
+                        value = left.content < right.content;
+                    }
+                    else value = false;
+                    break;
+                case ">":
+                    if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
+                        value = left.content > right.content;
+                    }
+                    else value = false;
+                    break;
+                case "<=":
+                    if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
+                        value = left.content <= right.content;
+                    }
+                    else value = false;
+                    break;
+                case ">=":
+                    if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
+                        value = left.content >= right.content;
+                    }
+                    else value = false;
+                    break;
+            }
+
+            if (!value) return new BooleanLiteral(false);
+
+            left = right;
         }
+
+        return new BooleanLiteral(value);
     }
 
     async EqualityExpression(ctx) {
@@ -486,15 +533,22 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
         let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(await this.visit(ctx.$right));
-        if (right instanceof Member) right = right.value;
 
-        switch (ctx.$op[0].image) {
-            case "==":
-                return new Boolean(left.content === right.content);
-            case "!=":
-                return new Boolean(left.content !== right.content);
+        for (let i = 0; i < ctx.$right.length; i++) {
+            let right = assign(await this.visit(ctx.$right[i]));
+            if (right instanceof Member) right = right.value;
+
+            switch (ctx.$op[i].image) {
+                case "==":
+                    left = new Boolean(left.content === right.content);
+                    break;
+                case "!=":
+                    left = new Boolean(left.content !== right.content);
+                    break;
+            }
         }
+
+        return left;
     }
 
     async LogicalAndExpression(ctx) {
@@ -502,10 +556,18 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
         let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(await this.visit(ctx.$right));
-        if (right instanceof Member) right = right.value;
 
-        return new BooleanLiteral(toBool(left) && toBool(right));
+        for (let i = 0; i < ctx.$right.length; i++) {
+            let right = assign(await this.visit(ctx.$right[i]));
+            if (right instanceof Member) right = right.value;
+
+            const leftbool = toBool(left);
+            if (!leftbool) return new BooleanLiteral(false);
+
+            left = new BooleanLiteral(leftbool && toBool(right));
+        }
+
+        return left;
     }
 
     async LogicalOrExpression(ctx) {
@@ -513,10 +575,18 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
         let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(await this.visit(ctx.$right));
-        if (right instanceof Member) right = right.value;
 
-        return new BooleanLiteral(toBool(left) || toBool(right));
+        for (let i = 0; i < ctx.$right.length; i++) {
+            let right = assign(await this.visit(ctx.$right[i]));
+            if (right instanceof Member) right = right.value;
+
+            const leftbool = toBool(left);
+            if (leftbool) return new BooleanLiteral(true);
+
+            left = new BooleanLiteral(leftbool || toBool(right));
+        }
+
+        return left;
     }
 
     async ConditionalExpression(ctx) {
@@ -588,14 +658,6 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         } else {
             throw this.error("Cannot assign to a static literal", ctx.$op);
         }
-    }
-
-    async Expression(ctx) {
-        let val = new NullLiteral;
-        for (const expr of ctx.$expression) {
-            val = await this.visit(expr);
-        }
-        return val;
     }
 
     async Statement(ctx) {

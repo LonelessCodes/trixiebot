@@ -69,12 +69,20 @@ const isNaN = new c.NativeFunc(function (_, number) {
 const isFinite = new c.NativeFunc(function (_, number) {
     return new c.BooleanLiteral(global.isFinite(number.content));
 });
-const parseNumber = new c.NativeFunc(function (_, string) {
-    return new c.NumberLiteral(
-        string instanceof c.StringLiteral ?
-            global.parseFloat(string.content) :
-            global.NaN
-    );
+const parseNumber = new c.NativeFunc(function (_, string, radix) {
+    if (!radix || !(radix instanceof c.NumberLiteral) || radix.content < 1) {
+        return new c.NumberLiteral(
+            string instanceof c.StringLiteral ?
+                global.parseFloat(string.content) :
+                global.NaN
+        );
+    } else {
+        return new c.NumberLiteral(
+            string instanceof c.StringLiteral ?
+                global.parseInt(string.content, radix.content) :
+                global.NaN
+        );
+    }
 });
 const E = new c.NumberLiteral(global.Math.E);
 const LN2 = new c.NumberLiteral(global.Math.LN2);

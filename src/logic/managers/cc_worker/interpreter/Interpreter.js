@@ -397,11 +397,15 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
         let left = assign(await this.visit(ctx.$left));
         if (left instanceof Member) left = left.value;
-        let right = assign(await this.visit(ctx.$right));
-        if (right instanceof Member) right = right.value;
 
-        
-        return new NumberLiteral(left.content ** right.content);
+        for (let i = 0; i < ctx.$right.length; i++) {
+            let right = assign(await this.visit(ctx.$right[i]));
+            if (right instanceof Member) right = right.value;
+
+            left = new NumberLiteral(left.content ** right.content);
+        }
+
+        return left;
     }
 
     async MultiExpression(ctx) {
@@ -431,9 +435,6 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                     break;
                 case "%":
                     left = new NumberLiteral(left.content % right.content);
-                    break;
-                case "^":
-                    left = new NumberLiteral(left.content ** right.content);
                     break;
             }
         }

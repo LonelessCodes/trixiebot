@@ -134,10 +134,7 @@ function hasTokenLabel(obj) {
 const parser = new CCParser(ALL_TOKENS, {
     outputCst: true,
     ignoredIssues: {
-        Statement: { OR: true },
-        StatementList: { OR: true },
-        MultiExpression: { OR: true },
-        ExponentiationExpression: { OR: true },
+        Statement: { OR: true }
     },
     errorMessageProvider: {
         buildMismatchTokenMessage({ actual, expected }) {
@@ -349,7 +346,7 @@ $.RULE("UpdateExpression", () => {
     $.OR([
         {
             ALT: () => {
-                $.SUBRULE($.MemberExpression, $left);
+                $.SUBRULE1($.MemberExpression, $left);
                 $.OPTION(() => {
                     $.OR2([
                         { ALT: () => $.CONSUME(t.Increment, { LABEL: "$postfix" }) },
@@ -364,15 +361,14 @@ $.RULE("UpdateExpression", () => {
                     { ALT: () => $.CONSUME2(t.Increment, { LABEL: "$prefix" }) },
                     { ALT: () => $.CONSUME2(t.Decrement, { LABEL: "$prefix" }) },
                 ]);
-                $.SUBRULE($.UnaryExpression, $right);
+                $.SUBRULE2($.MemberExpression, $right);
             }
-        }
+        },
     ]);
 });
 
 $.RULE("UnaryExpression", () => {
     $.OR([
-        { ALT: () => $.SUBRULE($.UpdateExpression, $left) },
         {
             ALT: () => {
                 $.OR2([
@@ -382,21 +378,17 @@ $.RULE("UnaryExpression", () => {
                 ]);
                 $.SUBRULE($.UnaryExpression, $left);
             }
-        }
+        },
+        { ALT: () => $.SUBRULE($.UpdateExpression, $left) }
     ]);
 });
 
 $.RULE("ExponentiationExpression", () => {
-    $.OR([
-        { ALT: () => $.SUBRULE($.UnaryExpression, $left) },
-        {
-            ALT: () => {
-                $.SUBRULE($.UpdateExpression, $left);
-                $.CONSUME(t.OP_Exponent, $operator);
-                $.SUBRULE($.ExponentiationExpression, $right);
-            }
-        }
-    ]);
+    $.SUBRULE($.UnaryExpression, $left);
+    $.MANY(() => {
+        $.CONSUME(t.OP_Exponent, $operator);
+        $.SUBRULE($.ExponentiationExpression, $right);
+    });
 });
 
 $.RULE("MultiExpression", () => {

@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.4"></a>
+## [2.4.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.3...v2.4.4) (2019-05-14)
+
+
+### Bug Fixes
+
+* **cc grammar:** fixed grammar issues with exponential expressions ([e143297](https://bitbucket.org/Loneless/trixiebot/commits/e143297))
+
+
+### Features
+
+* **cc runtime:** parseNumber supports radix now ([a491fc6](https://bitbucket.org/Loneless/trixiebot/commits/a491fc6))
+* **cc runtime:** parseNumber supports radix now ([d124e5a](https://bitbucket.org/Loneless/trixiebot/commits/d124e5a))
+
+
+
 <a name="2.4.3"></a>
 ## [2.4.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.2...v2.4.3) (2019-05-13)
 

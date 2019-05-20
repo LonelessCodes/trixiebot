@@ -14,7 +14,6 @@ All notable changes to this project will be documented in this file. See [standa
 ### Features
 
 * **cc runtime:** parseNumber supports radix now ([a491fc6](https://bitbucket.org/Loneless/trixiebot/commits/a491fc6))
-* **cc runtime:** parseNumber supports radix now ([d124e5a](https://bitbucket.org/Loneless/trixiebot/commits/d124e5a))
 
 
 

@@ -3,7 +3,10 @@ const Context = require("./Context");
 const { StatementStack, StatementManager } = require("./StatementManager");
 
 const RESERVED_KEYWORDS = [
-    "func", "return", "for", "of", "while", "break", "continue", "if", "then", "else", "reply", "and", "or", "null", "true", "false", "sleep"
+    "func", "return", "for", "of", "while", "break", "continue", "if", "then", "else", "reply", "and", "or", "null", "true", "false", "sleep",
+];
+const FUTURE_RESERVED_KEYWORDS = [
+    "import", "export"
 ];
 
 /**
@@ -987,6 +990,9 @@ class VariableStack extends Map {
         if (RESERVED_KEYWORDS.includes(name)) {
             throw _this.error("Cannot create variable: '" + name + "' is a reserved keyword", ctx.Identifier);
         }
+        if (FUTURE_RESERVED_KEYWORDS.includes(name)) {
+            throw _this.error("Cannot create variable: '" + name + "' is a future reserved keyword", ctx.Identifier);
+        }
         const currentStack = _this.statementStack.clone();
         const currentStatement = currentStack.current;
         const variable = new Variable(currentStack, name);
@@ -1016,6 +1022,7 @@ class Member {
 
 module.exports = {
     RESERVED_KEYWORDS,
+    FUTURE_RESERVED_KEYWORDS,
     toBool,
     assign,
     isReturn,

@@ -17,7 +17,7 @@ const VERSION = new c.StringLiteral("1");
 
 const Boolean = new c.NativeFunc(function (_, arg0) {
     if (arg0 instanceof c.NumberLiteral) {
-        return new c.BooleanLiteral(arg0.content > 0 ? true : false);
+        return new c.BooleanLiteral(arg0.content === 0 ? false : true);
     }
     if (arg0 instanceof c.StringLiteral) {
         return new c.BooleanLiteral(arg0.content === "true" ? true : false);
@@ -39,7 +39,7 @@ const Number = new c.NativeFunc(function (_, arg0) {
 });
 
 const String = new c.NativeFunc(function (_, arg0) {
-    return new c.StringLiteral(new global.String(arg0.content));
+    return new c.StringLiteral(new global.String(arg0 ? arg0.content : ""));
 });
 
 const Array = new c.NativeFunc(function (_, arg0) {
@@ -49,10 +49,7 @@ const Array = new c.NativeFunc(function (_, arg0) {
     return new c.ArrayLiteral([]);
 });
 
-const Object = new c.NativeFunc(function (_, arg0) {
-    if (arg0 instanceof c.ObjectLiteral) {
-        return new c.ObjectLiteral(new global.Object(arg0.content));
-    }
+const Object = new c.NativeFunc(function () {
     return new c.ObjectLiteral({});
 });
 
@@ -385,11 +382,11 @@ const pad = new c.NativeFunc("pad", function (context, value, width, fill = new 
     return new c.StringLiteral(str);
 });
 
-const parseHumanTime = new c.NativeFunc("parseHumanTime", function (_, str) {
+const parseHumanDuration = new c.NativeFunc("parseHumanTime", function (_, str) {
     if (!(str instanceof c.StringLiteral)) return new c.NumberLiteral(NaN);
     return new c.DurationLiteral(moment.duration(_parseHumanTime(str.content), "milliseconds"));
 });
-const toHumanTime = new c.NativeFunc("toHumanTime", function (_, num) {
+const toHumanDuration = new c.NativeFunc("toHumanTime", function (_, num) {
     if (!(num instanceof c.NumberLiteral || num instanceof c.DurationLiteral)) return new c.StringLiteral("");
     return new c.StringLiteral(_toHumanTime(num.content));
 });
@@ -423,11 +420,12 @@ module.exports = {
     MIN_SAFE_DIFFERENCE,
     NaN,
     Infinity,
+
+    E, LN2, LN10, LOG2E, LOG10E, SQRT1_2, SQRT2, PI,
+
     isNaN,
     isFinite,
     parseNumber,
-
-    E, LN2, LN10, LOG2E, LOG10E, SQRT1_2, SQRT2, PI, 
 
     floor,
     ceil,
@@ -436,10 +434,13 @@ module.exports = {
     exp, abs, acos, cos, acosh, cosh, asin, sin, asinh, sinh, atan, tan, atanh, tanh, atan2,
     cbrt, sqrt, hypot, log, log10, log2, max, min, 
 
+    random,
+    pad,
+
     Time,
     now,
     Duration,
-    random,
+    
     RichEmbed,
 
     Emoji,
@@ -449,10 +450,9 @@ module.exports = {
     Channel,
 
     storage,
-    pad,
 
-    parseHumanTime,
-    toHumanTime,
+    parseHumanDuration,
+    toHumanDuration,
 
     since, until,
 

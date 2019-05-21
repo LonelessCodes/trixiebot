@@ -9,7 +9,7 @@ const { Message, TextChannel, Permissions } = require("discord.js");
  * @param {Message} message 
  */
 async function onProcessingError(message, err) {
-    log(err);
+    log.error(err);
     
     try {
         if (message.channel.type === "text") {

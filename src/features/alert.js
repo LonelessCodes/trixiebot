@@ -107,14 +107,16 @@ class Picarto extends StreamProcessor {
 
     async checkChanges() {
         // get all online channels
-        /** @type {any[]} */
-        const picartoOnline = await this.request("online?adult=true");
+        try {
+            /** @type {any[]} */
+            const picartoOnline = await this.request("online?adult=true");
 
-        const stream = this.manager.getConfigs(this);
+            const stream = this.manager.getConfigs(this);
 
-        stream.addListener("data", config => this.checkChange(picartoOnline, config));
-        stream.once("end", () => { });
-        stream.once("error", err => { log(err); });
+            stream.addListener("data", config => this.checkChange(picartoOnline, config));
+            stream.once("end", () => { });
+            stream.once("error", err => { log(err); });
+        } catch (_) { _; }
     }
 
     /**

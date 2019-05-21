@@ -16,13 +16,13 @@ new class App {
 
         this.attachClientListeners();
 
-        this.initialize().then(() => {
-            log.debug("App", "I am ready");
-        }).catch(err => {
-            log.error("Failed to log in");
-            log.error(err);
-            process.exit(1);
-        });
+        this.initialize()
+            .then(() => log.debug("App", "I am ready"))
+            .catch(err => {
+                log.error("Failed to log in");
+                log.error(err);
+                process.exit(1);
+            });
     }
 
     async initialize() {
@@ -72,9 +72,7 @@ new class App {
 
         this.core = new Core(this.client, this.config, this.db);
 
-        await this.core
-            .setCommandsPackage("features")
-            .startMainComponents();
+        await this.core.startMainComponents("features");
     }
 
     attachClientListeners() {

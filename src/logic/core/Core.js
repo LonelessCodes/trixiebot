@@ -31,8 +31,6 @@ class Core {
         this.client = client;
         this.config = config;
 
-        this.commands_package = null;
-
         this.db = db;
 
         this.processor = new CommandProcessor(this.client, this.config, this.db);
@@ -41,35 +39,30 @@ class Core {
         this.upvotes = new UpvotesManager(this.client, this.db);
     }
 
-    setCommandsPackage(commands_package) {
-        this.commands_package = commands_package;
-        return this;
-    }
-
-    async startMainComponents() {
+    async startMainComponents(commands_package) {
         for (const voice of this.client.voiceConnections.array()) {
             voice.disconnect();
         }
 
-        await this.loadCommands();
+        await this.loadCommands(commands_package);
         await this.attachListeners();
         await this.setStatus();
         if (!info.DEV) this.setupDiscordBots();
     }
 
-    async loadCommands() {
-        if (!this.commands_package) throw new Error("Cannot load commands if not given a path to look at!");
+    async loadCommands(commands_package) {
+        if (!commands_package) throw new Error("Cannot load commands if not given a path to look at!");
 
         log("Installing Commands...");
 
-        const files = await walk(path.resolve(__dirname, "..", "..", this.commands_package));
+        const files = await walk(path.resolve(__dirname, "..", "..", commands_package));
 
         await Promise.all(files.map(async file => {
             if (path.extname(file) !== ".js") return;
 
             const timer = new NanoTimer().begin();
 
-            const install = require(path.resolve("../../" + this.commands_package, file));
+            const install = require(path.resolve("../../" + commands_package, file));
             await install(this.processor.REGISTRY, this.client, this.config, this.db);
 
             log(`installed time:${(timer.end() / 1000000000).toFixed(3)}ms file:${path.basename(file)}`);

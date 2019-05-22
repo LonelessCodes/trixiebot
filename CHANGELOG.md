@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.5"></a>
+## [2.4.5](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.4...v2.4.5) (2019-05-22)
+
+
+### Bug Fixes
+
+* **alert:** throw less unrelevant errors in logs ([1216ad0](https://bitbucket.org/Loneless/trixiebot/commits/1216ad0))
+* **cc:** add future reserved keywords ([b4710e3](https://bitbucket.org/Loneless/trixiebot/commits/b4710e3))
+
+
+### Features
+
+* 100% more Trixie Lulamoon quotes in the status!!!!!!1 ([c2773d6](https://bitbucket.org/Loneless/trixiebot/commits/c2773d6))
+* updated content in !trixie command ([4b8adb1](https://bitbucket.org/Loneless/trixiebot/commits/4b8adb1))
+
+
+
 <a name="2.4.4"></a>
 ## [2.4.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.3...v2.4.4) (2019-05-14)
 

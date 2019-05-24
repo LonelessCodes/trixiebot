@@ -103,7 +103,7 @@ module.exports = async function install(cr, client, config, db) {
                     embed.setTitle(`${userToString(user)} is on the Naughty list`);
                     embed.setDescription(`${str}Oh dear ... You swore a total of **${bad_words}** times in the messages we analysed (${total_user_messages}). It's a lump of coal in your stocking this year, you naughty thing.`);
                 } else {
-                    embed.setColor(0x67c23a);
+                    embed.setColor(CONST.COLOR.SUCCESS);
                     embed.setTitle(`${userToString(user)} is on the Nice list`);
                     if (naughty_percent === 0) {
                         embed.setDescription(`${str}Wow! You didn't swear at all in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time.`);

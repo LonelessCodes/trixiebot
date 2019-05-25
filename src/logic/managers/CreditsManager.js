@@ -190,7 +190,7 @@ class CreditsManager {
                 streak: 0
             };
 
-            else if (time_left > -CreditsManager.STREAK_TIME) {
+            else if (time_left < -CreditsManager.STREAK_TIME) {
                 await this.dailies.then(db => db.updateOne({
                     userId: user.id
                 }, { $set: { streak: 1, lastDaily: new Date } }));

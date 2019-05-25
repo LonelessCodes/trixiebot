@@ -178,6 +178,9 @@ class CreditsManager {
             userId: user.id
         }));
 
+        /** @type {number} */
+        const dailies = await secureRandom([150, 170, 200]);
+
         if (lastDaily) {
             const time_left = lastDaily.lastDaily.getTime() + CreditsManager.COOLDOWN - Date.now();
 
@@ -186,14 +189,23 @@ class CreditsManager {
                 dailies: 0,
                 streak: 0
             };
+
+            else if (time_left > -CreditsManager.STREAK_TIME) {
+                await this.dailies.then(db => db.updateOne({
+                    userId: user.id
+                }, { $set: { streak: 1, lastDaily: new Date } }));
+
+                return {
+                    dailies,
+                    streak: 1
+                };
+            }
         }
         
         if (!lastDaily) lastDaily = {
             streak: 0
         };
 
-        /** @type {number} */
-        const dailies = await secureRandom(150, 200);
         const streak = (lastDaily.streak % CreditsManager.MAX_STREAK) + 1;
 
         await this.dailies.then(db => db.updateOne({
@@ -263,5 +275,6 @@ class CreditsManager {
 
 CreditsManager.MAX_STREAK = 5;
 CreditsManager.COOLDOWN = 1000 * 3600 * 22; // 22 hours
+CreditsManager.STREAK_TIME = 1000 * 3600 * 6;
 
 module.exports = new CreditsManager;

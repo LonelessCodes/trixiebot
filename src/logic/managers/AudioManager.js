@@ -76,6 +76,8 @@ class VCGuild extends EventEmitter {
     }
 
     async leave() {
+        console.log("leave???");
+        
         if (!this.vc) return;
 
         if (this.vc.connection) {

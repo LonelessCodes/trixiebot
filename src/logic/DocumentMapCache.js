@@ -8,6 +8,7 @@ const { CronJob } = require("cron");
 const DEFAULTS = {
     maxSize: 500,
     ttl: 0,
+    indexes: {}
 };
 
 class DocumentMapCache {
@@ -17,20 +18,21 @@ class DocumentMapCache {
      * @param {string} keyName The document property to get docs from
      * @param {{ [x: string]: any }} databaseIndexes The indexes for the collection
      */
-    constructor(collection, keyName, databaseIndexes = {}, opts = {}) {
-        if (!databaseIndexes[keyName] || !databaseIndexes[keyName].unique) {
+    constructor(collection, keyName, opts = {}) {
+        opts = Object.assign({}, DEFAULTS, opts);
+
+        if (!opts.indexes[keyName]) opts.indexes[keyName] = { unique: true };
+        else if (!opts.indexes[keyName].unique)
             throw new Error("The index string must be a part of the databaseIndexes object and must be unique!");
-        }
 
         this.db = collection;
         this.keyName = keyName;
 
-        this.indexes = databaseIndexes;
-        for (const index in databaseIndexes) {
-            this.db.createIndex({ [index]: 1 }, databaseIndexes[index]);
+        this.indexes = opts.indexes[keyName];
+        for (const index in this.indexes) {
+            this.db.createIndex({ [index]: 1 }, this.indexes[index]);
         }
 
-        opts = Object.assign({}, DEFAULTS, opts);
         this.ttl = opts.ttl * 1000;
         this.maxSize = opts.maxSize;
 
@@ -131,6 +133,15 @@ class DocumentMapCache {
         return doc;
     }
 
+    async has(key) {
+        if (this._documents.has(key)) return !!this._getInternal(key);
+        else {
+            const doc = await this.db.findOne({ [this.keyName]: key });
+            this._setInternal(key, doc);
+            return !!doc;
+        }
+    }
+
     async mget(keys = []) {
         const docs = {};
         const get_keys = [];
@@ -149,6 +160,25 @@ class DocumentMapCache {
         }
 
         return docs;
+    }
+
+    async mhas(keys = []) {
+        const get_keys = [];
+
+        for (let key of keys) {
+            if (this._documents.has(key)) if (!this._getInternal(key)) return false;
+            else get_keys.push(key);
+        }
+
+        if (get_keys.length > 0) {
+            const rows = await this.db.find({ $or: get_keys.map(key => ({ [this.keyName]: key })) });
+            for (let row of rows) 
+                this._setInternal(row[this.keyName], row);
+
+            if (rows.length !== new Set(get_keys).size) return false;
+        }
+        
+        return true;
     }
 
     async set(key, values = {}) {

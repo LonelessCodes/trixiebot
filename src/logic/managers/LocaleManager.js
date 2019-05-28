@@ -72,8 +72,9 @@ module.exports = class LocaleManager {
         this.client = client;
         this.db = db.collection("locale");
         this._cache = new DocumentMapCache(this.db, "guildId", {
-            "guildId": { unique: true },
-            "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
+            indexes: {
+                "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
+            }
         });
         this.locales = locales;
 
@@ -151,7 +152,7 @@ module.exports = class LocaleManager {
 // expose the function for formating a string
 function format(message, format = {}) {
     for (const f in format)
-        message = message.replace(new RegExp(`{{\s*${f}\s*}}`, "g"), format[f]);
+        message = message.replace(new RegExp(`{{\\s*${f}\\s*}}`, "g"), format[f]);
 
     return message;
 }

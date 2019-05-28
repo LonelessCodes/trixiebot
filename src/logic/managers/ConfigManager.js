@@ -94,8 +94,9 @@ class ConfigManager {
 
         this.db = db.collection("guild_config");
         this._cache = new DocumentMapCache(this.db, "guildId", {
-            "guildId": { unique: true },
-            "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
+            indexes: {
+                "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
+            }
         });
 
         const values = {};

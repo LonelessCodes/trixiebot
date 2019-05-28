@@ -101,7 +101,7 @@ class DocumentMapCache {
         }
 
         this._documents.set(key, newdoc);
-        this._setInternal(key);
+        this._setTTLTimeout(key);
 
         return isNew;
     }

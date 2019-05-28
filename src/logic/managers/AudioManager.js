@@ -30,7 +30,7 @@ class VCGuild extends EventEmitter {
          */
         this.vc = null;
 
-        this.voiceStateChanged = this.voiceStateUpdate.bind(this);
+        this.voiceStateUpdate = this.voiceStateUpdate.bind(this);
         this.client.addListener("voiceStateUpdate", this.voiceStateUpdate);
     }
 
@@ -76,15 +76,23 @@ class VCGuild extends EventEmitter {
     }
 
     async leave() {
-        console.log("leave???");
-        
+        try {
+            throw new Error;
+        } catch (err) {
+            console.log(err);
+        }
+
         if (!this.vc) return;
 
         if (this.vc.connection) {
             await this.stop();
             await disconnect(this.vc.connection);
         }
-        if (this.vc) this.vc.leave();
+        // disconnect could trigger vc.connection.on("disconnect"), which will call leave
+        // and set vc to null before we can do it here, therefore trigger VCGuild#leave twice
+        if (!this.vc) return;
+
+        this.vc.leave();
         this.vc = null;
 
         this.emit("leave");

@@ -10,7 +10,7 @@ const DEFAULTS = {
     ttl: 0,
 };
 
-class DocumentCache {
+class DocumentMapCache {
     /**
      * Creates a new manager for caching database documents
      * @param {*} collection The database collection to get documents from
@@ -163,4 +163,4 @@ class DocumentCache {
     }
 }
 
-module.exports = DocumentCache;
+module.exports = DocumentMapCache;

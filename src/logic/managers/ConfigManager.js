@@ -3,7 +3,7 @@ const { isPlainObject } = require("../../modules/util");
 const { Db } = require("mongodb");
 // eslint-disable-next-line no-unused-vars
 const { Client, TextChannel } = require("discord.js");
-const DocumentCache = require("../DocumentCache");
+const DocumentMapCache = require("../DocumentMapCache");
 
 function index(obj, is, value) {
     if (typeof is == "string")
@@ -93,7 +93,7 @@ class ConfigManager {
         this.client = client;
 
         this.db = db.collection("guild_config");
-        this._cache = new DocumentCache(this.db, "guildId", {
+        this._cache = new DocumentMapCache(this.db, "guildId", {
             "guildId": { unique: true },
             "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
         });

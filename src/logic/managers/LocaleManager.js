@@ -3,7 +3,7 @@ const path = require("path");
 const { isPlainObject } = require("../../modules/util");
 const { po } = require("gettext-parser");
 const Gettext = require("node-gettext");
-const DocumentCache = require("../DocumentCache");
+const DocumentMapCache = require("../DocumentMapCache");
 
 const gt = new Gettext;
 
@@ -71,7 +71,7 @@ module.exports = class LocaleManager {
     constructor(client, db, locales) {
         this.client = client;
         this.db = db.collection("locale");
-        this._cache = new DocumentCache(this.db, "guildId", {
+        this._cache = new DocumentMapCache(this.db, "guildId", {
             "guildId": { unique: true },
             "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
         });

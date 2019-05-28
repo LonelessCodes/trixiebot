@@ -122,15 +122,17 @@ module.exports = async function install(cr, client) {
             let str = "";
             for (const line of s) {
                 if (line.startsWith("###")) {
-                    if (title) embed.addField(title, str.trim());
-                    else embed.setDescription(str.trim());
+                    if (title) embed.addField(title, str.trim().replace(/ \* /g, "\n* "));
+                    else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));
                     str = "";
                     title = line.replace(/^###+\s+/, "");
                 }
                 else str += line;
             }
-            if (title) embed.addField(title, str.trim());
-            else embed.setDescription(str.trim());
+            if (title) embed.addField(title, str.trim().replace(/ \* /g, "\n* "));
+            else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));
+
+            embed.addField("Full Changelog:", INFO.WEBSITE + "/changelog");
 
             embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
 

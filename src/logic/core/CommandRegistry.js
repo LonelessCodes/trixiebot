@@ -5,7 +5,6 @@ const { toHumanTime } = require("../../modules/util/time");
 // eslint-disable-next-line no-unused-vars
 const BaseCommand = require("../../class/BaseCommand");
 const AliasCommand = require("../../class/AliasCommand");
-const TreeCommand = require("../../class/TreeCommand");
 // eslint-disable-next-line no-unused-vars
 const CustomCommand = require("../../class/CustomCommand");
 const Category = require("../commands/Category");
@@ -232,12 +231,6 @@ class CommandRegistry {
         const cmd = this.commands.get(command);
         cmd.aliases.push(alias);
         this.register(alias, new AliasCommand(command, cmd));
-    }
-
-    addSubCommandTo(command, name, subCommand) {
-        if (!(command instanceof TreeCommand)) throw new Error("Can only add SubCommand to a TreeCommand instance");
-
-        command.addSubCommand(name, subCommand);
     }
 
     get(id) {

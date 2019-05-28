@@ -5,12 +5,10 @@ const { CronJob } = require("cron");
 // Currently speed is of greater priority than scalability. Will have to change that 
 // when bot gets bigger should limit cache to 1000 most active queries or so 
 
-class Document {
-    constructor(doc) {
-        doc = Object.setPrototypeOf(doc, Document.prototype);
-        return doc;
-    }
-}
+const DEFAULTS = {
+    maxSize: 500,
+    ttl: 0,
+};
 
 class DocumentCache {
     /**
@@ -19,7 +17,7 @@ class DocumentCache {
      * @param {string} keyName The document property to get docs from
      * @param {{ [x: string]: any }} databaseIndexes The indexes for the collection
      */
-    constructor(collection, keyName, databaseIndexes = {}, maxSize = 500) {
+    constructor(collection, keyName, databaseIndexes = {}, opts = {}) {
         if (!databaseIndexes[keyName] || !databaseIndexes[keyName].unique) {
             throw new Error("The index string must be a part of the databaseIndexes object and must be unique!");
         }
@@ -29,15 +27,15 @@ class DocumentCache {
 
         this.indexes = databaseIndexes;
         for (const index in databaseIndexes) {
-            collection.createIndex(index, databaseIndexes[index]);
+            this.db.createIndex({ [index]: 1 }, databaseIndexes[index]);
         }
+
+        this.opts = Object.assign({}, DEFAULTS, opts);
 
         /** @type {Map<string, CronJob>} */
         this._expire = new Map;
         /** @type {Map<string, Config>} */
         this._documents = new Map;
-
-        this.maxSize = maxSize;
     }
 
     checkIndexes(key) {
@@ -67,6 +65,23 @@ class DocumentCache {
         }
     }
 
+    _setInternal(key, newdoc) {
+        const isNew = !this._documents.has(key);
+        if (isNew && this._documents.size >= this.opts.maxSize) {
+            const [firstKey,] = this._documents.entries().next().value;
+            this._documents.delete(firstKey);
+
+            if (this._expire.has(firstKey)) {
+                this._expire.get(firstKey).stop();
+                this._expire.delete(firstKey);
+            }
+        }
+
+        this._documents.set(key, newdoc);
+
+        return isNew;
+    }
+
     async delete(key) {
         if (this._documents.has(key))
             this._documents.delete(key);
@@ -82,33 +97,21 @@ class DocumentCache {
         let doc;
 
         if (this._documents.has(key)) doc = this._documents.get(key);
-        else doc = await this.db.findOne({ [this.keyName]: key });
+        else {
+            doc = await this.db.findOne({ [this.keyName]: key });
+            this._setInternal(key, doc);
+        }
 
         return doc;
     }
 
     async set(key, values = {}) {
-        if (!(values instanceof Document) && !isPlainObject(values)) throw new Error("Values is not of type Object or typeof Document");
+        if (!isPlainObject(values)) throw new Error("Values is not of type Object or typeof Document");
 
-        if (!this._documents.has(key)) {
-            if (this._documents.size >= this.maxSize) {
-                const [firstKey,] = this._documents.entries().next().value;
-                this._documents.delete(firstKey);
-
-                if (this._expire.has(firstKey)) {
-                    this._expire.get(firstKey).stop();
-                    this._expire.delete(firstKey);
-                }
-            }
-
-            const newdoc = new Document(Object.assign({}, values, { [this.keyName]: key }));
-            this._documents.set(key, newdoc);
-            await this.db.updateOne({ [this.keyName]: key }, { $set: newdoc }, { upsert: true });
-        } else {
-            const newdoc = new Document(Object.assign({}, values, { [this.keyName]: key }));
-            this._documents.set(key, newdoc);
-            await this.db.replaceOne({ [this.keyName]: key }, newdoc);
-        }
+        const newdoc = Object.assign({}, values, { [this.keyName]: key });
+        const isNew = this._setInternal(key, newdoc);
+        if (isNew) await this.db.updateOne({ [this.keyName]: key }, { $set: newdoc }, { upsert: true });
+        else await this.db.replaceOne({ [this.keyName]: key }, newdoc);
 
         this.checkIndexes(key);
     }

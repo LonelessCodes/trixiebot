@@ -1,5 +1,29 @@
 const database = require("../../modules/getDatabase");
 
+/*
+    
+    Value:
+    {
+        type: string;
+        id: string;
+        guildId: string;
+        timestamp: Date;
+        value: number;
+        added: number;
+        removed: number;
+    }
+
+    Counter:
+    {
+        type: string;
+        id: string;
+        guildId: string;
+        timestamp: Date;
+        value: number;
+    }
+ 
+ */
+
 class Base {
     constructor(id, db) {
         this.id = id;
@@ -252,10 +276,11 @@ class Counter extends Base {
 
 class GuildStatsManager {
     constructor() {
+        this.old_db = database().then(db => db.collection("guild_stats"));
         this.db = database()
-            .then(db => db.collection("guild_stats"))
+            .then(db => db.collection("guild_stats_new"))
             .then(async db => {
-                await db.createIndex({ timestamp: 1 });
+                await db.createIndex({ timestamp: 1 }, { unique: true });
                 return db;
             });
 

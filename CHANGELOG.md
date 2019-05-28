@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.8"></a>
+## [2.4.8](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.7...v2.4.8) (2019-05-28)
+
+
+### Bug Fixes
+
+* **vc manager:** trixie leaves the voice call automatically again after everyone has left. ([b5c09f5](https://bitbucket.org/Loneless/trixiebot/commits/b5c09f5))
+
+
+
 <a name="2.4.7"></a>
 ## [2.4.7](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.6...v2.4.7) (2019-05-25)
 

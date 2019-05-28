@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.10"></a>
+## [2.4.10](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.9...v2.4.10) (2019-05-28)
+
+
+### Bug Fixes
+
+* **cache:** circular code typo fixed ([89633c6](https://bitbucket.org/Loneless/trixiebot/commits/89633c6))
+* **changelog command:** fixing the bullet point lists and added a link to the full changelog ([2f8fa72](https://bitbucket.org/Loneless/trixiebot/commits/2f8fa72))
+* **db caching:** now actually caching documents after going into the db ([cf2a897](https://bitbucket.org/Loneless/trixiebot/commits/cf2a897))
+
+
+### Features
+
+* **caching:** add internal doc ttl ([50fa2b8](https://bitbucket.org/Loneless/trixiebot/commits/50fa2b8))
+* tried to cache more. Failed, but hey. Reduced db queries before command execution from 5 to 4 ([4d5aa87](https://bitbucket.org/Loneless/trixiebot/commits/4d5aa87))
+
+
+
 <a name="2.4.9"></a>
 ## [2.4.9](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.8...v2.4.9) (2019-05-28)
 

@@ -176,7 +176,7 @@ class Core {
         const server_count = this.client.guilds.size;
 
         await Promise.all([
-            request.post(`https://divinediscordbots.com/bots/${this.client.user.id}/stats`, {
+            request.post(`https://divinediscordbots.com/bot/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {
                     Authorization: divinediscordbots_key

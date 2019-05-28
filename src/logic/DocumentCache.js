@@ -30,12 +30,16 @@ class DocumentCache {
             this.db.createIndex({ [index]: 1 }, databaseIndexes[index]);
         }
 
-        this.opts = Object.assign({}, DEFAULTS, opts);
+        opts = Object.assign({}, DEFAULTS, opts);
+        this.ttl = opts.ttl * 1000;
+        this.maxSize = opts.maxSize;
 
         /** @type {Map<string, CronJob>} */
         this._expire = new Map;
         /** @type {Map<string, Config>} */
         this._documents = new Map;
+        /** @type {Map<string, number>} */
+        this._ttl = new Map;
     }
 
     checkIndexes(key) {
@@ -65,24 +69,7 @@ class DocumentCache {
         }
     }
 
-    _setInternal(key, newdoc) {
-        const isNew = !this._documents.has(key);
-        if (isNew && this._documents.size >= this.opts.maxSize) {
-            const [firstKey,] = this._documents.entries().next().value;
-            this._documents.delete(firstKey);
-
-            if (this._expire.has(firstKey)) {
-                this._expire.get(firstKey).stop();
-                this._expire.delete(firstKey);
-            }
-        }
-
-        this._documents.set(key, newdoc);
-
-        return isNew;
-    }
-
-    async delete(key) {
+    _deleteInternal(key) {
         if (this._documents.has(key))
             this._documents.delete(key);
 
@@ -90,19 +77,78 @@ class DocumentCache {
             this._expire.get(key).stop();
             this._expire.delete(key);
         }
+
+        if (this._ttl.has(key)) {
+            clearTimeout(this._ttl.get(key));
+            this._ttl.delete(key);
+        }
+    }
+
+    _setTTLTimeout(key) {
+        if (this.ttl <= 0) return;
+
+        if (this._ttl.has(key)) clearTimeout(this._ttl.get(key));
+
+        const timeout = setTimeout(() => this._deleteInternal(key), this.ttl);
+        this._ttl.set(key, timeout);
+    }
+
+    _setInternal(key, newdoc) {
+        const isNew = !this._documents.has(key);
+        if (isNew && this.maxSize > 0 && this._documents.size >= this.maxSize) {
+            const [firstKey,] = this._documents.entries().next().value;
+            this._deleteInternal(firstKey);
+        }
+
+        this._documents.set(key, newdoc);
+        this._setInternal(key);
+
+        return isNew;
+    }
+
+    _getInternal(key) {
+        const doc = this._documents.get(key);
+        
+        if (doc) this._setTTLTimeout(key);
+
+        return doc;
+    }
+
+    async delete(key) {
+        this._deleteInternal(key);
         await this.db.deleteOne({ [this.keyName]: key });
     }
 
     async get(key) {
         let doc;
 
-        if (this._documents.has(key)) doc = this._documents.get(key);
+        if (this._documents.has(key)) doc = this._getInternal(key);
         else {
             doc = await this.db.findOne({ [this.keyName]: key });
             this._setInternal(key, doc);
         }
 
         return doc;
+    }
+
+    async mget(keys = []) {
+        const docs = {};
+        const get_keys = [];
+
+        for (let key of keys) {
+            if (this._documents.has(key)) docs[key] = this._getInternal(key);
+            else get_keys.push(key);
+        }
+
+        if (get_keys.length > 0) {
+            const rows = await this.db.find({ $or: get_keys.map(key => ({ [this.keyName]: key })) });
+            for (let row of rows) {
+                docs[row[this.keyName]] = row;
+                this._setInternal(row[this.keyName], row);
+            }
+        }
+
+        return docs;
     }
 
     async set(key, values = {}) {

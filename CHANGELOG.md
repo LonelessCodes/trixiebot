@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.4.9"></a>
+## [2.4.9](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.8...v2.4.9) (2019-05-28)
+
+
+### Bug Fixes
+
+* **message mentions:** fixed some critical bugs with empty strings matching to some user in the server ([4396cc5](https://bitbucket.org/Loneless/trixiebot/commits/4396cc5))
+* divine discord bots stats update fixed ([db0aa65](https://bitbucket.org/Loneless/trixiebot/commits/db0aa65))
+
+
+
 <a name="2.4.8"></a>
 ## [2.4.8](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.7...v2.4.8) (2019-05-28)
 

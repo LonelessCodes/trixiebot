@@ -53,15 +53,20 @@ class MessageMentions {
 
         for (let str of content.split(MessageMentions.USERS_PATTERN)) {
             str = str.trim();
+            if (str === "") continue;
+
             const matches = str.match(MessageMentions.USER_TAG_PATTERN) || [];
             for (let match of matches) {
                 match = match.trim();
+                if (match === "") continue;
                 const user = guild.client.users.find(user => user.tag === match);
                 if (user) this.users.set(user.id, user);
             }
 
             for (let displayName of str.split(MessageMentions.USER_TAG_PATTERN)) {
                 displayName = displayName.trim();
+                if (displayName === "") continue;
+                
                 const member = guild.members.find(member => member.displayName.startsWith(displayName));
                 if (member) this.users.set(member.user.id, member.user);
                 else {

@@ -134,6 +134,7 @@ module.exports = async function install(cr, client, config, db) {
     })
         .setHelp(new HelpContent()
             .setDescription("It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!"))
-        .setCategory(Category.ANALYSIS);
+        .setCategory(Category.ANALYSIS)
+        .dontList();
     cr.registerAlias("naughty", "nice");
 };

@@ -853,7 +853,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         if (!(value instanceof NumberLiteral)) {
             throw this.error("Sleeping duration must be a number", { val: value.native }, ctx.$value);
         }
-        if (value.content > Number.MAX_SAFE_INTEGER) {
+        if (!Number.isFinite(value.content)) {
             throw this.error("Cannot sleep for Infinity", ctx.$value);
         }
         if (value.content < 0) {

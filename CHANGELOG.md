@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.5.0"></a>
+# [2.5.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.10...v2.5.0) (2019-06-12)
+
+
+### Bug Fixes
+
+* **cc interpreter:** fixed Infinity ([d2729f1](https://bitbucket.org/Loneless/trixiebot/commits/d2729f1))
+
+
+### Features
+
+* **server stats:** redone the whole server stats stuff ([06600d8](https://bitbucket.org/Loneless/trixiebot/commits/06600d8))
+* added userstats command ([b36c81d](https://bitbucket.org/Loneless/trixiebot/commits/b36c81d))
+
+
+
 <a name="2.4.10"></a>
 ## [2.4.10](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.9...v2.4.10) (2019-05-28)
 

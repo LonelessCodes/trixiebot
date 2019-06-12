@@ -59,7 +59,7 @@ module.exports = async function install(cr, client) {
     cr.register("info", new class extends BaseCommand {
         async call(message) {
             const guilds = client.guilds;
-            const users = client.users;
+            const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
             const channels = client.channels;
 
             const embed = new Discord.RichEmbed()
@@ -79,7 +79,7 @@ module.exports = async function install(cr, client) {
 
                 .addField("Total Servers", guilds.size.toLocaleString("en"), true)
                 .addField("Text Channels", channels.filter(c => c.type === "text").size.toLocaleString("en"), true)
-                .addField("Total Users", users.size.toLocaleString("en"))
+                .addField("Total Users", users.toLocaleString("en"))
 
                 .addField("Executed Commands", stats.bot.get("COMMANDS_EXECUTED").get().toLocaleString("en"), true)
                 .addField("Processed Messages", stats.bot.get("MESSAGES_TODAY").get().toLocaleString("en"))

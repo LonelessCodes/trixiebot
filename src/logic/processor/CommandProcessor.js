@@ -13,7 +13,7 @@ class CommandProcessor {
 
         stats.bot.register("COMMANDS_EXECUTED", true);
 
-        guild_stats.register("commands", "counter");
+        guild_stats.registerCounter("commands");
     }
 
     async run(message) {
@@ -57,9 +57,7 @@ class CommandProcessor {
             stats.bot.get("COMMANDS_EXECUTED").inc(1);
             
             if (message.channel.type === "text")
-                await guild_stats.get("commands").increment(new Date, message.guild.id, command_name, 1);
-            const start = new Date;
-            start.setHours(start.getHours() - 24);
+                await guild_stats.get("commands").add(new Date, message.guild.id, message.channel.id, message.author.id, command_name);
         }
     }
 }

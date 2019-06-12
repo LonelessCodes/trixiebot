@@ -213,7 +213,7 @@ class Core {
             request.post(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
                 json: {
                     guilds: server_count,
-                    users: this.client.users.size,
+                    users: this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0),
                     voice_connections: this.client.voiceConnections.size
                 },
                 headers: {

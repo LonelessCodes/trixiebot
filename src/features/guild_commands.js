@@ -149,6 +149,40 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setDescription("Get some stats about the alive-ness of this server"))
         .setCategory(Category.INFO);
+
+    cr.register("userstats", new class extends BaseCommand {
+        async call(message, content) {
+            const mentions = new MessageMentions(content, message.guild);
+            const member = mentions.members.first() || message.member;
+            const user = member.user;
+
+            const guildId = message.guild.id;
+
+            const { today, yesterday, week, month, quartal } = generateTimeFrames();
+
+            const results = await Promise.all([
+                guild_stats.get("commands").getRangeUser(quartal, null, guildId, user.id).then(sort),
+                guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort)
+            ]);
+
+            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+            embed.setAuthor(`${userToString(member, true)} - ${await message.channel.translate("Statistics")}`, user.avatarURL);
+
+            embed.addField("Today", getString(today, null, results), true);
+            embed.addField("Yesterday", getString(yesterday, today, results), true);
+
+            embed.addField("Average (7 days)", getAverageString(week, 7, results));
+            embed.addField("Average (30 days)", getAverageString(month, 30, results));
+            embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
+
+            await message.channel.send({ embed });
+        }
+    })
+        .setHelp(new HelpContent()
+            .setDescription("Get some stats about how active someone is on the server")
+            .setUsage("<?@user>", "")
+            .addParameterOptional("@user", "The member c:"))
+        .setCategory(Category.INFO);
     
     cr.register("serverinfo", new class extends BaseCommand {
         async call(message) {

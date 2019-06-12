@@ -33,31 +33,34 @@ class WebsiteManager {
                 guild_stats.get("messages").getRange(month, now, guildId),
                 guild_stats.get("users").getRange(month, now, guildId),
 
-                guild_stats.get("users").getLastItemBefore(month),
+                guild_stats.get("users").getLastItemBefore(month, guildId),
             ]);
             return {
                 success: true,
                 commands: {
                     type: guild_stats.get("commands").type,
                     data: results[0].map(a => {
-                        a.timestamp = a.timestamp.toString();
+                        a.ts = a.ts.toString();
                         return a;
                     })
                 },
                 messages: {
                     type: guild_stats.get("messages").type,
                     data: results[1].map(a => {
-                        a.timestamp = a.timestamp.toString();
+                        a.ts = a.ts.toString();
                         return a;
                     })
                 },
                 users: {
                     type: guild_stats.get("users").type,
                     data: results[2].map(a => {
-                        a.timestamp = a.timestamp.toString();
+                        a.ts = a.ts.toString();
                         return a;
                     }),
-                    before: results[3]
+                    before: {
+                        ...results[3],
+                        ts: results[3].ts.toString()
+                    }
                 },
             };
         });

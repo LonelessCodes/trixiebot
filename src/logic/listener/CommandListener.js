@@ -3,7 +3,7 @@ const INFO = require("../../info");
 const stats = require("../stats");
 const guild_stats = require("../managers/GuildStatsManager");
 // eslint-disable-next-line no-unused-vars
-const { Message, TextChannel, Permissions } = require("discord.js");
+const { Message, Permissions } = require("discord.js");
 
 /**
  * @param {Message} message 
@@ -12,13 +12,6 @@ async function onProcessingError(message, err) {
     log.error(err);
     
     try {
-        if (message.channel.type === "text") {
-            const self = message.guild.me;
-            /** @type {TextChannel} */
-            const channel = message.channel;
-            if (!channel.memberPermissions(self).has(Permissions.FLAGS.SEND_MESSAGES, true))
-                return;
-        }
         if (INFO.DEV) await message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
         else await message.channel.sendTranslated("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
     } catch (_) { _; }
@@ -30,7 +23,7 @@ class CommandListener {
 
         stats.bot.register("MESSAGES_TODAY", true);
 
-        guild_stats.register("messages", "counter");
+        guild_stats.registerCounter("messages");
     }
 
     /**
@@ -42,15 +35,11 @@ class CommandListener {
 
             stats.bot.get("MESSAGES_TODAY").inc(1);
             if (message.channel.type === "text")
-                guild_stats.get("messages").increment(new Date, message.guild.id, null, 1);
-
-            if (message.channel.type === "text") {
-                const self = message.guild.me;
-                /** @type {TextChannel} */
-                const channel = message.channel;
-                if (!channel.memberPermissions(self).has(Permissions.FLAGS.SEND_MESSAGES, true))
-                    return;
-            }
+                guild_stats.get("messages").add(new Date, message.guild.id, message.channel.id, message.author.id);
+ 
+            if (message.channel.type === "text" &&
+                !message.channel.memberPermissions(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES, true))
+                return;
 
             await this.commandProcessor.run(message);
         } catch (err) {

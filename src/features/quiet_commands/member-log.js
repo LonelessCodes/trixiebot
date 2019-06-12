@@ -11,23 +11,24 @@ module.exports = async function install(cr, client, config) {
     await stats.bot.register("TOTAL_USERS");
     await stats.bot.register("TEXT_CHANNELS");
 
-    await guild_stats.register("users", "value");
+    const user_count = guild_stats.registerHistogram("users");
+    // const online_user_count = await guild_stats.registerHistogram("online_users");
 
-    for (const [guildId, guild] of client.guilds) {
-        guild_stats.get("users").set(new Date, guildId, null, guild.members.size);
-    }
+    for (const [guildId, guild] of client.guilds)
+        user_count.set(new Date, guildId, null, guild.memberCount);
 
     const updateGuildStatistics = () => {
         stats.bot.get("TOTAL_SERVERS").set(client.guilds.size);
         stats.bot.get("LARGE_SERVERS").set(client.guilds.filter(guild => !!guild.large).size);
-        stats.bot.get("TOTAL_USERS").set(client.users.size);
+        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
         stats.bot.get("TEXT_CHANNELS").set(client.channels.filter(guild => guild.type === "text").size);
     };
-
     updateGuildStatistics();
 
     client.addListener("guildCreate", guild => {
         setImmediate(async () => {
+            user_count.set(new Date, guild.id, null, guild.memberCount);
+
             const channel = findDefaultChannel(guild);
             if (!channel) return;
 
@@ -37,8 +38,6 @@ module.exports = async function install(cr, client, config) {
                 "Just call `!trixie` if you need my help");
             log.debug("Member Log", `Trixie got invited and joined new guild ${guild.name}`);
             updateGuildStatistics();
-
-            guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
         });
     });
 
@@ -49,6 +48,9 @@ module.exports = async function install(cr, client, config) {
 
     client.addListener("guildMemberAdd", async member => {
         const guild = member.guild;
+
+        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        user_count.set(new Date, guild.id, null, guild.memberCount);
 
         const guild_config = await config.get(guild.id);
 
@@ -65,13 +67,13 @@ module.exports = async function install(cr, client, config) {
         });
 
         await channel.send(str);
-        updateGuildStatistics();
-
-        guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
     });
 
     client.addListener("guildMemberRemove", async member => {
         const guild = member.guild;
+
+        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        user_count.set(new Date, guild.id, null, guild.memberCount);
 
         const guild_config = await config.get(guild.id);
 
@@ -88,12 +90,12 @@ module.exports = async function install(cr, client, config) {
         });
 
         await channel.send(str);
-        updateGuildStatistics();
-
-        guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
     });
 
     client.addListener("guildBanAdd", async (guild, user) => {
+        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        user_count.set(new Date, guild.id, null, guild.memberCount);
+
         const guild_config = await config.get(guild.id);
 
         if (!guild_config.ban.enabled) return;
@@ -108,8 +110,5 @@ module.exports = async function install(cr, client, config) {
         });
 
         await channel.send(str);
-        updateGuildStatistics();
-
-        guild_stats.get("users").set(new Date, guild.id, null, guild.members.size);
     });
 };

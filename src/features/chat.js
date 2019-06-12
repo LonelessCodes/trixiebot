@@ -13,12 +13,16 @@ module.exports = async function install(cr) {
         async call(message, input) {
             await typing.startTyping(message.channel);
 
-            const session = await bot.create(message.author.id);
+            try {
+                const session = await bot.create(message.author.id);
 
-            const reply = await session.ask(input);
+                const reply = await session.ask(input);
 
-            await typing.stopTyping(message.channel);
-            await message.channel.send(`${message.member.toString()} ${reply}`);
+                await typing.stopTyping(message.channel);
+                await message.channel.send(`${message.member.toString()} ${reply}`);
+            } catch (_) {
+                await typing.stopTyping(message.channel);
+            }
         }
     })
         .setHelp(new HelpContent()

@@ -21,7 +21,7 @@ function setNewVal(values, query, value) {
 }
 
 async function init() {
-    const database = await getDatabase("trixiedev");
+    const database = await getDatabase();
 
     const old_db = database.collection("guild_stats");
     const db = database.collection("guild_stats_new");

@@ -14,6 +14,10 @@ class NanoTimer {
         return this._diff[0] * NS_PER_SEC + this._diff[1];
     }
 }
-NanoTimer.NS_PER_SEC = NS_PER_SEC;
 
-module.exports = NanoTimer;
+function nanoTimer() {
+    return new NanoTimer().begin();
+}
+nanoTimer.NS_PER_SEC = NS_PER_SEC;
+
+module.exports = nanoTimer;

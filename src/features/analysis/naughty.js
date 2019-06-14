@@ -1,5 +1,5 @@
 const { userToString } = require("../../modules/util");
-const CONST = require("../../modules/CONST");
+const CONST = require("../../const");
 const Queue = require("../../logic/Queue");
 const fs = require("fs-extra");
 const path = require("path");

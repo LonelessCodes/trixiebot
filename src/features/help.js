@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const INFO = require("../info");
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 
 const BaseCommand = require("../class/BaseCommand");
 const AliasCommand = require("../class/AliasCommand");

@@ -9,7 +9,7 @@ const moment = require("moment");
 const { splitArgs } = require("../modules/util/string");
 const { toHumanTime } = require("../modules/util/time");
 const { userToString, timeout } = require("../modules/util/index");
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 const Paginator = require("../logic/Paginator");
 const Discord = require("discord.js");
 

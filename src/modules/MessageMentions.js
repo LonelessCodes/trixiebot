@@ -1,10 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const { Collection, User, Guild, Client, GuildMember, Role } = require("discord.js");
 
-/**
- * TODO: parse USER MENTIONS RIGHT
- */
-
 class MessageMentions {
     /**
      * New Custom message mention finder

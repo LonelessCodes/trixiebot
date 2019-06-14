@@ -1,5 +1,5 @@
 const fetch = require("node-fetch");
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../class/SimpleCommand");

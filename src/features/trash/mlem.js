@@ -1,5 +1,5 @@
 const { userToString } = require("../../modules/util");
-const CONST = require("../../modules/CONST");
+const CONST = require("../../const");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../class/SimpleCommand");

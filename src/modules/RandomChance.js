@@ -1,4 +1,4 @@
-const { randomItem } = require("../modules/util/array");
+const { randomItem } = require("./util/array");
 
 class RandomChance {
     constructor() {

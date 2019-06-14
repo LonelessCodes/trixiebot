@@ -1,4 +1,4 @@
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 const secureRandom = require("../modules/secureRandom");
 const Discord = require("discord.js");
 

@@ -3,7 +3,7 @@ const AliasCommand = require("../../class/AliasCommand");
 const CommandPermission = require("./CommandPermission");
 const Category = require("./Category");
 const { RichEmbed } = require("discord.js");
-const CONST = require("../../modules/CONST");
+const CONST = require("../../const");
 
 function ucFirst(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);

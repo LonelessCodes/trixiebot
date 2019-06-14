@@ -1,24 +1,23 @@
 const botlist_keys = require("../../../keys/botlist_keys.json");
+const statuses = require("../../../resources/text/statuses");
 const request = require("request-promise-native");
 const log = require("../../modules/log");
 const info = require("../../info");
-const NanoTimer = require("../../modules/NanoTimer");
+const nanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/util");
-const helpToJSON = require("../../modules/util/helpToJSON.js");
+const helpToJSON = require("../../modules/util/helpToJSON");
 const path = require("path");
 const fs = require("fs-extra");
 const secureRandom = require("../../modules/secureRandom");
 const WebsiteManager = require("../managers/WebsiteManager");
 const CommandProcessor = require("../processor/CommandProcessor");
-const CommandListener = require("../listener/CommandListener");
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("../managers/ConfigManager");
 const UpvotesManager = require("../managers/UpvotesManager");
 const CalendarEvents = require("../CalendarEvents");
 
-const Discord = require("discord.js");
 // eslint-disable-next-line no-unused-vars
-const { Client } = Discord;
+const { Client } = require("discord.js");
 
 class Core {
     /**
@@ -35,7 +34,6 @@ class Core {
 
         this.processor = new CommandProcessor(this.client, this.config, this.db);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.db);
-        this.commandListener = new CommandListener(this.processor);
         this.upvotes = new UpvotesManager(this.client, this.db);
     }
 
@@ -60,7 +58,7 @@ class Core {
         await Promise.all(files.map(async file => {
             if (path.extname(file) !== ".js") return;
 
-            const timer = new NanoTimer().begin();
+            const timer = nanoTimer();
 
             const install = require(path.resolve("../../" + commands_package, file));
             await install(this.processor.REGISTRY, this.client, this.config, this.db);
@@ -88,9 +86,7 @@ class Core {
     }
 
     async attachListeners() {
-        this.client.addListener("message", message => {
-            this.commandListener.onMessage(message);
-        });
+        this.client.addListener("message", message => this.processor.onMessage(message));
     }
 
     async setStatus() {
@@ -104,44 +100,7 @@ class Core {
             if (CalendarEvents.CHRISTMAS.isToday()) status = "Merry Christmas!";
             else if (CalendarEvents.HALLOWEEN.isToday()) status = "Happy Halloween!";
             else if (CalendarEvents.NEW_YEARS.isToday()) status = "Happy New Year!";
-            else {
-                status = await secureRandom([
-                    "Trixie is the highest level unicorn!",
-                    "Cheated? Moi?",
-                    "Hello... princess!",
-                    "Behold, the Peat and Growerful Triskie...!",
-                    "No fruit calls in my class!",
-                    "Everypony deserves a second chance—even a third chance!",
-                    "It's good to be the queen!",
-                    "Trixie will go with you, too!",
-
-                    // Season 7
-                    "Whoops! I guess I pictured a teacup poodle? Heh.",
-                    "[clears throat] Teleport.",
-
-                    // Season 6 
-                    "It's a working title.",
-                    "I'd love to perform for peanut butter crackers...",
-                    "Starlight? What time is it?",
-
-                    "Anything you can do, I can do better.",
-                    "Is Trixie destined to be the greatest equine who has ever lived!?!",
-                    "You can forgive me, can't you?",
-                    "Deep down, they never forget.",
-                    "Come and see the Pathetic and Friendless Trixie",
-                    "The Starlight I love is passionate, lively, and yeah, sometimes angry.",
-                    "Usually, ponies just call me Trixie. But \"Ms.Powerful\" has a nice ring.",
-
-                    "but... I'm trying so hard to be good.",
-                    "¿Me perdonas, Twilight?",
-                    "Everywhere I went I was laughed at and ostracized!",
-                    "Great idea, Princess Twilight. Asking me",
-                    "Teleport, like you told me to.",
-                    "Um, what exactly is a long-distance plan?",
-                    "The Great and Powerful Trixie doesn't chant.",
-                    "Your snoring is a bit, um..."
-                ]);
-            }
+            else status = await secureRandom(statuses);
 
             this.client.user.setStatus("online");
             this.client.user.setActivity(`!trixie | ${status}`, { type: "PLAYING" });

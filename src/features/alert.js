@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 const log = require("../modules/log");
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 const Discord = require("discord.js");
 const { EventEmitter } = require("events");
 

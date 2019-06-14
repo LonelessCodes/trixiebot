@@ -1,5 +1,5 @@
 const { userToString } = require("../../../modules/util");
-const CONST = require("../../../modules/const");
+const CONST = require("../../../const");
 const Events = require("events");
 const AudioManager = require("../AudioManager");
 // eslint-disable-next-line no-unused-vars

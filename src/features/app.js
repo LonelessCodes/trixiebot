@@ -1,5 +1,5 @@
 const INFO = require("../info");
-const CONST = require("../modules/const");
+const CONST = require("../const");
 const Discord = require("discord.js");
 
 const TextCommand = require("../class/TextCommand");

@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const CONST = require("../const");
+const CONST = require("../../const");
 const Discord = require("discord.js");
 
 module.exports.walk =
@@ -100,8 +100,9 @@ module.exports.userToString = function userToString(member, plainText = false) {
         `**${member.username}** #${member.discriminator}`;
 };
 
-module.exports.basicEmbed = function basicEmbed(title, color = CONST.COLOR.PRIMARY) {
+module.exports.basicEmbed = function basicEmbed(title, user, color = CONST.COLOR.PRIMARY) {
+    if (user instanceof Discord.GuildMember) user = user.user;
     return new Discord.RichEmbed()
         .setColor(color)
-        .setAuthor(module.exports.userToString(this.user, true) + " | " + title, this.user.avatarURL);
+        .setAuthor(module.exports.userToString(user, true) + " | " + title, user.avatarURL);
 };

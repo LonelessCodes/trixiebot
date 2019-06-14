@@ -4,7 +4,7 @@ const { toHumanTime } = require("../modules/util/time");
 const { timeout } = require("../modules/util");
 const getChangelog = require("../modules/getChangelog");
 const INFO = require("../info");
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 const Discord = require("discord.js");
 
 async function getCPUUsage() {

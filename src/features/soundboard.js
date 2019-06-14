@@ -15,7 +15,7 @@ const moment = require("moment");
 const { userToString } = require("../modules/util");
 const { toHumanTime } = require("../modules/util/time");
 const log = require("../modules/log");
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 const Discord = require("discord.js");
 const { Guild, User } = Discord;
 

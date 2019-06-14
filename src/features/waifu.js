@@ -4,7 +4,7 @@ const { toHumanTime } = require("../modules/util/time");
 const secureRandom = require("../modules/secureRandom");
 const credits = require("../logic/managers/CreditsManager");
 const purchaseSlots = require("../logic/managers/credits/purchaseSlots");
-const CONST = require("../modules/CONST");
+const CONST = require("../const");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../class/BaseCommand");

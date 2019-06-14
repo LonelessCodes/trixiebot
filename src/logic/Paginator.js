@@ -1,5 +1,5 @@
 const { userToString } = require("../modules/util");
-const CONST = require("../modules/const");
+const CONST = require("../const");
 const Events = require("events");
 // eslint-disable-next-line no-unused-vars
 const { User, TextChannel, Message, MessageReaction, RichEmbed } = require("discord.js");

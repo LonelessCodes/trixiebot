@@ -34,12 +34,12 @@ module.exports = async function install(cr) {
             }
 
             try {
-                const url = `http://api.voicerss.org/?key=${voicerssKey.key}&hl=en-us&f=44khz_16bit_mono&c=OGG&src=${encodeURIComponent(content)}`;
+                const url = `https://api.voicerss.org/?key=${voicerssKey.key}&hl=en-US&f=44khz_16bit_mono&c=OGG&src=${encodeURIComponent(content)}`;
 
                 const connection = await audio.connect(message.member);
                 const request = await fetch(url);
 
-                const dispatcher = connection.playStream(request.body);
+                const dispatcher = connection.playStream(request.body, { passes: 2 });
                 dispatcher.once("start", () => {
                     connection.player.streamingData.pausedTime = 0;
                 });

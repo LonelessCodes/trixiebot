@@ -1,8 +1,7 @@
-const botlist_keys = require("../../../keys/botlist_keys.json");
+const config = require("../../config");
 const statuses = require("../../../resources/text/statuses");
 const request = require("request-promise-native");
 const log = require("../../modules/log");
-const info = require("../../info");
 const nanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/util");
 const helpToJSON = require("../../modules/util/helpToJSON");
@@ -45,7 +44,7 @@ class Core {
         await this.loadCommands(commands_package);
         await this.attachListeners();
         await this.setStatus();
-        if (!info.DEV) this.setupDiscordBots();
+        this.setupDiscordBots();
     }
 
     async loadCommands(commands_package) {
@@ -122,54 +121,56 @@ class Core {
     }
 
     async updateStatistics() {
-        const {
-            "divinediscordbots.com": divinediscordbots_key,
-            "botsfordiscord.com": botsfordiscord_key,
-            "discord.bots.gg": discordbotsgg_key,
-            "botlist.space": botlistspace_key,
-            "terminal.ink": terminalink_key,
-            "discordbotlist.com": discordbotlist_key,
-            "discordbots.org": discordbots_key
-        } = botlist_keys;
-
         const server_count = this.client.guilds.size;
 
-        await Promise.all([
-            request.post(`https://divinediscordbots.com/bot/${this.client.user.id}/stats`, {
+        const promises = [];
+
+        if (config.has("botlists.divinediscordbots_com"))
+            promises.push(request.post(`https://divinediscordbots.com/bot/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {
-                    Authorization: divinediscordbots_key
+                    Authorization: config.get("botlists.divinediscordbots_com")
                 }
-            }).catch(err => err),
-            request.post(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
+            }).catch(err => err));
+        
+        if (config.has("botlists.botsfordiscord_com"))
+            promises.push(request.post(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: botsfordiscord_key
+                    Authorization: config.get("botlists.botsfordiscord_com")
                 }
-            }).catch(err => err),
-            request.post(`https://discord.bots.gg/api/v1/bots/${this.client.user.id}/stats`, {
+            }).catch(err => err));
+
+        if (config.has("botlists.discord_bots_gg"))
+            promises.push(request.post(`https://discord.bots.gg/api/v1/bots/${this.client.user.id}/stats`, {
                 json: { guildCount: server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: discordbotsgg_key
+                    Authorization: config.get("botlists.discord_bots_gg")
                 }
-            }).catch(err => err),
-            request.post(`https://botlist.space/api/bots/${this.client.user.id}`, {
+            }).catch(err => err));
+
+        if (config.has("botlists.botlist_space"))
+            promises.push(request.post(`https://botlist.space/api/bots/${this.client.user.id}`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: botlistspace_key
+                    Authorization: config.get("botlists.botlist_space")
                 }
-            }).catch(err => err),
-            request.post(`https://ls.terminal.ink/api/v2/bots/${this.client.user.id}`, {
+            }).catch(err => err));
+
+        if (config.has("botlists.ls_terminal_ink"))
+            promises.push(request.post(`https://ls.terminal.ink/api/v2/bots/${this.client.user.id}`, {
                 json: { bot: { count: server_count } },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: terminalink_key
+                    Authorization: config.get("botlists.ls_terminal_ink")
                 }
-            }).catch(err => err),
-            request.post(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
+            }).catch(err => err));
+
+        if (config.has("botlists.discordbotlist_com"))
+            promises.push(request.post(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
                 json: {
                     guilds: server_count,
                     users: this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0),
@@ -177,17 +178,20 @@ class Core {
                 },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: "Bot " + discordbotlist_key
+                    Authorization: "Bot " + config.get("botlists.discordbotlist_com")
                 }
-            }).catch(err => err),
-            request.post(`https://discordbots.org/api/bots/${this.client.user.id}/stats`, {
+            }).catch(err => err));
+
+        if (config.has("botlists.discordbots_org"))
+            promises.push(request.post(`https://discordbots.org/api/bots/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: discordbots_key
+                    Authorization: config.get("botlists.discordbots_org")
                 }
-            }).catch(err => err)
-        ]);
+            }).catch(err => err));
+
+        await Promise.all(promises);
     }
 }
 

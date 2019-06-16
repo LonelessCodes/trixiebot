@@ -51,7 +51,7 @@ class CommandProcessor {
 
             await this.run(message);
         } catch (err) {
-            onProcessingError(message, err);
+            await onProcessingError(message, err);
         }
     }
 

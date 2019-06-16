@@ -1,5 +1,5 @@
 const log = require("../modules/log");
-const voicerssKey = require("../../keys/voicerss.json");
+const config = require("../config");
 const fetch = require("node-fetch");
 const AudioManager = require("../logic/managers/AudioManager");
 const { ConnectError } = AudioManager;
@@ -9,6 +9,8 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
+    if (!config.has("voicerss.key")) return log.debug("config", "Found no API token for voicerss - Disabled tts command");
+    
     cr.register("tts", new class extends BaseCommand {
         async call(message, content) {
             if (content === "") return;
@@ -34,7 +36,7 @@ module.exports = async function install(cr) {
             }
 
             try {
-                const url = `https://api.voicerss.org/?key=${voicerssKey.key}&hl=en-US&f=44khz_16bit_mono&c=OGG&src=${encodeURIComponent(content)}`;
+                const url = `https://api.voicerss.org/?key=${config.get("voicerss.key")}&hl=en-US&f=44khz_16bit_mono&c=OGG&src=${encodeURIComponent(content)}`;
 
                 const connection = await audio.connect(message.member);
                 const request = await fetch(url);

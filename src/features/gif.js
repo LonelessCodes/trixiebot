@@ -1,4 +1,6 @@
-const giphy = require("giphy-api")(require("../../keys/giphy.json").key);
+const giphy_api = require("giphy-api");
+const config = require("../config");
+const log = require("../modules/log");
 const { randomItem } = require("../modules/util/array");
 
 const BaseCommand = require("../class/BaseCommand");
@@ -7,6 +9,10 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
+    if (!config.has("giphy.key")) return log.debug("config", "Found no API token for Giphy - Disabled gif command");
+
+    const giphy = giphy_api(config.get("giphy.key"));
+
     const gifCommand = cr.register("gif", new TreeCommand)
         .setHelp(new HelpContent()
             .setUsage("<query>", "returns the top result for the given `query`")

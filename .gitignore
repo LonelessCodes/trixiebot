@@ -1,2 +1,4 @@
-keys/
 node_modules/
+config/default.yaml
+config/development.yaml
+config/production.yaml

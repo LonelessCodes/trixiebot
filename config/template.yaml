@@ -1,0 +1,75 @@
+# never commit the config files!!!
+
+# to get started, copy the contents of this file into 
+# "default.yaml" and fill in all the data
+# additionally files "development.yaml" and "production.yaml"
+# can be created that will overwrite the default depending on
+# the NODE_ENV environment variable
+
+owner_id: "1234" # must be a string
+
+database:
+  host: localhost
+  port: 27017
+  db: trixiebot
+  # optional:
+  auth:
+    user: XXXX
+    pass: XXXX
+
+discord:
+  token:         XXXX
+  client_id:     "1234" # must be a string
+  client_secret: XXXX
+
+# the dir for user generated files created outside the project root
+user_files_dir: trixiefiles
+
+# Optional API Keys and configs
+
+prefix: "!"
+
+website_url: https://trixie.loneless.art
+invite_url:  https://trixie.loneless.art/invite
+
+derpibooru:
+  key:  XXXX
+
+cleverbot:
+  user: XXXX
+  key:  XXXX
+
+giphy:
+  key:  XXXX
+
+twitch:
+  client_id:     XXXX
+
+twitter:
+  consumer_key:         XXXX
+  consumer_secret:      XXXX
+  access_token:         XXXX
+  access_token_secret:  XXXX
+
+voicerss:
+  key: XXXX
+
+tumblr: 
+  key: XXXX
+
+# the vote webhook secrets
+webhook:
+  port: 5000
+  secrets:
+    discordbotlist_com:    XXXX
+    discordbots_org:       XXXX
+    botsfordiscord_com:    XXXX
+
+botlists:
+  divinediscordbots_com: XXXX
+  botlist_space:         XXXX
+  discord_bots_gg:       XXXX
+  discordbotlist_com:    XXXX
+  discordbots_org:       XXXX
+  terminal_ink:          XXXX
+  botsfordiscord_com:    XXXX

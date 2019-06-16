@@ -2,9 +2,7 @@ const EventEmitter = require("events");
 const http = require("http");
 const querystring = require("querystring");
 const log = require("../../modules/log");
-const tokens = require("../../../keys/botlist_keys.json");
-const secrets = require("../../../keys/webhook.json");
-const info = require("../../info");
+const config = require("../../config");
 
 class UpvotesManager extends EventEmitter {
     constructor(client, db) {
@@ -12,7 +10,9 @@ class UpvotesManager extends EventEmitter {
 
         this.client = client;
 
-        this.port = info.DEV ? 5001 : 5000;
+        if (!config.has("webhook.port")) return this;
+
+        this.port = config.get("webhook.port");
         this.path = "/webhook/upvote/";
 
         this.db = db.collection("votes");
@@ -80,44 +80,44 @@ class UpvotesManager extends EventEmitter {
     _processVote(req, res, url, data) {
         const [service] = url.split("/");
 
-        if (service === UpvotesManager.discordbotlist) {
-            const signature = req.headers["x-dbl-signature"];
-            if (!signature) return this._returnResponse(res, 400);
+        switch (service) {
+            case UpvotesManager.discordbotlist: {
+                const config_path = "webhook.secrets." + UpvotesManager.discordbotlist.replace(/./g, "_");
+                if (!config.has(config_path)) return;
 
-            const [secret, timestamp] = signature.split(" ");
-            if (secret !== secrets[UpvotesManager.discordbotlist]) return this._returnResponse(res, 400);
+                const signature = req.headers["x-dbl-signature"];
+                if (!signature) return this._returnResponse(res, 400);
 
-            let millis;
-            try {
-                millis = parseInt(timestamp);
-                if (millis > 1000 * 60 * 2) throw new Error("Timestamp too big");
-            } catch (_) {
-                return this._returnResponse(res, 400);
+                const [secret, timestamp] = signature.split(" ");
+                if (secret !== config.get(config_path)) return this._returnResponse(res, 400);
+
+                let millis;
+                try {
+                    millis = parseInt(timestamp);
+                    if (millis > 1000 * 60 * 2) throw new Error("Timestamp too big");
+                } catch (_) {
+                    return this._returnResponse(res, 400);
+                }
+
+                this.emit("vote", {
+                    id: data.id,
+                    site: UpvotesManager.discordbotlist,
+                    timestamp: Date.now() - millis
+                });
+                return this._returnResponse(res, 200, "Webhook successfully received");
             }
+            case UpvotesManager.discordbots: {
+                const config_path = "webhook.secrets." + UpvotesManager.discordbots.replace(/./g, "_");
+                if (!config.has(config_path)) return;
 
-            this.emit("vote", {
-                id: data.id,
-                site: UpvotesManager.discordbotlist,
-                timestamp: Date.now() - millis
-            });
-            return this._returnResponse(res, 200, "Webhook successfully received");
-        } else if (service === UpvotesManager.discordbots) {
-            const secret = req.headers["authorization"];
-            if (secret !== secrets[UpvotesManager.discordbots]) return this._returnResponse(res, 400);
+                const secret = req.headers["authorization"];
+                if (secret !== config.get(config_path)) return this._returnResponse(res, 400);
 
-            if (data.query === "") data.query = undefined;
-            if (data.query) data.query = querystring.parse(data.query.substr(1));
+                if (data.query === "") data.query = undefined;
+                if (data.query) data.query = querystring.parse(data.query.substr(1));
 
-            const timestamp = Date.now();
+                const timestamp = Date.now();
 
-            this.emit("vote", {
-                id: data.user,
-                type: data.type,
-                query: data.query,
-                site: UpvotesManager.discordbots,
-                timestamp
-            });
-            if (data.isWeekend) {
                 this.emit("vote", {
                     id: data.user,
                     type: data.type,
@@ -125,29 +125,62 @@ class UpvotesManager extends EventEmitter {
                     site: UpvotesManager.discordbots,
                     timestamp
                 });
+                if (data.isWeekend) {
+                    this.emit("vote", {
+                        id: data.user,
+                        type: data.type,
+                        query: data.query,
+                        site: UpvotesManager.discordbots,
+                        timestamp
+                    });
+                }
+                return this._returnResponse(res, 200, "Webhook successfully received");
             }
-            return this._returnResponse(res, 200, "Webhook successfully received");
-        } else if (service === UpvotesManager.botlistspace) {
-            const secret = req.headers["authorization"];
-            if (secret !== tokens[UpvotesManager.botlistspace]) return this._returnResponse(res, 400);
+            case UpvotesManager.botlistspace: {
+                const config_path = "webhook.secrets." + UpvotesManager.botlistspace.replace(/./g, "_");
+                if (!config.has(config_path)) return;
 
-            this.emit("vote", {
-                id: data.user.id,
-                site: UpvotesManager.botlistspace,
-                timestamp: Date.now()
-            });
-            return this._returnResponse(res, 200, "Webhook successfully received");
-        } else if (service === UpvotesManager.botsfordiscord) {
-            const secret = req.headers["authorization"];
-            if (secret !== secrets[UpvotesManager.botsfordiscord]) return this._returnResponse(res, 400);
+                const secret = req.headers["authorization"];
+                if (secret !== config.get(config_path)) return this._returnResponse(res, 400);
 
-            this.emit("vote", {
-                id: data.user,
-                type: data.type,
-                site: UpvotesManager.botsfordiscord,
-                timestamp: Date.now()
-            });
-            return this._returnResponse(res, 200, "Webhook successfully received");
+                this.emit("vote", {
+                    id: data.user.id,
+                    site: UpvotesManager.botlistspace,
+                    timestamp: Date.now()
+                });
+                return this._returnResponse(res, 200, "Webhook successfully received");
+            }
+            case UpvotesManager.botsfordiscord: {
+                const config_path = "webhook.secrets." + UpvotesManager.botsfordiscord.replace(/./g, "_");
+                if (!config.has(config_path)) return;
+
+                const secret = req.headers["authorization"];
+                if (secret !== config.get(config_path)) return this._returnResponse(res, 400);
+
+                this.emit("vote", {
+                    id: data.user,
+                    type: data.type,
+                    site: UpvotesManager.botsfordiscord,
+                    timestamp: Date.now()
+                });
+                return this._returnResponse(res, 200, "Webhook successfully received");
+            }
+            
+            case UpvotesManager.test: {
+                const config_path = "webhook.secrets." + UpvotesManager.test;
+                if (!config.has(config_path)) return;
+
+                const secret = req.headers["authorization"];
+                if (secret !== config.get(config_path)) return this._returnResponse(res, 400);
+
+                this.emit("vote", {
+                    id: data.user,
+                    type: data.type,
+                    site: UpvotesManager.test,
+                    timestamp: Date.now()
+                });
+                return this._returnResponse(res, 200, "Webhook successfully received");
+            }
         }
         return this._returnResponse(res, 404);
     }
@@ -162,5 +195,6 @@ UpvotesManager.discordbotlist = "discordbotlist.com";
 UpvotesManager.discordbots = "discordbots.org";
 UpvotesManager.botlistspace = "botlist.space";
 UpvotesManager.botsfordiscord = "botsfordiscord.com";
+UpvotesManager.test = "test";
 
 module.exports = UpvotesManager;

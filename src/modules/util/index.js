@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const config = require("../../config");
 const CONST = require("../../const");
 const Discord = require("discord.js");
 
@@ -86,7 +87,9 @@ module.exports.findDefaultChannel = function findDefaultChannel(guild) {
             .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
 };
 
-const ownerId = "108391799185285120";
+if (!config.has("owner_id")) throw new Error("No owner_id specified in the config");
+
+const ownerId = config.get("owner_id");
 module.exports.isOwner = function isOwner(member) {
     if (member instanceof Discord.GuildMember) member = member.user;
     const id = member.id;

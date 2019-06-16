@@ -239,8 +239,8 @@ class SampleUploader extends Events {
             await new Promise((res, rej) => {
                 ffmpeg(tmp_file.path)
                     .audioCodec("libopus")
-                    .audioBitrate(96)
-                    .audioChannels(1)
+                    .audioBitrate("96k")
+                    .audioChannels(2)
                     .audioFrequency(48000)
                     .saveToFile(sample.file)
                     .on("error", err => rej(err))

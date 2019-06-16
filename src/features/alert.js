@@ -9,10 +9,9 @@ const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
+const config = require("../config");
+
 const { default: TwitchClient } = require("twitch");
-const keys = {
-    twitch: require("../../keys/twitch.json")
-};
 
 class StreamProcessor extends EventEmitter {
     /**
@@ -168,7 +167,7 @@ class Twitch extends StreamProcessor {
         super(manager);
 
         return new Promise(async resolve => {
-            this.twitch = await TwitchClient.withCredentials(keys.twitch.client_id);
+            this.twitch = await TwitchClient.withCredentials(config.get("twitch.client_id"));
 
             setInterval(() => this.checkChanges(), 60 * 1000);
             this.checkChanges();
@@ -802,13 +801,12 @@ class Config {
     }
 }
 
-module.exports = async function install(cr, client, config, db) {
-    const manager = await new Manager(db, client, [
-        Picarto,
-        Twitch,
-        Piczel,
-        Smashcast,
-    ]);
+module.exports = async function install(cr, client, _, db) {
+    const services = [ Picarto, Piczel, Smashcast ];
+    if (config.has("twitch.client_id")) services.push(Twitch);
+    else log.debug("config", "Found no API client ID for Twitch - Disabled alerting Twitch streams");
+    
+    const manager = await new Manager(db, client, services);
 
     const alertCommand = cr.register("alert", new TreeCommand)
         .setHelp(new HelpContent()

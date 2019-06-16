@@ -1,5 +1,4 @@
-const discordKeys = require("../keys/discord.json");
-const discordKeyDev = require("../keys/discord_dev.json");
+const config = require("./config");
 const log = require("./modules/log");
 const info = require("./info");
 const Discord = require("discord.js");
@@ -30,7 +29,7 @@ new class App {
 
         const { Parameter } = ConfigManager;
         this.config = new ConfigManager(this.client, this.db, [
-            new Parameter("prefix", "❗ Prefix", "!", String),
+            new Parameter("prefix", "❗ Prefix", config.get("prefix") || "!", String),
 
             // new Parameter("calling", "📞 Accept calls servers", false, Boolean),
             new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
@@ -67,7 +66,8 @@ new class App {
         await new Promise(resolve => {
             this.client.once("ready", () => resolve());
 
-            this.client.login(info.DEV ? discordKeyDev.token : discordKeys.token);
+            if (!config.has("discord.token")) throw new Error("No Discord API Token specified in config files");
+            this.client.login(config.get("discord.token"));
         });
 
         this.core = new Core(this.client, this.config, this.db);

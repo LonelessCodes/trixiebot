@@ -1,3 +1,4 @@
+const config = require("../config");
 const getTumblrBlog = require("../modules/getTumblrBlog");
 const secureRandom = require("../modules/secureRandom");
 const log = require("../modules/log");
@@ -9,8 +10,10 @@ const Category = require("../logic/commands/Category");
 const usernameRegExp = /@([\w-]+)\b/g;
 
 module.exports = async function install(cr) {
+    if (!config.has("tumblr.key")) return log.debug("config", "Found no API token for Tumblr - Disabled mlpquote command");
+
     let quotes = [];
-    getTumblrBlog("incorrectmylittleponyquotes.tumblr.com")
+    getTumblrBlog(config.get("tumblr.key"), "incorrectmylittleponyquotes.tumblr.com")
         .then(posts => {
             return posts
                 .filter(post => post.tags.includes("incorrect my little pony quotes"))

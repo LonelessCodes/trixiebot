@@ -1,14 +1,20 @@
 const { MongoClient } = require("mongodb");
-const info = require("../info");
+const config = require("../config");
+
+if (!config.has("database.host") || !config.has("database.port"))
+    throw new Error("No DB connection details (host, port) were specified in the configs");
+if (!config.has("database.db"))
+    throw new Error("No db name was specified in the configs");
+
+const opts = {
+    autoReconnect: true,
+    useNewUrlParser: true,
+};
+if (config.has("database.auth")) opts.auth = config.get("database.auth");
 
 const database = MongoClient
-    .connect("mongodb://localhost:27017/", {
-        autoReconnect: true,
-        useNewUrlParser: true
-    });
+    .connect(`mongodb://${config.get("database.host")}:${config.get("database.port")}/`, opts);
 
-const defaultDB = info.DEV ? "trixiedev" : "trixiebot";
-
-module.exports = function getDatabase(name = defaultDB) {
+module.exports = function getDatabase(name = config.get("database.db")) {
     return database.then(client => client.db(name));
 };

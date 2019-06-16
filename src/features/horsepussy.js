@@ -1,4 +1,5 @@
-const derpibooruKey = require("../../keys/derpibooru.json");
+const config = require("../config");
+const log = require("../modules/log");
 const fetch = require("node-fetch");
 
 const BaseCommand = require("../class/BaseCommand");
@@ -24,7 +25,7 @@ async function get(params) {
         string.push(key + "=" + params[key]);
     string = string.join("&");
 
-    const result = await fetch(`https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`, {
+    const result = await fetch(`https://derpibooru.org/${scope}.json?key=${config.get("derpibooru.key")}&${string}`, {
         timeout: 10000
     });
     return await result.json();
@@ -55,6 +56,8 @@ async function process(message) {
 }
 
 module.exports = async function install(cr) {
+    if (!config.has("derpibooru.key")) return log.debug("config", "Found no API token for Derpibooru - Disabled horsepussy command");
+
     cr.register("horsepussy", new class extends BaseCommand {
         async call(message, msg) {
             await process(message, msg, "random");

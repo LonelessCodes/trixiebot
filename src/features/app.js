@@ -17,7 +17,7 @@ module.exports = async function install(cr, client) {
         .setCategory(Category.INFO);
     cr.registerAlias("version", "v");
 
-    cr.register("invite", new TextCommand(INFO.WEBSITE + "/invite"))
+    if (INFO.INVITE) cr.register("invite", new TextCommand(INFO.INVITE))
         .setHelp(new HelpContent().setDescription("Gives a link to invite TrixieBot to your own server."))
         .setCategory(Category.INFO);
 
@@ -33,8 +33,8 @@ module.exports = async function install(cr, client) {
                 "She offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins.\n\n" +
                 "Her set of commands range from utility stuff, simple fun, imageboard commands, custom commands, soundboards, to even a full web dashboard to configure Trixie and watch the growth of your server and so much more!\n" +
                 "For a list of all commands, go `" + m.guild.config.prefix + "help`.\n\n" + 
-                "Website " + INFO.WEBSITE + "\n" + 
-                "Web Dashboard " + INFO.WEBSITE + "/dashboard")
+                (INFO.WEBSITE ? ("Website " + INFO.WEBSITE + "\n" + 
+                "Web Dashboard " + INFO.WEBSITE + "/dashboard") : ""))
             .setFooter(`TrixieBot v${INFO.VERSION}`)
     })))
         .setHelp(new HelpContent().setDescription("First command to call."))

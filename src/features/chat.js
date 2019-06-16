@@ -2,7 +2,8 @@ const BaseCommand = require("../class/BaseCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
-const keys = require("../../keys/cleverbot.json");
+const log = require("../modules/log");
+const config = require("../config");
 const typing = require("../modules/typing");
 
 const request = require("request-promise-native");
@@ -98,7 +99,9 @@ class Cleverbot {
 }
 
 module.exports = async function install(cr) {
-    const bot = new Cleverbot(keys.user, keys.key);
+    if (!config.has("cleverbot.user") || !config.has("cleverbot.key")) return log.debug("config", "Found no API token for Tumblr - Disabled mlpquote command");
+
+    const bot = new Cleverbot(config.get("cleverbot.user"), config.get("cleverbot.key"));
 
     cr.register("chat", new class extends BaseCommand {
         async call(message, input) {

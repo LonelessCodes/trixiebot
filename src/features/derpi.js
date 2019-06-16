@@ -1,4 +1,5 @@
-const derpibooruKey = require("../../keys/derpibooru.json");
+const config = require("../config");
+const log = require("../modules/log");
 const { splitArgs } = require("../modules/util/string");
 const fetch = require("node-fetch");
 
@@ -34,7 +35,7 @@ async function fetchDerpi(params) {
         string.push(key + "=" + params[key]);
     string = string.join("&");
 
-    const url = `https://derpibooru.org/${scope}.json?key=${derpibooruKey.key}&${string}`;
+    const url = `https://derpibooru.org/${scope}.json?${string}`;
 
     const response = await fetch(url, { timeout: 10000 })
         .then(request => request.json());
@@ -42,7 +43,7 @@ async function fetchDerpi(params) {
     return response;
 }
 
-async function process(message, msg, type) {
+async function process(key, message, msg, type) {
     if (msg === "") return;
 
     const args = splitArgs(msg, 2);
@@ -99,7 +100,8 @@ async function process(message, msg, type) {
                 q: query,
                 sf: "id",
                 sd: "asc",
-                perpage: amount
+                perpage: amount,
+                key
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
@@ -115,7 +117,8 @@ async function process(message, msg, type) {
                 q: query,
                 sf: "id",
                 sd: "desc",
-                perpage: amount
+                perpage: amount,
+                key
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
@@ -131,7 +134,8 @@ async function process(message, msg, type) {
                 q: query,
                 sf: "score",
                 sd: "desc",
-                perpage: amount
+                perpage: amount,
+                key
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
@@ -144,13 +148,18 @@ async function process(message, msg, type) {
             break;
         case "random":
             result = await fetchDerpi({
-                q: query
+                q: query,
+                key
             });
             for (let i = 0; i < Math.min(amount, result.total); i++) {
                 const promise = fetchDerpi({
                     q: query,
-                    random_image: "true"
-                }).then(response => fetchDerpi({ scope: response.id }));
+                    random_image: "true",
+                    key
+                }).then(response => fetchDerpi({
+                    scope: response.id,
+                    key
+                }));
                 promises.push(promise);
             }
             responses = await Promise.all(promises);
@@ -196,6 +205,10 @@ async function process(message, msg, type) {
 }
 
 module.exports = async function install(cr) {
+    if (!config.has("derpibooru.key")) return log.debug("config", "Found no API token for Derpibooru - Disabled horsepussy command");
+
+    const key = config.get("derpibooru.key");
+
     const derpiCommand = cr.register("derpi", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
@@ -207,7 +220,7 @@ module.exports = async function install(cr) {
 
     derpiCommand.registerSubCommand("random", new class extends BaseCommand {
         async call(message, msg) {
-            await process(message, msg, "random");
+            await process(key, message, msg, "random");
         }
     }).setHelp(new HelpContent()
         .setUsage("<?amount> <query>")
@@ -216,21 +229,21 @@ module.exports = async function install(cr) {
 
     derpiCommand.registerSubCommand("top", new class extends BaseCommand {
         async call(message, msg) {
-            await process(message, msg, "top");
+            await process(key, message, msg, "top");
         }
     }).setHelp(new HelpContent()
         .setUsage("<?amount> <query>"));
 
     derpiCommand.registerSubCommand("latest", new class extends BaseCommand {
         async call(message, msg) {
-            await process(message, msg, "latest");
+            await process(key, message, msg, "latest");
         }
     }).setHelp(new HelpContent()
         .setUsage("<?amount> <query>"));
 
     derpiCommand.registerSubCommand("first", new class extends BaseCommand {
         async call(message, msg) {
-            await process(message, msg, "first");
+            await process(key, message, msg, "first");
         }
     }).setHelp(new HelpContent()
         .setUsage("<?amount> <query>"));

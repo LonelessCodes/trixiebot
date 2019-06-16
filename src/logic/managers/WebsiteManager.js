@@ -18,9 +18,7 @@ class WebsiteManager {
     async initializeIPC() {
         await ipc.promiseStart;
 
-        ipc.answer("checkGuilds", async guildIds => {
-            return guildIds.filter(guildId => this.client.guilds.has(guildId));
-        });
+        ipc.answer("checkGuilds", async guildIds => guildIds.filter(guildId => this.client.guilds.has(guildId)));
 
         ipc.answer("overview", async guildId => {
             const month = new Date;
@@ -249,6 +247,14 @@ class WebsiteManager {
             } catch (err) {
                 return { errors: [], success: false };
             }
+        });
+
+        ipc.answer("cc:lint", async code => {
+            const { errors } = await this.REGISTRY.cc.cpc.awaitAnswer("lint", { code });
+            return {
+                success: true,
+                errors
+            };
         });
 
         const cleanContent = (str, guild) => {
@@ -537,14 +543,6 @@ class WebsiteManager {
         ipc.answer("site:changelog", async () => {
             const changelog = await getChangelog();
             return { logs: changelog };
-        });
-
-        ipc.answer("cc:lint", async code => {
-            const { errors } = await this.REGISTRY.cc.cpc.awaitAnswer("lint", { code });
-            return {
-                success: true,
-                errors
-            };
         });
     }
 }

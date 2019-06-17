@@ -1,8 +1,12 @@
 const { toHumanTime } = require("../../../modules/util/time");
+const { promisify } = require("util");
 const path = require("path");
 const tmp = require("tmp");
 const fs = require("fs-extra");
+// const prism = require("prism-media");
+// const ogg = require("ogg");
 const ffmpeg = require("fluent-ffmpeg");
+const ffprobe = promisify(ffmpeg.ffprobe);
 const mime = require("mime");
 const request = require("request");
 const readChunk = require("read-chunk");
@@ -159,20 +163,15 @@ class SampleUploader extends Events {
         }
 
         try {
-            const duration = await new Promise((res, rej) => {
-                ffmpeg.ffprobe(tmp_file.path, (err, data) => {
-                    if (err) return rej(err);
+            const data = await ffprobe(tmp_file.path);
 
-                    const duration = parseFloat(data.format.duration);
-                    if (Number.isNaN(duration)) return rej(err);
-                    res(duration);
-                });
-            });
+            const duration = parseFloat(data.format.duration);
+            if (Number.isNaN(duration)) throw new Error("Couldn't parse duration of the audio input");
 
             if (duration * 1000 > SampleUploader.MAX_DURATION) {
                 tmp_file.cleanupCallback();
                 return this._emitError(`The soundclip cannot be longer than ${toHumanTime(SampleUploader.MAX_DURATION)}`);
-            }
+            }                                                                   
         } catch (err) {
             tmp_file.cleanupCallback();
             throw err;
@@ -236,10 +235,35 @@ class SampleUploader extends Events {
         try {
             await fs.ensureDir(path.dirname(sample.file), 0o0777);
 
-            await new Promise((res, rej) => {
+            // const transcoder = new prism.FFmpeg({
+            //     args: [
+            //         "-analyzeduration", "0",
+            //         "-loglevel", "0",
+            //         "-f", "s16le",
+            //         "-ar", "48000",
+            //         "-ac", "2",
+            //     ]
+            // });
+
+            // const opus_encoder = new prism.opus.Encoder({ rate: 48000, channels: 2, frameSize: 1920 });
+            // opus_encoder.setBitrate(96e3);
+
+            // const ogg_encoder = new ogg.Encoder;
+
+            await new Promise((res, rej) => {                
+                // ogg_encoder.pipe(fs.createWriteStream(sample.file))
+                //     .on("error", err => rej(err))
+                //     .on("close", () => res());
+
+                // fs.createReadStream(tmp_file.path)
+                //     .pipe(transcoder)
+                //     .pipe(opus_encoder)
+                //     .pipe(ogg_encoder.stream())
+                //     .on("error", err => rej(err));
+                
                 ffmpeg(tmp_file.path)
                     .audioCodec("libopus")
-                    .audioBitrate("96k")
+                    .audioBitrate(96)
                     .audioChannels(2)
                     .audioFrequency(48000)
                     .saveToFile(sample.file)
@@ -255,18 +279,14 @@ class SampleUploader extends Events {
 
         this._setStatus("Checking converted file for errors...");
 
-        try {
-            await new Promise((res, rej) => {
-                ffmpeg.ffprobe(sample.file, err => {
-                    if (err) return rej(err);
-                    res();
-                });
-            });
-        } catch (err) {
-            this._emitError("Trixie screwed up badly in properly converting the soundclip. Please try again ;A; So sorry :c");
-            await fs.unlink(sample.file);
-            return;
-        }
+        // try {
+        //     await ffprobe(sample.file);
+        // } catch (err) {
+        //     this._emitError("Trixie screwed up badly in properly converting the soundclip. Please try again ;A; So sorry :c");
+        //     console.log(err);
+        //     await fs.unlink(sample.file);
+        //     return;
+        // }
 
         this._setStatus("Saving to database and finishing up...");
 

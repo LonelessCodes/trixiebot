@@ -1,4 +1,6 @@
 const path = require("path");
+const fs = require("fs-extra");
+const prism = require("prism-media");
 // eslint-disable-next-line no-unused-vars
 const { User, Guild, VoiceConnection } = require("discord.js");
 
@@ -35,13 +37,36 @@ class Sample {
     }
 
     /**
+     * @param {VoiceConnection} connection
+     */
+    _play(connection) {
+        /*
+        The opus encoder and decoder for ffmpeg is preeeeeeetty broken, so 
+        therefore we rather directly use the ogg demuxer from the prism library
+        and pipe it through to the websocket
+        */
+        return new Promise((res, rej) => {
+            try {
+                const dispatcher = connection.playOpusStream(
+                    fs.createReadStream(this.file)
+                        .pipe(new prism.opus.OggDemuxer()),
+                    { passes: 2 }
+                );
+                dispatcher.once("start", () => {
+                    connection.player.streamingData.pausedTime = 0;
+                });
+                res(dispatcher);
+            } catch (err) {
+                rej(err);
+            }
+        });
+    }
+
+    /**
      * @param {VoiceConnection} connection 
      */
     async play(connection) {
-        const dispatcher = connection.playFile(this.file);
-        dispatcher.once("start", () => {
-            connection.player.streamingData.pausedTime = 0;
-        });
+        const dispatcher = await this._play(connection);
         await this.db.then(db => db.updateOne({ id: this.id }, { $inc: { plays: 1 }, $set: { last_played_at: new Date } }));
         return dispatcher;
     }
@@ -83,10 +108,7 @@ class PredefinedSample extends Sample {
      * @param {VoiceConnection} connection 
      */
     async play(connection) {
-        const dispatcher = connection.playFile(this.file);
-        dispatcher.once("start", () => {
-            connection.player.streamingData.pausedTime = 0;
-        });
+        const dispatcher = await this._play(connection);
         await this.db.then(db => db.updateOne({ name: this.name }, { $inc: { plays: 1 }, $set: { last_played_at: new Date } }));
         return dispatcher;
     }

@@ -53,6 +53,8 @@
     "node-gettext": "^2.0.0",
     "node-ipc": "^9.1.1",
     "node-opus": "^0.2.9",
+    "ogg": "^1.2.6",
+    "prism-media": "^1.0.2",
     "ps-tree": "^1.2.0",
     "random-number-csprng": "^1.0.2",
     "read-chunk": "^3.2.0",

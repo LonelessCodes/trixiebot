@@ -10,7 +10,7 @@ const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
     if (!config.has("voicerss.key")) return log.debug("config", "Found no API token for voicerss - Disabled tts command");
-    
+
     cr.register("tts", new class extends BaseCommand {
         async call(message, content) {
             if (content === "") return;
@@ -31,20 +31,23 @@ module.exports = async function install(cr) {
 
             if (content.length > 90000) {
                 message.react("❌");
-                message.channel.sendTranslated("I'm sorry to disappoint you, but I may only use up to 100 character :/");
+                message.channel.sendTranslated("I'm sorry to disappoint you, but I may only use up to 100000 character :/");
                 return;
             }
 
             try {
-                const url = `https://api.voicerss.org/?key=${config.get("voicerss.key")}&hl=en-US&f=44khz_16bit_mono&c=OGG&src=${encodeURIComponent(content)}`;
+                const url = `https://api.voicerss.org/?key=${config.get("voicerss.key")}&hl=en-US&f=48khz_16bit_mono&c=ogg&src=${encodeURIComponent(content)}`;
 
                 const connection = await audio.connect(message.member);
                 const request = await fetch(url);
+                const stream = request.body;
 
-                const dispatcher = connection.playStream(request.body, { passes: 2 });
+                const dispatcher = connection.playStream(stream, { passes: 2 });
                 dispatcher.once("start", () => {
                     connection.player.streamingData.pausedTime = 0;
                 });
+                stream.once("end", () => connection.setSpeaking(false));
+                stream.once("error", () => connection.setSpeaking(false));
 
                 await message.react("👍");
             } catch (err) {

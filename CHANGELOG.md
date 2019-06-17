@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.5.1"></a>
+## [2.5.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.0...v2.5.1) (2019-06-17)
+
+
+### Bug Fixes
+
+* **sb:** partially fix opus encode/decode errors caused by ffmpeg in soundboard ([8bf3274](https://bitbucket.org/Loneless/trixiebot/commits/8bf3274))
+
+
+### Features
+
+* cleaner config files ([55f0eae](https://bitbucket.org/Loneless/trixiebot/commits/55f0eae))
+
+
+
 <a name="2.5.0"></a>
 # [2.5.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.10...v2.5.0) (2019-06-12)
 

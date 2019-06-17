@@ -85,7 +85,8 @@ module.exports = async function install(cr, client) {
             client.guilds.forEach(guild => {
                 if (!guild.available) return;
                 const defaultChannel = findDefaultChannel(guild);
-                defaultChannel.send("Broadcast from creator", { embed: new Discord.RichEmbed().setDescription(msg) });
+                if (!defaultChannel) return;
+                defaultChannel.send("Broadcast from creator", { embed: new Discord.RichEmbed().setDescription(msg) }).catch(() => { });
             });
             log(`Broadcasted message ${msg}`);
         }

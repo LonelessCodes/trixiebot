@@ -33,6 +33,7 @@ class WebsiteManager {
 
                 guild_stats.get("users").getLastItemBefore(month, guildId),
             ]);
+
             return {
                 success: true,
                 commands: {
@@ -55,10 +56,10 @@ class WebsiteManager {
                         a.ts = a.ts.toString();
                         return a;
                     }),
-                    before: {
+                    before: results[3] ? {
                         ...results[3],
                         ts: results[3].ts.toString()
-                    }
+                    } : undefined
                 },
             };
         });

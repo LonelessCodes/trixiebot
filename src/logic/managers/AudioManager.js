@@ -121,7 +121,7 @@ class VCGuild extends EventEmitter {
             if (oldMember.voiceChannel.id !== this.vc.id) return;
         }
 
-        if (this.vc.members.size > 1) return;
+        if (this.vc.members.filter(m => !m.user.bot).size > 0) return;
 
         this.leave();
     }

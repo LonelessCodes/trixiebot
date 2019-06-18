@@ -11,9 +11,9 @@ const BaseCommand = require("../../class/BaseCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
 
-figlet.parseFont("univers", fs.readFileSync(path.join(__dirname, "..", "..", "..", "resources", "figlet", "univers.flf"), "utf8"));
+figlet.parseFont("univers", fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "figlet", "univers.flf"), "utf8"));
 
-const bad_words_array = (fs.readFileSync(path.join(__dirname, "..", "..", "..", "resources", "text", "bad_words.txt"), "utf8")).split(",");
+const bad_words_array = (fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "text", "bad_words.txt"), "utf8")).split(",");
 for (let word of bad_words_array) {
     word = word.replace(/-/g, " ");
     if (!bad_words_array.includes(word)) bad_words_array.push(word);

@@ -1,5 +1,5 @@
 const config = require("../../config");
-const statuses = require("../../../resources/text/statuses");
+const statuses = require("../../../assets/text/statuses");
 const request = require("request-promise-native");
 const log = require("../../modules/log");
 const nanoTimer = require("../../modules/NanoTimer");
@@ -78,7 +78,7 @@ class Core {
             });
         }
 
-        await fs.writeFile(path.join(process.cwd(), "resources", "commands.json"), JSON.stringify(jason, null, 2));
+        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), JSON.stringify(jason, null, 2));
         await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), JSON.stringify(jason, null, 2));
 
         log("Commands installed");

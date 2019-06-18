@@ -7,7 +7,7 @@ const DocumentMapCache = require("../DocumentMapCache");
 
 const gt = new Gettext;
 
-const translationsDir = "../../../resources/locale";
+const translationsDir = "../../../assets/locale";
 const locales = ["en", "de", "hu"];
 const domain = "messages";
 

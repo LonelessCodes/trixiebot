@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### Bug Fixes
 
 * **sb:** partially fix opus encode/decode errors caused by ffmpeg in soundboard ([8bf3274](https://bitbucket.org/Loneless/trixiebot/commits/8bf3274))
+* **chat command:** fixed infinite typing ([3ec4085](https://bitbucket.org/Loneless/trixiebot/commits/3ec4085))
 
 
 ### Features

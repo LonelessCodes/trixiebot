@@ -2,27 +2,15 @@
   "name": "trixiebot",
   "version": "2.5.1",
   "description": "Discord Bot to query Derpibooru.org and much much more!",
-  "main": "index.js",
-  "scripts": {
-    "start": "NODE_ENV=production node index.js",
-    "dev": "NODE_ENV=development node index.js",
-    "setup": "chmod +x install.sh && ./install.sh",
-    "release": "standard-version",
-    "releasemajor": "standard-version --release-as major",
-    "releaseminor": "standard-version --release-as minor",
-    "releasepatch": "standard-version --release-as patch"
+  "homepage": "https://trixie.loneless.art",
+  "author": {
+    "name": "Loneless",
+    "url": "https://loneless.art"
   },
-  "keywords": [
-    "discord",
-    "bot",
-    "derpibooru",
-    "and",
-    "much",
-    "much",
-    "more"
-  ],
-  "author": "Chris Shepherd",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://Loneless@bitbucket.org/Loneless/trixiebot.git"
+  },
   "dependencies": {
     "asciify-image": "^0.1.5",
     "bson": "^4.0.2",
@@ -76,5 +64,21 @@
   "engines": {
     "node": ">= 10.15.3",
     "npm": ">= 6.9.0"
-  }
+  },
+  "scripts": {
+    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development node index.js",
+    "setup": "chmod +x install.sh && ./install.sh",
+    "release": "standard-version",
+    "releasemajor": "standard-version --release-as major",
+    "releaseminor": "standard-version --release-as minor",
+    "releasepatch": "standard-version --release-as patch"
+  },
+  "license": "MIT",
+  "keywords": [
+    "discord",
+    "bot",
+    "trixie"
+  ],
+  "main": "./index.js"
 }

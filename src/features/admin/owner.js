@@ -19,7 +19,8 @@ const extnames = {
     ".json": "json"
 };
 
-module.exports = async function install(cr, client) {
+// eslint-disable-next-line no-unused-vars
+module.exports = async function install(cr, client, config, db) {
     cr.register("file", new class extends BaseCommand {
         async noPermission(message) { await message.channel.sendTranslated("no"); }
 

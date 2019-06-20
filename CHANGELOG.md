@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.6.0"></a>
+# [2.6.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.1...v2.6.0) (2019-06-20)
+
+
+### Bug Fixes
+
+* adjusted statistics update interval to prevent ratelimit errors ([86474ab](https://bitbucket.org/Loneless/trixiebot/commits/86474ab))
+* allow owner accessing config and db in owner commands ([4d6dd88](https://bitbucket.org/Loneless/trixiebot/commits/4d6dd88))
+* finding default channel when vc channel is called "general" bug ([f89362e](https://bitbucket.org/Loneless/trixiebot/commits/f89362e))
+* fixed some more small issues ([a6be3af](https://bitbucket.org/Loneless/trixiebot/commits/a6be3af))
+* leave vc if only bots are left in the chat ([89cfbbe](https://bitbucket.org/Loneless/trixiebot/commits/89cfbbe))
+
+
+### Features
+
+* **alert command:** Re-imagined the autoban command. Now actually usable for all cases. Yay! ([b501883](https://bitbucket.org/Loneless/trixiebot/commits/b501883))
+* add Paginator to penis command ([90e22a0](https://bitbucket.org/Loneless/trixiebot/commits/90e22a0))
+* **alert command:** show alert list when passing alert command no arguments (ux flow) ([e8da17b](https://bitbucket.org/Loneless/trixiebot/commits/e8da17b))
+
+
+
 <a name="2.5.1"></a>
 ## [2.5.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.0...v2.5.1) (2019-06-17)
 

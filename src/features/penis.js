@@ -1,12 +1,12 @@
-const CONST = require("../const");
 const secureRandom = require("../modules/secureRandom");
-const Discord = require("discord.js");
 
 const BaseCommand = require("../class/BaseCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 const MessageMentions = require("../modules/MessageMentions");
+
+const Paginator = require("../logic/Paginator");
 
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("penis");
@@ -74,22 +74,20 @@ module.exports = async function install(cr, client, config, db) {
             const uom = message.guild.config.uom;
             const r = uom === "cm" ? 2.54 : 1;
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-
             const penises = await database.find({ $or: message.guild.members.array().map(member => ({ userId: member.user.id })) }).toArray();
             const sorted = penises.sort((a, b) => b.length - a.length);
 
-            embed.setTitle(`${message.guild.name} Penis Leaderboard`);
-            for (const penis of sorted) {
+            const items = [];
+            for (let penis of sorted) {
                 const member = message.guild.members.find(member => member.user.id === penis.userId);
                 if (!member) continue;
-                embed.addField(
-                    `8${new Array(Math.round(penis.length)).fill("=").join("")}D   ${member.user.tag}`,
+                items.push(
+                    `**8${new Array(Math.round(penis.length)).fill("=").join("")}D   ${member.user.tag}**\n` +
                     `${await message.channel.translate("Length:")} **${(penis.length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(penis.girth * r).toFixed(1)} ${uom}**`
                 );
             }
 
-            await message.channel.send({ embed });
+            new Paginator("Penis Leaderboard", "The top penises in this server", 20, items, message.author, { number_items: true, guild: message.guild }).display(message.channel);
         }
     })
         .setHelp(new HelpContent()

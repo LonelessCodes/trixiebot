@@ -88,7 +88,7 @@ module.exports = async function install(cr, client, config, db) {
                 items.push(str);
             }
 
-            new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author).display(message.channel);
+            new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author, { guild: message.guild }).display(message.channel);
         }
     });
 };

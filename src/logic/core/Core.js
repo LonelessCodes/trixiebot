@@ -117,7 +117,7 @@ class Core {
 
     setupDiscordBots() {
         this.updateStatistics();
-        setInterval(() => this.updateStatistics(), 1800 * 1000);
+        setInterval(() => this.updateStatistics(), 3600 * 1000);
     }
 
     async updateStatistics() {

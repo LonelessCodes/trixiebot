@@ -194,8 +194,7 @@ module.exports = async function install(cr) {
                     items.push("```cs\n" + trans_str.join("\n\n") + "\n```");
                 }
 
-                const paginator = new Paginator("Transactions", `All of ${userToString(user)}'s (your) transactions`, 1, items, message.author);
-                paginator.display(message.channel);
+                new Paginator("Transactions", `All of ${userToString(user)}'s (your) transactions`, 1, items, message.author).display(message.channel);
             } else {
                 await message.channel.send("Looks like you didn't earn or spend money yet! Let's start by `" + message.guild.config.prefix + "daily`, to earn some munz");
             }

@@ -2,7 +2,7 @@ const { userToString } = require("../modules/util");
 const CONST = require("../const");
 const Events = require("events");
 // eslint-disable-next-line no-unused-vars
-const { User, TextChannel, Message, MessageReaction, RichEmbed } = require("discord.js");
+const { User, Guild, TextChannel, Message, MessageReaction, RichEmbed } = require("discord.js");
 
 class Paginator extends Events {
     /**
@@ -11,11 +11,16 @@ class Paginator extends Events {
      * @param {number} items_per_page 
      * @param {string[]} items 
      * @param {User} user
-     * @param {number} timeout 
-     * @param {boolean} show_page_numbers 
-     * @param {boolean} allow_text_input 
+     * @param {Object} opts
+     * @param {number} [opts.timeout]
+     * @param {boolean} [opts.show_page_numbers] 
+     * @param {boolean} [opts.allow_text_input]
+     * @param {boolean} [opts.wrap_page_ends]
+     * @param {boolean} [opts.number_items]
+     * @param {Guild} [opts.guild]
+     * @param {[string, string]} [opts.prefix_suffix]
      */
-    constructor(title, content, items_per_page, items, user, timeout = 60000, show_page_numbers = true, wrap_page_ends = true, number_items = false, prefix_suffix = ["", ""]) {
+    constructor(title, content, items_per_page, items, user, { timeout = 60000, show_page_numbers = true, wrap_page_ends = true, number_items = false, guild = null, prefix_suffix = ["", ""] } = {}) {
         super();
 
         this.title = title;
@@ -29,7 +34,11 @@ class Paginator extends Events {
         this.page_count = Math.ceil(this.total_items / this.items_per_page);
         this.wrap_page_ends = wrap_page_ends;
         this.number_items = number_items;
+        this.guild = guild;
         this.prefix_suffix = [prefix_suffix[0] || "", prefix_suffix[1] || ""];
+
+        /** @type {Message} */
+        this.message = null;
     }
 
     /**
@@ -39,6 +48,7 @@ class Paginator extends Events {
      */
     display(channel) {
         this.paginate(channel, 1);
+        return this;
     }
 
     /**
@@ -74,6 +84,7 @@ class Paginator extends Events {
      * @param {number} page_num 
      */
     async initialize(message, page_num) {
+        this.message = message;
         if (this.page_count > 1) {
             await message.react(Paginator.LEFT);
             await message.react(Paginator.STOP);
@@ -170,10 +181,12 @@ class Paginator extends Events {
     renderPage(page_num) {
         const embed = new RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
+        const user_header = this.guild ? this.guild.name : userToString(this.user, true);
+        const author_icon = this.guild ? this.guild.iconURL : this.user.avatarURL;
         if (this.title && this.title !== "") {
-            embed.setAuthor(userToString(this.user, true) + " | " + this.title, this.user.avatarURL);
+            embed.setAuthor(user_header + " | " + this.title, author_icon);
         } else {
-            embed.setAuthor(userToString(this.user, true), this.user.avatarURL);
+            embed.setAuthor(user_header, author_icon);
         }
 
         const start = (page_num - 1) * this.items_per_page;
@@ -202,7 +215,7 @@ class Paginator extends Events {
     /**
      * @param {Message} message 
      */
-    async end(message) {
+    async end(message = this.message) {
         await message.clearReactions().catch(() => { });
         this.emit("end", message);
     }

@@ -104,6 +104,9 @@ module.exports.userToString = function userToString(member, plainText = false) {
 };
 
 module.exports.basicEmbed = function basicEmbed(title, user, color = CONST.COLOR.PRIMARY) {
+    if (user instanceof Discord.Guild) return new Discord.RichEmbed()
+        .setColor(color)
+        .setAuthor(user.name + " | " + title, user.iconURL);
     if (user instanceof Discord.GuildMember) user = user.user;
     return new Discord.RichEmbed()
         .setColor(color)

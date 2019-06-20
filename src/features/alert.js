@@ -857,30 +857,35 @@ module.exports = async function install(cr, client, _, db) {
         }
     })
         .setHelp(new HelpContent().setUsage("<page url>", "unsubscribe Trixie from a Picarto channel"));
+    
+    async function list(message) {
+        const s_channels = await manager.getChannels(message.guild);
+
+        if (s_channels.length === 0) {
+            await message.channel.sendTranslated("Hehe, nothing here lol. Time to add some.");
+            return;
+        }
+
+        /** @type {Map<any, Channel>} */
+        const sorted_by_channels = new Map;
+        for (const s_channel of s_channels)
+            sorted_by_channels.set(s_channel.channel, [...(sorted_by_channels.get(s_channel.channel) || []), s_channel]);
+
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        for (const [g_channel, s_channels] of sorted_by_channels) {
+            let str = "";
+            for (const s_channel of s_channels) str += s_channel.getURL(true) + "\n";
+
+            embed.addField("#" + g_channel.name, str);
+        }
+
+        await message.channel.send({ embed });
+
+    }
 
     alertCommand.registerSubCommand("list", new class extends BaseCommand {
         async call(message) {
-            const s_channels = await manager.getChannels(message.guild);
-
-            if (s_channels.length === 0) {
-                await message.channel.sendTranslated("Hehe, nothing here lol. Time to add some.");
-                return;
-            }
-
-            /** @type {Map<any, Channel>} */
-            const sorted_by_channels = new Map;
-            for (const s_channel of s_channels)
-                sorted_by_channels.set(s_channel.channel, [...(sorted_by_channels.get(s_channel.channel) || []), s_channel]);
-
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            for (const [g_channel, s_channels] of sorted_by_channels) {
-                let str = "";
-                for (const s_channel of s_channels) str += s_channel.getURL(true) + "\n";
-
-                embed.addField("#" + g_channel.name, str);
-            }
-
-            await message.channel.send({ embed });
+            await list(message);
         }
     })
         .setHelp(new HelpContent().setUsage("", "list all active streaming alerts"));
@@ -914,7 +919,7 @@ module.exports = async function install(cr, client, _, db) {
     alertCommand.registerDefaultCommand(new class extends BaseCommand {
         async call(message, content) {
             if (content === "") {
-                return;
+                return await list(message);
             }
             const g_channel = message.mentions.channels.first() || message.channel;
 

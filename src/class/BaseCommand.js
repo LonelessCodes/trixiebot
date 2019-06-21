@@ -29,7 +29,6 @@ class BaseCommand {
         this._category = null;
         this._help = null;
         this.aliases = [];
-        this.name = null;
         this.explicit = false;
     }
 
@@ -108,8 +107,8 @@ class BaseCommand {
 
     async beforeProcessCall() { }
 
-    async run(message, commandName, content, pass_through) {
-        return await this.call(message, content, pass_through);
+    async run(message, command_name, content, pass_through) {
+        return await this.call(message, content, { pass_through, command_name });
     }
 
     async call() { }

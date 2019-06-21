@@ -47,8 +47,8 @@ class CommandRegistry {
         this.timeout.createIndex({ guildId: 1, memberId: 1 }, { unique: true });
     }
 
-    async rateLimit(message, commandName) {
-        if (!this.global_ratelimit || (this.global_ratelimit_message && !this.global_ratelimit_message.testAndAdd(`${commandName}:${message.guild.id}:${message.channel.id}`))) return;
+    async rateLimit(message, command_name) {
+        if (!this.global_ratelimit || (this.global_ratelimit_message && !this.global_ratelimit_message.testAndAdd(`${command_name}:${message.guild.id}:${message.channel.id}`))) return;
         await message.channel.sendTranslated(`Whoa whoa not so fast! You may only do this ${this.global_ratelimit.max} ${this.global_ratelimit.max === 1 ? "time" : "times"} every ${this.global_ratelimit.toString()}. There is still ${toHumanTime(this.global_ratelimit.tryAgainIn(message.author.id))} left to wait.`);
     }
 
@@ -60,7 +60,7 @@ class CommandRegistry {
         let command = await this.cc.get(message.guild, { command_name, prefix_used, raw_content: message.content });
         if (command) return await this.processCC(message, command_name, content, command);
 
-        command = this.commands.get(command_name); 
+        command = this.commands.get(command_name);
         if (command) return await this.processCommand(message, command_name, content, prefix_used, command);
     }
 
@@ -70,7 +70,7 @@ class CommandRegistry {
      * @param {string} content 
      * @param {CustomCommand} command 
      */
-    async processCC(message, command_name, content, command) {        
+    async processCC(message, command_name, content, command) {
         if (!command.enabled) return false;
 
         if (await this.blacklisted_users.has(message.author.id)) {
@@ -225,7 +225,6 @@ class CommandRegistry {
     register(id, command) {
         if (this.commands.has(id)) throw new Error("Command name already exists");
 
-        command.name = id;
         this.commands.set(id, command);
         return command;
     }

@@ -71,13 +71,13 @@ module.exports = async function install(cr, client, config, db) {
         .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 3));
 
     fuckCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, content) {
+        async call(message, content, { command_name }) {
             const mention = new MessageMentions(content, message.guild).members.first();
             if (!mention) {
-                await HelpBuilder.sendHelp(message, fuckCommand.name, fuckCommand);
+                await HelpBuilder.sendHelp(message, command_name, fuckCommand);
                 return;
             }
-            
+
             const phrases = await database.find({ verified: true }).toArray(); // return only text and author
             if (phrases.length === 0) {
                 await message.channel.send(`I'm sorry, but... I don't have any fucks to give. Add fucks using \`${message.prefix}fuck add\``);

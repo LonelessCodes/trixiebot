@@ -40,7 +40,6 @@ class TreeCommand extends BaseCommand {
     registerSubCommand(id, command) {
         if (this.sub_commands.has(id)) throw new Error("Command name already exists");
 
-        command.name = this.name + " " + id;
         command.setPermissions(this.permissions);
         this.sub_commands.set(id, command);
         return command;

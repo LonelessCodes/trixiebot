@@ -76,8 +76,6 @@ module.exports = async function install(cr, client, config, db) {
             }
 
             timeout_notices[message.channel.id].last = false;
-
-            return "pass_through";
         }
     })
         .setHelp(new HelpContent()

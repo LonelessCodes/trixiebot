@@ -16,6 +16,10 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
         }
 
+        /**
+         * TODO: CACHE DATABASE STUFF
+         */
+
         async beforeProcessCall(message, content) {
             if (message.channel.type !== "text") return [];
 
@@ -42,7 +46,7 @@ module.exports = async function install(cr, client, config, db) {
         .setPermissions(permission)
         .setIgnore(false);
     
-    const removeCommand = new class extends BaseCommand {
+    const removeCommand = (new class extends BaseCommand {
         async call(message, content) {
             const word = content.trim().toLowerCase();
 
@@ -56,12 +60,11 @@ module.exports = async function install(cr, client, config, db) {
                 word
             });
         }
-    };
+    }).setHelp(new HelpContent()
+        .setUsage("<phrase>")
+        .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
 
-    muteWordCommand.registerSubCommand("remove", removeCommand)
-        .setHelp(new HelpContent()
-            .setUsage("<phrase>")
-            .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
+    muteWordCommand.registerSubCommand("remove", removeCommand);
     
     cr.register("unmute", removeCommand);
 
@@ -76,7 +79,7 @@ module.exports = async function install(cr, client, config, db) {
             .setUsage("", "Remove all muted words"));
 
     muteWordCommand.registerSubCommand("list", new class extends BaseCommand {
-        async call(message, content, muted_words) {
+        async call(message, content, { pass_through: muted_words }) {
             let str = "";
             if (muted_words.length > 0) {
                 str = await message.channel.translate("Currently muted are:") + "\n";

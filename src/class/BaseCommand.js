@@ -15,11 +15,6 @@ Message.prototype.translate = LocaleManager.autoTranslate;
 Channel.prototype.translate = LocaleManager.autoTranslateChannel;
 Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
 
-Message.prototype.end = async function (...args) {
-    await this.channel.stopTyping();
-    return await this.channel.send(...args);
-};
-
 class BaseCommand {
     /**
      * @param {CommandPermission.CommandPermission} permissions 
@@ -110,8 +105,6 @@ class BaseCommand {
     get help() {
         return this._help;
     }
-
-    async init() { return this; }
 
     async beforeProcessCall() { }
 

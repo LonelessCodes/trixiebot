@@ -20,8 +20,12 @@ class AliasCommand extends BaseCommand {
         return null;
     }
 
-    async run(message, command_name, content) {
-        await this.command.run(message, command_name, content);
+    async beforeProcessCall(message, content) {
+        return await this.command.beforeProcessCall(message, content);
+    }
+
+    async run(message, command_name, content, pass_through) {
+        await this.command.run(message, command_name, content, pass_through);
     }
 }
 

@@ -2,6 +2,7 @@
 
 ## 2019
 
+* Allow nested help responses: !help sb remove, maybe also !sb remove help
 * Improve deleted messages catching:
     * with messageID, timestamp, channelID, userID, username#0000
     * also catch edited messages, but only keep them in DB for 3 days, unless message gets deleted (identify if by messageID)

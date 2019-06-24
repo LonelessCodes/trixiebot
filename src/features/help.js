@@ -2,7 +2,8 @@ const Discord = require("discord.js");
 const INFO = require("../info");
 const CONST = require("../const");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const AliasCommand = require("../class/AliasCommand");
 const HelpBuilder = require("../logic/commands/HelpBuilder");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -15,24 +16,22 @@ function sortCommands(commands) {
 }
 
 module.exports = async function install(cr, client, config, database) {
-    cr.register("help", new class extends BaseCommand {
-        async call(message, content) {
-            if (content !== "") {
-                const toLowerCase = content.toLowerCase();
-                const c = Array.from(cr.commands.entries()).find(([id,]) => id.toLowerCase() === toLowerCase);
-                if (!c) return;
+    cr.register("help", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
+            const toLowerCase = content.toLowerCase();
+            const c = Array.from(cr.commands.entries()).find(([id,]) => id.toLowerCase() === toLowerCase);
+            if (!c) return;
 
-                let [name, command] = c;
+            let [name, command] = c;
 
-                if (command instanceof AliasCommand) {
-                    name = command.parentName;
-                    command = command.command;
-                }
-                
-                await HelpBuilder.sendHelp(message, name, command);
-                return true;
+            if (command instanceof AliasCommand) {
+                name = command.parentName;
+                command = command.command;
             }
-
+            
+            await HelpBuilder.sendHelp(message, name, command);
+        }))
+        .registerOverload("0", new SimpleCommand(async message => {
             const disabledCommands = await database.collection("disabled_commands").find({
                 guildId: message.guild.id
             }).toArray();
@@ -85,11 +84,8 @@ Optional Argument: \`<?arg>\`
 To check command usage, type \`${message.guild.config.prefix}help <command>\``);
             embed.setFooter(`TrixieBot v${INFO.VERSION} | Commands: ${cr.commands.size}`, client.user.avatarURL);
 
-            await message.channel.send({ embed });
-
-            return true;
-        }
-    })
+            return { embed };
+        }))
         .setHelp(new HelpContent()
             .setDescription("Haha, very funny")
             .setUsage("<?command>")

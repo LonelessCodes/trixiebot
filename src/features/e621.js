@@ -3,7 +3,8 @@ const { randomItem } = require("../modules/util/array");
 const fetch = require("node-fetch");
 const INFO = require("../info");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
@@ -37,8 +38,6 @@ async function fetchImages(params) {
 }
 
 async function process(message, msg, type) {
-    if (msg === "") return;
-
     let args = splitArgs(msg, 2);
 
     let popular_order = "week";
@@ -224,33 +223,25 @@ module.exports = async function install(cr) {
      * SUB COMMANDS
      */
 
-    e621Command.registerSubCommand("random", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(message, msg, "random");
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<?amount> <query>")
-        .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
-        .addParameter("query", "a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)"));
+    e621Command.registerSubCommand("random", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "random")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>")
+            .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
+            .addParameter("query", "a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)"));
 
-    e621Command.registerSubCommand("latest", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(message, msg, "latest");
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<?amount> <query>"));
+    e621Command.registerSubCommand("latest", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "latest")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>"));
     
-    e621Command.registerSubCommand("top", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(message, msg, "top");
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<?amount> <query>"));
+    e621Command.registerSubCommand("top", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "top")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>"));
     
-    e621Command.registerSubCommand("popular", new class extends BaseCommand {
-        async call(message, msg) {
-            if (msg === "") return;
-
+    e621Command.registerSubCommand("popular", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, msg) => {
             let popular_order = "week";
 
             if (/^day|week|month/i.test(msg)) {
@@ -319,11 +310,10 @@ module.exports = async function install(cr) {
             }).join("\n");
 
             await message.channel.send(output);
-        }
-    }).setHelp(new HelpContent()
-        .setDescription("Returns the current most popular images by day, week or month.")
-        .setUsage("<?timerange> <?amount>")
-        .addParameterOptional("timerange", "Popular by 'day', 'week' or 'month'. Default: 'week'"));
+        })).setHelp(new HelpContent()
+            .setDescription("Returns the current most popular images by day, week or month.")
+            .setUsage("<?timerange> <?amount>")
+            .addParameterOptional("timerange", "Popular by 'day', 'week' or 'month'. Default: 'week'"));
 
     e621Command.registerSubCommandAlias("random", "*");
 };

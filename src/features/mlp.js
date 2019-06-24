@@ -3,17 +3,14 @@ const cheerio = require("cheerio");
 const CONST = require("../const");
 const Discord = require("discord.js");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    cr.register("mlp", new class extends BaseCommand {
-        async call(message, query) {
-            if (query === "") {
-                return;
-            }
-
+    cr.register("mlp", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, query) => {
             const searchRequest = await fetch(`http://mlp.wikia.com/api/v1/Search/List?query=${encodeURIComponent(query)}&format=json&limit=1`);
             const searchJson = await searchRequest.json();
             if (!searchJson.items || !searchJson.items[0]) {
@@ -104,9 +101,8 @@ module.exports = async function install(cr) {
             for (const field of fields)
                 embed.addField(field.key, field.value, true);
 
-            await message.channel.send({ embed });
-        }
-    })
+            return { embed };
+        }))
         .setHelp(new HelpContent()
             .setDescription("Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.")
             .setUsage("<query>", "come look it up with me owo")

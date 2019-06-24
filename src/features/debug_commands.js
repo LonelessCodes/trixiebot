@@ -51,92 +51,86 @@ function getCPUInfo() {
     };
 }
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr, client) {
-    cr.register("info", new class extends BaseCommand {
-        async call(message) {
-            const guilds = client.guilds;
-            const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
-            const channels = client.channels;
+    cr.register("info", new SimpleCommand(async () => {
+        const guilds = client.guilds;
+        const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
+        const channels = client.channels;
 
-            const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOR.PRIMARY)
+        const embed = new Discord.RichEmbed()
+            .setColor(CONST.COLOR.PRIMARY)
 
-                .addField("Commands", cr.commands.size.toLocaleString("en"))
+            .addField("Commands", cr.commands.size.toLocaleString("en"))
 
-                .addField("Bot Version", INFO.VERSION, true)
-                .addField("Node.js Version", process.version.substr(1), true)
-                .addField("Discord.js Version", Discord.version)
+            .addField("Bot Version", INFO.VERSION, true)
+            .addField("Node.js Version", process.version.substr(1), true)
+            .addField("Discord.js Version", Discord.version)
 
-                .addField("CPU Usage", ((await getCPUUsage()) * 100).toFixed(0) + "%", true)
-                .addField("CPU Cores", os.cpus().length.toString(), true)
-                .addField("Memory Usage", ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB")
+            .addField("CPU Usage", ((await getCPUUsage()) * 100).toFixed(0) + "%", true)
+            .addField("CPU Cores", os.cpus().length.toString(), true)
+            .addField("Memory Usage", ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB")
 
-                .addField("Uptime", "Server: " + toHumanTime(Math.floor(os.uptime() * 1000)) + ", Bot: " + toHumanTime(Math.floor(process.uptime() * 1000)))
+            .addField("Uptime", "Server: " + toHumanTime(Math.floor(os.uptime() * 1000)) + ", Bot: " + toHumanTime(Math.floor(process.uptime() * 1000)))
 
-                .addField("Total Servers", guilds.size.toLocaleString("en"), true)
-                .addField("Text Channels", channels.filter(c => c.type === "text").size.toLocaleString("en"), true)
-                .addField("Total Users", users.toLocaleString("en"))
+            .addField("Total Servers", guilds.size.toLocaleString("en"), true)
+            .addField("Text Channels", channels.filter(c => c.type === "text").size.toLocaleString("en"), true)
+            .addField("Total Users", users.toLocaleString("en"))
 
-                .addField("Executed Commands", stats.bot.get("COMMANDS_EXECUTED").get().toLocaleString("en"), true)
-                .addField("Processed Messages", stats.bot.get("MESSAGES_TODAY").get().toLocaleString("en"))
+            .addField("Executed Commands", stats.bot.get("COMMANDS_EXECUTED").get().toLocaleString("en"), true)
+            .addField("Processed Messages", stats.bot.get("MESSAGES_TODAY").get().toLocaleString("en"))
 
-                .addField("Active Web Users", stats.web.get(stats.web.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
-                .addField("Total Web Users", stats.web.get(stats.web.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"));
+            .addField("Active Web Users", stats.web.get(stats.web.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
+            .addField("Total Web Users", stats.web.get(stats.web.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"));
 
-            await message.channel.send({ embed });
-        }
-    })
+        return { embed };
+    }))
         .setHelp(new HelpContent().setDescription("Gets the bot technical information. Nothing all that interesting."))
         .setCategory(Category.INFO);
 
-    cr.register("ping", new class extends BaseCommand {
-        async call(message) {
-            const pongText = await message.channel.translate("pong! Wee hee");
-            const m = await message.channel.send(pongText);
-            const ping = m.createdTimestamp - message.createdTimestamp;
-            await m.edit(pongText + "\n" +
-                `:stopwatch: \`Latency is     ${ping}ms\`\n` +
-                `:heartbeat: \`API Latency is ${Math.round(client.ping)}ms\``);
-        }
-    })
+    cr.register("ping", new SimpleCommand(async message => {
+        const pongText = await message.channel.translate("pong! Wee hee");
+        const m = await message.channel.send(pongText);
+        const ping = m.createdTimestamp - message.createdTimestamp;
+        await m.edit(pongText + "\n" +
+            `:stopwatch: \`Latency is     ${ping}ms\`\n` +
+            `:heartbeat: \`API Latency is ${Math.round(client.ping)}ms\``);
+    }))
         .setHelp(new HelpContent().setDescription("Ping-Pong-Ping-Pong-Ping-WEE HEEEEE."))
         .setCategory(Category.INFO);
     cr.registerAlias("ping", "trixie ping");
 
-    cr.register("changelog", new class extends BaseCommand {
-        async call(message) {
-            const logs = await getChangelog();
+    cr.register("changelog", new SimpleCommand(async message => {
+        const logs = await getChangelog();
 
-            const latest = logs[0];
-            const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOR.PRIMARY);
+        const latest = logs[0];
+        const embed = new Discord.RichEmbed()
+            .setColor(CONST.COLOR.PRIMARY);
 
-            embed.setTitle("v" + latest.version);
+        embed.setTitle("v" + latest.version);
 
-            const s = latest.body.split("\n");
-            let title = null;
-            let str = "";
-            for (const line of s) {
-                if (line.startsWith("###")) {
-                    if (title) embed.addField(title, str.trim().replace(/ \* /g, "\n* "));
-                    else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));
-                    str = "";
-                    title = line.replace(/^###+\s+/, "");
-                }
-                else str += line;
+        const s = latest.body.split("\n");
+        let title = null;
+        let str = "";
+        for (const line of s) {
+            if (line.startsWith("###")) {
+                if (title) embed.addField(title, str.trim().replace(/ \* /g, "\n* "));
+                else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));
+                str = "";
+                title = line.replace(/^###+\s+/, "");
             }
-            if (title) embed.addField(title, str.trim().replace(/ \* /g, "\n* "));
-            else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));
-
-            embed.addField("Full Changelog:", INFO.WEBSITE + "/changelog");
-
-            embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
-
-            await message.channel.send({ embed });
+            else str += line;
         }
-    });
+        if (title) embed.addField(title, str.trim().replace(/ \* /g, "\n* "));
+        else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));
+
+        embed.addField("Full Changelog:", INFO.WEBSITE + "/changelog");
+
+        embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
+
+        await message.channel.send({ embed });
+    }));
 };

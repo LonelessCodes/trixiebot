@@ -1,5 +1,5 @@
-const BaseCommand = require("../class/BaseCommand");
 const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
@@ -39,7 +39,7 @@ class ChooseCommand extends TreeCommand {
 }
 
 module.exports = async function install(cr) {
-    const sbCmd = cr.register("soundboard", new TreeCommand)
+    const sbCmd = cr.register("sb", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.")
             .setUsage("<?sound name|id>", "Play a soundie of the one's available for you in this server")
@@ -47,18 +47,16 @@ module.exports = async function install(cr) {
             .addParameterOptional("id", "sound clip id to play instead of sound name"))
         .setCategory(Category.AUDIO);
 
-    sbCmd.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, content) {
-            if (content === "") {
-                const max_slots_user = await soundboard.getSlotsUser(message.author);
-                const max_slots_guild = await soundboard.getSlotsGuild(message.guild);
+    sbCmd.registerDefaultCommand(new OverloadCommand)
+        .registerOverload("0", new SimpleCommand(async message => {
+            const max_slots_user = await soundboard.getSlotsUser(message.author);
+            const max_slots_guild = await soundboard.getSlotsGuild(message.guild);
 
-                const samples = await soundboard.getAvailableSamples(message.guild, message.author);
-                
-                new SampleList(message.author, message.guild, samples, { user: max_slots_user, guild: max_slots_guild }).display(message.channel);
-                return;
-            }
+            const samples = await soundboard.getAvailableSamples(message.guild, message.author);
 
+            new SampleList(message.author, message.guild, samples, { user: max_slots_user, guild: max_slots_guild }).display(message.channel);
+        }))
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
             let sample = await soundboard.getSample(message.guild, message.author, content.toLowerCase());
             if (!sample) {
                 if (!SampleID.isId(content)) {
@@ -85,8 +83,7 @@ module.exports = async function install(cr) {
                 log.error(err);
                 await message.channel.sendTranslated(":x: Some error happened and caused some whoopsies");
             }
-        }
-    });
+        }));
 
     async function uploadSample(message, user, name, cb) {
         const uploader = soundboard.getSampleUploader(user);
@@ -429,5 +426,5 @@ module.exports = async function install(cr) {
         .setUsage("<?scope>", "Buy additional soundboard slots with Trixie's currency"));
     sbCmd.registerSubCommandAlias("buyslot", "b");
 
-    cr.registerAlias("soundboard", "sb");
+    cr.registerAlias("sb", "soundboard");
 };

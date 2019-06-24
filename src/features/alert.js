@@ -4,7 +4,8 @@ const CONST = require("../const");
 const Discord = require("discord.js");
 const { EventEmitter } = require("events");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
@@ -820,12 +821,35 @@ module.exports = async function install(cr, client, _, db) {
      * SUB COMMANDS
      */
 
-    alertCommand.registerSubCommand("remove", new class extends BaseCommand {
-        async call(message, url) {
-            if (url === "") {
-                return;
-            }
+    const list_command = new SimpleCommand(async message => {
+        const s_channels = await manager.getChannels(message.guild);
 
+        if (s_channels.length === 0) {
+            await message.channel.sendTranslated("Hehe, nothing here lol. Time to add some.");
+            return;
+        }
+
+        /** @type {Map<any, Channel>} */
+        const sorted_by_channels = new Map;
+        for (const s_channel of s_channels)
+            sorted_by_channels.set(s_channel.channel, [...(sorted_by_channels.get(s_channel.channel) || []), s_channel]);
+
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        for (const [g_channel, s_channels] of sorted_by_channels) {
+            let str = "";
+            for (const s_channel of s_channels) str += s_channel.getURL(true) + "\n";
+
+            embed.addField("#" + g_channel.name, str);
+        }
+
+        await message.channel.send({ embed });
+    });
+
+    alertCommand.registerSubCommand("list", list_command)
+        .setHelp(new HelpContent().setUsage("", "list all active streaming alerts"));
+
+    alertCommand.registerSubCommand("remove", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, url) => {
             const g_channel = message.mentions.channels.first() || message.channel;
 
             if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
@@ -854,73 +878,34 @@ module.exports = async function install(cr, client, _, db) {
             await message.channel.sendTranslated("Stopped alerting for {{name}}", {
                 name: config.name
             });
-        }
-    })
+        }))
         .setHelp(new HelpContent().setUsage("<page url>", "unsubscribe Trixie from a Picarto channel"));
-    
-    async function list(message) {
-        const s_channels = await manager.getChannels(message.guild);
 
-        if (s_channels.length === 0) {
-            await message.channel.sendTranslated("Hehe, nothing here lol. Time to add some.");
-            return;
+    alertCommand.registerSubCommand("compact", new SimpleCommand(async message => {
+        if (await manager.isCompact(message.guild)) {
+            await manager.unsetCompact(message.guild);
+            await message.channel.send("Compact online announcements are now turned off.");
+        } else {
+            await manager.setCompact(message.guild);
+            await message.channel.send("Compact online announcements are now turned on.");
         }
-
-        /** @type {Map<any, Channel>} */
-        const sorted_by_channels = new Map;
-        for (const s_channel of s_channels)
-            sorted_by_channels.set(s_channel.channel, [...(sorted_by_channels.get(s_channel.channel) || []), s_channel]);
-
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        for (const [g_channel, s_channels] of sorted_by_channels) {
-            let str = "";
-            for (const s_channel of s_channels) str += s_channel.getURL(true) + "\n";
-
-            embed.addField("#" + g_channel.name, str);
-        }
-
-        await message.channel.send({ embed });
-
-    }
-
-    alertCommand.registerSubCommand("list", new class extends BaseCommand {
-        async call(message) {
-            await list(message);
-        }
-    })
-        .setHelp(new HelpContent().setUsage("", "list all active streaming alerts"));
-
-    alertCommand.registerSubCommand("compact", new class extends BaseCommand {
-        async call(message) {
-            if (await manager.isCompact(message.guild)) {
-                await manager.unsetCompact(message.guild);
-                await message.channel.send("Compact online announcements are now turned off.");
-            } else {
-                await manager.setCompact(message.guild);
-                await message.channel.send("Compact online announcements are now turned on.");
-            }
-        }
-    })
+    }))
         .setHelp(new HelpContent().setUsage("", "toggle compact online announcements"));
 
-    alertCommand.registerSubCommand("cleanup", new class extends BaseCommand {
-        async call(message) {
-            if (await manager.isCleanup(message.guild)) {
-                await manager.unsetCleanup(message.guild);
-                await message.channel.send("Not deleting online announcements when going offline now.");
-            } else {
-                await manager.setCleanup(message.guild);
-                await message.channel.send("Cleaning up online announcements now.");
-            }
+    alertCommand.registerSubCommand("cleanup", new SimpleCommand(async message => {
+        if (await manager.isCleanup(message.guild)) {
+            await manager.unsetCleanup(message.guild);
+            await message.channel.send("Not deleting online announcements when going offline now.");
+        } else {
+            await manager.setCleanup(message.guild);
+            await message.channel.send("Cleaning up online announcements now.");
         }
-    })
+    }))
         .setHelp(new HelpContent().setUsage("", "toggle cleaning up online announcements"));
 
-    alertCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, content) {
-            if (content === "") {
-                return await list(message);
-            }
+    alertCommand.registerDefaultCommand(new OverloadCommand)
+        .registerOverload("0", list_command)
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
             const g_channel = message.mentions.channels.first() || message.channel;
 
             const url = content.replace(new RegExp(g_channel.toString(), "g"), "").trim();
@@ -958,8 +943,7 @@ module.exports = async function install(cr, client, _, db) {
             await message.channel.sendTranslated("Will be alerting y'all there when {{name}} goes online!", {
                 name: config.name
             });
-        }
-    });
-
+        }));
+    
     alertCommand.registerSubCommandAlias("*", "add");
 };

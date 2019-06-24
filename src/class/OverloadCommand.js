@@ -1,6 +1,5 @@
 const BaseCommand = require("./BaseCommand");
-const { findArgs } = require("../modules/util/string");
-const HelpBuilder = require("../../logic/commands/HelpBuilder");
+const HelpBuilder = require("../logic/commands/HelpBuilder");
 
 class OverloadCommand extends BaseCommand {
     constructor(permissions) {
@@ -8,18 +7,21 @@ class OverloadCommand extends BaseCommand {
 
         /** @type {Map<string, BaseCommand>} */
         this.overloads = new Map;
+
+        this._linked_to = this;
     }
 
     async run(message, command_name, content, pass_through) {
-        const args = findArgs(content);
+        const args = content.split(/\s+/).filter(s => s !== "");
 
-        if (this.overloads.size < 1) {
+        if (this.overloads.size === 0) {
             throw new Error("No Overloads registered");
         }
 
         const command = this.getCmd(args);
         if (!command) {
-            await HelpBuilder.sendHelp(message, command_name, this);
+            await HelpBuilder.sendHelp(message, command_name, this._linked_to || this);
+            // maybe send a shorter version of the help
             return;
         }
 
@@ -46,9 +48,12 @@ class OverloadCommand extends BaseCommand {
                     const num = parseInt(option.slice(0, -1));
                     if (!Number.isNaN(num) && size >= num) return cmd;
                 }
-                const RANGE = option.split(/-/);
-                if (RANGE.length === 1) if (RANGE[0] === size) return cmd;
-                else if (RANGE.length === 2) if (size >= RANGE[0] && RANGE[1] >= size) return cmd;
+                const RANGE = option.split(/-/).slice(0, 2).map(s => parseInt(s));
+                if (RANGE.length === 1) {
+                    if (RANGE[0] === size) return cmd;
+                } else if (RANGE.length === 2) {
+                    if (size >= RANGE[0] && RANGE[1] >= size) return cmd;
+                }
             }
         }
     }
@@ -63,6 +68,11 @@ class OverloadCommand extends BaseCommand {
 
         command.setPermissions(this.permissions);
         this.overloads.set(args, command);
+        return this;
+    }
+
+    linkTo(command) {
+        this._linked_to = command;
         return this;
     }
 }

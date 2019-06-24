@@ -2,7 +2,7 @@ const config = require("../config");
 const log = require("../modules/log");
 const fetch = require("node-fetch");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -58,11 +58,7 @@ async function process(message) {
 module.exports = async function install(cr) {
     if (!config.has("derpibooru.key")) return log.debug("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
-    cr.register("horsepussy", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(message, msg, "random");
-        }
-    })
+    cr.register("horsepussy", new SimpleCommand(message => process(message)))
         .setHelp(new HelpContent()
             .setDescription("Get some gud quality horse pussi OwO"))
         .setExplicit(true)
@@ -72,4 +68,5 @@ module.exports = async function install(cr) {
     cr.registerAlias("horsepussy", "ponypussy");
     cr.registerAlias("horsepussy", "ponypussi");
     cr.registerAlias("horsepussy", "ponepussi");
+    cr.registerAlias("horsepussy", "ponypoossy");
 };

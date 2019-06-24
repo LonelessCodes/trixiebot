@@ -2,7 +2,8 @@ const CONST = require("../const");
 const RandomChance = require("../modules/RandomChance");
 const Discord = require("discord.js");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -91,10 +92,8 @@ replies.add({
 }, 1);
 
 module.exports = async function install(cr) {
-    cr.register("8ball", new class extends BaseCommand {
-        async call(message, question) {
-            if (question === "") return;
-
+    cr.register("8ball", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async message => {
             /** @type {{ text: string; type: number; }} */
             const reply = await replies.random();
 
@@ -116,8 +115,7 @@ module.exports = async function install(cr) {
                 .setTitle(`${reply.text} ${emoji}`);
 
             await message.channel.send({ embed });
-        }
-    })
+        }))
         .setHelp(new HelpContent()
             .setDescription("An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy")
             .setUsage("<question>")

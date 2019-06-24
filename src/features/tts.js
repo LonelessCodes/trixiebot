@@ -4,17 +4,16 @@ const fetch = require("node-fetch");
 const AudioManager = require("../logic/managers/AudioManager");
 const { ConnectError } = AudioManager;
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
     if (!config.has("voicerss.key")) return log.debug("config", "Found no API token for voicerss - Disabled tts command");
 
-    cr.register("tts", new class extends BaseCommand {
-        async call(message, content) {
-            if (content === "") return;
-
+    cr.register("tts", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
             if (!/[a-z0-9]/.test(content)) {
                 message.react("❌");
                 message.channel.sendTranslated("Ehhh rather send a normal message. This kind of message is know to kinda break me");
@@ -56,8 +55,7 @@ module.exports = async function install(cr) {
                 log.error(err);
                 message.channel.sendTranslated("Some error happened and caused some whoopsies");
             }
-        }
-    })
+        }))
         .setHelp(new HelpContent()
             .setDescription("Make Trixie join the user's current voice channel and read the `message` out aloud.")
             .setUsage("<message>")

@@ -1,12 +1,12 @@
 const { randomItem } = require("../../modules/util/array");
 
-const BaseCommand = require("../../class/BaseCommand");
+const SimpleCommand = require("../../class/SimpleCommand");
+const OverloadCommand = require("../../class/OverloadCommand");
 const TreeCommand = require("../../class/TreeCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
 const RateLimiter = require("../../logic/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
-const HelpBuilder = require("../../logic/commands/HelpBuilder");
 const MessageMentions = require("../../modules/MessageMentions");
 
 module.exports = async function install(cr, client, config, db) {
@@ -26,11 +26,13 @@ module.exports = async function install(cr, client, config, db) {
      * SUB COMMANDS
      */
 
-    fuckCommand.registerSubCommand("add", new class extends BaseCommand {
-        async call(message, text) {
-            if (text === "") {
-                return;
-            }
+    fuckCommand.registerSubCommand("add", new OverloadCommand)
+        .setHelp(new HelpContent()
+            .setUsage("<text>", "Add your own phrase")
+            .addParameter("text", "the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `{{prefix}}fuck add rides ${name}'s skin bus into tuna town`"))
+        .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 3))
+
+        .registerOverload("1+", new SimpleCommand(async (message, text) => {
             if (added_recently.filter(id => message.author.id === id).length > 5) {
                 await message.channel.send("Cool down, bro. I can't let you add so much at once! Come back in an hour or so.");
                 return;
@@ -63,37 +65,24 @@ module.exports = async function install(cr, client, config, db) {
             }, 1000 * 60 * 60); // 60 minutes
 
             await message.channel.send("Added!");
+        }));
+
+    fuckCommand.registerDefaultCommand(new SimpleCommand(async (message, content) => {
+        const mention = new MessageMentions(content, message.guild).members.first() || message.member;
+
+        const phrases = await database.find({ verified: true }).toArray(); // return only text and author
+        if (phrases.length === 0) {
+            return `I'm sorry, but... I don't have any fucks to give. Add fucks using \`${message.prefix}fuck add\``;
         }
-    })
-        .setHelp(new HelpContent()
-            .setUsage("<text>", "Add your own phrase")
-            .addParameter("text", "the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `{{prefix}}fuck add rides ${name}'s skin bus into tuna town`"))
-        .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 3));
 
-    fuckCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, content, { command_name }) {
-            const mention = new MessageMentions(content, message.guild).members.first();
-            if (!mention) {
-                await HelpBuilder.sendHelp(message, command_name, fuckCommand);
-                return;
-            }
-
-            const phrases = await database.find({ verified: true }).toArray(); // return only text and author
-            if (phrases.length === 0) {
-                await message.channel.send(`I'm sorry, but... I don't have any fucks to give. Add fucks using \`${message.prefix}fuck add\``);
-                return;
-            }
-
-            const phrase = await randomItem(phrases);
-            const username = mention.displayName;
-            let text = phrase.text;
-            text = text.replace(/\$\{name\}'s/g,
-                username.toLowerCase().charAt(username.length - 1) === "s" ?
-                    `${username}'` :
-                    `${username}'s`);
-            text = text.replace(/\$\{name\}/g, username);
-            await message.channel.send(text);
-            return;
-        }
-    });
+        const phrase = await randomItem(phrases);
+        const username = mention.displayName;
+        let text = phrase.text;
+        text = text.replace(/\$\{name\}'s/g,
+            username.toLowerCase().charAt(username.length - 1) === "s" ?
+                `${username}'` :
+                `${username}'s`);
+        text = text.replace(/\$\{name\}/g, username);
+        return text;
+    }));
 };

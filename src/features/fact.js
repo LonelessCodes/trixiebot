@@ -5,7 +5,7 @@ const config = require("../config");
 const log = require("../modules/log");
 const Twit = require("twit");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -15,9 +15,9 @@ module.exports = async function install(cr) {
     const twitter = new Twit(config.get("twitter"));
     const get = promisify(twitter.get).bind(twitter);
 
-    const facts = new Set();
+    const facts = new Promise(async function loadTweets(resolve) {
+        const facts = new Set();
 
-    const firstSetLoaded = new Promise(async function loadTweets(resolve) {
         let tweets_available = true;
         let smallest_id = null;
         let newest_id = null;
@@ -44,16 +44,10 @@ module.exports = async function install(cr) {
     }).catch(log);
 
     async function getFact() {
-        return await randomItem([...facts]);
+        return await randomItem([...(await facts)]);
     }
 
-    cr.register("fact", new class extends BaseCommand {
-        async call(message) {
-            await firstSetLoaded;
-            const fact = await getFact();
-            await message.channel.send(fact);
-        }
-    })
+    cr.register("fact", new SimpleCommand(() => getFact()))
         .setHelp(new HelpContent()
             .setDescription("Gets random UberFacts fact"))
         .setCategory(Category.UTILS);

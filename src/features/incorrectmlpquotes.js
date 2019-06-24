@@ -3,7 +3,7 @@ const getTumblrBlog = require("../modules/getTumblrBlog");
 const secureRandom = require("../modules/secureRandom");
 const log = require("../modules/log");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -26,17 +26,14 @@ module.exports = async function install(cr) {
         .then(() => log("mlpquotes", "loaded"))
         .catch(() => { });
 
-    cr.register("mlpquote", new class extends BaseCommand {
-        async call(message) {
-            if (quotes.length === 0) {
-                await message.channel.send("Quotes not yet done loading :c come back in a few seconds to minutes");
-                return;
-            }
-
-            const quote = await secureRandom(quotes);
-            await message.channel.send(quote);
+    cr.register("mlpquote", new SimpleCommand(async message => {
+        if (quotes.length === 0) {
+            await message.channel.send("Quotes not yet done loading :c come back in a few seconds to minutes");
+            return;
         }
-    })
+
+        return await secureRandom(quotes);
+    }))
         .setHelp(new HelpContent()
             .setDescription("Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com"))
         .setCategory(Category.MLP)

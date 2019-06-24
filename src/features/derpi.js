@@ -3,7 +3,8 @@ const log = require("../modules/log");
 const { splitArgs } = require("../modules/util/string");
 const fetch = require("node-fetch");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
@@ -44,8 +45,6 @@ async function fetchDerpi(params) {
 }
 
 async function process(key, message, msg, type) {
-    if (msg === "") return;
-
     const args = splitArgs(msg, 2);
 
     let amount = 1;
@@ -218,35 +217,27 @@ module.exports = async function install(cr) {
      * SUB COMMANDS
      */
 
-    derpiCommand.registerSubCommand("random", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(key, message, msg, "random");
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<?amount> <query>")
-        .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
-        .addParameter("query", "a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)"));
+    derpiCommand.registerSubCommand("random", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "random")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>")
+            .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
+            .addParameter("query", "a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)"));
 
-    derpiCommand.registerSubCommand("top", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(key, message, msg, "top");
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<?amount> <query>"));
+    derpiCommand.registerSubCommand("top", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "top")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>"));
 
-    derpiCommand.registerSubCommand("latest", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(key, message, msg, "latest");
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<?amount> <query>"));
+    derpiCommand.registerSubCommand("latest", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "latest")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>"));
 
-    derpiCommand.registerSubCommand("first", new class extends BaseCommand {
-        async call(message, msg) {
-            await process(key, message, msg, "first");
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<?amount> <query>"));
+    derpiCommand.registerSubCommand("first", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "first")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>"));
 
     derpiCommand.registerSubCommandAlias("random", "*");
     cr.registerAlias("derpi", "db");

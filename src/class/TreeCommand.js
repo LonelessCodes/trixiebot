@@ -12,7 +12,7 @@ class TreeCommand extends BaseCommand {
     async run(message, command_name, content, pass_through) {
         const args = splitArgs(content, 2);
 
-        if (this.sub_commands.size < 1) {
+        if (this.sub_commands.size === 0) {
             throw new Error("No SubCommands registered");
         }
 
@@ -55,6 +55,9 @@ class TreeCommand extends BaseCommand {
     }
 
     registerDefaultCommand(command) {
+        // not a great solution
+        // but the only thing that works
+        if (typeof command.linkTo === "function") command.linkTo(this);
         command.setPermissions(this.permissions);
         this.registerSubCommand("*", command);
         return command;

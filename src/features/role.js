@@ -3,7 +3,8 @@ const Discord = require("discord.js");
 
 const AliasCommand = require("../class/AliasCommand");
 const TreeCommand = require("../class/TreeCommand");
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 const CommandPermission = require("../logic/commands/CommandPermission");
@@ -73,12 +74,8 @@ module.exports = async function install(cr, client, config, db) {
      * SUB COMMANDS
      */
 
-    roleCommand.registerSubCommand("remove", new class extends BaseCommand {
-        async call(message, content) {
-            if (content === "") {
-                return;
-            }
-
+    roleCommand.registerSubCommand("remove", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
             const members = message.mentions.members.array();
             const permission = message.channel.permissionsFor(message.member).has(Discord.Permissions.FLAGS.MANAGE_ROLES);
             if (members.length > 0) {
@@ -147,21 +144,16 @@ module.exports = async function install(cr, client, config, db) {
                     await message.channel.sendTranslated("Role removed.");
                 }
             }
-        }
-    })
+        }))
         .setHelp(new HelpContent()
             .setUsage("<role> <?user mention 1> <?user mention 2> ...", "to remove")
             .addParameter("role", "The role you would like to have removed")
             .addParameter("user mention", "This is irrelevant to you, if you don't have rights to manage roles yourself"));
 
-    const listRoles = roleCommand.registerSubCommand("available", new class extends BaseCommand {
-        get help() {
-            return new HelpContent().setUsage("", "Show all public roles that you can add to yourself.");
-        }
-        async call(message) {
-            await message.channel.send(await rolesMessage(message.guild, message.channel, database));
-        }
-    });
+    const listRoles = roleCommand.registerSubCommand("available", new SimpleCommand(async message => {
+        await message.channel.send(await rolesMessage(message.guild, message.channel, database));
+    }))
+        .setHelp(new HelpContent().setUsage("", "Show all public roles that you can add to yourself."));
     cr.register("roles", new AliasCommand("role", listRoles));
 
     const roleConfig = roleCommand.registerSubCommand("config", new TreeCommand)
@@ -169,73 +161,66 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsageTitle("Admin Area")
             .setUsage("", "Configure roles that everyone can add"));
-    roleConfig.registerSubCommand("add", new class extends BaseCommand {
-        async call(message, content) {
-            const args = findArgs(content);
-            const role_query = args[0];
-            const category = args[1] || undefined;
+    
+    roleConfig.registerSubCommand("add", new SimpleCommand(async (message, content) => {
+        const args = findArgs(content);
+        const role_query = args[0];
+        const category = args[1] || undefined;
 
-            const role_obj = findRoleInServer(message.guild, role_query);
-            if (!role_obj) {
-                await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                return;
-            }
-
-            const compare = role_obj.comparePositionTo(message.member.highestRole);
-            if (compare > 0) {
-                await message.channel.sendTranslated("Sorry, you can't add a role to the config that is more powerful than your owns.");
-                return;
-            }
-
-            await database.updateOne({
-                guildId: message.guild.id,
-                roleId: role_obj.id
-            }, {
-                $set: {
-                    category
-                }
-            }, { upsert: true });
-            await message.channel.sendTranslated("Made the role available for everyone! It's free real estate");
+        const role_obj = findRoleInServer(message.guild, role_query);
+        if (!role_obj) {
+            await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
+            return;
         }
-    })
+
+        const compare = role_obj.comparePositionTo(message.member.highestRole);
+        if (compare > 0) {
+            await message.channel.sendTranslated("Sorry, you can't add a role to the config that is more powerful than your owns.");
+            return;
+        }
+
+        await database.updateOne({
+            guildId: message.guild.id,
+            roleId: role_obj.id
+        }, {
+            $set: {
+                category
+            }
+        }, { upsert: true });
+        await message.channel.sendTranslated("Made the role available for everyone! It's free real estate");
+    }))
         .setHelp(new HelpContent()
             .setUsage("<role> <?category>", "Add a role to the public configuration"));
-    roleConfig.registerSubCommand("remove", new class extends BaseCommand {
-        async call(message, content) {
-            const args = findArgs(content);
-            const role = args[0];
+    
+    roleConfig.registerSubCommand("remove", new SimpleCommand(async (message, content) => {
+        const args = findArgs(content);
+        const role = args[0];
 
-            const role_obj = message.guild.roles.find("name", role);
-            if (!role_obj) {
-                await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                return;
-            }
-
-            const compare = role_obj.comparePositionTo(message.member.highestRole);
-            if (compare > 0) {
-                await message.channel.sendTranslated("Sorry, you can't remove a role to the config that is more powerful than your owns.");
-                return;
-            }
-
-            await database.deleteOne({
-                guildId: message.guild.id,
-                roleId: role_obj.id
-            });
-            await message.channel.sendTranslated("Removed the role from the config. Ouchie wouchie ;~;");
+        const role_obj = message.guild.roles.find("name", role);
+        if (!role_obj) {
+            await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
+            return;
         }
-    })
+
+        const compare = role_obj.comparePositionTo(message.member.highestRole);
+        if (compare > 0) {
+            await message.channel.sendTranslated("Sorry, you can't remove a role to the config that is more powerful than your owns.");
+            return;
+        }
+
+        await database.deleteOne({
+            guildId: message.guild.id,
+            roleId: role_obj.id
+        });
+        await message.channel.sendTranslated("Removed the role from the config. Ouchie wouchie ;~;");
+    }))
         .setHelp(new HelpContent()
             .setUsage("<role>", "Remove a role from the public configuration")
             .addParameter("role", "The \"quoted\" role name of the role you want to remove")
             .addParameterOptional("category", "The \"quoted\" name of the category you want to add the role to. Not given will be \"Other\""));
 
-    roleCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, content) {
-            // if no role name return the usage
-            if (content === "") {
-                return;
-            }
-
+    roleCommand.registerDefaultCommand(new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
             // get all mentions
             const members = message.mentions.members.array();
             // check permission of author
@@ -312,8 +297,7 @@ module.exports = async function install(cr, client, config, db) {
                     await message.channel.sendTranslated("Role added! /)");
                 }
             }
-        }
-    });
+        }));
     roleCommand.registerSubCommandAlias("*", "add");
 
     cr.registerAlias("role", "rank");

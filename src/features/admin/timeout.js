@@ -4,7 +4,8 @@ const { toHumanTime, parseHumanTime } = require("../../modules/util/time");
 const { splitArgs } = require("../../modules/util/string");
 const Discord = require("discord.js");
 
-const BaseCommand = require("../../class/BaseCommand");
+const SimpleCommand = require("../../class/SimpleCommand");
+const OverloadCommand = require("../../class/OverloadCommand");
 const TreeCommand = require("../../class/TreeCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const CommandPermission = require("../../logic/commands/CommandPermission");
@@ -26,7 +27,7 @@ module.exports = async function install(cr, client, config, db) {
         async beforeProcessCall(message) {
             if (!timeout_notices[message.channel.id])
                 timeout_notices[message.channel.id] = {};
-            
+
             const timeout_entry = await database.findOne({ guildId: message.guild.id, memberId: message.author.id });
             if (timeout_entry) {
                 const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
@@ -86,97 +87,86 @@ module.exports = async function install(cr, client, config, db) {
         .setPermissions(permission)
         .setIgnore(false);
 
-    timeoutCommand.registerSubCommand("remove", new class extends BaseCommand {
-        async call(message, content) {
-            const members = new MessageMentions(content, message.guild).members.array();
+    timeoutCommand.registerSubCommand("remove", new SimpleCommand(async (message, content) => {
+        const members = new MessageMentions(content, message.guild).members.array();
 
-            for (const member of members) {
-                await database_messages.updateMany({
-                    guildId: message.guild.id,
-                    memberId: member.id
-                }, {
-                    $set: {
-                        timeoutEnd: new Date
-                    }
-                });
-            }
-
-            const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
-
-            await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
-                users: members.map(member => userToString(member)).join(" ")
+        for (const member of members) {
+            await database_messages.updateMany({
+                guildId: message.guild.id,
+                memberId: member.id
+            }, {
+                $set: {
+                    timeoutEnd: new Date
+                }
             });
-
-            await Promise.all(promises);
         }
-    })
+
+        const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
+
+        await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
+            users: members.map(member => userToString(member)).join(" ")
+        });
+
+        await Promise.all(promises);
+    }))
         .setHelp(new HelpContent()
             .setUsage("<user mention 1> <user mention 2> ...")
             .addParameter("user mention", "user to remove timeout from. Multiple users possible"));
 
-    timeoutCommand.registerSubCommand("clear", new class extends BaseCommand {
-        async call(message) {
-            const timeouts = await database.find({ guildId: message.guild.id }).toArray();
+    timeoutCommand.registerSubCommand("clear", new SimpleCommand(async message => {
+        const timeouts = await database.find({ guildId: message.guild.id }).toArray();
 
-            for (const timeout of timeouts) {
-                await database_messages.updateMany({
-                    guildId: message.guild.id,
-                    memberId: timeout.memberId
-                }, {
-                    $set: {
-                        timeoutEnd: new Date
-                    }
-                });
-            }
-
-            await database.deleteMany({ guildId: message.guild.id });
-
-            await message.channel.sendTranslated("Removed all timeouts successfully");
-        }
-    })
-        .setHelp(new HelpContent()
-            .setUsage("", "remove all timeouts"));
-    
-    timeoutCommand.registerSubCommand("list", new class extends BaseCommand {
-        async call(message) {
-            let longestName = 0;
-            let longestString = 0;
-            const docs = (await database.find({ guildId: message.guild.id }).toArray()).map(doc => {
-                doc.member = message.guild.members.has(doc.memberId) ?
-                    message.guild.members.get(doc.memberId) :
-                    null;
-                if (longestName < userToString(doc.member).length) {
-                    longestName = userToString(doc.member).length;
+        for (const timeout of timeouts) {
+            await database_messages.updateMany({
+                guildId: message.guild.id,
+                memberId: timeout.memberId
+            }, {
+                $set: {
+                    timeoutEnd: new Date
                 }
-                doc.string = toHumanTime(doc.expiresAt.getTime() - Date.now());
-                if (longestString < doc.string.length) {
-                    longestString = doc.string.length;
-                }
-                return doc;
-            }).filter(doc => !!doc.member);
-            let str = "```";
-            for (const doc of docs) {
-                str += "\n";
-                str += userToString(doc.member);
-                str += new Array(longestName - userToString(doc.member).length).fill(" ").join("");
-                str += " | ";
-                str += doc.string;
-            }
-            str += "\n```";
-            await message.channel.send(str);
+            });
         }
-    })
+
+        await database.deleteMany({ guildId: message.guild.id });
+
+        await message.channel.sendTranslated("Removed all timeouts successfully");
+    }))
+        .setHelp(new HelpContent().setUsage("", "remove all timeouts"));
+
+    timeoutCommand.registerSubCommand("list", new SimpleCommand(async message => {
+        let longestName = 0;
+        let longestString = 0;
+        const docs = (await database.find({ guildId: message.guild.id }).toArray()).map(doc => {
+            doc.member = message.guild.members.has(doc.memberId) ?
+                message.guild.members.get(doc.memberId) :
+                null;
+            if (longestName < userToString(doc.member).length) {
+                longestName = userToString(doc.member).length;
+            }
+            doc.string = toHumanTime(doc.expiresAt.getTime() - Date.now());
+            if (longestString < doc.string.length) {
+                longestString = doc.string.length;
+            }
+            return doc;
+        }).filter(doc => !!doc.member);
+        let str = "```";
+        for (const doc of docs) {
+            str += "\n";
+            str += userToString(doc.member);
+            str += new Array(longestName - userToString(doc.member).length).fill(" ").join("");
+            str += " | ";
+            str += doc.string;
+        }
+        str += "\n```";
+        await message.channel.send(str);
+    }))
         .setHelp(new HelpContent()
             .setUsage("", "list all timeouts present at the moment"));
 
-    timeoutCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, msg) {
-            if (msg === "") {
-                return;
-            }
-
+    timeoutCommand.registerDefaultCommand(new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, msg) => {
             const args = splitArgs(msg, 2);
-            if (args.length > 2) {
+            if (args.length < 2) {
                 await message.channel.sendTranslated("At least two arguments are required: duration and @user");
                 return;
             }
@@ -236,6 +226,5 @@ module.exports = async function install(cr, client, config, db) {
             }));
 
             await Promise.all(promises);
-        }
-    });
+        }));
 };

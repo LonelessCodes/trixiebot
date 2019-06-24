@@ -1,7 +1,7 @@
 const CONST = require("../const");
 const Discord = require("discord.js");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -119,88 +119,82 @@ function generateTimeFrames() {
 }
 
 module.exports = async function install(cr) {
-    cr.register("stats", new class extends BaseCommand {
-        async call(message) {
-            const guildId = message.guild.id;
+    cr.register("stats", new SimpleCommand(async message => {
+        const guildId = message.guild.id;
 
-            const { today, yesterday, week, month, quartal } = generateTimeFrames();
+        const { today, yesterday, week, month, quartal } = generateTimeFrames();
 
-            const results = await Promise.all([
-                guild_stats.get("commands").getRange(quartal, null, guildId).then(sort),
-                guild_stats.get("messages").getRange(quartal, null, guildId).then(sort),
-                guild_stats.get("users").getRange(quartal, null, guildId).then(sort),
+        const results = await Promise.all([
+            guild_stats.get("commands").getRange(quartal, null, guildId).then(sort),
+            guild_stats.get("messages").getRange(quartal, null, guildId).then(sort),
+            guild_stats.get("users").getRange(quartal, null, guildId).then(sort),
 
-                guild_stats.get("users").getLastItemBefore(quartal, guildId),
-            ]);
+            guild_stats.get("users").getLastItemBefore(quartal, guildId),
+        ]);
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setAuthor(`${message.guild.name} - ${await message.channel.translate("Statistics")}`, message.guild.iconURL);
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        embed.setAuthor(`${message.guild.name} - ${await message.channel.translate("Statistics")}`, message.guild.iconURL);
 
-            embed.addField("Today", getString(today, null, results), true);
-            embed.addField("Yesterday", getString(yesterday, today, results), true);
+        embed.addField("Today", getString(today, null, results), true);
+        embed.addField("Yesterday", getString(yesterday, today, results), true);
 
-            embed.addField("Average (7 days)", getAverageString(week, 7, results));
-            embed.addField("Average (30 days)", getAverageString(month, 30, results));
-            if (results[3] && results[3].ts.getTime() < quartal.getTime()) embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
+        embed.addField("Average (7 days)", getAverageString(week, 7, results));
+        embed.addField("Average (30 days)", getAverageString(month, 30, results));
+        if (results[3] && results[3].ts.getTime() < quartal.getTime()) embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
 
-            await message.channel.send({ embed });
-        }
-    })
+        return { embed };
+    }))
         .setHelp(new HelpContent()
             .setDescription("Get some stats about the alive-ness of this server"))
         .setCategory(Category.INFO);
 
-    cr.register("userstats", new class extends BaseCommand {
-        async call(message, content) {
-            const mentions = new MessageMentions(content, message.guild);
-            const member = mentions.members.first() || message.member;
-            const user = member.user;
+    cr.register("userstats", new SimpleCommand(async (message, content) => {
+        const mentions = new MessageMentions(content, message.guild);
+        const member = mentions.members.first() || message.member;
+        const user = member.user;
 
-            const guildId = message.guild.id;
+        const guildId = message.guild.id;
 
-            const { today, yesterday, week, month, quartal } = generateTimeFrames();
+        const { today, yesterday, week, month, quartal } = generateTimeFrames();
 
-            const results = await Promise.all([
-                guild_stats.get("commands").getRangeUser(quartal, null, guildId, user.id).then(sort),
-                guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort)
-            ]);
+        const results = await Promise.all([
+            guild_stats.get("commands").getRangeUser(quartal, null, guildId, user.id).then(sort),
+            guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort)
+        ]);
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setAuthor(`${userToString(member, true)} - ${await message.channel.translate("Statistics")}`, user.avatarURL);
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        embed.setAuthor(`${userToString(member, true)} - ${await message.channel.translate("Statistics")}`, user.avatarURL);
 
-            embed.addField("Today", getString(today, null, results), true);
-            embed.addField("Yesterday", getString(yesterday, today, results), true);
+        embed.addField("Today", getString(today, null, results), true);
+        embed.addField("Yesterday", getString(yesterday, today, results), true);
 
-            embed.addField("Average (7 days)", getAverageString(week, 7, results));
-            embed.addField("Average (30 days)", getAverageString(month, 30, results));
-            embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
+        embed.addField("Average (7 days)", getAverageString(week, 7, results));
+        embed.addField("Average (30 days)", getAverageString(month, 30, results));
+        embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
 
-            await message.channel.send({ embed });
-        }
-    })
+        return { embed };
+    }))
         .setHelp(new HelpContent()
             .setDescription("Get some stats about how active someone is on the server")
             .setUsage("<?@user>", "")
             .addParameterOptional("@user", "The member c:"))
         .setCategory(Category.INFO);
     
-    cr.register("serverinfo", new class extends BaseCommand {
-        async call(message) {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
-            embed.setThumbnail(message.guild.iconURL);
+    cr.register("serverinfo", new SimpleCommand(async message => {
+        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
+        embed.setThumbnail(message.guild.iconURL);
 
-            if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
-            embed.addField("ID", message.guild.id, true);
-            embed.addField("User Count", message.guild.memberCount, true);
-            embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
-            embed.addField("Channel Count", message.guild.channels.filter(c => c.type === "text").size, true);
-            embed.addField("Emoji Count", message.guild.emojis.size, true);
-            embed.addField("Region", message.guild.region, true);
+        if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
+        embed.addField("ID", message.guild.id, true);
+        embed.addField("User Count", message.guild.memberCount, true);
+        embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
+        embed.addField("Channel Count", message.guild.channels.filter(c => c.type === "text").size, true);
+        embed.addField("Emoji Count", message.guild.emojis.size, true);
+        embed.addField("Region", message.guild.region, true);
 
-            await message.channel.send({ embed });
-        }
-    })
+        return { embed };
+    }))
         .setHelp(new HelpContent()
             .setDescription("Receive information about this server"))
         .setCategory(Category.INFO);

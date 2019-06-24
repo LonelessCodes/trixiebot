@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 
-const BaseCommand = require("../../class/BaseCommand");
+const SimpleCommand = require("../../class/SimpleCommand");
+const OverloadCommand = require("../../class/OverloadCommand");
 const TreeCommand = require("../../class/TreeCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const CommandPermission = require("../../logic/commands/CommandPermission");
@@ -46,64 +47,49 @@ module.exports = async function install(cr, client, config, db) {
         .setPermissions(permission)
         .setIgnore(false);
     
-    const removeCommand = (new class extends BaseCommand {
-        async call(message, content) {
+    const removeCommand = new OverloadCommand()
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
             const word = content.trim().toLowerCase();
-
-            if (word === "") {
-                return;
-            }
 
             await database.deleteOne({ guildId: message.guild.id, word });
 
             await message.channel.sendTranslated("Removed muted word \"{{word}}\" successfully", {
                 word
             });
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<phrase>")
-        .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
+        }))
+        .setHelp(new HelpContent()
+            .setUsage("<phrase>")
+            .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
 
     muteWordCommand.registerSubCommand("remove", removeCommand);
-    
     cr.register("unmute", removeCommand);
 
-    muteWordCommand.registerSubCommand("clear", new class extends BaseCommand {
-        async call(message) {
-            await database.deleteMany({ guildId: message.guild.id });
+    muteWordCommand.registerSubCommand("clear", new SimpleCommand(async message => {
+        await database.deleteMany({ guildId: message.guild.id });
 
-            await message.channel.sendTranslated("Removed all muted words successfully");
+        await message.channel.sendTranslated("Removed all muted words successfully");
+    }))
+        .setHelp(new HelpContent().setUsage("", "Remove all muted words"));
+
+    muteWordCommand.registerSubCommand("list", new SimpleCommand(async (message, content, { pass_through: muted_words }) => {
+        let str = "";
+        if (muted_words.length > 0) {
+            str = await message.channel.translate("Currently muted are:") + "\n";
+            str += "`" + muted_words.join("`, `") + "`";
+        } else {
+            str = await message.channel.translate("Nothing yet muted");
         }
-    })
-        .setHelp(new HelpContent()
-            .setUsage("", "Remove all muted words"));
 
-    muteWordCommand.registerSubCommand("list", new class extends BaseCommand {
-        async call(message, content, { pass_through: muted_words }) {
-            let str = "";
-            if (muted_words.length > 0) {
-                str = await message.channel.translate("Currently muted are:") + "\n";
-                str += "`" + muted_words.join("`, `") + "`";
-            } else {
-                str = await message.channel.translate("Nothing yet muted");
-            }
+        return str;
+    }))
+        .setHelp(new HelpContent().setUsage("", "list all muted words and phrases"));
 
-            await message.channel.send(str);
-        }
-    })
-        .setHelp(new HelpContent()
-            .setUsage("", "list all muted words and phrases"));
-
-    muteWordCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message, content, muted_words) {
+    muteWordCommand.registerDefaultCommand(new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, content, { pass_through: muted_words }) => {
             /**
              * @type {string}
              */
             const word = content.trim().toLowerCase();
-
-            if (word === "") {
-                return;
-            }
 
             if (muted_words.includes(word)) {
                 await message.channel.sendTranslated("Already got this muted");
@@ -115,8 +101,7 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.sendTranslated("Got it! Blacklisted use of \"{{word}}\"", {
                 word
             });
-        }
-    });
+        }));
 
     muteWordCommand.registerSubCommandAlias("*", "add");
 };

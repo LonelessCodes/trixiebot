@@ -1,4 +1,5 @@
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -99,12 +100,12 @@ class Cleverbot {
 }
 
 module.exports = async function install(cr) {
-    if (!config.has("cleverbot.user") || !config.has("cleverbot.key")) return log.debug("config", "Found no API token for Tumblr - Disabled mlpquote command");
+    if (!config.has("cleverbot.user") || !config.has("cleverbot.key")) return log.debug("config", "Found no API credentials for Cleverbot.io - Disabled chat command");
 
     const bot = new Cleverbot(config.get("cleverbot.user"), config.get("cleverbot.key"));
 
-    cr.register("chat", new class extends BaseCommand {
-        async call(message, input) {
+    cr.register("chat", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, input) => {
             await typing.startTyping(message.channel);
 
             try {
@@ -117,8 +118,7 @@ module.exports = async function install(cr) {
             } catch (_) {
                 await typing.stopTyping(message.channel);
             }
-        }
-    })
+        }))
         .setHelp(new HelpContent()
             .setDescription("Talk with Trixie1!!! (using a cleverbot integration)"))
         .setCategory(Category.FUN);

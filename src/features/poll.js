@@ -3,7 +3,8 @@ const { parseHumanTime, toHumanTime } = require("../modules/util/time");
 const CONST = require("../const");
 const Discord = require("discord.js");
 
-const BaseCommand = require("../class/BaseCommand");
+const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
@@ -178,15 +179,8 @@ module.exports = async function install(cr, client, config, db) {
         Poll.add(poll_object);
     }
 
-    cr.register("poll", new class extends BaseCommand {
-        async call(message, content) {
-            /**
-             * @type {string}
-             */
-            if (content === "") {
-                return;
-            }
-
+    cr.register("poll", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (message, content) => {
             if (await database.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
                 await message.channel.sendTranslated("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
                 return;
@@ -236,8 +230,7 @@ module.exports = async function install(cr, client, config, db) {
             }) + "\n" + await message.channel.translate("You vote by simply posting {{options}} in this channel", {
                 options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``
             }));
-        }
-    })
+        }))
         .setHelp(new HelpContent()
             .setDescription("Create a poll that users can vote on")
             .setUsage("<duration> <option 1>, <option 2>, ..., <option n>")

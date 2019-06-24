@@ -1,6 +1,6 @@
 const { userToString } = require("../../modules/util");
 
-const BaseCommand = require("../../class/BaseCommand");
+const SimpleCommand = require("../../class/SimpleCommand");
 const TreeCommand = require("../../class/TreeCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const CommandPermission = require("../../logic/commands/CommandPermission");
@@ -45,50 +45,46 @@ module.exports = async function install(cr, client, config, db) {
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN);
     
-    deletedCommand.registerSubCommand("clear", new class extends BaseCommand {
-        async call(message) {
-            await database.deleteMany({ guildId: message.guild.id });
+    deletedCommand.registerSubCommand("clear", new SimpleCommand(async message => {
+        await database.deleteMany({ guildId: message.guild.id });
 
-            await message.channel.sendTranslated("Removed all deleted messages successfully");
-        }
-    })
+        await message.channel.sendTranslated("Removed all deleted messages successfully");
+    }))
         .setHelp(new HelpContent()
             .setUsage("", "Clears list of deleted messages"));
 
-    deletedCommand.registerDefaultCommand(new class extends BaseCommand {
-        async call(message) {
-            const messages = await database.find({
-                guildId: message.guild.id
-            }).toArray();
+    deletedCommand.registerDefaultCommand(new SimpleCommand(async message => {
+        const messages = await database.find({
+            guildId: message.guild.id
+        }).toArray();
 
-            if (messages.length === 0) {
-                await message.channel.sendTranslated("Yeeeeah, nothing found");
-                return;
-            }
-
-            const page_limit = 10;
-            
-            const items = [];
-            for (const deleted_message of messages) {
-                let str = "";
-                const channel = message.guild.channels.get(deleted_message.channelId);
-                if (channel) str += `# **${channel.name}**`;
-                else str += "# **deleted channel**";
-
-                const timestamp = deleted_message.timestamp.toLocaleString().slice(0, -3);
-                str += ` | ${timestamp} | `;
-
-                const member = message.guild.members.get(deleted_message.memberId);
-                if (member) str += `${userToString(member)}: `;
-                else str += "**deleted user**: ";
-
-                str += "\n";
-                str += `\`${deleted_message.message.replace(/`/g, "´")}\``;
-                str += "\n";
-                items.push(str);
-            }
-
-            new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author, { guild: message.guild }).display(message.channel);
+        if (messages.length === 0) {
+            await message.channel.sendTranslated("Yeeeeah, nothing found");
+            return;
         }
-    });
+
+        const page_limit = 10;
+        
+        const items = [];
+        for (const deleted_message of messages) {
+            let str = "";
+            const channel = message.guild.channels.get(deleted_message.channelId);
+            if (channel) str += `# **${channel.name}**`;
+            else str += "# **deleted channel**";
+
+            const timestamp = deleted_message.timestamp.toLocaleString().slice(0, -3);
+            str += ` | ${timestamp} | `;
+
+            const member = message.guild.members.get(deleted_message.memberId);
+            if (member) str += `${userToString(member)}: `;
+            else str += "**deleted user**: ";
+
+            str += "\n";
+            str += `\`${deleted_message.message.replace(/`/g, "´")}\``;
+            str += "\n";
+            items.push(str);
+        }
+
+        new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author, { guild: message.guild }).display(message.channel);
+    }));
 };

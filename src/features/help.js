@@ -4,6 +4,7 @@ const CONST = require("../const");
 
 const SimpleCommand = require("../class/SimpleCommand");
 const OverloadCommand = require("../class/OverloadCommand");
+const TreeCommand = require("../class/TreeCommand");
 const AliasCommand = require("../class/AliasCommand");
 const HelpBuilder = require("../logic/commands/HelpBuilder");
 const HelpContent = require("../logic/commands/HelpContent");
@@ -18,18 +19,37 @@ function sortCommands(commands) {
 module.exports = async function install(cr, client, config, database) {
     cr.register("help", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
-            const toLowerCase = content.toLowerCase();
-            const c = Array.from(cr.commands.entries()).find(([id,]) => id.toLowerCase() === toLowerCase);
-            if (!c) return;
+            let query = content.toLowerCase();
+            let path = [];
+            let cmd_map = cr.commands;
+            while (cmd_map != null) {
+                let found = false;
+                for (let [name, command] of cmd_map) {
+                    if (!query.startsWith(name.toLowerCase())) continue;
 
-            let [name, command] = c;
+                    query = query.slice(name.length).trim();
 
-            if (command instanceof AliasCommand) {
-                name = command.parentName;
-                command = command.command;
+                    if (command instanceof AliasCommand) {
+                        name = command.parentName;
+                        command = command.command;
+                    }
+
+                    path.push(name);
+
+                    if (query === "") {
+                        await HelpBuilder.sendHelp(message, path.join(" "), command);
+                        return;
+                    }
+
+                    if (command instanceof TreeCommand) {
+                        cmd_map = command.sub_commands;
+                        found = true;
+                    }
+                    break;
+                }
+
+                if (!found) return;
             }
-            
-            await HelpBuilder.sendHelp(message, name, command);
         }))
         .registerOverload("0", new SimpleCommand(async message => {
             const disabledCommands = await database.collection("disabled_commands").find({

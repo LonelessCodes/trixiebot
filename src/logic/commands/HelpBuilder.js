@@ -6,7 +6,7 @@ const { RichEmbed } = require("discord.js");
 const CONST = require("../../const");
 
 function ucFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return string.split(" ").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
 }
 
 function format(message, format = {}) {

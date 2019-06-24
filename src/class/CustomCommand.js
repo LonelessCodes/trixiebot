@@ -87,7 +87,7 @@ class CustomCommand extends BaseCommand {
         const msg = {
             command_name: this.type === 0 ? command_name : null,
             msg: new CCMessage(message),
-            args: this.type === 0 ? [] : findArgs(content),
+            args: this.type !== 0 ? [] : findArgs(content),
             content,
             guild: {
                 id: guild.id,

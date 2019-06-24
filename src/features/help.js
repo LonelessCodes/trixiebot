@@ -36,6 +36,8 @@ module.exports = async function install(cr, client, config, database) {
                 guildId: message.guild.id
             }).toArray();
 
+            const custom_commands = await cr.cc.getCommands(message.guild.id, message.channel.id);
+
             /** @type {Map<CategoryClass, Map<string, BaseCommand>>} */
             const categories = new Map;
 
@@ -52,6 +54,10 @@ module.exports = async function install(cr, client, config, database) {
             }
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+
+            if (custom_commands.length > 0) {
+                embed.addField("Custom Commands", custom_commands.map(c => c.trigger).sort().map(s => `\`${s}\``).join(", "));
+            }
 
             const ordered = [
                 Category.MLP,

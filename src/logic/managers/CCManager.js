@@ -391,6 +391,17 @@ class CCManager {
         return { errors, cst };
     }
 
+    async getCommands(guildId, channelId) {
+        const query = { guildId, enabled: true, type: TYPE.COMMAND };
+        if (channelId) query.disabled_channels = {
+            $not: {
+                $all: [channelId]
+            }
+        };
+
+        return await this.database.find(query).toArray();
+    }
+
     async getCommandsForWeb(guildId) {
         const rows = await this.database.find({ guildId }).toArray();
         const errors = new Map;

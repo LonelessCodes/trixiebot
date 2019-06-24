@@ -107,8 +107,8 @@ class BaseCommand {
 
     async beforeProcessCall() { }
 
-    async run(message, command_name, content, pass_through) {
-        return await this.call(message, content, { pass_through, command_name });
+    async run(message, command_name, content, pass_through, timer) {
+        return await this.call(message, content, { pass_through, command_name, timer });
     }
 
     async call() { }

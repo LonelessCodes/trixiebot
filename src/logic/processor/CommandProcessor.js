@@ -4,6 +4,7 @@ const { splitArgs } = require("../../modules/util/string");
 const stats = require("../stats");
 const guild_stats = require("../managers/GuildStatsManager");
 const CommandRegistry = require("../core/CommandRegistry");
+const nanoTimer = require("../../modules/NanoTimer");
 // eslint-disable-next-line no-unused-vars
 const { Message, Permissions } = require("discord.js");
 
@@ -38,6 +39,8 @@ class CommandProcessor {
      * @param {Message} message 
      */
     async onMessage(message) {
+        const timer = nanoTimer();
+
         try {
             if (message.author.bot || message.author.equals(message.client.user)) return;
 
@@ -49,13 +52,13 @@ class CommandProcessor {
                 !message.channel.memberPermissions(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES, true))
                 return;
 
-            await this.run(message);
+            await this.run(message, timer);
         } catch (err) {
             await onProcessingError(message, err);
         }
     }
 
-    async run(message) {
+    async run(message, timer) {
         let raw_content = message.content;
 
         // remove prefix
@@ -85,7 +88,7 @@ class CommandProcessor {
 
         const [command_name, processed_content] = splitArgs(raw_content, 2);
 
-        const executed = await this.REGISTRY.process(msg, command_name.toLowerCase(), processed_content, prefix, prefixUsed);
+        const executed = await this.REGISTRY.process(msg, command_name.toLowerCase(), processed_content, prefix, prefixUsed, timer);
 
         // const diff = timer.end();
         // commandTime.observe(diff);

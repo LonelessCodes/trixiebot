@@ -52,7 +52,7 @@ class CommandRegistry {
         await message.channel.sendTranslated(`Whoa whoa not so fast! You may only do this ${this.global_ratelimit.max} ${this.global_ratelimit.max === 1 ? "time" : "times"} every ${this.global_ratelimit.toString()}. There is still ${toHumanTime(this.global_ratelimit.tryAgainIn(message.author.id))} left to wait.`);
     }
 
-    async process(message, command_name, content, prefix, prefix_used) {
+    async process(message, command_name, content, prefix, prefix_used, timer) {
         // only for now!!!
         if (message.channel.type !== "text") return false;
 
@@ -61,7 +61,7 @@ class CommandRegistry {
         if (command) return await this.processCC(message, command_name, content, command);
 
         command = this.commands.get(command_name);
-        if (command) return await this.processCommand(message, command_name, content, prefix_used, command);
+        if (command) return await this.processCommand(message, command_name, content, prefix_used, command, timer);
     }
 
     /**
@@ -119,8 +119,9 @@ class CommandRegistry {
      * @param {string} content
      * @param {boolean} prefixUsed
      * @param {BaseCommand} command
+     * @param {NanoTimer} timer
      */
-    async processCommand(message, command_name, content, prefixUsed, command) {
+    async processCommand(message, command_name, content, prefixUsed, command, timer) {
         if (command && command instanceof AliasCommand) {
             command_name = command.parentName;
             command = command.command;
@@ -214,7 +215,7 @@ class CommandRegistry {
 
             const pass_through = await promises.get(command_name);
             // const command_result = await command.run(message, command_name, content, pass_through);
-            await command.run(message, command_name, content, pass_through);
+            await command.run(message, command_name, content, pass_through, timer);
 
             await Promise.all(promises.values());
 

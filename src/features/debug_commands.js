@@ -5,6 +5,7 @@ const { timeout } = require("../modules/util");
 const getChangelog = require("../modules/getChangelog");
 const INFO = require("../info");
 const CONST = require("../const");
+const nanoTimer = require("../modules/NanoTimer");
 const Discord = require("discord.js");
 
 async function getCPUUsage() {
@@ -91,13 +92,19 @@ module.exports = async function install(cr, client) {
         .setHelp(new HelpContent().setDescription("Gets the bot technical information. Nothing all that interesting."))
         .setCategory(Category.INFO);
 
-    cr.register("ping", new SimpleCommand(async message => {
+    cr.register("ping", new SimpleCommand(async (message, _, { timer }) => {
+        const internal_ping = timer.end() / nanoTimer.NS_PER_SEC;
+
         const pongText = await message.channel.translate("pong! Wee hee");
         const m = await message.channel.send(pongText);
+
         const ping = m.createdTimestamp - message.createdTimestamp;
         await m.edit(pongText + "\n" +
-            `:stopwatch: \`Latency is     ${ping}ms\`\n` +
-            `:heartbeat: \`API Latency is ${Math.round(client.ping)}ms\``);
+            "```" +
+            `⏱ Real Latency:     ${ping}ms\n` +
+            `⏱ Internal Latency: ${internal_ping.toFixed(3)}ms\n` + 
+            `💓 API Latency:      ${Math.round(client.ping)}ms\n` +
+            "```");
     }))
         .setHelp(new HelpContent().setDescription("Ping-Pong-Ping-Pong-Ping-WEE HEEEEE."))
         .setCategory(Category.INFO);

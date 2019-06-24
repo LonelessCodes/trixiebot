@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.7.0"></a>
+# [2.7.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.6.0...v2.7.0) (2019-06-24)
+
+
+### Bug Fixes
+
+* potential bug in AliasCommand, that would probably have never happened tho ([6d22531](https://bitbucket.org/Loneless/trixiebot/commits/6d22531))
+* **cc:** fixed $args ([c3e0fef](https://bitbucket.org/Loneless/trixiebot/commits/c3e0fef))
+
+
+### Features
+
+* **Command System:** added Overloaded Commands ([5342c36](https://bitbucket.org/Loneless/trixiebot/commits/5342c36))
+* **Command System:** Improved Plug&Play-ability of commands ([4a34db9](https://bitbucket.org/Loneless/trixiebot/commits/4a34db9))
+* added overloaded commands everywhere needed, ([31c9da8](https://bitbucket.org/Loneless/trixiebot/commits/31c9da8))
+* added ROADMAP.md ([47dd02d](https://bitbucket.org/Loneless/trixiebot/commits/47dd02d))
+* **help command:** deep search help (e.g. !help alert remove) ([e93e1ca](https://bitbucket.org/Loneless/trixiebot/commits/e93e1ca))
+* **help command:** show custom commands ([db7f284](https://bitbucket.org/Loneless/trixiebot/commits/db7f284))
+
+
+
 <a name="2.6.0"></a>
 # [2.6.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.1...v2.6.0) (2019-06-20)
 

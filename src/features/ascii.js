@@ -15,7 +15,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    cr.register("ascii", new SimpleCommand(async (message, content, { command_name }) => {
+    const ascii_cmd = new SimpleCommand(async (message, content, { command_name }) => {
         const urls = [];
         const match = content.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
         urls.push(...(match || []));
@@ -24,7 +24,7 @@ module.exports = async function install(cr) {
         }
 
         if (urls.length === 0) {
-            await HelpBuilder.sendHelp(message, command_name, this);
+            await HelpBuilder.sendHelp(message, command_name, ascii_cmd);
             return;
         }
 
@@ -61,12 +61,14 @@ module.exports = async function install(cr) {
                     return reject("The image must be JPG, PNG or GIF");
                 }
             });
-        }).then(body => 
+        }).then(body =>
             message.channel.send(body)
-        ).catch(err => 
+        ).catch(err =>
             message.channel.send(err)
         );
-    }))
+    });
+
+    cr.register("ascii", ascii_cmd)
         .setHelp(new HelpContent()
             .setDescription("Generates ascii art from an image")
             .setUsage("<?url>")

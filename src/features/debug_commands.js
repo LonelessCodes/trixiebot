@@ -93,7 +93,7 @@ module.exports = async function install(cr, client) {
         .setCategory(Category.INFO);
 
     cr.register("ping", new SimpleCommand(async (message, _, { timer }) => {
-        const internal_ping = timer.end() / nanoTimer.NS_PER_SEC;
+        const internal_ping = timer.end() / nanoTimer.NS_PER_MS;
 
         const pongText = await message.channel.translate("pong! Wee hee");
         const m = await message.channel.send(pongText);
@@ -102,7 +102,7 @@ module.exports = async function install(cr, client) {
         await m.edit(pongText + "\n" +
             "```" +
             `⏱ Real Latency:     ${ping}ms\n` +
-            `⏱ Internal Latency: ${internal_ping.toFixed(3)}ms\n` + 
+            `⏱ Internal Latency: ${internal_ping.toFixed(1)}ms\n` + 
             `💓 API Latency:      ${Math.round(client.ping)}ms\n` +
             "```");
     }))

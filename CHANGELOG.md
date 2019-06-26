@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.7.1"></a>
+## [2.7.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.0...v2.7.1) (2019-06-26)
+
+
+### Bug Fixes
+
+* **ascii command:** fixed typo, now returning help ([caa1398](https://bitbucket.org/Loneless/trixiebot/commits/caa1398))
+* **cc runtime:** fixed RichEmbed timestamp ([af26663](https://bitbucket.org/Loneless/trixiebot/commits/af26663))
+
+
+### Features
+
+* **ping command:** Add internal latency ([3a156dd](https://bitbucket.org/Loneless/trixiebot/commits/3a156dd))
+* new deleted messages catching ([70836c0](https://bitbucket.org/Loneless/trixiebot/commits/70836c0))
+
+
+
 <a name="2.7.0"></a>
 # [2.7.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.6.0...v2.7.0) (2019-06-24)
 

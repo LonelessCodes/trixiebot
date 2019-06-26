@@ -10,27 +10,65 @@ const Paginator = require("../../logic/Paginator");
 
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("deleted_messages");
-    database.createIndex("timestamp", { expireAfterSeconds: 7 * 24 * 3600 });
+    database.createIndex("deletedAt", { expireAfterSeconds: 7 * 24 * 3600 });
+    database.createIndex("editedAt", { expireAfterSeconds: 3 * 24 * 3600 });
+    database.createIndex({ messageId: 1 }, { unique: true });
 
     client.on("messageDelete", async message => {
         if (message.author.bot) return;
         if (message.author.id === client.user.id) return;
         if (message.content === "") return;
         if (message.channel.type !== "text") return;
-        await database.insertOne({
-            guildId: message.guild.id,
-            memberId: message.author.id,
-            name: message.author.username + "#" + message.author.discriminator,
-            channelId: message.channel.id,
+
+        await database.updateOne({
             messageId: message.id,
-            message: message.content,
-            timestamp: new Date(message.createdTimestamp)
-        });
+        }, {
+            $set: {
+                guildId: message.guild.id,
+                channelId: message.channel.id,
+                userId: message.author.id,
+                name: message.author.tag,
+                attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
+                createdAt: message.createdAt,
+                deletedAt: new Date
+            },
+            $push: {
+                edits: {
+                    content: message.content,
+                    editedAt: message.editedAt || message.createdAt
+                }
+            },
+            $unset: {
+                editedAt: 1
+            }
+        }, { upsert: true });
     });
 
-    const prune = () => database.deleteMany({ timestamp: { $lt: new Date(Date.now() - 7 * 24 * 3600 * 1000) } });
-    prune();
-    setInterval(prune, 60 * 1000);
+    client.on("messageUpdate", async (message, new_message) => {
+        if (message.author.bot) return;
+        if (message.author.id === client.user.id) return;
+        if (message.channel.type !== "text") return;
+
+        await database.updateOne({
+            messageId: message.id,
+        }, {
+            $set: {
+                guildId: message.guild.id,
+                channelId: message.channel.id,
+                userId: message.author.id,
+                name: message.author.tag,
+                attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
+                createdAt: message.createdAt,
+                editedAt: new_message.editedAt
+            },
+            $push: {
+                edits: {
+                    content: message.content,
+                    editedAt: message.editedAt || message.createdAt
+                }
+            }
+        }, { upsert: true });
+    });
 
     // Registering down here
 
@@ -66,22 +104,21 @@ module.exports = async function install(cr, client, config, db) {
         const page_limit = 10;
         
         const items = [];
-        for (const deleted_message of messages) {
+        for (const deleted_message of messages.filter(m => "deletedAt" in m).sort((a, b) => b.deletedAt - a.deletedAt)) {
             let str = "";
             const channel = message.guild.channels.get(deleted_message.channelId);
             if (channel) str += `# **${channel.name}**`;
             else str += "# **deleted channel**";
 
-            const timestamp = deleted_message.timestamp.toLocaleString().slice(0, -3);
+            const timestamp = deleted_message.deletedAt.toLocaleString().slice(0, -3);
             str += ` | ${timestamp} | `;
 
-            const member = message.guild.members.get(deleted_message.memberId);
+            const member = message.client.users.get(deleted_message.userId);
             if (member) str += `${userToString(member)}: `;
-            else str += "**deleted user**: ";
+            else str += `**${deleted_message.name}**: `;
 
             str += "\n";
-            str += `\`${deleted_message.message.replace(/`/g, "´")}\``;
-            str += "\n";
+            str += `\`${deleted_message.edits[deleted_message.edits.length - 1].content.replace(/`/g, "´")}\``;
             items.push(str);
         }
 

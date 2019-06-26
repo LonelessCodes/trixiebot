@@ -18,6 +18,10 @@ class WebsiteManager {
     async initializeIPC() {
         await ipc.promiseStart;
 
+        function ts(ts) {
+            return ts.toISOString();
+        }
+
         ipc.answer("checkGuilds", async guildIds => guildIds.filter(guildId => this.client.guilds.has(guildId)));
 
         ipc.answer("overview", async guildId => {
@@ -39,26 +43,26 @@ class WebsiteManager {
                 commands: {
                     type: guild_stats.get("commands").type,
                     data: results[0].map(a => {
-                        a.ts = a.ts.toString();
+                        a.ts = ts(a.ts);
                         return a;
                     })
                 },
                 messages: {
                     type: guild_stats.get("messages").type,
                     data: results[1].map(a => {
-                        a.ts = a.ts.toString();
+                        a.ts = ts(a.ts);
                         return a;
                     })
                 },
                 users: {
                     type: guild_stats.get("users").type,
                     data: results[2].map(a => {
-                        a.ts = a.ts.toString();
+                        a.ts = ts(a.ts);
                         return a;
                     }),
                     before: results[3] ? {
                         ...results[3],
-                        ts: results[3].ts.toString()
+                        ts: ts(results[3].ts)
                     } : undefined
                 },
             };
@@ -242,8 +246,11 @@ class WebsiteManager {
             try {
                 const errors = await this.REGISTRY.cc.getErrors(guildId, commandId);
                 return {
-                    errors: errors || [],
-                    success: errors ? true : false
+                    errors: errors.map(e => {
+                        e.ts = ts(e.ts);
+                        return e;
+                    }),
+                    success: true
                 };
             } catch (err) {
                 return { errors: [], success: false };
@@ -293,17 +300,18 @@ class WebsiteManager {
 
             const deleted = [];
 
-            for (const row of deleted_raw) {
-                const channel = this.client.channels.get(row.channelId);
-                const user = this.client.users.get(row.memberId);
+            for (const row of deleted_raw.filter(m => "deletedAt" in m)) {
+                const channel = guild.channels.get(row.channelId);
+                const user = this.client.users.get(row.userId);
                 deleted.push({
-                    user: user ? userToString(user, true) : (row.name || "unknown-user"), // "unknown-user" for backwards compatability support
+                    user: user ? userToString(user, true) : row.name, // "unknown-user" for backwards compatability support
                     channel: {
                         id: channel ? channel.id : row.channelId,
                         name: channel ? channel.name : "deleted-channel"
                     },
-                    content: cleanContent(row.message, guild),
-                    timestamp: row.timestamp.getTime()
+                    edits: row.edits.map(e => ({ content: cleanContent(e.content), editedAt: ts(e.editedAt) })),
+                    attachments: row.attachments,
+                    deletedAt: ts(row.deletedAt)
                 });
             }
 

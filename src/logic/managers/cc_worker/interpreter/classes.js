@@ -430,7 +430,7 @@ function RichEmbed(opts = {}) {
         }),
         setTimestamp: new c.NativeFunc(function (_, timestamp = new c.TimeLiteral()) {
             if (timestamp instanceof c.NumberLiteral) timestamp = new c.TimeLiteral(timestamp);
-            embed.timestamp = timestamp.time.toDate();
+            embed.timestamp = timestamp.time.toDate().toISOString();
             return obj;
         }),
         setTitle: new c.NativeFunc(function (_, title = new c.StringLiteral("")) {

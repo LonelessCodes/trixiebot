@@ -161,6 +161,8 @@ class Picarto extends StreamProcessor {
     get base() { return "https://api.picarto.tv/v1/"; }
     get url() { return "picarto.tv"; }
     get name() { return "picarto"; }
+    get display_name() { return "Picarto"; }
+    get color() { return 0x1DA456; }
 }
 
 class Twitch extends StreamProcessor {
@@ -248,6 +250,8 @@ class Twitch extends StreamProcessor {
 
     get url() { return "twitch.tv"; }
     get name() { return "twitch"; }
+    get display_name() { return "Twitch"; }
+    get color() { return 0x6441A4; }
 }
 
 class Piczel extends StreamProcessor {
@@ -348,6 +352,7 @@ class Piczel extends StreamProcessor {
     get base() { return "https://piczel.tv/api/"; }
     get url() { return "piczel.tv"; }
     get name() { return "piczel"; }
+    get display_name() { return "Piczel.tv"; }
 }
 
 class Smashcast extends StreamProcessor {
@@ -445,6 +450,8 @@ class Smashcast extends StreamProcessor {
     get base() { return "https://api.smashcast.tv/"; }
     get url() { return "smashcast.tv"; }
     get name() { return "smashcast"; }
+    get display_name() { return "Smashcast"; }
+    get color() { return 0x208EFC; }
 }
 
 class ChannelQueryCursor {
@@ -554,8 +561,9 @@ class Manager extends EventEmitter {
                 service.on("online", async channel => {
                     const embed = await channel.getEmbed();
 
-                    const onlineMessage = await channel.channel.sendTranslated("{{user}} is live!", {
-                        user: channel.name
+                    const onlineMessage = await channel.channel.send("{{user}} is live on {{service}}!", {
+                        user: channel.name,
+                        service: channel.service.display_name
                     }, { embed });
 
                     channel.setMessage(onlineMessage);
@@ -767,7 +775,7 @@ class OnlineChannel extends Channel {
 
         if (await this.manager.isCompact(this.channel.guild)) {
             const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOR.PRIMARY)
+                .setColor(this.service.color || CONST.COLOR.PRIMARY)
                 .setURL(this.url)
                 .setAuthor(this.name, this.avatar)
                 .setTitle(this.title);
@@ -777,7 +785,7 @@ class OnlineChannel extends Channel {
             return embed;
         } else {
             const embed = new Discord.RichEmbed()
-                .setColor(CONST.COLOR.PRIMARY)
+                .setColor(this.service.color || CONST.COLOR.PRIMARY)
                 .setURL(this.url)
                 .setAuthor(this.name)
                 .setTitle(this.title);

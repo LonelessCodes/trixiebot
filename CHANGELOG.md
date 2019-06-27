@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.7.2"></a>
+## [2.7.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.1...v2.7.2) (2019-06-27)
+
+
+### Bug Fixes
+
+* **debug command:** Divided internal latency by wrong factor ([b63814d](https://bitbucket.org/Loneless/trixiebot/commits/b63814d))
+
+
+### Features
+
+* **alert:** visual indication of differences between streaming services ([3ddb08c](https://bitbucket.org/Loneless/trixiebot/commits/3ddb08c))
+
+
+
 <a name="2.7.1"></a>
 ## [2.7.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.0...v2.7.1) (2019-06-26)
 

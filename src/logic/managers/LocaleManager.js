@@ -7,17 +7,17 @@ const DocumentMapCache = require("../DocumentMapCache");
 
 const gt = new Gettext;
 
-const translationsDir = "../../../assets/locale";
+const translationsDir = path.join(__dirname, "..", "..", "..", "assets", "locale");
 const locales = ["en", "de", "hu"];
 const domain = "messages";
 
 for (const locale of locales) {
     const filename = `${locale}.po`;
-    const translationsFilePath = path.join(__dirname, translationsDir, filename);
+    const translationsFilePath = path.join(translationsDir, filename);
     const translationsContent = fs.readFileSync(translationsFilePath, "utf8")
         // we do this because I don't want to make a translation to be dependent of the context
-        .split("\n").
-        filter(line => {
+        .split("\n")
+        .filter(line => {
             if (line.startsWith("msgctxt")) return false;
             return true;
         })

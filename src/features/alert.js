@@ -561,7 +561,7 @@ class Manager extends EventEmitter {
                 service.on("online", async channel => {
                     const embed = await channel.getEmbed();
 
-                    const onlineMessage = await channel.channel.send("{{user}} is live on {{service}}!", {
+                    const onlineMessage = await channel.channel.sendTranslated("{{user}} is live on {{service}}!", {
                         user: channel.name,
                         service: channel.service.display_name
                     }, { embed });

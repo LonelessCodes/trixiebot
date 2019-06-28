@@ -2,7 +2,6 @@
 
 ## 2019
 
-* Make Alert better (visual distinction between services)
 * Reinvent Calendar Events to support ranges
     * Implement seasonal commands
 * Implement interfaces for new deleted messages catching

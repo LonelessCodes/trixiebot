@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.8.0"></a>
+# [2.8.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.3...v2.8.0) (2019-06-30)
+
+
+### Features
+
+* **alert command:** better nsfw warn image ([6f9c0bd](https://bitbucket.org/Loneless/trixiebot/commits/6f9c0bd))
+
+
+
 <a name="2.7.3"></a>
 ## [2.7.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.2...v2.7.3) (2019-06-28)
 

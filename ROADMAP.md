@@ -12,3 +12,4 @@
 * XP System (global and locale seperated, but connected somehow)
 * Purchasable roles
 * Marketplace (incl. purchasable roles)
+* CC fix Logical Expression logic

@@ -2,6 +2,7 @@ const fetch = require("node-fetch");
 const log = require("../modules/log");
 const CONST = require("../const");
 const Discord = require("discord.js");
+const gm = require("gm");
 const { EventEmitter } = require("events");
 
 const SimpleCommand = require("../class/SimpleCommand");
@@ -9,10 +10,39 @@ const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const { CommandPermission } = require("../logic/commands/CommandPermission");
 
 const config = require("../config");
 
 const { default: TwitchClient } = require("twitch");
+
+async function nsfwThumb(url) {
+    const response = await fetch(url, { method: "GET" });
+
+    if (!response.ok) throw new Error("Thumbnail could not be loaded");
+
+    const in_stream = response.body;
+
+    return await new Promise((res, rej) => {
+        gm(in_stream, "thumb.jpg")
+            .size({ bufferStream: true }, function (err, size) {
+                if (err) return rej(err);
+                this.resize(420, 236)
+                    .blur(40, 10)
+                    .region(size.width, size.height, 0, 0)
+                    .gravity("Center")
+                    .fill("white")
+                    .fontSize(size.width / 10)
+                    .font("Open Sans")
+                    .drawText(0, 0, "N S F W")
+                    .quality(85)
+                    .stream("jpeg", (err, out_stream) => {
+                        if (err) return rej(err);
+                        res(out_stream);
+                    });
+            });
+    });
+}
 
 class StreamProcessor extends EventEmitter {
     /**
@@ -124,7 +154,6 @@ class Picarto extends StreamProcessor {
      * @param {Channel} savedConfig 
      */
     async checkChange(picartoOnline, savedConfig) {
-        const g_channel = savedConfig.channel;
         const oldChannel = this.online.find(oldChannel =>
             savedConfig.userId === oldChannel.userId &&
             savedConfig.channel.guild.id === oldChannel.channel.guild.id);
@@ -147,11 +176,7 @@ class Picarto extends StreamProcessor {
                 nsfw: channelPage.adult,
                 category: channelPage.category,
                 tags: channelPage.tags,
-                thumbnail: g_channel.nsfw ?
-                    `${channelPage.thumbnails.web_large}?${Date.now()}` :
-                    channelPage.adult ?
-                        "https://66.media.tumblr.com/6c2c27a36111b356b65cf21746b72698/tumblr_p4tu9xcuEv1v9xi8y_og_500.jpg" :
-                        `${channelPage.thumbnails.web_large}?${Date.now()}`
+                thumbnail: channelPage.thumbnails.web_large
             });
 
             this.emit("online", onlineChannel);
@@ -319,7 +344,6 @@ class Piczel extends StreamProcessor {
      * @param {Channel} savedConfig 
      */
     async checkChange(piczelOnline, savedConfig) {
-        const g_channel = savedConfig.channel;
         const oldChannel = this.online.find(oldChannel =>
             savedConfig.userId === oldChannel.userId &&
             savedConfig.channel.guild.id === oldChannel.channel.guild.id);
@@ -338,11 +362,7 @@ class Piczel extends StreamProcessor {
                 avatar: channelPage.user.avatar ? channelPage.user.avatar.avatar.url : null,
                 nsfw: channelPage.adult,
                 tags: channelPage.tags,
-                thumbnail: g_channel.nsfw ?
-                    `https://piczel.tv/static/thumbnail/stream_${channelPage.id}.jpg?${Date.now()}` :
-                    channelPage.adult ?
-                        null :
-                        `https://piczel.tv/static/thumbnail/stream_${channelPage.id}.jpg?${Date.now()}`
+                thumbnail: `https://piczel.tv/static/thumbnail/stream_${channelPage.id}.jpg`
             });
 
             this.emit("online", onlineChannel);
@@ -696,7 +716,9 @@ class Channel {
     constructor(manager, service, channel, conf = {}) {
         /** @type {Manager} */
         this.manager = manager;
+        /** @type {Picarto|Twitch|Piczel|Smashcast} */
         this.service = service;
+        /** @type {Discord.TextChannel} */
         this.channel = channel;
 
         this.userId = conf.userId;
@@ -773,26 +795,53 @@ class OnlineChannel extends Channel {
         if (this.game) footer.push(`Game: ${this.game}`);
         if (this.tags && this.tags.length > 0) footer.push(`Tags: ${this.tags.join(", ")}`);
 
+        const blur = this.thumbnail ?
+            this.channel.nsfw ?
+                false :
+                this.nsfw ?
+                    true :
+                    false :
+            false;
+        
+        /** @type {Discord.Attachment} */
+        let attachment;
+        try {
+            attachment = new Discord.Attachment(await nsfwThumb(this.thumbnail), "thumb.jpg");
+        } catch (_) {
+            _;
+        }
+
+        const can_use_blur = blur && attachment;
+        const thumbnail = can_use_blur ?
+            "attachment://thumb.jpg" :
+            !blur && this.thumbnail ?
+                `${this.thumbnail}?${Date.now()}`
+                : null;
+        
+        const embed = new Discord.RichEmbed()
+            .setColor(this.service.color || CONST.COLOR.PRIMARY)
+            .setURL(this.url)
+
         if (await this.manager.isCompact(this.channel.guild)) {
-            const embed = new Discord.RichEmbed()
-                .setColor(this.service.color || CONST.COLOR.PRIMARY)
-                .setURL(this.url)
-                .setAuthor(this.name, this.avatar)
+            embed.setAuthor(this.name, this.avatar)
                 .setTitle(this.title);
-            if (this.thumbnail) embed.setImage(this.thumbnail);
+            if (thumbnail) {
+                if (can_use_blur) embed.attachFile(attachment);
+                embed.setImage(thumbnail);
+            }
             embed.setFooter(footer.join(" | "));
 
             return embed;
         } else {
-            const embed = new Discord.RichEmbed()
-                .setColor(this.service.color || CONST.COLOR.PRIMARY)
-                .setURL(this.url)
-                .setAuthor(this.name)
-                .setTitle(this.title);
+            embed.setAuthor(this.name)
+                .setTitle(this.title)
+                .setThumbnail(this.avatar);
             if (this.followers != null) embed.addField("Followers", this.followers.toLocaleString("en"), true);
             if (this.totalviews != null) embed.addField("Total Viewers", this.totalviews.toLocaleString("en"), true);
-            embed.setThumbnail(this.avatar);
-            if (this.thumbnail) embed.setImage(this.thumbnail);
+            if (thumbnail) {
+                if (can_use_blur) embed.attachFile(attachment);
+                embed.setImage(thumbnail);
+            }
             embed.setFooter(footer.join(" | "));
             
             return embed;
@@ -823,7 +872,8 @@ module.exports = async function install(cr, client, _, db) {
             .setUsage("<page url> <?channel>", "Subscribe Trixie to a streaming channel!")
             .addParameter("page url", "copy the url of the stream page and paste it in here")
             .addParameterOptional("channel", "the channel to post the alert to later. If omitted will be this channel"))
-        .setCategory(Category.MODERATION);
+        .setCategory(Category.UTILS)
+        .setPermissions(new CommandPermission([Discord.Permissions.FLAGS.MANAGE_CHANNELS]));
 
     /**
      * SUB COMMANDS

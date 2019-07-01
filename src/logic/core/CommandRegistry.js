@@ -27,7 +27,7 @@ class CommandRegistry {
         /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;
 
-        this.global_ratelimit = new RateLimiter(TimeUnit.MINUTE, 15, 20);
+        this.global_ratelimit = new RateLimiter(TimeUnit.MINUTE, 15, 40);
         this.global_ratelimit_message = new RateLimiter(TimeUnit.MINUTE, 5);
 
         // caches

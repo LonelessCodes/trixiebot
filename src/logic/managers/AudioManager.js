@@ -80,7 +80,7 @@ class VCGuild extends EventEmitter {
 
         if (this.vc.connection) {
             await this.stop();
-            await disconnect(this.vc.connection);
+            if (this.vc && this.vc.connection) await disconnect(this.vc.connection);
         }
         // disconnect could trigger vc.connection.on("disconnect"), which will call leave
         // and set vc to null before we can do it here, therefore trigger VCGuild#leave twice

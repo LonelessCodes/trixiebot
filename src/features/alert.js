@@ -28,7 +28,7 @@ async function nsfwThumb(url) {
             .size({ bufferStream: true }, function (err, size) {
                 if (err) return rej(err);
                 this.resize(420, 236)
-                    .blur(40, 10)
+                    .blur(35, 9)
                     .region(size.width, size.height, 0, 0)
                     .gravity("Center")
                     .fill("white")
@@ -57,12 +57,8 @@ class StreamProcessor extends EventEmitter {
         /** @type {OnlineChannel[]} */
         this.online = [];
 
-        this.on("online", channel => {
-            this.online.push(channel);
-        });
-        this.on("offline", channel => {
-            this.removeChannel(channel);
-        });
+        this.on("online", channel => this.online.push(channel));
+        this.on("offline", channel => this.removeChannel(channel));
     }
 
     testURL() {
@@ -330,7 +326,7 @@ class Piczel extends StreamProcessor {
         // get all online channels
         /** @type {any} */
         const piczelOnline = await this.request("streams/?nsfw=true&live_only=false");
-        if (piczelOnline.error || !piczelOnline[0]) throw new Error("Piczel error:", piczelOnline.error);
+        if (piczelOnline.error) throw new Error("Piczel error:", piczelOnline.error);
 
         const stream = this.manager.getConfigs(this);
 
@@ -579,6 +575,12 @@ class Manager extends EventEmitter {
                         await oldChannel.delete();
                 });
                 service.on("online", async channel => {
+                    if (channel.channel.deleted) {
+                        await this.removeChannel(channel);
+                        return;
+                    }
+                    if (!channel.channel.memberPermissions(channel.channel.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES)) return;
+
                     const embed = await channel.getEmbed();
 
                     const onlineMessage = await channel.channel.sendTranslated("{{user}} is live on {{service}}!", {
@@ -820,11 +822,10 @@ class OnlineChannel extends Channel {
         
         const embed = new Discord.RichEmbed()
             .setColor(this.service.color || CONST.COLOR.PRIMARY)
-            .setURL(this.url)
+            .setURL(this.url);
 
         if (await this.manager.isCompact(this.channel.guild)) {
-            embed.setAuthor(this.name, this.avatar)
-                .setTitle(this.title);
+            embed.setAuthor(this.name, this.avatar, this.url);
             if (thumbnail) {
                 if (can_use_blur) embed.attachFile(attachment);
                 embed.setImage(thumbnail);

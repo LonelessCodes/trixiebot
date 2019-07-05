@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.8.1"></a>
+## [2.8.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.0...v2.8.1) (2019-07-05)
+
+
+### Bug Fixes
+
+* **alert command:** Piczel endless errors when no stream is online on the site ([1a4f00d](https://bitbucket.org/Loneless/trixiebot/commits/1a4f00d))
+* **audio manager:** disconnecting even tho already disconnected ([e972b3c](https://bitbucket.org/Loneless/trixiebot/commits/e972b3c))
+
+
+
 <a name="2.8.0"></a>
 # [2.8.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.3...v2.8.0) (2019-06-30)
 

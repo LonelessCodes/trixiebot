@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.8.2"></a>
+## [2.8.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.1...v2.8.2) (2019-07-08)
+
+
+### Bug Fixes
+
+* fixed the message nonce error thing i guess maybe?? ([514129a](https://bitbucket.org/Loneless/trixiebot/commits/514129a))
+
+
+
 <a name="2.8.1"></a>
 ## [2.8.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.0...v2.8.1) (2019-07-05)
 

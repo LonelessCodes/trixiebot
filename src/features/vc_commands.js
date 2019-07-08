@@ -52,7 +52,10 @@ module.exports = async function install(cr) {
             await message.react("👍");
         } catch (err) {
             await message.react("❌");
-            if (err instanceof ConnectError) return message.channel.sendTranslated(err.message);
+            if (err instanceof ConnectError) {
+                message.channel.sendTranslated(err.message);
+                return;
+            }
             log.error(err);
             message.channel.sendTranslated("Some error happened and caused some whoopsies");
         }

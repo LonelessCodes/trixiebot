@@ -23,7 +23,8 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(member);
         if (!account) {
-            return await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            return;
         }
 
         const embed = basicEmbed("Bank Account", member);
@@ -84,7 +85,8 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(user);
         if (!account) {
-            return await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            return;
         }
 
         await message.channel.send(`:yen: You currently have an account balance of **${credits.getBalanceString(account.balance, await credits.getName(message.guild))}**. oof`);
@@ -97,21 +99,25 @@ module.exports = async function install(cr) {
 
         const my_account = await credits.getAccount(me);
         if (!my_account) {
-            return await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            return;
         }
 
         const other_user = message.mentions.members.first();
         if (!other_user) {
-            return await message.channel.send("To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`");
+            await message.channel.send("To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`");
+            return;
         }
 
         if (other_user.id === me.id) {
-            return await message.channel.send("Okay, but why should you...");
+            await message.channel.send("Okay, but why should you...");
+            return;
         }
 
         const other_account = await credits.getAccount(other_user);
         if (!other_account) {
-            return await message.channel.send("This user didn't open a bank account yet");
+            await message.channel.send("This user didn't open a bank account yet");
+            return;
         }
 
         const args = splitArgs(content, 3); // if someone adds the currency name at the end, it should still work
@@ -120,17 +126,20 @@ module.exports = async function install(cr) {
         try {
             amount = parseFloat(args[1]);
         } catch (_) {
-            return await message.channel.send("That is not a valid number, bruh! Remember it's `<@user> <amount>`");
+            await message.channel.send("That is not a valid number, bruh! Remember it's `<@user> <amount>`");
+            return;
         }
 
         const name = await credits.getName(message.guild);
 
         if (amount < 10) {
-            return await message.channel.send("You can only pay someone at least 10 " + name.plural);
+            await message.channel.send("You can only pay someone at least 10 " + name.plural);
+            return;
         }
 
         if (!(await credits.canPurchase(me, amount))) {
-            return await message.channel.send(":atm: You do not have enough money on your account to pay " + userToString(other_user) + " this much");
+            await message.channel.send(":atm: You do not have enough money on your account to pay " + userToString(other_user) + " this much");
+            return;
         }
 
         await credits.makeTransaction(message.guild, other_user, amount, "pay", `Got money from ${userToString(me, true)}`);
@@ -148,7 +157,8 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(user);
         if (!account) {
-            return await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            return;
         }
 
         const trans_raw = await credits.getTransactions(user);
@@ -197,7 +207,8 @@ module.exports = async function install(cr) {
         if (singular === "") {
             const name = await credits.getName(guild);
 
-            return await message.channel.send(`Current configuration:\nSingular: **${name.singular}**\nPlural: **${name.plural}**\n\nExample: **${credits.getBalanceString(Math.floor(Math.random() * 50), name)}**`);
+            await message.channel.send(`Current configuration:\nSingular: **${name.singular}**\nPlural: **${name.plural}**\n\nExample: **${credits.getBalanceString(Math.floor(Math.random() * 50), name)}**`);
+            return;
         }
 
         await credits.setName(guild, singular, plural === "" ? undefined : plural);
@@ -216,7 +227,8 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(member);
         if (!account) {
-            return await message.channel.send("To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`");
+            await message.channel.send("To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`");
+            return;
         }
 
         const args = splitArgs(content, 3); // if someone adds the currency name at the end, it should still work
@@ -225,7 +237,8 @@ module.exports = async function install(cr) {
         try {
             amount = parseFloat(args[1]);
         } catch (_) {
-            return await message.channel.send("That is not a valid number, bruh! Remember it's `<@user> <amount>`");
+            await message.channel.send("That is not a valid number, bruh! Remember it's `<@user> <amount>`");
+            return;
         }
 
         const old_balance = await credits.getBalance(member);
@@ -241,7 +254,8 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(user);
         if (!account) {
-            return await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            return;
         }
 
         const { dailies = 0, streak = 0, time_left = 0 } = await credits.getDailies(user);

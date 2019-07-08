@@ -24,7 +24,6 @@ for (const locale of locales) {
         .join("\n");
 
     const parsedTranslations = po.parse(translationsContent, "utf8");
-    console.log(JSON.stringify(parsedTranslations, null, 2))
     gt.addTranslations(locale, domain, parsedTranslations);
 }
 

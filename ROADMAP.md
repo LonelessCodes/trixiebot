@@ -4,7 +4,6 @@
 
 * Reinvent Calendar Events to support ranges
     * Implement seasonal commands
-* Implement interfaces for new deleted messages catching
 * Custom Commands !commands should always go first, then the rest
 * Make basic custom commands work
 * New Approach at Localization
@@ -13,3 +12,4 @@
 * Purchasable roles
 * Marketplace (incl. purchasable roles)
 * CC fix Logical Expression logic
+* repair toString on arrays

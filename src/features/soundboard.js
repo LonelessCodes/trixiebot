@@ -79,7 +79,10 @@ module.exports = async function install(cr) {
                 await message.react("👍");
             } catch (err) {
                 await message.react("❌");
-                if (err instanceof AudioManager.ConnectError) return message.channel.sendTranslated(err.message);
+                if (err instanceof AudioManager.ConnectError) {
+                    message.channel.sendTranslated(err.message);
+                    return;
+                }
                 log.error(err);
                 await message.channel.sendTranslated(":x: Some error happened and caused some whoopsies");
             }
@@ -359,7 +362,8 @@ module.exports = async function install(cr) {
         const slots = isUser ? await soundboard.getSlotsUser(user) : await soundboard.getSlotsGuild(guild);
 
         if (slots >= soundboard.MAX_SLOTS) {
-            return message.channel.send("You have reached the maximum amount of soundboard slots, which is " + soundboard.MAX_SLOTS + "!");
+            message.channel.send("You have reached the maximum amount of soundboard slots, which is " + soundboard.MAX_SLOTS + "!");
+            return;
         }
 
         const cost = prices[slots]; // slots length is pretty much also the index of the next slot

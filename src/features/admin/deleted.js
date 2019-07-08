@@ -30,7 +30,8 @@ module.exports = async function install(cr, client, config, db) {
                 name: message.author.tag,
                 attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
                 createdAt: message.createdAt,
-                deletedAt: new Date
+                deletedAt: new Date,
+                deleted: true
             },
             $push: {
                 edits: {
@@ -59,7 +60,8 @@ module.exports = async function install(cr, client, config, db) {
                 name: message.author.tag,
                 attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
                 createdAt: message.createdAt,
-                editedAt: new_message.editedAt
+                editedAt: new_message.editedAt,
+                deleted: false
             },
             $push: {
                 edits: {

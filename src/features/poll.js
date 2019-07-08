@@ -163,9 +163,9 @@ module.exports = async function install(cr, client, config, db) {
 
         const votes = poll.votes;
 
-        const users = new Discord.Collection(poll.users.map(userId => {
-            return [userId, guild.members.get(userId)];
-        }));
+        const users = new Discord.Collection(poll.users.map(userId => 
+            [userId, guild.members.get(userId)]
+        ));
 
         const poll_object = new Poll(
             database,
@@ -186,7 +186,7 @@ module.exports = async function install(cr, client, config, db) {
                 return;
             }
 
-            const duration_string = content.match(/([\d.]+(d|h|m|s|ms)\s*)+/g)[0];
+            let duration_string = (content.match(/([\d.]+(d|h|m|s|ms)\s*)+/g) || [])[0];
             if (!duration_string) {
                 await message.channel.send(await message.channel.translate("`duration` must be formated as in the example."));
                 return;

@@ -12,7 +12,14 @@ const { Message, Permissions } = require("discord.js");
  * @param {Message} message 
  */
 async function onProcessingError(message, err) {
-    log.error(err);
+    log.error(
+        "ProcessingError {\n" +
+        "  content:   " + JSON.stringify(message.content) + "\n" +
+        "  guildId:   " + message.guild.id + "\n" +
+        "  channelId: " + message.channel.id + "\n" +
+        "  userId:    " + message.author.id + "\n" +
+        "  error:    ", err, "}"
+    );
 
     try {
         if (INFO.DEV) await message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);

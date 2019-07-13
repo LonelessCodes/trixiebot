@@ -76,7 +76,7 @@ new class App {
     }
 
     attachClientListeners() {
-        this.client.addListener("warn", warn => log.warn(warn));
+        this.client.addListener("warn", warn => log.warn("ClientError:", warn));
 
         this.client.addListener("error", error => log.error(
             error.stack ||
@@ -104,10 +104,9 @@ process.addListener("uncaughtException", error => {
 });
 
 process.addListener("unhandledRejection", (reason, p) => {
-    log.warn("Unhandled Rejection at:", p);
+    log.warn("UnhandledRejection:", p);
 });
 
 process.addListener("warning", warning => {
-    log.warn(warning.message); // Print the warning message
-    log.warn(warning.stack);   // Print the stack trace
+    log.warn("ProcessWarn:", warning.message, "\n", warning.stack); // Print the warning message // Print the stack trace
 });

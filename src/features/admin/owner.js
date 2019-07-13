@@ -27,6 +27,11 @@ module.exports = async function install(cr, client, config, db) {
 
         async call(message, msg) {
             const file = path.resolve(path.join(process.cwd(), msg));
+            if (!(await fs.exists(file))) {
+                await message.channel.send("Doesn't exist");
+                return;
+            }
+
             const stat = await fs.stat(file);
 
             if (!stat.isFile()) {
@@ -42,27 +47,16 @@ module.exports = async function install(cr, client, config, db) {
             const language = extnames[path.extname(msg)] || "";
             const highWaterMark = 2000 - 2 * 4 - language.length;
 
-            let tmp = "";
-            const stream = fs.createReadStream(file, { encoding: "utf8", highWaterMark });
-            stream.on("data", async data => {
-                do {
-                    const string = tmp + data;
-                    let lastIndex = string.substring(0, highWaterMark).lastIndexOf("\n");
-                    const result = string.substring(0, lastIndex).replace(/`/g, "´");
-                    tmp = string.substring(lastIndex + 1);
-                    message.channel.send(`\`\`\`${language}\n${result}\n\`\`\``);
-                } while (tmp.length > highWaterMark);
-            });
-            stream.on("end", async () => {
-                while (tmp.length > 0) {
-                    const string = tmp;
-                    let lastIndex = string.substring(0, highWaterMark).lastIndexOf("\n");
-                    const result = string.substring(0, lastIndex).replace(/`/g, "´");
-                    tmp = string.substring(lastIndex + 1);
-                    message.channel.send(`\`\`\`${result}\`\`\``);
-                }
-                log(`Sent file contents of ${msg}`);
-            });
+            let tmp = await fs.readFile(file, { encoding: "utf8" });
+
+            while (tmp.length > 0) {
+                let lastIndex = tmp.substring(0, highWaterMark).lastIndexOf("\n");
+                const result = tmp.substring(0, lastIndex).replace(/`/g, "´");
+                tmp = tmp.substring(lastIndex + 1);
+                await message.channel.send(`\`\`\`${result}\`\`\``);
+            }
+
+            log(`Sent file contents of ${msg}`);
         }
     }).setIgnore(false).setCategory(Category.OWNER);
 

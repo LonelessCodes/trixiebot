@@ -23,7 +23,7 @@ module.exports = async function install(cr) {
         new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setTitle("BLEP o3o")
-            .setImage("https://d.equestriadev.de/i/_blep.gif")
+            .setImage("https://derpicdn.net/img/view/2017/11/7/1580178.gif")
             .setFooter(await message.channel.translate("The chat got blep'd by {{user}} | Art by n0nnny", {
                 user: userToString(message.author, true)
             }))

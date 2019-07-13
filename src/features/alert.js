@@ -142,7 +142,7 @@ class Picarto extends StreamProcessor {
             stream.addListener("data", config => this.checkChange(picartoOnline, config));
             stream.once("end", () => { });
             stream.once("error", err => { log(err); });
-        } catch (_) { _; }
+        } catch (_) { _; } // Picarto is down
     }
 
     /**
@@ -162,20 +162,22 @@ class Picarto extends StreamProcessor {
             // if the channel was not recently online, set it online
             if (oldChannel || savedConfig.messageId) return;
 
-            channelPage = await this.request("channel/id/" + channelPage.user_id);
+            try {
+                channelPage = await this.request("channel/id/" + channelPage.user_id);
 
-            const onlineChannel = new OnlineChannel(savedConfig, {
-                title: channelPage.title,
-                followers: channelPage.followers,
-                totalviews: channelPage.viewers_total,
-                avatar: channelPage.avatar,
-                nsfw: channelPage.adult,
-                category: channelPage.category,
-                tags: channelPage.tags,
-                thumbnail: channelPage.thumbnails.web_large
-            });
+                const onlineChannel = new OnlineChannel(savedConfig, {
+                    title: channelPage.title,
+                    followers: channelPage.followers,
+                    totalviews: channelPage.viewers_total,
+                    avatar: channelPage.avatar,
+                    nsfw: channelPage.adult,
+                    category: channelPage.category,
+                    tags: channelPage.tags,
+                    thumbnail: channelPage.thumbnails.web_large
+                });
 
-            this.emit("online", onlineChannel);
+                this.emit("online", onlineChannel);
+            } catch (_) { _; } // Picarto is down
         }
     }
 
@@ -253,6 +255,7 @@ class Twitch extends StreamProcessor {
             if (oldChannel || config.messageId) return;
 
             const stream = await this.twitch.helix.streams.getStreamByUserId(config.userId);
+            if (!stream) return;
 
             const onlineChannel = new OnlineChannel(config, {
                 title: stream.title,
@@ -324,15 +327,16 @@ class Piczel extends StreamProcessor {
 
     async checkChanges() {
         // get all online channels
-        /** @type {any} */
-        const piczelOnline = await this.request("streams/?nsfw=true&live_only=false");
-        if (piczelOnline.error) throw new Error("Piczel error:", piczelOnline.error);
+        try {
+            const piczelOnline = await this.request("streams/?nsfw=true&live_only=false");
+            if (piczelOnline.error) throw new Error("Piczel error:", piczelOnline.error);
 
-        const stream = this.manager.getConfigs(this);
+            const stream = this.manager.getConfigs(this);
 
-        stream.addListener("data", config => this.checkChange(piczelOnline, config));
-        stream.once("end", () => { });
-        stream.once("error", err => { log(err); });
+            stream.addListener("data", config => this.checkChange(piczelOnline, config));
+            stream.once("end", () => { });
+            stream.once("error", err => { log(err); });
+        } catch (_) { _; } // Piczel is down
     }
 
     /**
@@ -425,11 +429,13 @@ class Smashcast extends StreamProcessor {
 
         const set = new Set(channels.map(c => c.name));
 
-        const online_channels = await this.request("media/live/" + Array.from(set).join(","));
+        try {
+            const online_channels = await this.request("media/live/" + Array.from(set).join(","));
 
-        const online = online_channels.livestream.filter(stream => stream.media_is_live !== "0");
+            const online = online_channels.livestream.filter(stream => stream.media_is_live !== "0");
 
-        for (let config of channels) await this.checkChange(config, online).catch(err => log.error(err));
+            for (let config of channels) await this.checkChange(config, online).catch(err => log.error(err));
+        } catch (_) { _; } // Smashcast is down
     }
 
     async checkChange(config, online_channels) {

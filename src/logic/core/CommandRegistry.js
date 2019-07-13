@@ -72,6 +72,9 @@ class CommandRegistry {
      */
     async processCC(message, command_name, content, command) {
         if (!command.enabled) return false;
+        
+        if (message.guild && !message.member) message.member = message.guild.member(message.author) || null;
+        if (!message.member) return false;
 
         if (await this.blacklisted_users.has(message.author.id)) {
             await message.channel.send("You have been blacklisted from using all of Trixie's functions. " +
@@ -177,7 +180,9 @@ class CommandRegistry {
             promises.set(key, cmd.beforeProcessCall(message, content));
         }
 
-        if (!prefixUsed || !command) return false;
+        if (message.guild && !message.member) message.member = message.guild.member(message.author) || null;
+
+        if (!prefixUsed || !command || !message.member) return false;
 
         if (!message.channel.nsfw && command.explicit && !message.guild.config.explicit) return false;
 

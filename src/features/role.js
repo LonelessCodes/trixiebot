@@ -196,7 +196,7 @@ module.exports = async function install(cr, client, config, db) {
         const args = findArgs(content);
         const role = args[0];
 
-        const role_obj = message.guild.roles.find("name", role);
+        const role_obj = message.guild.roles.find(r => r.name === role);
         if (!role_obj) {
             await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
             return;

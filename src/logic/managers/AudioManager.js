@@ -115,6 +115,7 @@ class VCGuild extends EventEmitter {
         if (!this.connected) return;
 
         if (oldMember.user.id === this.client.user.id) {
+            if (oldMember.voiceChannel && !newMember.voiceChannel) return this.destroy();
             this.vc = newMember.voiceChannel;
         } else {
             if (!oldMember.voiceChannel) return;

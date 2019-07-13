@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.8.3"></a>
+## [2.8.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.2...v2.8.3) (2019-07-13)
+
+
+### Bug Fixes
+
+* **alert:** don't log unreachable api errors. They just clutter the logs with garbage ([6b87076](https://bitbucket.org/Loneless/trixiebot/commits/6b87076))
+* hopefully fixed problems with missing Message#member on messages sent in guild ([b0b8202](https://bitbucket.org/Loneless/trixiebot/commits/b0b8202))
+* **Audio Manager:** destroy voice connection when disconnected from a vc by an admin. ([e915cdb](https://bitbucket.org/Loneless/trixiebot/commits/e915cdb))
+* **blep command:** show blep gif ([12ebc79](https://bitbucket.org/Loneless/trixiebot/commits/12ebc79))
+* **owner commands:** fix exec errors on too long stdout and allowed top level await in eval ([dd7b13f](https://bitbucket.org/Loneless/trixiebot/commits/dd7b13f))
+* **owner commands:** fixed Trixie crashing when looking up a file ([974a9bd](https://bitbucket.org/Loneless/trixiebot/commits/974a9bd))
+* **poll command:** handle NaN and 0 votes errors ([8bd9bf7](https://bitbucket.org/Loneless/trixiebot/commits/8bd9bf7))
+* **role command:** Collection#find deprecation waning ([4f76730](https://bitbucket.org/Loneless/trixiebot/commits/4f76730))
+
+
+### Features
+
+* better error context in logs (only for developer) ([c5bf4ef](https://bitbucket.org/Loneless/trixiebot/commits/c5bf4ef))
+* improved logging ([08def3e](https://bitbucket.org/Loneless/trixiebot/commits/08def3e))
+
+
+
 <a name="2.8.2"></a>
 ## [2.8.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.1...v2.8.2) (2019-07-08)
 

@@ -62,12 +62,20 @@ module.exports = async function install(cr, client, config, db) {
 
     cr.register("exec", new SimpleCommand(async (message, msg) => {
         const content = await promisify(exec)(msg);
-        await message.channel.send("```\n" + resolveStdout(content.stdout + content.stderr) + "\n```");
+        let escaped = resolveStdout("Out:\n" + content.stdout + "\nErr:\n" + content.stderr);
+
+        while (escaped.length > 0) {
+            let lastIndex = escaped.substring(0, 2000 - 2 * 3).lastIndexOf("\n");
+            const result = escaped.substring(0, lastIndex).replace(/`/g, "´");
+            escaped = escaped.substring(lastIndex + 1);
+            await message.channel.send(`\`\`\`${result}\`\`\``);
+        }
+
         log(`Sent stdout for command ${msg}`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
     cr.register("eval", new SimpleCommand(async (message, msg) => {
-        const content = await eval(msg);
+        const content = await eval(`(async () => {${msg}})()`);
         await message.channel.send("```\n" + content + "\n```");
         log(`Evaluated ${msg} and sent result`);
     })).setIgnore(false).setCategory(Category.OWNER);
@@ -80,7 +88,7 @@ module.exports = async function install(cr, client, config, db) {
             defaultChannel.send("Broadcast from creator", { embed: new Discord.RichEmbed().setDescription(msg) }).catch(() => { });
         });
         log(`Broadcasted message ${msg}`);
-    })).setIgnore(false).setCategory(Category.OWNER); // 505123661003358210
+    })).setIgnore(false).setCategory(Category.OWNER);
 
     cr.register("send", new SimpleCommand(async (message, msg) => {
         const s = splitArgs(msg, 2);
@@ -96,7 +104,7 @@ module.exports = async function install(cr, client, config, db) {
         if (!isOwner(message.author)) return;
 
         if (!/^(backup|database|mongoarchive)\b/i.test(message.content)) return;
-        
+
         const url = await ipc.awaitAnswer("admin:mongoarchive");
 
         await message.channel.send(`Get your archive here: ${url}`);

@@ -1,7 +1,7 @@
 const path = require("path");
 const tmp = require("tmp");
 const fs = require("fs-extra");
-const log = require("../../../modules/log");
+const log = require("../../../modules/log").namespace("sb recorder");
 const decodeOpus = require("./recorder/decodeOpus");
 const isEnoughDiskSpace = require("../../../modules/isEnoughDiskSpace");
 // eslint-disable-next-line no-unused-vars

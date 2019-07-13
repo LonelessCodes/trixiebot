@@ -1,6 +1,7 @@
 const cpc = require("../../modules/cpc");
 const respawn = require("../../modules/respawn");
-const log = require("../../modules/log");
+const nanoTimer = require("../../modules/NanoTimer");
+const log = require("../../modules/log").namespace("cc manager");
 const path = require("path");
 const uuid = require("uuid/v1");
 const BSON = require("bson");
@@ -98,12 +99,17 @@ class CCManager {
         this.errors_db = database.collection("cc_errors");
         this.errors_db.createIndex({ ts: 1 });
 
-        log.debug("CustomC Registry", "Starting worker");
+        log("Starting worker");
+        const timer = nanoTimer();
+
         const dir = path.join(__dirname, "cc_worker");
         const file = path.join(dir, "worker.js");
         this.fork = respawn([file], { cwd: dir, fork: true, env: process.env }).restart();
         this.cpc = cpc(this.fork);
-        this.cpc.addListener("ready", () => log.debug("CustomC Registry", "Worker ready"));
+        this.cpc.addListener("ready", () => {
+            const time = timer.end() / nanoTimer.NS_PER_MS;
+            log(`Worker ready. boot_time:${time.toFixed(1)}ms`);
+        });
 
         this.attachListeners();
 

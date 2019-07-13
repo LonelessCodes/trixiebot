@@ -1,4 +1,4 @@
-const log = require("../../modules/log");
+const log = require("../../modules/log").namespace("owner cmd");
 const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");

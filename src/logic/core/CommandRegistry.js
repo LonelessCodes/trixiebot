@@ -1,4 +1,4 @@
-const log = require("../../modules/log");
+const log = require("../../modules/log").namespace("registry");
 const { isOwner } = require("../../modules/util");
 const { splitArgs } = require("../../modules/util/string");
 const { toHumanTime } = require("../../modules/util/time");
@@ -106,7 +106,7 @@ class CommandRegistry {
             return false;
         }
 
-        log.debug("CustomC Registry", `command:${command.id}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+        log.debug("CustomC", `command:${command.id}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
 
         await command.run(message, command_name, content);
 
@@ -203,7 +203,7 @@ class CommandRegistry {
 
         // good to send help when using `command help` and `help command`
         if (/^(help|usage)$/i.test(splitArgs(content, 2)[0])) {
-            log.debug("Command Registry", `command:help, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+            log.debug("Command", `command:help, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
 
             await HelpBuilder.sendHelp(message, command_name, command);
 
@@ -211,7 +211,7 @@ class CommandRegistry {
 
             return true;
         } else {
-            log.debug("Command Registry", `command:${command_name}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+            log.debug("Command", `command:${command_name}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
 
             const pass_through = await promises.get(command_name);
             // const command_result = await command.run(message, command_name, content, pass_through);

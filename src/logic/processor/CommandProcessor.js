@@ -1,4 +1,4 @@
-const log = require("../../modules/log");
+const log = require("../../modules/log").namespace("processor");
 const INFO = require("../../info");
 const { splitArgs } = require("../../modules/util/string");
 const stats = require("../stats");

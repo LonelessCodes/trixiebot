@@ -1,4 +1,4 @@
-const _log = require("../../../../modules/log");
+const { log: _log } = require("../util");
 const { parseHumanTime: _parseHumanTime, toHumanTime: _toHumanTime } = require("../../../../modules/util/time");
 const Context = require("./Context");
 const c = require("./classes");

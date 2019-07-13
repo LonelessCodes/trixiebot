@@ -10,7 +10,9 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    if (!config.has("voicerss.key")) return log.debug("config", "Found no API token for voicerss - Disabled tts command");
+    if (!config.has("voicerss.key")) return log.namespace("config", "Found no API token for voicerss - Disabled tts command");
+
+    const logtts = log.namespace("tts cmd");
 
     cr.register("tts", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
@@ -55,7 +57,7 @@ module.exports = async function install(cr) {
                     message.channel.sendTranslated(err.message);
                     return;
                 }
-                log.error(err);
+                logtts.error(err);
                 message.channel.sendTranslated("Some error happened and caused some whoopsies");
             }
         }))

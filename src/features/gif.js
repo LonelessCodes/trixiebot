@@ -10,7 +10,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    if (!config.has("giphy.key")) return log.debug("config", "Found no API token for Giphy - Disabled gif command");
+    if (!config.has("giphy.key")) return log.namespace("config", "Found no API token for Giphy - Disabled gif command");
 
     const giphy = giphy_api(config.get("giphy.key"));
 

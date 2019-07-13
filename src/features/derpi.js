@@ -204,7 +204,7 @@ async function process(key, message, msg, type) {
 }
 
 module.exports = async function install(cr) {
-    if (!config.has("derpibooru.key")) return log.debug("config", "Found no API token for Derpibooru - Disabled horsepussy command");
+    if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
     const key = config.get("derpibooru.key");
 

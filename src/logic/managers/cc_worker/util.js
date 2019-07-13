@@ -26,6 +26,9 @@ const getExcerpt = (txt, pos) => {
     };
 };
 
+const log = require("../../../modules/log").namespace("cc worker");
+
 module.exports = {
-    getExcerpt
+    getExcerpt,
+    log
 };

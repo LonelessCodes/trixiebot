@@ -10,7 +10,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    if (!config.has("twitter")) return log.debug("config", "Found no API credentials for Twitter - Disabled fact command");
+    if (!config.has("twitter")) return log.namespace("config", "Found no API credentials for Twitter - Disabled fact command");
 
     const twitter = new Twit(config.get("twitter"));
     const get = promisify(twitter.get).bind(twitter);
@@ -40,7 +40,7 @@ module.exports = async function install(cr) {
             await timeout(60000 * 15 / 900); // care about rate limits
         }
 
-        log("Loaded all uberfacts:", facts.size);
+        log.namespace("fact cmd")("Facts loaded:", facts.size);
     }).catch(log);
 
     async function getFact() {

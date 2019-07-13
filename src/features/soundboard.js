@@ -14,7 +14,7 @@ const credits = require("../logic/managers/CreditsManager");
 const moment = require("moment");
 const { userToString } = require("../modules/util");
 const { toHumanTime } = require("../modules/util/time");
-const log = require("../modules/log");
+const log = require("../modules/log").namespace("sb cmd");
 const CONST = require("../const");
 const Discord = require("discord.js");
 const { Guild, User } = Discord;
@@ -372,7 +372,7 @@ module.exports = async function install(cr) {
         const name = await credits.getName(message.guild);
 
         if (!(await credits.canPurchase(user, cost))) {
-            message.channel.send(`:atm: You don't have enough ${name.plural} to buy more slots! You need **${credits.getBalanceString(cost, name)}**.`);
+            message.channel.send(`:atm: You don't have enough ${name.plural || name.singular} to buy more slots! You need **${credits.getBalanceString(cost, name)}**.`);
             return;
         }
 

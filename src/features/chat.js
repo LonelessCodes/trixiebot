@@ -100,7 +100,7 @@ class Cleverbot {
 }
 
 module.exports = async function install(cr) {
-    if (!config.has("cleverbot.user") || !config.has("cleverbot.key")) return log.debug("config", "Found no API credentials for Cleverbot.io - Disabled chat command");
+    if (!config.has("cleverbot.user") || !config.has("cleverbot.key")) return log.namespace("config", "Found no API credentials for Cleverbot.io - Disabled chat command");
 
     const bot = new Cleverbot(config.get("cleverbot.user"), config.get("cleverbot.key"));
 

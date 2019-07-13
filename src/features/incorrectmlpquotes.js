@@ -10,7 +10,7 @@ const Category = require("../logic/commands/Category");
 const usernameRegExp = /@([\w-]+)\b/g;
 
 module.exports = async function install(cr) {
-    if (!config.has("tumblr.key")) return log.debug("config", "Found no API token for Tumblr - Disabled mlpquote command");
+    if (!config.has("tumblr.key")) return log.namespace("config", "Found no API token for Tumblr - Disabled mlpquote command");
 
     let quotes = [];
     getTumblrBlog(config.get("tumblr.key"), "incorrectmylittleponyquotes.tumblr.com")
@@ -23,7 +23,7 @@ module.exports = async function install(cr) {
                     .replace(usernameRegExp, (match, username) => `<http://${username}.tumblr.com>`));
         })
         .then(q => quotes = q)
-        .then(() => log("mlpquotes", "loaded"))
+        .then(() => log.namespace("mlpquote cmd")("Quotes loaded:", quotes.length))
         .catch(() => { });
 
     cr.register("mlpquote", new SimpleCommand(async message => {

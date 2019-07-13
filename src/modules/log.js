@@ -5,7 +5,7 @@ const chalk = require("chalk");
  * E.g. Useful to fit a 6bit string (each char either 1 or 0) to an 8bit string
  */
 function toString(input, length) {
-    input = input.toString ? input.toString() : input;
+    input = typeof input.toString === "function" ? input.toString() : input;
     let string = "";
     for (let i = 0; i < length - input.length; i++) string += "0";
     string += input;
@@ -32,29 +32,55 @@ function getTimeString() {
 
 class Logger extends Function {
     /**
+     * @param {string[]} [ns]
      * @returns {function(...messages: any[]): void}
      */
-    constructor() {
+    constructor(ns = []) {
         /**
          * @param {any[]} messages
          */
-        function log(...messages) { 
-            console.log(getTimeString(), ...messages);
+        function log(...messages) {
+            console.log(getTimeString(), ...log.ns, ...messages);
         }
         Object.setPrototypeOf(log, Logger.prototype);
+        log._ns = [...ns];
         return log;
     }
 
+    get ns() {
+        return this._ns.map(ns => chalk.magenta(`[${ns}]`));
+    }
+
+    /**
+     * @param  {...any} messages 
+     */
     warn(...messages) {
-        console.warn(getTimeString(), chalk.yellow("warn"), ...messages);
+        console.warn(getTimeString(), chalk.yellow("warn"), ...this.ns, ...messages);
     }
 
+    /**
+     * @param  {...any} messages 
+     */
     error(...messages) {
-        console.error(getTimeString(), chalk.bgRed.white.bold("error"), ...messages);
+        console.error(getTimeString(), chalk.bgRed.white.bold("error"), ...this.ns, ...messages);
     }
 
-    debug(file, ...messages) {
-        console.debug(getTimeString(), chalk.cyan.bold(file + ":"), ...messages);
+    /**
+     * @param {string} context 
+     * @param  {...any} messages 
+     */
+    debug(context, ...messages) {
+        console.debug(getTimeString(), ...this.ns, chalk.cyan.bold(context + ":"), ...messages);
+    }
+
+    /**
+     * @param {string} ns 
+     * @param  {...any} args 
+     */
+    namespace(ns, ...args) {
+        const logger = new Logger([...this._ns, ns]);
+        if (args.length > 0) logger(...args);
+        return logger;
     }
 }
 

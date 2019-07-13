@@ -1,7 +1,7 @@
 const EventEmitter = require("events");
 const http = require("http");
 const querystring = require("querystring");
-const log = require("../../modules/log");
+const log = require("../../modules/log").namespace("upvotes manager");
 const config = require("../../config");
 
 class UpvotesManager extends EventEmitter {
@@ -30,7 +30,7 @@ class UpvotesManager extends EventEmitter {
                 });
             }
 
-            log.debug("Upvotes Manager", `${id} voted on ${site}`);
+            log(`${id} voted on ${site}`);
         });
     }
 

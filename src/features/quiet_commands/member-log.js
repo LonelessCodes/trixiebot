@@ -1,5 +1,5 @@
 const { userToString } = require("../../modules/util");
-const log = require("../../modules/log");
+const log = require("../../modules/log").namespace("member log");
 const stats = require("../../logic/stats");
 const guild_stats = require("../../logic/managers/GuildStatsManager");
 const { findDefaultChannel } = require("../../modules/util");
@@ -36,13 +36,13 @@ module.exports = async function install(cr, client, config) {
             await channel.sendTranslated("Hi! I'm new here. Let me introduce myself:\n" +
                 "I'm TrixieBot, a bot which offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins. My set of commands range from random, simple fun, booru and GIF searching, imageboard commands, great moderation commands and so much more!\n" +
                 "Just call `!trixie` if you need my help");
-            log.debug("Member Log", `Trixie got invited and joined new guild ${guild.name}`);
+            log.debug("added", `id:${guild.id} name:${guild.name} channels:${guild.channels.size} members:${guild.memberCount}`);
             updateGuildStatistics();
         });
     });
 
     client.addListener("guildDelete", guild => {
-        log.debug("Member Log", `Trixie got removed from guild ${guild.name}`);
+        log.debug("removed", `id:${guild.id} name:${guild.name} channels:${guild.channels.size} members:${guild.memberCount}`);
         updateGuildStatistics();
     });
 

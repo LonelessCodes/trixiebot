@@ -1,4 +1,4 @@
-const log = require("../modules/log");
+const log = require("../modules/log").namespace("vc cmds");
 const AudioManager = require("../logic/managers/AudioManager");
 const { ConnectError } = AudioManager;
 
@@ -15,7 +15,7 @@ module.exports = async function install(cr) {
             await message.react("👍");
         } catch (err) {
             await message.react("❌");
-            log.error(err);
+            log.namespace("leave", err);
             message.channel.sendTranslated("Some error happened and caused some whoopsies");
         }
     }))
@@ -34,7 +34,7 @@ module.exports = async function install(cr) {
             await message.react("👍");
         } catch (err) {
             await message.react("❌");
-            log.error(err);
+            log.namespace("stop", err);
             message.channel.sendTranslated("Some error happened and caused some whoopsies");
         }
     }))
@@ -56,7 +56,7 @@ module.exports = async function install(cr) {
                 message.channel.sendTranslated(err.message);
                 return;
             }
-            log.error(err);
+            log.namespace("join", err);
             message.channel.sendTranslated("Some error happened and caused some whoopsies");
         }
     }))

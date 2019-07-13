@@ -1,7 +1,7 @@
 const config = require("../../config");
 const statuses = require("../../../assets/text/statuses");
 const request = require("request-promise-native");
-const log = require("../../modules/log");
+const log = require("../../modules/log").namespace("core");
 const nanoTimer = require("../../modules/NanoTimer");
 const { walk } = require("../../modules/util");
 const helpToJSON = require("../../modules/util/helpToJSON");
@@ -51,6 +51,7 @@ class Core {
         if (!commands_package) throw new Error("Cannot load commands if not given a path to look at!");
 
         log("Installing Commands...");
+        const all_timer = nanoTimer();
 
         const files = await walk(path.resolve(__dirname, "..", "..", commands_package));
 
@@ -62,8 +63,12 @@ class Core {
             const install = require(path.resolve("../../" + commands_package, file));
             await install(this.processor.REGISTRY, this.client, this.config, this.db);
 
-            log(`installed time:${(timer.end() / 1000000000).toFixed(3)}ms file:${path.basename(file)}`);
+            log.debug("cmd", `installed time:${(timer.end() / nanoTimer.NS_PER_MS).toFixed(3)}ms file:${path.basename(file)}`);
         }));
+
+        const install_time = all_timer.end() / nanoTimer.NS_PER_SEC;
+        
+        log("Building commands.json");
 
         const jason = {
             prefix: this.config.default_config.prefix,
@@ -81,7 +86,9 @@ class Core {
         await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), JSON.stringify(jason, null, 2));
         await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), JSON.stringify(jason, null, 2));
 
-        log("Commands installed");
+        const build_time = all_timer.end() / nanoTimer.NS_PER_SEC - install_time;
+
+        log(`Commands installed. install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
     }
 
     async attachListeners() {

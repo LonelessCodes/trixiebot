@@ -1,5 +1,5 @@
 const fetch = require("node-fetch");
-const log = require("../modules/log");
+const log = require("../modules/log").namespace("alert cmd");
 const CONST = require("../const");
 const Discord = require("discord.js");
 const gm = require("gm");
@@ -869,7 +869,7 @@ class Config {
 module.exports = async function install(cr, client, _, db) {
     const services = [ Picarto, Piczel, Smashcast ];
     if (config.has("twitch.client_id")) services.push(Twitch);
-    else log.debug("config", "Found no API client ID for Twitch - Disabled alerting Twitch streams");
+    else log.namespace("config", "Found no API client ID for Twitch - Disabled alerting Twitch streams");
     
     const manager = await new Manager(db, client, services);
 

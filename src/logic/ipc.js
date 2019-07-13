@@ -1,5 +1,5 @@
 const info = require("../info");
-const log = require("../modules/log");
+const log = require("../modules/log").namespace("ipc");
 const uuid = require("uuid");
 const ipc = require("node-ipc");
 

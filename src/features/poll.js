@@ -9,6 +9,8 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 function progressBar(v, a, b) {
+    if (Number.isNaN(v)) v = 0;
+    if (!Number.isFinite(v)) v = 0;
     const length = 20;
     const str = new Array(length);
     str.fill(a);
@@ -76,7 +78,7 @@ class Poll {
 
         const total = this.users.size; // get num of votes
 
-        if (total < 1) {
+        if (total === 0) {
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setDescription(await this.channel.translate("But no one voted :c"));
             await this.channel.sendTranslated("{{user}} Poll ended!", {
@@ -93,8 +95,7 @@ class Poll {
             .sort((a, b) => b.votes - a.votes);
 
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        for (const vote of result)
-            embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
+        for (const vote of result) embed.addField(vote.text, progressBar(vote.votes / total, "█", "░"));
         embed.setFooter(LocaleManager.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").format({
             votesCount: total
         }).fetch(total));
@@ -105,22 +106,22 @@ class Poll {
     }
 
     vote(member, option) {
-        if (!this.users.has(member.id)) {
-            this.users.set(member.id, member);
-            this.votes[option]++;
+        if (this.users.has(member.id)) return;
 
-            this.db.updateOne({
-                guildId: this.guild.id,
-                channelId: this.channel.id
-            }, {
-                $set: {
-                    votes: this.votes,
-                    users: Array.from(this.users.keys())
-                }
-            });
+        this.users.set(member.id, member);
+        this.votes[option]++;
 
-            return true;
-        }
+        this.db.updateOne({
+            guildId: this.guild.id,
+            channelId: this.channel.id
+        }, {
+            $set: {
+                votes: this.votes,
+                users: Array.from(this.users.keys())
+            }
+        });
+
+        return true;
     }
 }
 

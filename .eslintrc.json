@@ -8,6 +8,7 @@
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
+    "extends": "eslint:recommended",
     "rules": {
         "strict": 0,
         "indent": [
@@ -30,6 +31,7 @@
         "no-cond-assign": "off",
         "no-control-regex": "off",
 
-        "no-console": "off"
+        "no-console": "off",
+        "no-async-promise-executor": "off"
     }
 }

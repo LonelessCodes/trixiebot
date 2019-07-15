@@ -41,6 +41,8 @@ module.exports = async function install(cr) {
 
                 const connection = await audio.connect(message.member);
                 const request = await fetch(url);
+                if (!request.ok) throw new ConnectError("HTTP Request Error");
+                
                 const stream = request.body;
 
                 const dispatcher = connection.playStream(stream, { passes: 2 });

@@ -47,6 +47,13 @@ module.exports.timeout = function timeout(ms) {
 };
 
 /**
+ * @returns {Promise<void>}
+ */
+module.exports.immediate = function immediate() {
+    return new Promise(res => setImmediate(res));
+};
+
+/**
  * @param {string} string 
  */
 module.exports.resolveStdout = function resolveStdout(string) {

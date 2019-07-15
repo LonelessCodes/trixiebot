@@ -142,8 +142,7 @@ class AudioManager {
      */
     getGuild(guild) {
         if (this.guilds.has(guild.id)) return this.guilds.get(guild.id);
-        const g = new VCGuild(guild);
-        g.once("destroy", () => this.guilds.delete(guild.id));
+        const g = new VCGuild(guild).once("destroy", () => this.guilds.delete(guild.id));
         this.guilds.set(guild.id, g);
         return g;
     }

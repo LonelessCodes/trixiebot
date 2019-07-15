@@ -41,7 +41,7 @@ module.exports = async function install(cr, client, config, db) {
             const user = message.author;
 
             const channels = message.guild.channels.array().filter(c => c.type === "text" &&
-                c.memberPermissions(message.guild.me).has(Discord.Permissions.FLAGS.VIEW_CHANNEL));
+                c.permissionsFor(message.guild.me).has(Discord.Permissions.FLAGS.VIEW_CHANNEL));
 
             const step = 1 / channels.length;
             const limit = 4000;

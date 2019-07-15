@@ -217,7 +217,7 @@ module.exports = async function install(cr, client, config, db) {
                 { number_items: true, guild: message.guild }
             ).display(message.channel);
 
-            const msgs = await message.channel.awaitMessages(m => m.author.id === message.author.id && /[0-9]+/.test(m.content), { max: 1, time: 60000 });
+            const msgs = await message.channel.awaitMessages(m => m.author.id === message.author.id && /[0-9]+/.test(m.content), { maxMatches: 1,  time: 60000 });
             if (msgs.size > 0) {
                 const m = msgs.first();
                 const num = parseInt(m.content) - 1;

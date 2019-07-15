@@ -56,7 +56,7 @@ class CommandProcessor {
                 guild_stats.get("messages").add(new Date, message.guild.id, message.channel.id, message.author.id);
 
             if (message.channel.type === "text" &&
-                !message.channel.memberPermissions(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES, true))
+                !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES, true))
                 return;
 
             await this.run(message, timer);

@@ -7,7 +7,7 @@ const Category = require("../logic/commands/Category");
 
 const MessageMentions = require("../modules/MessageMentions");
 const guild_stats = require("../logic/managers/GuildStatsManager");
-const { userToString } = require("../modules/util/index");
+const { basicEmbed } = require("../modules/util/index");
 
 function sort(data) {
     return data.map(entry => {
@@ -132,8 +132,7 @@ module.exports = async function install(cr) {
             guild_stats.get("users").getLastItemBefore(quartal, guildId),
         ]);
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        embed.setAuthor(`${message.guild.name} - ${await message.channel.translate("Statistics")}`, message.guild.iconURL);
+        const embed = basicEmbed(await message.channel.translate("Statistics"), message.guild);
 
         embed.addField("Today", getString(today, null, results), true);
         embed.addField("Yesterday", getString(yesterday, today, results), true);
@@ -162,8 +161,7 @@ module.exports = async function install(cr) {
             guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort)
         ]);
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        embed.setAuthor(`${userToString(member, true)} - ${await message.channel.translate("Statistics")}`, user.avatarURL);
+        const embed = basicEmbed(await message.channel.translate("Statistics"), member);
 
         embed.addField("Today", getString(today, null, results), true);
         embed.addField("Yesterday", getString(yesterday, today, results), true);

@@ -215,7 +215,7 @@ class Twitch extends StreamProcessor {
 
         const user = await this.twitch.helix.users.getUserByName(channel_name);
         if (!user) return new Config(this, channel, channel_name);
-            
+
         const user_id = user.id;
         const name = user.displayName;
 
@@ -536,7 +536,7 @@ class ChannelQueryCursor {
         if (!guild.available) return null;
 
         const g_channel = guild.channels.get(config.channelId);
-        if (!g_channel){
+        if (!g_channel) {
             this.manager.removeChannel(new Config(this.service, null, config.name, config.userId, config._id));
             return null;
         }
@@ -585,7 +585,7 @@ class Manager extends EventEmitter {
                         await this.removeChannel(channel);
                         return;
                     }
-                    if (!channel.channel.memberPermissions(channel.channel.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES)) return;
+                    if (!channel.channel.permissionsFor(channel.channel.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES)) return;
 
                     const embed = await channel.getEmbed();
 
@@ -810,8 +810,8 @@ class OnlineChannel extends Channel {
                     true :
                     false :
             false;
-        
         /** @type {Discord.Attachment} */
+
         let attachment;
         try {
             attachment = new Discord.Attachment(await nsfwThumb(this.thumbnail), "thumb.jpg");
@@ -825,8 +825,8 @@ class OnlineChannel extends Channel {
             !blur && this.thumbnail ?
                 `${this.thumbnail}?${Date.now()}`
                 : null;
-        
         const embed = new Discord.RichEmbed()
+
             .setColor(this.service.color || CONST.COLOR.PRIMARY)
             .setURL(this.url);
 
@@ -850,7 +850,7 @@ class OnlineChannel extends Channel {
                 embed.setImage(thumbnail);
             }
             embed.setFooter(footer.join(" | "));
-            
+
             return embed;
         }
     }
@@ -867,10 +867,10 @@ class Config {
 }
 
 module.exports = async function install(cr, client, _, db) {
-    const services = [ Picarto, Piczel, Smashcast ];
+    const services = [Picarto, Piczel, Smashcast];
     if (config.has("twitch.client_id")) services.push(Twitch);
     else log.namespace("config", "Found no API client ID for Twitch - Disabled alerting Twitch streams");
-    
+
     const manager = await new Manager(db, client, services);
 
     const alertCommand = cr.register("alert", new TreeCommand)
@@ -1009,6 +1009,6 @@ module.exports = async function install(cr, client, _, db) {
                 name: config.name
             });
         }));
-    
+
     alertCommand.registerSubCommandAlias("*", "add");
 };

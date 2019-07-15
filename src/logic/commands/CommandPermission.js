@@ -21,6 +21,9 @@ class CommandPermission {
         this.permissions = permissions;
     }
 
+    /**
+     * @param {GuildMember} member 
+     */
     test(member) {
         for (const permission of this.permissions) {
             if (!member.hasPermission(permission, false, true, true)) return false;

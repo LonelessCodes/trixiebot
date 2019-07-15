@@ -1,3 +1,6 @@
+const nanoTimer = require("./modules/NanoTimer");
+const bootup_timer = nanoTimer();
+
 const config = require("./config");
 const log = require("./modules/log");
 const info = require("./info");
@@ -16,7 +19,7 @@ new class App {
         this.attachClientListeners();
 
         this.initialize()
-            .then(() => log.namespace("app", "I am ready"))
+            .then(() => log.namespace("app", "Ready uwu.", `bootup_time:${(bootup_timer.end() / nanoTimer.NS_PER_SEC).toFixed(3)}s`))
             .catch(err => {
                 log.error("Failed to log in", err);
                 process.exit(1);
@@ -75,21 +78,22 @@ new class App {
     }
 
     attachClientListeners() {
-        this.client.addListener("warn", warn => log.warn("ClientWarn:", warn));
+        const djs_log = log.namespace("discord.js");
 
-        this.client.addListener("error", error => log.error("ClientError:", 
+        this.client.addListener("warn", warn => djs_log.warn(warn));
+
+        this.client.addListener("error", error => djs_log.error(
             error.stack ||
                 error.error ?
                 error.error.stack || error.error :
                 error
         ));
 
-        const djs_log = log.namespace("discord.js");
+        // this.client.addListener("debug", debug => {
+        //     if (/heartbeat/i.test(debug)) return;
+        //     djs_log(debug);
+        // });
 
-        this.client.addListener("debug", debug => {
-            if (/heartbeat/i.test(debug)) return;
-            djs_log(debug);
-        });
 
         this.client.addListener("disconnect", closeEvent => djs_log(closeEvent));
 

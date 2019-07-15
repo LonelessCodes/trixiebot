@@ -1,5 +1,4 @@
-const { userToString } = require("../../../modules/util");
-const CONST = require("../../../const");
+const { basicEmbed } = require("../../../modules/util");
 const Events = require("events");
 const AudioManager = require("../AudioManager");
 // eslint-disable-next-line no-unused-vars
@@ -75,9 +74,7 @@ class SampleList extends Events {
     renderEmbed(withEmoji = true) {
         const samples = this.samples;
 
-        const embed = new RichEmbed().setColor(CONST.COLOR.PRIMARY);
-
-        embed.setAuthor(userToString(this.user, true) + " | Available Samples", this.user.avatarURL);
+        const embed = basicEmbed("Available Samples", this.user);
 
         embed.setDescription("Play a sample with `" + this.guild.config.prefix + "sb <sample name>`. View more info about a sample by typing `" + this.guild.config.prefix + "sb info u <sample name>` for user samples and `" + this.guild.config.prefix + "sb info s <sample name>` for server samples.");
 

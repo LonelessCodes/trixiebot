@@ -1,6 +1,17 @@
 const BaseCommand = require("./BaseCommand");
 
+// eslint-disable-next-line no-unused-vars
+const { CommandPermissions } = require("../logic/commands/CommandPermission");
+// eslint-disable-next-line no-unused-vars
+const { Message } = require("discord.js");
+// eslint-disable-next-line no-unused-vars
+const { NanoTimer } = require("../modules/NanoTimer");
+
 class SimpleCommand extends BaseCommand {
+    /**
+     * @param {(message: Message, content: string, add: { pass_through: any, command_name: string, timer: NanoTimer }) => any} func 
+     * @param {CommandPermissions} permissions 
+     */
     constructor(func = async () => {}, permissions) {
         super(permissions);
 

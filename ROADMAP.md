@@ -13,3 +13,4 @@
 * Marketplace (incl. purchasable roles)
 * CC fix Logical Expression logic
 * repair toString on arrays
+* ban, kick und tempban commands (tempban === member.ban({ days: 7 }))

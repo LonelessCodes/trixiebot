@@ -21,5 +21,6 @@ function nanoTimer() {
 }
 nanoTimer.NS_PER_SEC = NS_PER_SEC;
 nanoTimer.NS_PER_MS = NS_PER_MS;
+nanoTimer.NanoTimer = NanoTimer;
 
 module.exports = nanoTimer;

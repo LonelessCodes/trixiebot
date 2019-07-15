@@ -18,3 +18,4 @@ const database = MongoClient
 module.exports = function getDatabase(name = config.get("database.db")) {
     return database.then(client => client.db(name));
 };
+module.exports.client = database;

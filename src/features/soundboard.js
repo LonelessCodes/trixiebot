@@ -380,7 +380,7 @@ module.exports = async function install(cr) {
 
         active.add(isUser ? user.id : guild.id);
 
-        message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === message.author.id, { max: 1, time: 60000, errors: ["time"] })
+        message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === message.author.id, { maxMatches: 1, time: 60000, errors: ["time"] })
             .then(async messages => {
                 const m = messages.first();
                 if (/^buy$/i.test(m.content)) {

@@ -137,7 +137,7 @@ module.exports = async function install(cr, client, config, db) {
             .setUsage("<? userID|username#0000|username>", "view the autoban patterns of this server")
             .addParameterOptional("userID|username#0000|username", "If given, add an autoban configuration"))
         .setCategory(Category.MODERATION)
-        .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.BAN_MEMBERS]));
+        .setPermissions(new CommandPermission([Discord.Permissions.FLAGS.BAN_MEMBERS]));
 
     autobanCmd.registerDefaultCommand(new OverloadCommand)
         .registerOverload("0", new SimpleCommand(async message => {

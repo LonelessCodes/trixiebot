@@ -17,7 +17,7 @@ Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
 
 class BaseCommand {
     /**
-     * @param {CommandPermission.CommandPermission} permissions 
+     * @param {CommandPermission} permissions 
      */
     constructor(permissions) {
         this.setPermissions(permissions || CommandPermission.USER);
@@ -55,9 +55,9 @@ class BaseCommand {
     setPermissions(permissions) {
         this.permissions =
             permissions ?
-                permissions instanceof CommandPermission.CommandPermission ?
+                permissions instanceof CommandPermission ?
                     permissions :
-                    new CommandPermission.CommandPermission(permissions instanceof Array ? permissions : [permissions]) :
+                    new CommandPermission(permissions instanceof Array ? permissions : [permissions]) :
                 CommandPermission.USER;
         return this;
     }

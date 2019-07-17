@@ -309,7 +309,7 @@ class WebsiteManager {
                         id: channel ? channel.id : row.channelId,
                         name: channel ? channel.name : "deleted-channel"
                     },
-                    edits: row.edits.map(e => ({ content: cleanContent(e.content), editedAt: ts(e.editedAt) })),
+                    edits: row.edits.map(e => ({ content: cleanContent(e.content, guild), editedAt: ts(e.editedAt) })),
                     attachments: row.attachments,
                     deletedAt: ts(row.deletedAt)
                 });

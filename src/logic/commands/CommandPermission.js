@@ -35,28 +35,26 @@ class CommandPermission {
         return this.permissions.map(permission => NAMES.get(permission)).join(", ");
     }
 }
-
-module.exports = {
-    USER: new CommandPermission([]),
-    ADMIN: new class extends CommandPermission {
-        /**
-         * @param {GuildMember} member 
-         */
-        test(member) {
-            return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) ||
-                module.exports.OWNER.test(member);
-        }
-        toString() {
-            return "Administrator or Manage Server";
-        }
-    },
-    OWNER: new class extends CommandPermission {
-        test(member) {
-            return isOwner(member);
-        }
-        toString() {
-            return "Bot Owner";
-        }
-    },
-    CommandPermission
+CommandPermission.USER = new CommandPermission([]);
+CommandPermission.ADMIN = new class extends CommandPermission {
+    /**
+     * @param {GuildMember} member 
+     */
+    test(member) {
+        return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) ||
+            module.exports.OWNER.test(member);
+    }
+    toString() {
+        return "Administrator or Manage Server";
+    }
 };
+CommandPermission.OWNER = new class extends CommandPermission {
+    test(member) {
+        return isOwner(member);
+    }
+    toString() {
+        return "Bot Owner";
+    }
+};
+
+module.exports = CommandPermission;

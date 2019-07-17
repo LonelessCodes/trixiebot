@@ -10,7 +10,7 @@ const Category = require("../../logic/commands/Category");
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("mute");
 
-    const permission = new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
+    const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
     const muteWordCommand = cr.register("muteword", new class extends TreeCommand {
         async noPermission(message) {

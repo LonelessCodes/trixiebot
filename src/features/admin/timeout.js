@@ -21,7 +21,7 @@ module.exports = async function install(cr, client, config, db) {
     const database_messages = db.collection("timeout_messages");
     database_messages.createIndex("timeoutEnd", { expireAfterSeconds: 24 * 3600 });
 
-    const permission = new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
+    const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
     const timeoutCommand = cr.register("timeout", new class extends TreeCommand {
         async beforeProcessCall(message) {

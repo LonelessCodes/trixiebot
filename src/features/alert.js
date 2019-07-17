@@ -10,7 +10,7 @@ const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
-const { CommandPermission } = require("../logic/commands/CommandPermission");
+const CommandPermission = require("../logic/commands/CommandPermission");
 
 const config = require("../config");
 

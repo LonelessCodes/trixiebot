@@ -2,7 +2,7 @@ const SimpleCommand = require("../class/SimpleCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
-const Permissions = require("../logic/commands/CommandPermission");
+const CommandPermissions = require("../logic/commands/CommandPermission");
 
 const credits = require("../logic/managers/CreditsManager");
 const moment = require("moment");
@@ -219,7 +219,7 @@ module.exports = async function install(cr) {
             .setUsage("<?singular> <?plural>", "Change the name of the currency. If not given any arguments, view the current configuration")
             .addParameterOptional("singular", "Sets the singular of the currency name")
             .addParameterOptional("plural", "Sets the plural of the currency name. If omitted, singular name will be used for everything"))
-        .setPermissions(Permissions.ADMIN);
+        .setPermissions(CommandPermissions.ADMIN);
 
     bankCmd.registerSubCommand("set", new SimpleCommand(async (message, content) => {
         const member = message.mentions.members.first();

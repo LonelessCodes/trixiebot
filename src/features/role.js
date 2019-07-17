@@ -157,7 +157,7 @@ module.exports = async function install(cr, client, config, db) {
     cr.register("roles", new AliasCommand("role", listRoles));
 
     const roleConfig = roleCommand.registerSubCommand("config", new TreeCommand)
-        .setPermissions(new CommandPermission.CommandPermission([Discord.Permissions.FLAGS.MANAGE_ROLES]))
+        .setPermissions(new CommandPermission([Discord.Permissions.FLAGS.MANAGE_ROLES]))
         .setHelp(new HelpContent()
             .setUsageTitle("Admin Area")
             .setUsage("", "Configure roles that everyone can add"));

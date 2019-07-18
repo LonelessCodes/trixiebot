@@ -74,7 +74,7 @@ module.exports = async function install(cr, client, config, db) {
 
     // Registering down here
 
-    const deletedCommand = cr.register("deleted", new class extends TreeCommand {
+    const deletedCommand = cr.registerCommand("deleted", new class extends TreeCommand {
         async noPermission(message) {
             await message.channel.sendTranslated("No boi, git gud");
         }

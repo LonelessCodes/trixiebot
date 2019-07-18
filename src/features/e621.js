@@ -214,7 +214,7 @@ async function process(message, msg, type) {
 }
 
 module.exports = async function install(cr) {
-    const e621Command = cr.register("e621", new TreeCommand)
+    const e621Command = cr.registerCommand("e621", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
         .setCategory(Category.IMAGE);

@@ -7,7 +7,7 @@ const Category = require("../logic/commands/Category");
 const MessageMentions = require("../modules/MessageMentions");
 
 module.exports = async function install(cr) {
-    cr.register("trump", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("trump", new SimpleCommand(async (message, content) => {
         const mentions = new MessageMentions(content, message.guild);
         if (mentions.members.size > 0) {
             const member = mentions.members.first();

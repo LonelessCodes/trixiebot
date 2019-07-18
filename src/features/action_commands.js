@@ -14,14 +14,14 @@ const hugs = [
 ];
 
 module.exports = async function install(cr) {
-    cr.register("hug", new TextActionCommand("Hug someone!!!", hugs, "Hugging yourself? How about huggig someone you love!"))
+    cr.registerCommand("hug", new TextActionCommand("Hug someone!!!", hugs, "Hugging yourself? How about huggig someone you love!"))
         .setAllowEveryone(true);
     cr.registerAlias("hug", "hugs");
 
-    cr.register("pat", new TextActionCommand("*patpat*", "*patpats {{user}}*", "Aww, take a pat <3"))
+    cr.registerCommand("pat", new TextActionCommand("*patpat*", "*patpats {{user}}*", "Aww, take a pat <3"))
         .setAllowEveryone(true);
 
-    cr.register("kiss", new TextActionCommand("Kiss someone -3-", [
+    cr.registerCommand("kiss", new TextActionCommand("Kiss someone -3-", [
         "( ˘ ³˘){{user}}",
         "（*＾3＾）{{user}}",
         "(╯3╰){{user}}",
@@ -33,7 +33,7 @@ module.exports = async function install(cr) {
     ], "Aww, *kisses*"))
         .setAllowEveryone(true);
 
-    cr.register("touch", new TextActionCommand("Touch someone o.o\"", [
+    cr.registerCommand("touch", new TextActionCommand("Touch someone o.o\"", [
         "{{user}}ԅ(‾⌣‾ԅ)",
         "{{user}}ԅ╏ ˵ ⊚ ◡ ⊚ ˵ ╏┐",
         "(¬_¬”)-cԅ(‾⌣‾ԅ)",
@@ -43,7 +43,7 @@ module.exports = async function install(cr) {
     ], "Aww, *kisses*"))
         .setAllowEveryone(true);
 
-    cr.register("point", new TextActionCommand("Point at someone", [
+    cr.registerCommand("point", new TextActionCommand("Point at someone", [
         "(☞ﾟ∀ﾟ)☞ {{user}}",
         "( ´థ౪థ)σ’`ﾞ {{user}}",
         "┗(•ˇ_ˇ•)―→ {{user}}",
@@ -58,41 +58,41 @@ module.exports = async function install(cr) {
     ], ">:3 *points at u*"))
         .setAllowEveryone(true);
 
-    cr.register("poke", new TextActionCommand("Poke poke", "*pokes {{user}}*", "Aww, *pokes you* :eyes:"))
+    cr.registerCommand("poke", new TextActionCommand("Poke poke", "*pokes {{user}}*", "Aww, *pokes you* :eyes:"))
         .setAllowEveryone(true);
 
-    cr.register("slap", new TextActionCommand("Slap someone real dirty >:c", "*slaps {{user}}*", "Hmm, why do you want this? Uh, I guess... *slaps you*"))
+    cr.registerCommand("slap", new TextActionCommand("Slap someone real dirty >:c", "*slaps {{user}}*", "Hmm, why do you want this? Uh, I guess... *slaps you*"))
         .setAllowEveryone(true);
 
-    cr.register("bite", new TextActionCommand("Ouchie! Bite someone", "*bites {{user}}* :eyes:", "*bites you*"))
+    cr.registerCommand("bite", new TextActionCommand("Ouchie! Bite someone", "*bites {{user}}* :eyes:", "*bites you*"))
         .setAllowEveryone(true);
 
-    cr.register("lick", new TextActionCommand("Lick someone clean!", "*licks {{user}}* :heart:", "*licks you*"))
+    cr.registerCommand("lick", new TextActionCommand("Lick someone clean!", "*licks {{user}}* :heart:", "*licks you*"))
         .setAllowEveryone(true)
         .setExplicit(true);
 
-    cr.register("tickle", new TextActionCommand("Nuuuu I'm so ticklish!!!! >~<\nTickle someone", "*tickles {{user}}*", "*tickles you*"))
+    cr.registerCommand("tickle", new TextActionCommand("Nuuuu I'm so ticklish!!!! >~<\nTickle someone", "*tickles {{user}}*", "*tickles you*"))
         .setAllowEveryone(true);
 
-    cr.register("smile", new TextActionCommand("Smile at someone", "*smiles at {{user}}* :heart:", "*smiles at you*"))
+    cr.registerCommand("smile", new TextActionCommand("Smile at someone", "*smiles at {{user}}* :heart:", "*smiles at you*"))
         .setAllowEveryone(true);
 
-    cr.register("stare", new TextActionCommand("Stare at someone :eyes:", "*stares at {{user}}* :eyes:", "*stares at you*"))
+    cr.registerCommand("stare", new TextActionCommand("Stare at someone :eyes:", "*stares at {{user}}* :eyes:", "*stares at you*"))
         .setAllowEveryone(true);
 
-    cr.register("holdhands", new TextActionCommand("Hold hands with a cutie", "*holding {{user}}'s hand* :heart:", "*holding your hand*"))
+    cr.registerCommand("holdhands", new TextActionCommand("Hold hands with a cutie", "*holding {{user}}'s hand* :heart:", "*holding your hand*"))
         .setAllowEveryone(true);
 
-    cr.register("cuddle", new TextActionCommand("Cuddle someone and give them a warm feeling", "*cuddles {{user}}* :heart:", "*cuddles you*"))
+    cr.registerCommand("cuddle", new TextActionCommand("Cuddle someone and give them a warm feeling", "*cuddles {{user}}* :heart:", "*cuddles you*"))
         .setAllowEveryone(true);
 
-    cr.register("snuggle", new TextActionCommand("Snuggle someone and die from the cuteness!!! >3<", "*snuggles {{user}}* :heart:", "*snuggles you*"))
+    cr.registerCommand("snuggle", new TextActionCommand("Snuggle someone and die from the cuteness!!! >3<", "*snuggles {{user}}* :heart:", "*snuggles you*"))
         .setAllowEveryone(true);
 
-    cr.register("nuzzle", new TextActionCommand("Nuzzle someone", "*nuzzles {{user}}*", "*nuzzles you*"))
+    cr.registerCommand("nuzzle", new TextActionCommand("Nuzzle someone", "*nuzzles {{user}}*", "*nuzzles you*"))
         .setAllowEveryone(true);
 
-    cr.register("nom", new TextActionCommand("nomnom someone", "*nomnoms {{user}}*", "*nomnoms you*"))
+    cr.registerCommand("nom", new TextActionCommand("nomnom someone", "*nomnoms {{user}}*", "*nomnoms you*"))
         .setAllowEveryone(true);
     cr.registerAlias("nom", "nomnom");
 };

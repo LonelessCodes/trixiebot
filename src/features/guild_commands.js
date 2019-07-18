@@ -119,7 +119,7 @@ function generateTimeFrames() {
 }
 
 module.exports = async function install(cr) {
-    cr.register("stats", new SimpleCommand(async message => {
+    cr.registerCommand("stats", new SimpleCommand(async message => {
         const guildId = message.guild.id;
 
         const { today, yesterday, week, month, quartal } = generateTimeFrames();
@@ -147,7 +147,7 @@ module.exports = async function install(cr) {
             .setDescription("Get some stats about the alive-ness of this server"))
         .setCategory(Category.INFO);
 
-    cr.register("userstats", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("userstats", new SimpleCommand(async (message, content) => {
         const mentions = new MessageMentions(content, message.guild);
         const member = mentions.members.first() || message.member;
         const user = member.user;
@@ -178,7 +178,7 @@ module.exports = async function install(cr) {
             .addParameterOptional("@user", "The member c:"))
         .setCategory(Category.INFO);
     
-    cr.register("serverinfo", new SimpleCommand(async message => {
+    cr.registerCommand("serverinfo", new SimpleCommand(async message => {
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
         embed.setThumbnail(message.guild.iconURL);

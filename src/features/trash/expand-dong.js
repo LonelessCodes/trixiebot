@@ -5,7 +5,7 @@ const TreeCommand = require("../../class/TreeCommand");
 
 module.exports = async function install(cr) {
     // expand dong
-    cr.register("expand", new TreeCommand).dontList().registerSubCommand("dong", new SimpleCommand(async message => {
+    cr.registerCommand("expand", new TreeCommand).dontList().registerSubCommand("dong", new SimpleCommand(async message => {
         let progress = 3;
         const dick = await message.channel.send(`8${new Array(progress).fill("=").join("")}D`);
         while (progress++ < 30) {

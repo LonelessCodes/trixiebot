@@ -14,7 +14,7 @@ module.exports = async function install(cr) {
 
     const logtts = log.namespace("tts cmd");
 
-    cr.register("tts", new OverloadCommand)
+    cr.registerCommand("tts", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
             if (!/[a-z0-9]/.test(content)) {
                 message.react("❌");

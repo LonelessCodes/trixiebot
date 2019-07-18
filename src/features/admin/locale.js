@@ -8,7 +8,7 @@ const CommandPermission = require("../../logic/commands/CommandPermission");
 const Category = require("../../logic/commands/Category");
 
 module.exports = async function install(cr, client) {
-    cr.register("locale", new OverloadCommand)
+    cr.registerCommand("locale", new OverloadCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie supports multiple different languages, including " + client.locale.locales.map(v => `\`${v}\``).join(", ") + ". Here you can set them in your server")
             .setUsage("<?locale> <?channel>", "view the Trixie's locales in this server")

@@ -6,7 +6,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    cr.register("chucknorris", new SimpleCommand(async () => {
+    cr.registerCommand("chucknorris", new SimpleCommand(async () => {
         /** @type {} */
         const request = await fetch("https://api.chucknorris.io/jokes/random");
         const magic = await request.json();

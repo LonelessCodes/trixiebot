@@ -23,7 +23,7 @@ module.exports = async function install(cr, client, config, db) {
 
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
-    const timeoutCommand = cr.register("timeout", new class extends TreeCommand {
+    const timeoutCommand = cr.registerCommand("timeout", new class extends TreeCommand {
         async beforeProcessCall(message) {
             if (!timeout_notices[message.channel.id])
                 timeout_notices[message.channel.id] = {};

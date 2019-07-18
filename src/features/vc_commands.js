@@ -7,7 +7,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    cr.register("leavevc", new SimpleCommand(async message => {
+    cr.registerCommand("leavevc", new SimpleCommand(async message => {
         const audio = AudioManager.getGuild(message.guild);
 
         try {
@@ -26,7 +26,7 @@ module.exports = async function install(cr) {
     cr.registerAlias("leavevc", "leave");
     cr.registerAlias("leavevc", "begone");
 
-    cr.register("stopvc", new SimpleCommand(async message => {
+    cr.registerCommand("stopvc", new SimpleCommand(async message => {
         const audio = AudioManager.getGuild(message.guild);
 
         try {
@@ -44,7 +44,7 @@ module.exports = async function install(cr) {
     
     cr.registerAlias("stopvc", "stop");
 
-    cr.register("joinvc", new SimpleCommand(async message => {
+    cr.registerCommand("joinvc", new SimpleCommand(async message => {
         const audio = AudioManager.getGuild(message.guild);
 
         try {

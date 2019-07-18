@@ -34,7 +34,7 @@ module.exports = async function install(cr, client, config, db) {
 
     const database = db.collection("santaslist");
 
-    cr.register("naughty", new SimpleCommand(async message => {
+    cr.registerCommand("naughty", new SimpleCommand(async message => {
         const progress = await message.channel.send(`${progressBar(0.0, "█", "░")} | Waiting in queue...`);
 
         queue.push(async () => {

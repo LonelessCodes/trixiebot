@@ -8,24 +8,24 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr, client) {
-    cr.register("donate", new TextCommand("https://paypal.me/loneless ❤"))
+    cr.registerCommand("donate", new TextCommand("https://paypal.me/loneless ❤"))
         .setHelp(new HelpContent().setDescription("**TrixieBot costs $12 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤"))
         .setCategory(Category.INFO);
 
-    cr.register("version", new TextCommand(`v${INFO.VERSION}`))
+    cr.registerCommand("version", new TextCommand(`v${INFO.VERSION}`))
         .setHelp(new HelpContent().setDescription("Returns the currently running version of TrixieBot"))
         .setCategory(Category.INFO);
     cr.registerAlias("version", "v");
 
-    if (INFO.INVITE) cr.register("invite", new TextCommand(INFO.INVITE))
+    if (INFO.INVITE) cr.registerCommand("invite", new TextCommand(INFO.INVITE))
         .setHelp(new HelpContent().setDescription("Gives a link to invite TrixieBot to your own server."))
         .setCategory(Category.INFO);
 
-    cr.register("vote", new TextCommand(":eyes: https://discordbots.org/bot/397037692963258368/vote"))
+    cr.registerCommand("vote", new TextCommand(":eyes: https://discordbots.org/bot/397037692963258368/vote"))
         .setHelp(new HelpContent().setDescription("Vote for TrixieBot on bot listing sites! Pls"))
         .setCategory(Category.INFO);
     
-    cr.register("trixie", new SimpleCommand(m => ({
+    cr.registerCommand("trixie", new SimpleCommand(m => ({
         embed: new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setAuthor("TrixieBot", client.user.avatarURL, INFO.WEBSITE)

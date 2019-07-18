@@ -2,7 +2,7 @@ const TreeCommand = require("../../class/TreeCommand");
 const BaseCommand = require("../../class/BaseCommand");
 
 module.exports = function install(cr, client, config, database) {
-    // const birthday = cr.register("birthday", new class extends TreeCommand {
+    // const birthday = cr.registerCommand("birthday", new class extends TreeCommand {
 
     // });
 

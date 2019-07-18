@@ -47,7 +47,7 @@ module.exports = async function install(cr) {
         return await randomItem([...(await facts)]);
     }
 
-    cr.register("fact", new SimpleCommand(() => getFact()))
+    cr.registerCommand("fact", new SimpleCommand(() => getFact()))
         .setHelp(new HelpContent()
             .setDescription("Gets random UberFacts fact"))
         .setCategory(Category.UTILS);

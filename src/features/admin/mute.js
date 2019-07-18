@@ -12,7 +12,7 @@ module.exports = async function install(cr, client, config, db) {
 
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
-    const muteWordCommand = cr.register("muteword", new class extends TreeCommand {
+    const muteWordCommand = cr.registerCommand("muteword", new class extends TreeCommand {
         async noPermission(message) {
             await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
         }
@@ -62,7 +62,7 @@ module.exports = async function install(cr, client, config, db) {
             .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
 
     muteWordCommand.registerSubCommand("remove", removeCommand);
-    cr.register("unmute", removeCommand);
+    cr.registerCommand("unmute", removeCommand);
 
     muteWordCommand.registerSubCommand("clear", new SimpleCommand(async message => {
         await database.deleteMany({ guildId: message.guild.id });

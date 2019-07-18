@@ -17,7 +17,7 @@ function sortCommands(commands) {
 }
 
 module.exports = async function install(cr, client, config, database) {
-    cr.register("help", new OverloadCommand)
+    cr.registerCommand("help", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
             let query = content.toLowerCase();
             let path = [];

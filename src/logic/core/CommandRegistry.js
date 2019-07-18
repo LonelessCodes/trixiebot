@@ -228,7 +228,7 @@ class CommandRegistry {
         }
     }
 
-    register(id, command) {
+    registerCommand(id, command) {
         if (this.commands.has(id)) throw new Error("Command name already exists");
 
         this.commands.set(id, command);
@@ -241,7 +241,7 @@ class CommandRegistry {
 
         const cmd = this.commands.get(command);
         cmd.aliases.push(alias);
-        this.register(alias, new AliasCommand(command, cmd));
+        this.registerCommand(alias, new AliasCommand(command, cmd));
     }
 
     get(id) {

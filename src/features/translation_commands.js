@@ -33,7 +33,7 @@ function translator(type, description) {
 }
 
 module.exports = async function install(cr) {
-    cr.register("pirate", translator("pirate", "Translate something into pirate-ish"));
-    cr.register("yoda", translator("yoda", "Translate something into yoda-ish"));
-    cr.register("dolan", translator("dolan", "Translate something into dolan duck-ish"));
+    cr.registerCommand("pirate", translator("pirate", "Translate something into pirate-ish"));
+    cr.registerCommand("yoda", translator("yoda", "Translate something into yoda-ish"));
+    cr.registerCommand("dolan", translator("dolan", "Translate something into dolan duck-ish"));
 };

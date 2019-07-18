@@ -131,7 +131,7 @@ module.exports = async function install(cr, client, config, db) {
      * COMMAND
      */
 
-    const autobanCmd = cr.register("autoban", new TreeCommand)
+    const autobanCmd = cr.registerCommand("autoban", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Autoban allows admins to make sure to keep specific users out of the server, even if they create a new account.\n\nGlob is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.\nPatterns use the RegEx specification. Infos on RegEx can be found here: https://regexr.com/. A good sandbox for RegEx tooling is https://regex101.com/")
             .setUsage("<? userID|username#0000|username>", "view the autoban patterns of this server")

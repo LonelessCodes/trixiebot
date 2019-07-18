@@ -22,7 +22,7 @@ const extnames = {
 
 // eslint-disable-next-line no-unused-vars
 module.exports = async function install(cr, client, config, db) {
-    cr.register("file", new class extends BaseCommand {
+    cr.registerCommand("file", new class extends BaseCommand {
         async noPermission(message) { await message.channel.sendTranslated("no"); }
 
         async call(message, msg) {
@@ -60,7 +60,7 @@ module.exports = async function install(cr, client, config, db) {
         }
     }).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.register("exec", new SimpleCommand(async (message, msg) => {
+    cr.registerCommand("exec", new SimpleCommand(async (message, msg) => {
         const content = await promisify(exec)(msg);
         let escaped = resolveStdout("Out:\n" + content.stdout + "\nErr:\n" + content.stderr);
 
@@ -74,13 +74,13 @@ module.exports = async function install(cr, client, config, db) {
         log(`Sent stdout for command ${msg}`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.register("eval", new SimpleCommand(async (message, msg) => {
+    cr.registerCommand("eval", new SimpleCommand(async (message, msg) => {
         const content = await eval(`(async () => {${msg}})()`);
         await message.channel.send("```\n" + content + "\n```");
         log(`Evaluated ${msg} and sent result`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.register("broadcast", new SimpleCommand(async (message, msg) => {
+    cr.registerCommand("broadcast", new SimpleCommand(async (message, msg) => {
         client.guilds.forEach(guild => {
             if (!guild.available) return;
             const defaultChannel = findDefaultChannel(guild);
@@ -90,7 +90,7 @@ module.exports = async function install(cr, client, config, db) {
         log(`Broadcasted message ${msg}`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.register("send", new SimpleCommand(async (message, msg) => {
+    cr.registerCommand("send", new SimpleCommand(async (message, msg) => {
         const s = splitArgs(msg, 2);
         const guild = client.guilds.get(s[0]);
         if (!guild.available) return;

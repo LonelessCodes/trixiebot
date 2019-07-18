@@ -104,7 +104,7 @@ module.exports = async function install(cr) {
 
     const bot = new Cleverbot(config.get("cleverbot.user"), config.get("cleverbot.key"));
 
-    cr.register("chat", new OverloadCommand)
+    cr.registerCommand("chat", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, input) => {
             await typing.startTyping(message.channel);
 

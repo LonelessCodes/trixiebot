@@ -92,7 +92,7 @@ replies.add({
 }, 1);
 
 module.exports = async function install(cr) {
-    cr.register("8ball", new OverloadCommand)
+    cr.registerCommand("8ball", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async message => {
             /** @type {{ text: string; type: number; }} */
             const reply = await replies.random();

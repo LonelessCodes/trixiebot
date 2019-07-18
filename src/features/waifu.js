@@ -66,7 +66,7 @@ module.exports = async function install(cr, client, config, db) {
     const database = db.collection("waifu");
     const databaseSlots = db.collection("waifu_slots");
 
-    const waifuCommand = cr.register("waifu", new TreeCommand)
+    const waifuCommand = cr.registerCommand("waifu", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("This tool helps you manage your waifus with ease!")
             .setUsage("", "Show all waifus you have claimed"))

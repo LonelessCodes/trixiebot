@@ -7,7 +7,7 @@ const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    cr.register("mlem", new SimpleCommand(async message => 
+    cr.registerCommand("mlem", new SimpleCommand(async message => 
         new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setTitle("MLEM o3o")
@@ -19,7 +19,7 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent().setDescription("Mlem the chat :3"))
         .setCategory(Category.ACTION);
 
-    cr.register("blep", new SimpleCommand(async message =>
+    cr.registerCommand("blep", new SimpleCommand(async message =>
         new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setTitle("BLEP o3o")

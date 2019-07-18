@@ -8,7 +8,7 @@ module.exports = async function install(cr, client, config, database) {
     /**
      * DISABLE
      */
-    const disableCmd = cr.register("disable", new TreeCommand)
+    const disableCmd = cr.registerCommand("disable", new TreeCommand)
         .setHelp(new HelpContent("Disable Trixie from listening to some commands or channels"))
         .setCategory(Category.MODERATION);
 
@@ -62,7 +62,7 @@ module.exports = async function install(cr, client, config, database) {
     /**
      * ENABLE
      */
-    const enableCmd = cr.register("enable", new TreeCommand)
+    const enableCmd = cr.registerCommand("enable", new TreeCommand)
         .setHelp(new HelpContent("If you have disabled channels or commands for Trixie, you can enable them here again."))
         .setCategory(Category.MODERATION);
 

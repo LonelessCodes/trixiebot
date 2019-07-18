@@ -39,7 +39,7 @@ class ChooseCommand extends TreeCommand {
 }
 
 module.exports = async function install(cr) {
-    const sbCmd = cr.register("sb", new TreeCommand)
+    const sbCmd = cr.registerCommand("sb", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.")
             .setUsage("<?sound name|id>", "Play a soundie of the one's available for you in this server")

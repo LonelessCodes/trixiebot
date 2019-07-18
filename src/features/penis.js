@@ -11,7 +11,7 @@ const Paginator = require("../logic/Paginator");
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("penis");
 
-    const penisCommand = cr.register("penis", new TreeCommand)
+    const penisCommand = cr.registerCommand("penis", new TreeCommand)
         .setExplicit(true)
         .setHelp(new HelpContent()
             .setDescription("Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.")

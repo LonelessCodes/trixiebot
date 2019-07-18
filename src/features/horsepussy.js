@@ -58,7 +58,7 @@ async function process(message) {
 module.exports = async function install(cr) {
     if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
-    cr.register("horsepussy", new SimpleCommand(message => process(message)))
+    cr.registerCommand("horsepussy", new SimpleCommand(message => process(message)))
         .setHelp(new HelpContent()
             .setDescription("Get some gud quality horse pussi OwO"))
         .setExplicit(true)

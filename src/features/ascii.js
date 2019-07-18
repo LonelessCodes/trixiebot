@@ -68,7 +68,7 @@ module.exports = async function install(cr) {
         );
     });
 
-    cr.register("ascii", ascii_cmd)
+    cr.registerCommand("ascii", ascii_cmd)
         .setHelp(new HelpContent()
             .setDescription("Generates ascii art from an image")
             .setUsage("<?url>")

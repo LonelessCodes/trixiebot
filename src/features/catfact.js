@@ -5,7 +5,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    cr.register("catfact", new SimpleCommand(async () => {
+    cr.registerCommand("catfact", new SimpleCommand(async () => {
         /** @type {} */
         const request = await fetch("https://cat-fact.herokuapp.com/facts/random");
         const magic = await request.json();

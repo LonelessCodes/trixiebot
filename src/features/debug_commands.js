@@ -57,7 +57,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr, client) {
-    cr.register("info", new SimpleCommand(async () => {
+    cr.registerCommand("info", new SimpleCommand(async () => {
         const guilds = client.guilds;
         const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
         const channels = client.channels;
@@ -92,7 +92,7 @@ module.exports = async function install(cr, client) {
         .setHelp(new HelpContent().setDescription("Gets the bot technical information. Nothing all that interesting."))
         .setCategory(Category.INFO);
 
-    cr.register("ping", new SimpleCommand(async (message, _, { timer }) => {
+    cr.registerCommand("ping", new SimpleCommand(async (message, _, { timer }) => {
         const internal_ping = timer.end() / nanoTimer.NS_PER_MS;
 
         const pongText = await message.channel.translate("pong! Wee hee");
@@ -110,7 +110,7 @@ module.exports = async function install(cr, client) {
         .setCategory(Category.INFO);
     cr.registerAlias("ping", "trixie ping");
 
-    cr.register("changelog", new SimpleCommand(async message => {
+    cr.registerCommand("changelog", new SimpleCommand(async message => {
         const logs = await getChangelog();
 
         const latest = logs[0];

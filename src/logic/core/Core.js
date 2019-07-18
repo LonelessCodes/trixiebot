@@ -9,7 +9,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const secureRandom = require("../../modules/secureRandom");
 const WebsiteManager = require("../managers/WebsiteManager");
-const CommandProcessor = require("../processor/CommandProcessor");
+const CommandProcessor = require("./CommandProcessor");
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("../managers/ConfigManager");
 const UpvotesManager = require("../managers/UpvotesManager");

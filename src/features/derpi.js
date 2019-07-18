@@ -208,7 +208,7 @@ module.exports = async function install(cr) {
 
     const key = config.get("derpibooru.key");
 
-    const derpiCommand = cr.register("derpi", new TreeCommand)
+    const derpiCommand = cr.registerCommand("derpi", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
         .setCategory(Category.IMAGE);

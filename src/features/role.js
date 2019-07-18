@@ -62,7 +62,7 @@ async function rolesMessage(guild, channel, db) {
 module.exports = async function install(cr, client, config, db) {
     const database = db.collection("roles");
 
-    const roleCommand = cr.register("role", new TreeCommand)
+    const roleCommand = cr.registerCommand("role", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("A whole easy to use role manager. Configure roles everyone can add themselves.")
             .setUsage("<role> <?user mention 1> <?user mention 2> ...", "to add roles")
@@ -154,7 +154,7 @@ module.exports = async function install(cr, client, config, db) {
         await message.channel.send(await rolesMessage(message.guild, message.channel, database));
     }))
         .setHelp(new HelpContent().setUsage("", "Show all public roles that you can add to yourself."));
-    cr.register("roles", new AliasCommand("role", listRoles));
+    cr.registerCommand("roles", new AliasCommand("role", listRoles));
 
     const roleConfig = roleCommand.registerSubCommand("config", new TreeCommand)
         .setPermissions(new CommandPermission([Discord.Permissions.FLAGS.MANAGE_ROLES]))

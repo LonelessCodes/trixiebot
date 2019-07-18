@@ -14,7 +14,7 @@ module.exports = async function install(cr) {
 
     const giphy = giphy_api(config.get("giphy.key"));
 
-    const gifCommand = cr.register("gif", new TreeCommand)
+    const gifCommand = cr.registerCommand("gif", new TreeCommand)
         .setHelp(new HelpContent()
             .setUsage("<query>", "returns the top result for the given `query`")
             .addParameter("query", "What type of gif you want to have"))

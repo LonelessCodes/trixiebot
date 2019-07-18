@@ -3,7 +3,7 @@ const INFO = require("../../info");
 const { splitArgs } = require("../../modules/util/string");
 const stats = require("../stats");
 const guild_stats = require("../managers/GuildStatsManager");
-const CommandRegistry = require("../core/CommandRegistry");
+const CommandRegistry = require("./CommandRegistry");
 const nanoTimer = require("../../modules/NanoTimer");
 // eslint-disable-next-line no-unused-vars
 const { Message, Permissions } = require("discord.js");

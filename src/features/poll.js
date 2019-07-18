@@ -180,7 +180,7 @@ module.exports = async function install(cr, client, config, db) {
         Poll.add(poll_object);
     }
 
-    cr.register("poll", new OverloadCommand)
+    cr.registerCommand("poll", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
             if (await database.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
                 await message.channel.sendTranslated("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");

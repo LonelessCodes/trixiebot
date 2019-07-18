@@ -6,7 +6,7 @@ const Category = require("../logic/commands/Category");
 const MessageMentions = require("../modules/MessageMentions");
 
 module.exports = async function install(cr) {
-    cr.register("smol", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("smol", new SimpleCommand(async (message, content) => {
         const mention = new MessageMentions(content, message.guild).members.first();
         if (!mention) {
             const text = content.replace(/[^\S\x0a\x0d]+/g, " ");

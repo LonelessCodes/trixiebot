@@ -50,14 +50,14 @@ async function randomBird() {
 }
 
 module.exports = async function install(cr) {
-    cr.register("cat", new SimpleCommand(async message => {
+    cr.registerCommand("cat", new SimpleCommand(async message => {
         return await message.channel.translate("meow") + " " + catFace() + " " + await randomCat();
     }))
         .setHelp(new HelpContent().setDescription("Random cat image :3"))
         .setCategory(Category.IMAGE);
     cr.registerAlias("cat", "kitty");
 
-    cr.register("dog", new SimpleCommand(async message => {
+    cr.registerCommand("dog", new SimpleCommand(async message => {
         return await message.channel.translate("woof") + " " + dogFace() + " " + await randomDog();
     }))
         .setHelp(new HelpContent().setDescription("Random dog image :3"))
@@ -67,7 +67,7 @@ module.exports = async function install(cr) {
     cr.registerAlias("dog", "bork");
     cr.registerAlias("dog", "pup");
 
-    cr.register("fox", new SimpleCommand(async message => {
+    cr.registerCommand("fox", new SimpleCommand(async message => {
         return await message.channel.translate("yip") + " " + "🦊" + " " + await randomFox();
     }))
         .setHelp(new HelpContent().setDescription("Random fox image :3"))
@@ -76,13 +76,13 @@ module.exports = async function install(cr) {
     cr.registerAlias("fox", "foxi");
     cr.registerAlias("fox", "weff");
 
-    cr.register("shibe", new SimpleCommand(async message => {
+    cr.registerCommand("shibe", new SimpleCommand(async message => {
         return await message.channel.translate("weff") + " " + dogFace() + " " + await randomShibe();
     }))
         .setHelp(new HelpContent().setDescription("Random SHIBE image :3"))
         .setCategory(Category.IMAGE);
 
-    cr.register("bird", new SimpleCommand(async message => {
+    cr.registerCommand("bird", new SimpleCommand(async message => {
         return await message.channel.translate("peep") + " " + "ovo" + " " + await randomBird();
     }))
         .setHelp(new HelpContent().setDescription("Random Birb image ovo"))

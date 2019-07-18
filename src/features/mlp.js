@@ -9,7 +9,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 
 module.exports = async function install(cr) {
-    cr.register("mlp", new OverloadCommand)
+    cr.registerCommand("mlp", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, query) => {
             const searchRequest = await fetch(`http://mlp.wikia.com/api/v1/Search/List?query=${encodeURIComponent(query)}&format=json&limit=1`);
             const searchJson = await searchRequest.json();

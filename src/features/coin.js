@@ -8,7 +8,7 @@ const Category = require("../logic/commands/Category");
 const coin = ["heads", "tails"];
 
 module.exports = async function install(cr) {
-    cr.register("coin", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("coin", new SimpleCommand(async (message, content) => {
         let bet = content.toLowerCase();
         if (bet === "") {
             bet = await randomItem(coin);

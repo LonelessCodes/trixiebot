@@ -22,7 +22,7 @@ async function randomBoob(reconnectTries = 0) {
 }
 
 module.exports = async function install(cr) {
-    cr.register("boobs", new SimpleCommand(async () => {
+    cr.registerCommand("boobs", new SimpleCommand(async () => {
         const url = await randomBoob();
         return new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)

@@ -26,7 +26,7 @@ module.exports = async function install(cr) {
         .then(() => log.namespace("mlpquote cmd")("Quotes loaded:", quotes.length))
         .catch(() => { });
 
-    cr.register("mlpquote", new SimpleCommand(async message => {
+    cr.registerCommand("mlpquote", new SimpleCommand(async message => {
         if (quotes.length === 0) {
             await message.channel.send("Quotes not yet done loading :c come back in a few seconds to minutes");
             return;

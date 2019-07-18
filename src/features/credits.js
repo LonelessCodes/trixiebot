@@ -12,7 +12,7 @@ const { userToString, timeout, basicEmbed } = require("../modules/util/index");
 const Paginator = require("../logic/Paginator");
 
 module.exports = async function install(cr) {
-    const bankCmd = cr.register("bank", new TreeCommand)
+    const bankCmd = cr.registerCommand("bank", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.")
             .setUsage("", "Look at your bank account"))
@@ -249,7 +249,7 @@ module.exports = async function install(cr) {
     }))
         .setCategory(Category.OWNER);
 
-    cr.register("daily", new SimpleCommand(async message => {
+    cr.registerCommand("daily", new SimpleCommand(async message => {
         const user = message.author;
 
         const account = await credits.getAccount(user);

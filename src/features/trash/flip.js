@@ -6,7 +6,7 @@ const Category = require("../../logic/commands/Category");
 const MessageMentions = require("../../modules/MessageMentions");
 
 module.exports = async function install(cr) {
-    cr.register("flip", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("flip", new SimpleCommand(async (message, content) => {
         const mention = new MessageMentions(content, message.guild).members.first();
         if (!mention) {
             if (content === "") {
@@ -19,7 +19,7 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent().setDescription("Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi").setUsage("<user|string>").addParameter("user|string", "user or text to flip"))
         .setCategory(Category.ACTION);
 
-    cr.register("unflip", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("unflip", new SimpleCommand(async (message, content) => {
         const mention = new MessageMentions(content, message.guild).members.first();
         if (!mention) {
             if (content === "") {

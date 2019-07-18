@@ -18,7 +18,7 @@ const types_human = new Map([
 ]);
 
 module.exports = async function install(cr, client, config) {
-    cr.register("config", new OverloadCommand)
+    cr.registerCommand("config", new OverloadCommand)
         .setHelp(new HelpContent()
             .setUsage("<?parameter> <?value>", "view the Trixie's config in this server")
             .addParameterOptional("parameter", "view only this parameter's config")
@@ -130,7 +130,7 @@ module.exports = async function install(cr, client, config) {
 
     // prefix alias
 
-    cr.register("prefix", new OverloadCommand)
+    cr.registerCommand("prefix", new OverloadCommand)
         .setHelp(new HelpContent()
             .setDescription("Alias for `{{prefix}}config prefix <?value>`")
             .setUsage("<?prefix>", "view Trixie's prefix in this server")

@@ -873,7 +873,7 @@ module.exports = async function install(cr, client, _, db) {
 
     const manager = await new Manager(db, client, services);
 
-    const alertCommand = cr.register("alert", new TreeCommand)
+    const alertCommand = cr.registerCommand("alert", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Make Trixie announce streamers when they go live.\nSupported are Picarto, Piczel, Twitch and Smashcast.")
             .setUsage("<page url> <?channel>", "Subscribe Trixie to a streaming channel!")

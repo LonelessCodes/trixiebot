@@ -4,6 +4,7 @@ const { splitArgs } = require("../../modules/util/string");
 const stats = require("../stats");
 const guild_stats = require("../managers/GuildStatsManager");
 const CommandRegistry = require("./CommandRegistry");
+const CommandDispatcher = require("./CommandDispatcher");
 const nanoTimer = require("../../modules/NanoTimer");
 // eslint-disable-next-line no-unused-vars
 const { Message, Permissions } = require("discord.js");
@@ -24,7 +25,7 @@ async function onProcessingError(message, err) {
     try {
         if (INFO.DEV) await message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
         else await message.channel.sendTranslated("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
-    } catch (_) { _; }
+    } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
 }
 
 class CommandProcessor {
@@ -33,7 +34,8 @@ class CommandProcessor {
         this.config = config;
         this.db = database;
 
-        this.REGISTRY = new CommandRegistry(client, config, database);
+        this.REGISTRY = new CommandRegistry(client, database);
+        this.DISPATCHER = new CommandDispatcher(client, database, this.REGISTRY);
 
         stats.bot.register("COMMANDS_EXECUTED", true);
         stats.bot.register("MESSAGES_TODAY", true);
@@ -71,9 +73,10 @@ class CommandProcessor {
         // remove prefix
         let me = "";
         let prefix = "";
-        let prefixUsed = true;
+        let prefix_used = true;
 
         if (message.channel.type === "text") {
+            // eslint-disable-next-line require-atomic-updates
             message.guild.config = await this.config.get(message.guild.id);
 
             me = message.guild.me.toString();
@@ -88,26 +91,26 @@ class CommandProcessor {
         } else if (raw_content.startsWith(prefix)) {
             raw_content = raw_content.substr(prefix.length);
         } else {
-            prefixUsed = false;
+            prefix_used = false;
         }
 
-        const msg = Object.assign(Object.create(message), message, { prefix, prefixUsed });
+        const msg = Object.assign(Object.create(message), message, { prefix, prefix_used });
 
         const [command_name, processed_content] = splitArgs(raw_content, 2);
 
-        const executed = await this.REGISTRY.process(msg, command_name.toLowerCase(), processed_content, prefix, prefixUsed, timer);
+        const executed = await this.DISPATCHER.process(msg, command_name.toLowerCase(), processed_content, prefix, prefix_used, timer);
 
         // const diff = timer.end();
         // commandTime.observe(diff);
 
         // use some stats observing software
 
-        if (executed) {
-            stats.bot.get("COMMANDS_EXECUTED").inc(1);
-            
-            if (message.channel.type === "text")
-                await guild_stats.get("commands").add(new Date, message.guild.id, message.channel.id, message.author.id, command_name);
-        }
+        if (!executed) return;
+
+        stats.bot.get("COMMANDS_EXECUTED").inc(1);
+        
+        if (message.channel.type === "text")
+            await guild_stats.get("commands").add(new Date, message.guild.id, message.channel.id, message.author.id, command_name);
     }
 }
 

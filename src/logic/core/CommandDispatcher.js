@@ -65,6 +65,8 @@ class CommandDispatcher {
     async processCC(message, command_name, content, command) {
         if (!command.enabled) return false;
 
+        if (message.channel.type !== "text") return;
+
         if (message.guild && !message.member) message.member = message.guild.member(message.author) || null;
         if (!message.member) return false;
 
@@ -122,6 +124,8 @@ class CommandDispatcher {
             command = command.command;
         }
 
+        if (!command.hasScope(message.channel)) return;
+
         // is the case of cases, Owner should be able to use Owner commands everywhere, regardless of timeouts and other problems
         const isOwnerCommand = command && command.category && command.category === Category.OWNER && isOwner(message.author);
 
@@ -170,6 +174,7 @@ class CommandDispatcher {
 
         for (const [, cmd] of this.REGISTRY) {
             if (cmd instanceof AliasCommand) continue;
+            if (!cmd.hasScope(message.channel)) return;
             promises.set(cmd.id, cmd.beforeProcessCall(message, content));
         }
 

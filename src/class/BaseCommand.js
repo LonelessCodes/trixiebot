@@ -2,6 +2,7 @@ const { toHumanTime } = require("../modules/util/time");
 const { Message, Channel, Guild } = require("discord.js");
 const LocaleManager = require("../logic/managers/LocaleManager");
 const CommandPermission = require("../logic/commands/CommandPermission");
+const CommandScope = require("../logic/commands/CommandScope");
 const RateLimiter = require("../logic/RateLimiter");
 const TimeUnit = require("../modules/TimeUnit");
 
@@ -20,16 +21,26 @@ class BaseCommand {
      * @param {CommandPermission} permissions 
      */
     constructor(permissions) {
+        this.id = Symbol("command id");
+
+        this.setRateLimiter(null);
         this.setPermissions(permissions || CommandPermission.USER);
-        this._rateLimitMessageRateLimiter = null;
-        this.rateLimiter = null;
         this.ignore = true;
-        this.level = 0;
         this.list = true;
         this._category = null;
         this._help = null;
         this.aliases = [];
         this.explicit = false;
+        this.setScope(null);
+    }
+
+    async rateLimit(message) {
+        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(`${message.guild.id}:${message.channel.id}`))) return;
+        await this.rateLimitMessage(message);
+    }
+
+    async rateLimitMessage(message) {
+        await message.channel.sendTranslated(`Whoa whoa not so fast! You may only do this ${this.rateLimiter.max} ${this.rateLimiter.max === 1 ? "time" : "times"} every ${this.rateLimiter.toString()}. There is still ${toHumanTime(this.rateLimiter.tryAgainIn(message.author.id))} left to wait.`);
     }
 
     setRateLimiter(rateLimiter) {
@@ -42,14 +53,9 @@ class BaseCommand {
         }
         return this;
     }
-    
-    async rateLimit(message) {
-        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(`${message.guild.id}:${message.channel.id}`))) return;
-        await this.rateLimitMessage(message);
-    }
 
-    async rateLimitMessage(message) {
-        await message.channel.sendTranslated(`Whoa whoa not so fast! You may only do this ${this.rateLimiter.max} ${this.rateLimiter.max === 1 ? "time" : "times"} every ${this.rateLimiter.toString()}. There is still ${toHumanTime(this.rateLimiter.tryAgainIn(message.author.id))} left to wait.`);
+    async noPermission(message) {
+        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area >:c");
     }
     
     setPermissions(permissions) {
@@ -62,17 +68,8 @@ class BaseCommand {
         return this;
     }
 
-    async noPermission(message) {
-        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area >:c");
-    }
-
     setIgnore(v = false) {
         this.ignore = v;
-        return this;
-    }
-
-    setLevel(v) {
-        this.level = v;
         return this;
     }
 
@@ -99,6 +96,17 @@ class BaseCommand {
     setExplicit(v = true) {
         this.explicit = v;
         return this;
+    }
+
+    setScope(v) {
+        this.scope = new CommandScope(v || CommandScope.DEFAULT).freeze();
+        return this;
+    }
+
+    hasScope(channel) {
+        if (!this.scope.has(CommandScope.FLAGS.GUILD) && channel.type === "text") return false;
+        if (!this.scope.has(CommandScope.FLAGS.DM) && channel.type === "dm") return false;
+        return true;
     }
 
     get help() {

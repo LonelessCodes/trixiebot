@@ -7,8 +7,11 @@ class CommandRegistry {
 
         /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;
+        /** @type {Map<string|RegExp, BaseCommand>} */
+        this.keywords = new Map;
     }
 
+    // Classical Commands
 
     registerCommand(id, command) {
         if (this.commands.has(id)) throw new Error("Command name already exists");
@@ -26,6 +29,8 @@ class CommandRegistry {
         this.registerCommand(alias, new AliasCommand(command, cmd));
     }
 
+    *[Symbol.iterator]() {
+        yield* this.commands;
     }
 }
 

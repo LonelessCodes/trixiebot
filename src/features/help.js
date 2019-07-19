@@ -33,6 +33,7 @@ module.exports = async function install(cr, client, config, database) {
                         name = command.parentName;
                         command = command.command;
                     }
+                    if (!command.hasScope(message.channel)) continue;
 
                     path.push(name);
 
@@ -63,6 +64,7 @@ module.exports = async function install(cr, client, config, database) {
 
             for (const [name, command] of cr.commands) {
                 if (command instanceof AliasCommand) continue;
+                if (!command.hasScope(message.channel)) continue;
                 if (disabledCommands.some(row => row.name === name)) continue;
                 if (!message.channel.nsfw && command.explicit) continue;
                 if (!command.list) continue;

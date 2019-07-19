@@ -41,8 +41,8 @@ CommandPermission.ADMIN = new class extends CommandPermission {
      * @param {GuildMember} member 
      */
     test(member) {
-        return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) ||
-            module.exports.OWNER.test(member);
+        return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) 
+            || module.exports.OWNER.test(member);
     }
     toString() {
         return "Administrator or Manage Server";

@@ -81,8 +81,6 @@ class CommandProcessor {
 
             me = message.guild.me.toString();
             prefix = message.guild.config.prefix;
-        } else {
-            return;
         }
 
         // check prefixes

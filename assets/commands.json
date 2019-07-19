@@ -260,17 +260,17 @@
       }
     },
     {
-      "name": "chucknorris",
+      "name": "coin",
       "help": {
-        "description": "Chuck\nNorris\nFacts!!!",
-        "usage": "\n`!chucknorris`",
+        "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
         "category": "Misc"
       }
     },
     {
-      "name": "coin",
+      "name": "chucknorris",
       "help": {
-        "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
+        "description": "Chuck\nNorris\nFacts!!!",
+        "usage": "\n`!chucknorris`",
         "category": "Misc"
       }
     },
@@ -387,20 +387,20 @@
       }
     },
     {
-      "name": "mlp",
-      "help": {
-        "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
-        "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
-        "category": "My Little Pony"
-      }
-    },
-    {
       "name": "penis",
       "help": {
         "explicit": true,
         "description": "Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.",
         "usage": "\n`!penis <?mention>` *(alias `!cock`, `!dick`)*\n`mention` - optional- User who's penis you wish to ~~pleasure~~ measure\n\n`!penis leaderboard` - Shows where you are in the penis size ranking",
         "category": "Action"
+      }
+    },
+    {
+      "name": "mlp",
+      "help": {
+        "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
+        "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
+        "category": "My Little Pony"
       }
     },
     {
@@ -546,24 +546,6 @@
       }
     },
     {
-      "name": "disable",
-      "help": {
-        "description": "Disable Trixie from listening to some commands or channels",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "enable",
-      "help": {
-        "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
-      }
-    },
-    {
       "name": "locale",
       "help": {
         "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
@@ -586,6 +568,24 @@
       "help": {
         "permissions": "Manage Messages",
         "usage": "\n`!unmute <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted"
+      }
+    },
+    {
+      "name": "disable",
+      "help": {
+        "description": "Disable Trixie from listening to some commands or channels",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "enable",
+      "help": {
+        "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
       }
     },
     {

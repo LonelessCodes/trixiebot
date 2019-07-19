@@ -1,6 +1,7 @@
 const TreeCommand = require("../../class/TreeCommand");
 const AliasCommand = require("../../class/AliasCommand");
 const CommandPermission = require("../../logic/commands/CommandPermission");
+const CommandScope = require("../../logic/commands/CommandScope");
 
 function format(message, format = {}) {
     for (const f in format) {
@@ -78,6 +79,7 @@ function HelpToJSON(config, name, command) {
         if (command instanceof TreeCommand) {
             for (const [sub_cmd_name, sub_command] of command.sub_commands) {
                 if (sub_command instanceof AliasCommand) continue;
+                if (!sub_command.scope.has(CommandScope.FLAGS.GUILD)) continue;
                 if (sub_cmd_name === "*") continue;
 
                 const sub_name = name + " " + sub_cmd_name;

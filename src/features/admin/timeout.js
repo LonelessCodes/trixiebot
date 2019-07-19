@@ -1,3 +1,4 @@
+/* eslint-disable require-atomic-updates */
 const { userToString } = require("../../modules/util");
 const LocaleManager = require("../../logic/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../modules/util/time");

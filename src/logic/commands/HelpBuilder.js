@@ -84,6 +84,7 @@ class HelpBuilder extends RichEmbed {
             if (command instanceof TreeCommand) {
                 for (const [sub_cmd_name, sub_command] of command.sub_commands) {
                     if (sub_command instanceof AliasCommand) continue;
+                    if (!sub_command.hasScope(message.channel)) continue;
                     if (sub_cmd_name === "*") continue;
                     if (!message.channel.nsfw && sub_command.explicit) continue;
                     if (!sub_command.list) continue;

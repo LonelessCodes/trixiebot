@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
 const { promisify } = require("util");
-const { resolveStdout, findDefaultChannel, isOwner } = require("../../modules/util");
+const { resolveStdout, findDefaultChannel } = require("../../modules/util");
 const { splitArgs } = require("../../modules/util/string");
 const ipc = require("../../logic/ipc");
 const Discord = require("discord.js");
@@ -11,6 +11,7 @@ const Discord = require("discord.js");
 const SimpleCommand = require("../../class/SimpleCommand");
 const BaseCommand = require("../../class/BaseCommand");
 const Category = require("../../logic/commands/Category");
+const CommandScope = require("../../logic/commands/CommandScope");
 
 const extnames = {
     ".js": "javascript",
@@ -98,15 +99,11 @@ module.exports = async function install(cr, client, config, db) {
         defaultChannel.send(s[1]);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    client.addListener("message", async message => {
-        if (message.author.bot) return;
-        if (message.channel.type !== "dm") return;
-        if (!isOwner(message.author)) return;
-
-        if (!/^(backup|database|mongoarchive)\b/i.test(message.content)) return;
-
+    cr.registerCommand("backup", new SimpleCommand(async message => {
         const url = await ipc.awaitAnswer("admin:mongoarchive");
 
         await message.channel.send(`Get your archive here: ${url}`);
-    });
+    }))
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.FLAGS.DM);
 };

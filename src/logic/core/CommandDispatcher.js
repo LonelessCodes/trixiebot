@@ -16,6 +16,13 @@ const RateLimiter = require("../RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
 const DocumentMapCache = require("../DocumentMapCache");
 
+function debugString(command_name, message) {
+    switch (message.channel.type) {
+        case "text": return `command:${command_name}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`;
+        default: return `command:${command_name}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, c_type:${message.channel.type}, channel:${message.channel.id}`;
+    }
+}
+
 class CommandDispatcher {
     constructor(client, database, registry) {
         this.client = client;
@@ -49,8 +56,12 @@ class CommandDispatcher {
 
     async process(message, command_name, content, prefix, prefix_used, timer) {
         /** @type {BaseCommand} */
-        let command = await this.REGISTRY.cc.get(message.guild, { command_name, prefix_used, raw_content: message.content });
-        if (command) return await this.processCC(message, command_name, content, command);
+        let command;
+
+        if (message.channel.type === "text") {
+            command = await this.REGISTRY.CC.get(message.guild, { command_name, prefix_used, raw_content: message.content });
+            if (command) return await this.processCC(message, command_name, content, command);
+        }
 
         command = this.REGISTRY.commands.get(command_name);
         if (command) return await this.processCommand(message, command_name, content, prefix_used, command, timer);
@@ -64,8 +75,6 @@ class CommandDispatcher {
      */
     async processCC(message, command_name, content, command) {
         if (!command.enabled) return false;
-
-        if (message.channel.type !== "text") return;
 
         if (message.guild && !message.member) message.member = message.guild.member(message.author) || null;
         if (!message.member) return false;
@@ -119,6 +128,8 @@ class CommandDispatcher {
      * @param {NanoTimer} timer
      */
     async processCommand(message, command_name, content, prefix_used, command, timer) {
+        const c_type = message.channel.type;
+
         if (command && command instanceof AliasCommand) {
             command_name = command.parentName;
             command = command.command;
@@ -129,70 +140,76 @@ class CommandDispatcher {
         // is the case of cases, Owner should be able to use Owner commands everywhere, regardless of timeouts and other problems
         const isOwnerCommand = command && command.category && command.category === Category.OWNER && isOwner(message.author);
 
-        if (prefix_used && command && command.ignore && !isOwnerCommand) {
+        if (command && command.ignore && !isOwnerCommand) {
             if (await this.blacklisted_users.has(message.author.id)) {
                 await message.channel.send("You have been blacklisted from using all of Trixie's functions. " +
                     "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere.");
                 return false;
             }
 
-            const [disabledCommands, disabledChannels, disabledCommandChannels] = await Promise.all([
-                this.disabled_commands.findOne({
-                    guildId: message.guild.id,
-                    commands: {
-                        $all: [command_name]
-                    }
-                }),
-                this.disabled_channels.findOne({
-                    guildId: message.guild.id,
-                    channels: {
-                        $all: [message.channel.id]
-                    }
-                }),
-                this.disabled_commands_channels.findOne({
-                    guildId: message.guild.id,
-                    command: command_name,
-                    channels: {
-                        $all: [message.channel.id]
-                    }
-                })
-            ]);
+            if (c_type === "text") {
+                const [disabledCommands, disabledChannels, disabledCommandChannels] = await Promise.all([
+                    this.disabled_commands.findOne({
+                        guildId: message.guild.id,
+                        commands: {
+                            $all: [command_name]
+                        }
+                    }),
+                    this.disabled_channels.findOne({
+                        guildId: message.guild.id,
+                        channels: {
+                            $all: [message.channel.id]
+                        }
+                    }),
+                    this.disabled_commands_channels.findOne({
+                        guildId: message.guild.id,
+                        command: command_name,
+                        channels: {
+                            $all: [message.channel.id]
+                        }
+                    })
+                ]);
 
-            if (disabledCommands) return false;
+                if (disabledCommands) return false;
 
-            const category = command.category;
-            if (disabledChannels &&
-                category !== Category.MODERATION &&
-                category !== Category.OWNER) return false;
+                const category = command.category;
+                if (disabledChannels &&
+                    category !== Category.MODERATION &&
+                    category !== Category.OWNER) return false;
 
-            if (disabledCommandChannels &&
-                category !== Category.MODERATION &&
-                category !== Category.OWNER) return false;
+                if (disabledCommandChannels &&
+                    category !== Category.MODERATION &&
+                    category !== Category.OWNER) return false;
+            }
         }
 
         const promises = new Map;
 
         for (const [, cmd] of this.REGISTRY) {
             if (cmd instanceof AliasCommand) continue;
-            if (!cmd.hasScope(message.channel)) return;
+            if (!cmd.hasScope(message.channel)) continue;
             promises.set(cmd.id, cmd.beforeProcessCall(message, content));
         }
 
-        // eslint-disable-next-line require-atomic-updates
-        if (message.guild && !message.member) message.member = message.guild.member(message.author) || null;
+        if (!command) return;
 
-        if (!prefix_used || !command || !message.member) return false;
+        if (c_type === "text") {
+            // eslint-disable-next-line require-atomic-updates
+            if (!message.member) message.member = message.guild.member(message.author) || null;
 
-        if (!message.channel.nsfw && command.explicit && !message.guild.config.explicit) return false;
+            if (!prefix_used || !message.member) return false;
 
-        if (!command.permissions.test(message.member)) {
-            await command.noPermission(message);
-            return;
+            if (!message.channel.nsfw && command.explicit) return false;
+
+            if (!isOwnerCommand && !CommandPermission.ADMIN.test(message.member) && command.ignore) {
+                const timeouted = await this.timeout.findOne({ guildId: message.guild.id, memberId: message.author.id });
+                if (timeouted) return false;
+            }
         }
 
-        if (!isOwnerCommand && !CommandPermission.ADMIN.test(message.member) && command.ignore) {
-            const timeouted = await this.timeout.findOne({ guildId: message.guild.id, memberId: message.author.id });
-            if (timeouted) return false;
+        if (!command.permissions.test(message.member || message.author)) {
+            await command.noPermission(message);
+            return;
         }
 
         if (this.global_ratelimit && !this.global_ratelimit.testAndAdd(message.author.id)) {
@@ -207,7 +224,7 @@ class CommandDispatcher {
 
         // good to send help when using `command help` and `help command`
         if (/^(help|usage)$/i.test(splitArgs(content, 2)[0])) {
-            log.debug("Command", `command:help, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+            log.debug("Command", debugString("help", message));
 
             await HelpBuilder.sendHelp(message, command_name, command);
 
@@ -215,7 +232,7 @@ class CommandDispatcher {
 
             return true;
         } else {
-            log.debug("Command", `command:${command_name}, user:${message.author.username}#${message.author.discriminator}, userid:${message.author.id}, guild:${message.guild.id}, channel:${message.channel.id}`);
+            log.debug("Command", debugString(command_name, message));
 
             const pass_through = await promises.get(command.id);
             // const command_result = await command.run(message, command_name, content, pass_through);

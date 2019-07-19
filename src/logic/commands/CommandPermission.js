@@ -1,6 +1,6 @@
 const { isOwner } = require("../../modules/util");
 // eslint-disable-next-line no-unused-vars
-const { Permissions, GuildMember } = require("discord.js");
+const { Permissions, GuildMember, User } = require("discord.js");
 
 const { FLAGS } = Permissions;
 
@@ -22,10 +22,11 @@ class CommandPermission {
     }
 
     /**
-     * @param {GuildMember} member 
+     * @param {GuildMember|User} member 
      */
     test(member) {
         for (const permission of this.permissions) {
+            if (member instanceof User) return false;
             if (!member.hasPermission(permission, false, true, true)) return false;
         }
         return true;
@@ -38,9 +39,10 @@ class CommandPermission {
 CommandPermission.USER = new CommandPermission([]);
 CommandPermission.ADMIN = new class extends CommandPermission {
     /**
-     * @param {GuildMember} member 
+     * @param {GuildMember|User} member 
      */
     test(member) {
+        if (member instanceof User) return false;
         return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) 
             || module.exports.OWNER.test(member);
     }

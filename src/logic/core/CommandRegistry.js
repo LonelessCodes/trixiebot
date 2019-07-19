@@ -3,7 +3,7 @@ const CCManager = require("../managers/CCManager");
 
 class CommandRegistry {
     constructor(client, database) {
-        this.cc = new CCManager(client, database);
+        this.CC = new CCManager(client, database);
 
         /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;

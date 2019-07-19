@@ -25,7 +25,7 @@ class OverloadCommand extends BaseCommand {
             return;
         }
 
-        if (!command.permissions.test(message.member)) {
+        if (!command.permissions.test(message.member || message.author)) {
             await command.noPermission(message);
             return;
         }

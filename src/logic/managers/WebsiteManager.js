@@ -153,7 +153,7 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
-            const commands = await this.REGISTRY.cc.getCommandsForWeb(guildId);
+            const commands = await this.REGISTRY.CC.getCommandsForWeb(guildId);
 
             const config = await this.config.get(guildId);
 
@@ -170,7 +170,7 @@ class WebsiteManager {
                 return { success: false };
             
             try {
-                const command = await this.REGISTRY.cc.addCommand(guildId, {
+                const command = await this.REGISTRY.CC.addCommand(guildId, {
                     type, trigger, case_sensitive, code, disabled_channels
                 });
                 return {
@@ -186,11 +186,11 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
             
-            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
                 return { success: false };
 
             try {
-                const command = await this.REGISTRY.cc.updateCommand(guildId, commandId, {
+                const command = await this.REGISTRY.CC.updateCommand(guildId, commandId, {
                     type, trigger, case_sensitive, code, disabled_channels
                 });
                 return {
@@ -206,13 +206,13 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
-            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
                 return { success: false };
 
             try {
                 return {
                     success: true,
-                    enabled: await this.REGISTRY.cc.enableCommand(guildId, commandId, enabled)
+                    enabled: await this.REGISTRY.CC.enableCommand(guildId, commandId, enabled)
                 };
             } catch (err) {
                 return { success: false };
@@ -223,11 +223,11 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
-            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
                 return { success: false };
 
             try {
-                await this.REGISTRY.cc.removeCommand(guildId, commandId);
+                await this.REGISTRY.CC.removeCommand(guildId, commandId);
                 return {
                     success: true
                 };
@@ -240,11 +240,11 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { errors: [], success: false };
 
-            if (!(await this.REGISTRY.cc.hasCommand(guildId, commandId)))
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
                 return { errors: [], success: false };
 
             try {
-                const errors = await this.REGISTRY.cc.getErrors(guildId, commandId);
+                const errors = await this.REGISTRY.CC.getErrors(guildId, commandId);
                 return {
                     errors: errors.map(e => {
                         e.ts = ts(e.ts);
@@ -258,7 +258,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:lint", async code => {
-            const { errors } = await this.REGISTRY.cc.cpc.awaitAnswer("lint", { code });
+            const { errors } = await this.REGISTRY.CC.cpc.awaitAnswer("lint", { code });
             return {
                 success: true,
                 errors

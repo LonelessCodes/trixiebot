@@ -260,17 +260,17 @@
       }
     },
     {
-      "name": "coin",
-      "help": {
-        "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
-        "category": "Misc"
-      }
-    },
-    {
       "name": "chucknorris",
       "help": {
         "description": "Chuck\nNorris\nFacts!!!",
         "usage": "\n`!chucknorris`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "coin",
+      "help": {
+        "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
         "category": "Misc"
       }
     },
@@ -387,20 +387,20 @@
       }
     },
     {
+      "name": "mlp",
+      "help": {
+        "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
+        "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
+        "category": "My Little Pony"
+      }
+    },
+    {
       "name": "penis",
       "help": {
         "explicit": true,
         "description": "Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.",
         "usage": "\n`!penis <?mention>` *(alias `!cock`, `!dick`)*\n`mention` - optional- User who's penis you wish to ~~pleasure~~ measure\n\n`!penis leaderboard` - Shows where you are in the penis size ranking",
         "category": "Action"
-      }
-    },
-    {
-      "name": "mlp",
-      "help": {
-        "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
-        "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
-        "category": "My Little Pony"
       }
     },
     {
@@ -546,6 +546,24 @@
       }
     },
     {
+      "name": "disable",
+      "help": {
+        "description": "Disable Trixie from listening to some commands or channels",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "enable",
+      "help": {
+        "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
+      }
+    },
+    {
       "name": "locale",
       "help": {
         "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
@@ -571,24 +589,6 @@
       }
     },
     {
-      "name": "disable",
-      "help": {
-        "description": "Disable Trixie from listening to some commands or channels",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "enable",
-      "help": {
-        "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
-      }
-    },
-    {
       "name": "timeout",
       "help": {
         "permissions": "Manage Messages",
@@ -602,6 +602,39 @@
         "description": "It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!",
         "usage": "\n`!naughty` *(alias `!nice`)*",
         "category": "Analysis"
+      }
+    },
+    {
+      "name": "flip",
+      "help": {
+        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
+        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "unflip",
+      "help": {
+        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
+        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "fuck",
+      "help": {
+        "explicit": true,
+        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.",
+        "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "larson",
+      "help": {
+        "description": "well\nyeah",
+        "usage": "\n`!larson`",
+        "category": "Image"
       }
     },
     {
@@ -642,39 +675,6 @@
         "description": "That's right, put it back where it was ノ( ゜-゜ノ)",
         "usage": "\n`!untableflip` *(alias `!utf`)*",
         "category": "Action"
-      }
-    },
-    {
-      "name": "flip",
-      "help": {
-        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
-        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "unflip",
-      "help": {
-        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
-        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "fuck",
-      "help": {
-        "explicit": true,
-        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.",
-        "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "larson",
-      "help": {
-        "description": "well\nyeah",
-        "usage": "\n`!larson`",
-        "category": "Image"
       }
     },
     {

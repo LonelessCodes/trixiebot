@@ -99,8 +99,7 @@ if (!config.has("owner_id")) throw new Error("No owner_id specified in the confi
 const ownerId = config.get("owner_id");
 module.exports.isOwner = function isOwner(member) {
     if (member instanceof Discord.GuildMember) member = member.user;
-    const id = member.id;
-    return id === ownerId;
+    return member.id === ownerId;
 };
 
 module.exports.userToString = function userToString(member, plainText = false) {

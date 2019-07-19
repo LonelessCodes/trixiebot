@@ -27,7 +27,7 @@ class HelpBuilder extends RichEmbed {
         this.setAuthor(`${ucFirst(name)} command`, message.client.user.avatarURL);
         if (help.description) this.setDescription(help.description);
 
-        const prefix = message.guild.config.prefix;
+        const prefix = message.channel.type === "text" ? message.guild.config.prefix : "";
 
         if (command.permissions && command.permissions !== CommandPermission.USER)
             this.addField("Permissions required:", command.permissions.toString());

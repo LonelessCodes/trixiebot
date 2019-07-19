@@ -11,6 +11,7 @@ const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
 // eslint-disable-next-line no-unused-vars
 const CategoryClass = Category.Category;
+const CommandScope = require("../logic/commands/CommandScope");
 
 function sortCommands(commands) {
     return Array.from(commands.keys()).sort().map(s => `\`${s}\``).join(", ");
@@ -53,11 +54,16 @@ module.exports = async function install(cr, client, config, database) {
             }
         }))
         .registerOverload("0", new SimpleCommand(async message => {
-            const disabledCommands = await database.collection("disabled_commands").find({
-                guildId: message.guild.id
-            }).toArray();
+            const is_guild = message.channel.type === "text";
+            const is_dm = message.channel.type === "dm";
 
-            const custom_commands = await cr.cc.getCommands(message.guild.id, message.channel.id);
+            const prefix = is_guild ? message.guild.config.prefix : "";
+
+            const disabledCommands = is_guild ? await database.collection("disabled_commands").find({
+                guildId: message.guild.id
+            }).toArray() : [];
+
+            const custom_commands = is_guild ? await cr.CC.getCommands(message.guild.id, message.channel.id) : [];
 
             /** @type {Map<CategoryClass, Map<string, BaseCommand>>} */
             const categories = new Map;
@@ -104,16 +110,19 @@ module.exports = async function install(cr, client, config, database) {
             }
 
             embed.setAuthor("TrixieBot Help", client.user.avatarURL);
-            embed.setDescription(`**Command list**
-Required Argument: \`<arg>\`
-Optional Argument: \`<?arg>\`
-@-Mentions can be replaced through a username and a tag or part of a username:
-\`${message.guild.config.prefix}whois @Loneless#0893 / Loneless#0893 / Lone\`
-To check command usage, type \`${message.guild.config.prefix}help <command>\``);
+            embed.setDescription(
+                "**Command list**\n" + 
+                "Required Argument: `<arg>`\n" + 
+                "Optional Argument: `<?arg>`\n" +
+                (!is_dm ? "@-Mentions can be replaced through a username and a tag or part of a username:\n" + 
+                `\`${prefix}whois @Loneless#0893 / Loneless#0893 / Lone\`\n` : "") +
+                `To check command usage, type \`${prefix}help <command>\``
+            );
             embed.setFooter(`TrixieBot v${INFO.VERSION} | Commands: ${cr.commands.size}`, client.user.avatarURL);
 
             return { embed };
         }))
+        .setScope(CommandScope.ALL)
         .setHelp(new HelpContent()
             .setDescription("Haha, very funny")
             .setUsage("<?command>")

@@ -35,7 +35,7 @@ class BaseCommand {
     }
 
     async rateLimit(message) {
-        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(`${message.guild.id}:${message.channel.id}`))) return;
+        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(`${message.channel.type === "text" ? message.guild.id : ""}:${message.channel.id}`))) return;
         await this.rateLimitMessage(message);
     }
 

@@ -5,6 +5,7 @@ const dogFace = require("dog-ascii-faces");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 async function randomCat(reconnectTries = 0) {
     let file;
@@ -54,14 +55,16 @@ module.exports = async function install(cr) {
         return await message.channel.translate("meow") + " " + catFace() + " " + await randomCat();
     }))
         .setHelp(new HelpContent().setDescription("Random cat image :3"))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("cat", "kitty");
 
     cr.registerCommand("dog", new SimpleCommand(async message => {
         return await message.channel.translate("woof") + " " + dogFace() + " " + await randomDog();
     }))
         .setHelp(new HelpContent().setDescription("Random dog image :3"))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("dog", "doggo");
     cr.registerAlias("dog", "puppy");
     cr.registerAlias("dog", "bork");
@@ -71,7 +74,8 @@ module.exports = async function install(cr) {
         return await message.channel.translate("yip") + " " + "🦊" + " " + await randomFox();
     }))
         .setHelp(new HelpContent().setDescription("Random fox image :3"))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("fox", "foxie");
     cr.registerAlias("fox", "foxi");
     cr.registerAlias("fox", "weff");
@@ -80,13 +84,16 @@ module.exports = async function install(cr) {
         return await message.channel.translate("weff") + " " + dogFace() + " " + await randomShibe();
     }))
         .setHelp(new HelpContent().setDescription("Random SHIBE image :3"))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL);
+    cr.registerAlias("shibe", "shiba");
 
     cr.registerCommand("bird", new SimpleCommand(async message => {
         return await message.channel.translate("peep") + " " + "ovo" + " " + await randomBird();
     }))
         .setHelp(new HelpContent().setDescription("Random Birb image ovo"))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("bird", "birb");
     cr.registerAlias("bird", "borb");
     cr.registerAlias("bird", "birbo");

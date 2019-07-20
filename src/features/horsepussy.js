@@ -5,6 +5,7 @@ const fetch = require("node-fetch");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 function getArtist(tags) {
     const arr = tags.split(/,\s*/g);
@@ -62,7 +63,8 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setDescription("Get some gud quality horse pussi OwO"))
         .setExplicit(true)
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL);
 
     cr.registerAlias("horsepussy", "horsepussi");
     cr.registerAlias("horsepussy", "ponypussy");

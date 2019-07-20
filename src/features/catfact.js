@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
     cr.registerCommand("catfact", new SimpleCommand(async () => {
@@ -17,5 +18,6 @@ module.exports = async function install(cr) {
     }))
         .setHelp(new HelpContent()
             .setDescription("Get you a cat fact that will help you raise your babies better <3"))
-        .setCategory(Category.MISC);
+        .setCategory(Category.MISC)
+        .setScope(CommandScope.ALL);
 };

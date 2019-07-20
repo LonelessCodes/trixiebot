@@ -75,6 +75,12 @@ class OverloadCommand extends BaseCommand {
         this._linked_to = command;
         return this;
     }
+
+    setScope(v, recursive = false) {
+        super.setScope(v, recursive);
+        for (let [, cmd] of this.overloads) cmd.setScope(v, recursive);
+        return this;
+    }
 }
 
 module.exports = OverloadCommand;

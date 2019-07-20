@@ -1,7 +1,7 @@
 const BaseCommand = require("./BaseCommand");
 const HelpBuilder = require("../logic/commands/HelpBuilder");
 
-class OverloadCommand extends BaseCommand {
+class HelpCommand extends BaseCommand {
     constructor(permissions) {
         super(permissions);
 
@@ -18,4 +18,4 @@ class OverloadCommand extends BaseCommand {
     }
 }
 
-module.exports = OverloadCommand;
+module.exports = HelpCommand;

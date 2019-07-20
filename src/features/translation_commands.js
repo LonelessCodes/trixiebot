@@ -1,8 +1,10 @@
 const fetch = require("node-fetch");
 
 const SimpleCommand = require("../class/SimpleCommand");
+const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 const RateLimiter = require("../logic/RateLimiter");
 const TimeUnit = require("../modules/TimeUnit");
 
@@ -20,16 +22,15 @@ async function translate(type, text) {
 }
 
 function translator(type, description) {
-    return new SimpleCommand(async (message, text) => {
-        if (text === "") return;
-        return await translate(type, text);
-    })
+    return new OverloadCommand()
+        .registerOverload("1+", new SimpleCommand((message, text) => translate(type, text)))
         .setHelp(new HelpContent()
             .setDescription(description)
             .setUsage("<text>")
             .addParameter("text", "The text to translate"))
         .setCategory(Category.TEXT)
-        .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 2));
+        .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 2))
+        .setScope(CommandScope.ALL);
 }
 
 module.exports = async function install(cr) {

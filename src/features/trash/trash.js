@@ -1,9 +1,11 @@
 const SimpleCommand = require("../../class/SimpleCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
+const CommandScope = require("../../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
     cr.registerCommand("cider", new SimpleCommand(async message => "**🍺 " + await message.channel.translate("A round of cider is distributed in the chat!") + "**"))
         .setHelp(new HelpContent().setDescription("Serve the chat some cider"))
-        .setCategory(Category.MLP);
+        .setCategory(Category.MLP)
+        .setScope(CommandScope.ALL);
 };

@@ -2,6 +2,7 @@ const { timeout } = require("../../modules/util");
 
 const SimpleCommand = require("../../class/SimpleCommand");
 const TreeCommand = require("../../class/TreeCommand");
+const CommandScope = require("../../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
     // expand dong
@@ -12,5 +13,5 @@ module.exports = async function install(cr) {
             await timeout(1000); // can't go faster because of rate limits
             await dick.edit(`8${new Array(progress).fill("=").join("")}D`);
         }
-    }));
+    })).setScope(CommandScope.All);
 };

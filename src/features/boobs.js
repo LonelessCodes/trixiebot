@@ -5,6 +5,7 @@ const Discord = require("discord.js");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 async function randomBoob(reconnectTries = 0) {
     let file;
@@ -30,7 +31,8 @@ module.exports = async function install(cr) {
     }))
         .setHelp(new HelpContent().setDescription("I wonder what this does"))
         .setExplicit(true)
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("boobs", "boobies");
     cr.registerAlias("boobs", "bewbs");
 };

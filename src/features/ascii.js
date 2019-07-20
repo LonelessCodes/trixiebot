@@ -13,6 +13,7 @@ const options = {
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
     const ascii_cmd = new SimpleCommand(async (message, content, { command_name }) => {
@@ -73,5 +74,6 @@ module.exports = async function install(cr) {
             .setDescription("Generates ascii art from an image")
             .setUsage("<?url>")
             .addParameterOptional("url", "Url to an image. Or add an attachment to your message"))
-        .setCategory(Category.MISC);
+        .setCategory(Category.MISC)
+        .setScope(CommandScope.ALL);
 };

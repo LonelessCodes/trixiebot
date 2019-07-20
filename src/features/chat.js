@@ -2,6 +2,7 @@ const SimpleCommand = require("../class/SimpleCommand");
 const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 const log = require("../modules/log");
 const config = require("../config");
@@ -114,14 +115,18 @@ module.exports = async function install(cr) {
                 const reply = await session.ask(input);
 
                 await typing.stopTyping(message.channel);
-                await message.channel.send(`${message.member.toString()} ${reply}`);
+                if (message.channel.type === "text")
+                    await message.channel.send(`${message.member.toString()} ${reply}`);
+                else
+                    await message.channel.send(`${message.author.toString()} ${reply}`);
             } catch (_) {
                 await typing.stopTyping(message.channel);
             }
         }))
         .setHelp(new HelpContent()
             .setDescription("Talk with Trixie1!!! (using a cleverbot integration)"))
-        .setCategory(Category.FUN);
+        .setCategory(Category.FUN)
+        .setScope(CommandScope.ALL);
     
     cr.registerAlias("chat", "cleverbot");
 };

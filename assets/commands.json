@@ -605,39 +605,6 @@
       }
     },
     {
-      "name": "flip",
-      "help": {
-        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
-        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "unflip",
-      "help": {
-        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
-        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "fuck",
-      "help": {
-        "explicit": true,
-        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.",
-        "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "larson",
-      "help": {
-        "description": "well\nyeah",
-        "usage": "\n`!larson`",
-        "category": "Image"
-      }
-    },
-    {
       "name": "face",
       "help": {
         "description": "Get a random ASCII face",
@@ -675,6 +642,39 @@
         "description": "That's right, put it back where it was ノ( ゜-゜ノ)",
         "usage": "\n`!untableflip` *(alias `!utf`)*",
         "category": "Action"
+      }
+    },
+    {
+      "name": "flip",
+      "help": {
+        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
+        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "unflip",
+      "help": {
+        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
+        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "fuck",
+      "help": {
+        "explicit": true,
+        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.",
+        "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "larson",
+      "help": {
+        "description": "well\nyeah",
+        "usage": "\n`!larson`",
+        "category": "Image"
       }
     },
     {

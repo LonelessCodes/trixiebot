@@ -5,9 +5,10 @@ const Discord = require("discord.js");
 const SimpleCommand = require("../../class/SimpleCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
+const CommandScope = require("../../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
-    cr.registerCommand("mlem", new SimpleCommand(async message => 
+    cr.registerCommand("mlem", new SimpleCommand(async message =>
         new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setTitle("MLEM o3o")
@@ -17,7 +18,8 @@ module.exports = async function install(cr) {
             }))
     ))
         .setHelp(new HelpContent().setDescription("Mlem the chat :3"))
-        .setCategory(Category.ACTION);
+        .setCategory(Category.ACTION)
+        .setScope(CommandScope.ALL);
 
     cr.registerCommand("blep", new SimpleCommand(async message =>
         new Discord.RichEmbed()
@@ -29,5 +31,6 @@ module.exports = async function install(cr) {
             }))
     ))
         .setHelp(new HelpContent().setDescription("Blep the chat :3"))
-        .setCategory(Category.ACTION);
+        .setCategory(Category.ACTION)
+        .setScope(CommandScope.ALL);
 };

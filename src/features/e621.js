@@ -8,6 +8,7 @@ const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 const filter_tags = ["shota", "cub", "self_harm", "suicide", "animal_abuse", "gore", "child_abuse"];
 
@@ -217,7 +218,8 @@ module.exports = async function install(cr) {
     const e621Command = cr.registerCommand("e621", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL, true);
     
     /**
      * SUB COMMANDS

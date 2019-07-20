@@ -55,6 +55,7 @@ function getCPUInfo() {
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 module.exports = async function install(cr, client) {
     cr.registerCommand("info", new SimpleCommand(async () => {
@@ -90,7 +91,8 @@ module.exports = async function install(cr, client) {
         return { embed };
     }))
         .setHelp(new HelpContent().setDescription("Gets the bot technical information. Nothing all that interesting."))
-        .setCategory(Category.INFO);
+        .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
 
     cr.registerCommand("ping", new SimpleCommand(async (message, _, { timer }) => {
         const internal_ping = timer.end() / nanoTimer.NS_PER_MS;
@@ -107,7 +109,8 @@ module.exports = async function install(cr, client) {
             "```");
     }))
         .setHelp(new HelpContent().setDescription("Ping-Pong-Ping-Pong-Ping-WEE HEEEEE."))
-        .setCategory(Category.INFO);
+        .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("ping", "trixie ping");
 
     cr.registerCommand("changelog", new SimpleCommand(async message => {
@@ -139,5 +142,8 @@ module.exports = async function install(cr, client) {
         embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
 
         await message.channel.send({ embed });
-    }));
+    }))
+        .setHelp(new HelpContent().setDescription("Gets the changes made to TrixieBot in the latest versions"))
+        .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
 };

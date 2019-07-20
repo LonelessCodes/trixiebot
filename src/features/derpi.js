@@ -8,6 +8,7 @@ const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 //                                                                                               no real gore, but candy gore is allowed
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "(gore AND -candy gore)", "foal abuse"];
@@ -211,7 +212,8 @@ module.exports = async function install(cr) {
     const derpiCommand = cr.registerCommand("derpi", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL, true);
 
     /**
      * SUB COMMANDS

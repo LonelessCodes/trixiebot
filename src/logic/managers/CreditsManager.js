@@ -224,6 +224,11 @@ class CreditsManager {
      * @returns {Promise<{ singular: string; plural: string }>}
      */
     async getName(guild) {
+        if (!guild) return {
+            singular: "credit",
+            plural: "credits"
+        };
+
         const config = await this.config.then(db => db.findOne({ guildId: guild.id }));
 
         if (!config) return {

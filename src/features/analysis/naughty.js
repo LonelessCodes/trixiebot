@@ -112,7 +112,6 @@ module.exports = async function install(cr, client, config, db) {
                     embed.setColor(CONST.COLOR.WARNING);
                     embed.setDescription(`${str}Close call! You swore **${bad_words}** times in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time`);
                 }
-                embed.setFooter("Art by ItsSpoopsB");
             }
 
             if (Object.keys(bad_words_used).length) {

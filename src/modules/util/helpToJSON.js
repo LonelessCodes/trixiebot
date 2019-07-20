@@ -1,4 +1,5 @@
 const TreeCommand = require("../../class/TreeCommand");
+const ScopeCommand = require("../../class/ScopedCommand");
 const AliasCommand = require("../../class/AliasCommand");
 const CommandPermission = require("../../logic/commands/CommandPermission");
 const CommandScope = require("../../logic/commands/CommandScope");
@@ -35,6 +36,11 @@ function HelpToJSON(config, name, command) {
     let i = 0;
 
     const func = (name, command, parentName) => {
+        if (command instanceof ScopeCommand) {
+            command = command.getCmd({ type: "text" });
+            if (!command) return;
+        }
+
         const help = command.help;
         let field = fields[i];
 

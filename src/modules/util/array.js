@@ -1,11 +1,11 @@
 const secureRandom = require("../secureRandom");
 
-module.exports = new class ArrayUtils {
-    async randomItem(arr) {
+module.exports = class ArrayUtils {
+    static async randomItem(arr) {
         return await secureRandom(arr);
     }
 
-    lastItem(arr) {
+    static lastItem(arr) {
         return arr[arr.length - 1];
     }
 };

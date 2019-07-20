@@ -4,6 +4,7 @@ const { randomItem } = require("../modules/util/array");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 const coin = ["heads", "tails"];
 
@@ -34,5 +35,6 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setUsage("<bet>")
             .addParameter("bet", "your bet. Either `heads` or `tails`"))
-        .setCategory(Category.MISC);
+        .setCategory(Category.MISC)
+        .setScope(CommandScope.ALL);
 };

@@ -6,6 +6,7 @@ const SimpleCommand = require("../class/SimpleCommand");
 const OverloadCommand = require("../class/OverloadCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 const replies = new RandomChance();
 replies.add({
@@ -120,6 +121,7 @@ module.exports = async function install(cr) {
             .setDescription("An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy")
             .setUsage("<question>")
             .addParameter("question", "The question you are eager to ask"))
-        .setCategory(Category.MISC);
+        .setCategory(Category.MISC)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("8ball", "tellme");
 };

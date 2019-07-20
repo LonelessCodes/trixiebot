@@ -62,6 +62,12 @@ class TreeCommand extends BaseCommand {
         this.registerSubCommand("*", command);
         return command;
     }
+
+    setScope(v, recursive = false) {
+        super.setScope(v, recursive);
+        if (recursive) for (let [, cmd] of this.sub_commands) cmd.setScope(v, recursive);
+        return this;
+    }
 }
 
 module.exports = TreeCommand;

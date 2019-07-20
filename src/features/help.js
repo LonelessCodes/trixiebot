@@ -57,7 +57,7 @@ module.exports = async function install(cr, client, config, database) {
             const is_guild = message.channel.type === "text";
             const is_dm = message.channel.type === "dm";
 
-            const prefix = is_guild ? message.guild.config.prefix : "";
+            const prefix = is_guild ? message.prefix : "";
 
             const disabledCommands = is_guild ? await database.collection("disabled_commands").find({
                 guildId: message.guild.id
@@ -111,22 +111,22 @@ module.exports = async function install(cr, client, config, database) {
 
             embed.setAuthor("TrixieBot Help", client.user.avatarURL);
             embed.setDescription(
-                "**Command list**\n" + 
-                "Required Argument: `<arg>`\n" + 
+                "**Command list**\n" +
+                "Required Argument: `<arg>`\n" +
                 "Optional Argument: `<?arg>`\n" +
-                (!is_dm ? "@-Mentions can be replaced through a username and a tag or part of a username:\n" + 
-                `\`${prefix}whois @Loneless#0893 / Loneless#0893 / Lone\`\n` : "") +
+                (!is_dm ? "@-Mentions can be replaced through a username and a tag or part of a username:\n" +
+                    `\`${prefix}whois @Loneless#0893 / Loneless#0893 / Lone\`\n` : "") +
                 `To check command usage, type \`${prefix}help <command>\``
             );
             embed.setFooter(`TrixieBot v${INFO.VERSION} | Commands: ${cr.commands.size}`, client.user.avatarURL);
 
             return { embed };
         }))
-        .setScope(CommandScope.ALL)
         .setHelp(new HelpContent()
             .setDescription("Haha, very funny")
             .setUsage("<?command>")
             .addParameterOptional("command", "The name of the command you want help for. Whole command list if omitted"))
-        .setCategory(Category.INFO);
+        .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
     cr.registerAlias("help", "h");
 };

@@ -23,7 +23,7 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(member);
         if (!account) {
-            await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.prefix + "bank create`");
             return;
         }
 
@@ -73,7 +73,7 @@ module.exports = async function install(cr) {
             str += "\nGet started using your balance to purchase items and unlock features now.";
             await message.channel.send(str);
         } else {
-            await message.channel.send(":atm: Ayy you now have a bank account! Check it out at `" + message.guild.config.prefix + "bank`");
+            await message.channel.send(":atm: Ayy you now have a bank account! Check it out at `" + message.prefix + "bank`");
         }
     }))
         .setHelp(new HelpContent()
@@ -85,7 +85,7 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(user);
         if (!account) {
-            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.prefix + "bank create`");
             return;
         }
 
@@ -99,7 +99,7 @@ module.exports = async function install(cr) {
 
         const my_account = await credits.getAccount(me);
         if (!my_account) {
-            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.prefix + "bank create`");
             return;
         }
 
@@ -157,7 +157,7 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(user);
         if (!account) {
-            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("Before you can use any money related activities, please create a bank account using `" + message.prefix + "bank create`");
             return;
         }
 
@@ -193,7 +193,7 @@ module.exports = async function install(cr) {
 
             new Paginator("Transactions", `All of ${userToString(user)}'s (your) transactions`, 1, items, message.author).display(message.channel);
         } else {
-            await message.channel.send("Looks like you didn't earn or spend money yet! Let's start by `" + message.guild.config.prefix + "daily`, to earn some munz");
+            await message.channel.send("Looks like you didn't earn or spend money yet! Let's start by `" + message.prefix + "daily`, to earn some munz");
         }
     }))
         .setHelp(new HelpContent()
@@ -254,7 +254,7 @@ module.exports = async function install(cr) {
 
         const account = await credits.getAccount(user);
         if (!account) {
-            await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.guild.config.prefix + "bank create`");
+            await message.channel.send("It looks like you haven't opened a bank account yet. How about doing so with `" + message.prefix + "bank create`");
             return;
         }
 

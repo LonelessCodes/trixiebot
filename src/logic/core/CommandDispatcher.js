@@ -129,6 +129,7 @@ class CommandDispatcher {
      */
     async processCommand(message, command_name, content, prefix_used, command, timer) {
         const c_type = message.channel.type;
+        const is_guild = c_type === "text";
 
         if (command && command instanceof AliasCommand) {
             command_name = command.parentName;
@@ -147,7 +148,7 @@ class CommandDispatcher {
                 return false;
             }
 
-            if (c_type === "text") {
+            if (is_guild) {
                 const [disabledCommands, disabledChannels, disabledCommandChannels] = await Promise.all([
                     this.disabled_commands.findOne({
                         guildId: message.guild.id,
@@ -193,7 +194,7 @@ class CommandDispatcher {
 
         if (!command) return;
 
-        if (c_type === "text") {
+        if (is_guild) {
             // eslint-disable-next-line require-atomic-updates
             if (!message.member) message.member = message.guild.member(message.author) || null;
 

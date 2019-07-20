@@ -1,4 +1,5 @@
 const TreeCommand = require("../../class/TreeCommand");
+const ScopeCommand = require("../../class/ScopedCommand");
 const AliasCommand = require("../../class/AliasCommand");
 const CommandPermission = require("./CommandPermission");
 const Category = require("./Category");
@@ -27,7 +28,7 @@ class HelpBuilder extends RichEmbed {
         this.setAuthor(`${ucFirst(name)} command`, message.client.user.avatarURL);
         if (help.description) this.setDescription(help.description);
 
-        const prefix = message.channel.type === "text" ? message.guild.config.prefix : "";
+        const prefix = message.channel.type === "text" ? message.prefix : "";
 
         if (command.permissions && command.permissions !== CommandPermission.USER)
             this.addField("Permissions required:", command.permissions.toString());
@@ -39,6 +40,11 @@ class HelpBuilder extends RichEmbed {
         let i = 0;
 
         const func = (name, command, parentName) => {
+            if (command instanceof ScopeCommand) {
+                command = command.getCmd(message.channel);
+                if (!command) return;
+            }
+
             const help = command.help;
             let field = fields[i];
 

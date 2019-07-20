@@ -4,6 +4,7 @@ const SimpleCommand = require("../../class/SimpleCommand");
 const TextCommand = require("../../class/TextCommand");
 const HelpContent = require("../../logic/commands/HelpContent");
 const Category = require("../../logic/commands/Category");
+const CommandScope = require("../../logic/commands/CommandScope");
 
 /**
  * Get random entry of an Array
@@ -138,12 +139,12 @@ const faces = [
 ];
 
 module.exports = async function install(cr) {
-    cr.registerCommand("face", new SimpleCommand(() => randomItem(faces))).setHelp(new HelpContent().setDescription("Get a random ASCII face")).setCategory(Category.MISC);
-    cr.registerCommand("lenny", new TextCommand(faces[0])).setHelp(new HelpContent().setDescription("( ͡° ͜ʖ ͡°)")).setCategory(Category.MISC);
-    cr.registerCommand("shrug", new TextCommand(faces[1])).setHelp(new HelpContent().setDescription("¯\\_(ツ)_/¯")).setCategory(Category.MISC);
+    cr.registerCommand("face", new SimpleCommand(() => randomItem(faces))).setHelp(new HelpContent().setDescription("Get a random ASCII face")).setCategory(Category.MISC).setScope(CommandScope.ALL);
+    cr.registerCommand("lenny", new TextCommand(faces[0])).setHelp(new HelpContent().setDescription("( ͡° ͜ʖ ͡°)")).setCategory(Category.MISC).setScope(CommandScope.ALL);
+    cr.registerCommand("shrug", new TextCommand(faces[1])).setHelp(new HelpContent().setDescription("¯\\_(ツ)_/¯")).setCategory(Category.MISC).setScope(CommandScope.ALL);
 
-    cr.registerCommand("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻")).setHelp(new HelpContent().setDescription("(╯°□°）╯︵ Tableflip")).setCategory(Category.ACTION);
+    cr.registerCommand("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻")).setHelp(new HelpContent().setDescription("(╯°□°）╯︵ Tableflip")).setCategory(Category.ACTION).setScope(CommandScope.ALL);
     cr.registerAlias("tableflip", "tf");
-    cr.registerCommand("untableflip", new TextCommand("┬─┬ ノ( ゜-゜ノ)")).setHelp(new HelpContent().setDescription("That's right, put it back where it was ノ( ゜-゜ノ)")).setCategory(Category.ACTION);
+    cr.registerCommand("untableflip", new TextCommand("┬─┬ ノ( ゜-゜ノ)")).setHelp(new HelpContent().setDescription("That's right, put it back where it was ノ( ゜-゜ノ)")).setCategory(Category.ACTION).setScope(CommandScope.ALL);
     cr.registerAlias("untableflip", "utf");
 };

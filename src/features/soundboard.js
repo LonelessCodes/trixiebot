@@ -114,7 +114,7 @@ module.exports = async function install(cr) {
             const slots = await soundboard.getTakenSlotsUser(message.author);
             const max_slots = await soundboard.getSlotsUser(message.author);
             if (slots >= max_slots) {
-                await message.channel.send(`❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing \`${message.guild.config.prefix}sb buyslot\``);
+                await message.channel.send(`❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing \`${message.prefix}sb buyslot\``);
                 return;
             }
 
@@ -130,7 +130,7 @@ module.exports = async function install(cr) {
             const slots = await soundboard.getTakenSlotsGuild(message.guild);
             const max_slots = await soundboard.getSlotsGuild(message.guild);
             if (slots >= max_slots) {
-                await message.channel.send(`❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing \`${message.guild.config.prefix}sb buyslot server\``);
+                await message.channel.send(`❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing \`${message.prefix}sb buyslot server\``);
                 return;
             }
 
@@ -159,7 +159,7 @@ module.exports = async function install(cr) {
 
     async function importSample(scope, message, user, id, cb) {
         if (!SampleID.isId(id)) {
-            await message.channel.send(`❌ \`${id}\` is not a valid sample id. With import you can add other user's samples to your or your server's soundboard, but only if you know the id of that sample. You could ask users with a kewl sample to show you the id with \`${message.guild.config.prefix}sb info <sample name>\``);
+            await message.channel.send(`❌ \`${id}\` is not a valid sample id. With import you can add other user's samples to your or your server's soundboard, but only if you know the id of that sample. You could ask users with a kewl sample to show you the id with \`${message.prefix}sb info <sample name>\``);
             return;
         }
 
@@ -207,7 +207,7 @@ module.exports = async function install(cr) {
             const slots = await soundboard.getTakenSlotsUser(message.author);
             const max_slots = await soundboard.getSlotsUser(message.author);
             if (slots >= max_slots) {
-                await message.channel.send(`❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing \`${message.guild.config.prefix}sb buyslot\``);
+                await message.channel.send(`❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing \`${message.prefix}sb buyslot\``);
                 return;
             }
 
@@ -223,7 +223,7 @@ module.exports = async function install(cr) {
             const slots = await soundboard.getTakenSlotsGuild(message.guild);
             const max_slots = await soundboard.getSlotsGuild(message.guild);
             if (slots >= max_slots) {
-                await message.channel.send(`❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing \`${message.guild.config.prefix}sb buyslot server\``);
+                await message.channel.send(`❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing \`${message.prefix}sb buyslot server\``);
                 return;
             }
 

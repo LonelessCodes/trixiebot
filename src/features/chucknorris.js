@@ -4,6 +4,7 @@ const HTMLDecoderEncoder = require("html-encoder-decoder");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
     cr.registerCommand("chucknorris", new SimpleCommand(async () => {
@@ -18,5 +19,6 @@ module.exports = async function install(cr) {
     }))
         .setHelp(new HelpContent()
             .setDescription("Chuck\nNorris\nFacts!!!"))
-        .setCategory(Category.MISC);
+        .setCategory(Category.MISC)
+        .setScope(CommandScope.ALL);
 };

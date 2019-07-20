@@ -6,6 +6,7 @@ const log = require("../modules/log");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 const usernameRegExp = /@([\w-]+)\b/g;
 
@@ -37,7 +38,8 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setDescription("Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com"))
         .setCategory(Category.MLP)
-        .dontList();
+        .dontList()
+        .setScope(CommandScope.ALL);
     
     cr.registerAlias("mlpquote", "mlpquotes");
 };

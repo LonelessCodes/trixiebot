@@ -8,6 +8,7 @@ const OverloadCommand = require("../class/OverloadCommand");
 const TreeCommand = require("../class/TreeCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
     if (!config.has("giphy.key")) return log.namespace("config", "Found no API token for Giphy - Disabled gif command");
@@ -18,7 +19,8 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setUsage("<query>", "returns the top result for the given `query`")
             .addParameter("query", "What type of gif you want to have"))
-        .setCategory(Category.IMAGE);
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL, true);
     
     // could be Overload command, but will leave like this
     gifCommand.registerSubCommand("random", new SimpleCommand(async (message, query) => {

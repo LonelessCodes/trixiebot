@@ -8,6 +8,7 @@ const Twit = require("twit");
 const SimpleCommand = require("../class/SimpleCommand");
 const HelpContent = require("../logic/commands/HelpContent");
 const Category = require("../logic/commands/Category");
+const CommandScope = require("../logic/commands/CommandScope");
 
 module.exports = async function install(cr) {
     if (!config.has("twitter")) return log.namespace("config", "Found no API credentials for Twitter - Disabled fact command");
@@ -50,7 +51,8 @@ module.exports = async function install(cr) {
     cr.registerCommand("fact", new SimpleCommand(() => getFact()))
         .setHelp(new HelpContent()
             .setDescription("Gets random UberFacts fact"))
-        .setCategory(Category.UTILS);
+        .setCategory(Category.UTILS)
+        .setScope(CommandScope.ALL, true);
     
     cr.registerAlias("fact", "uberfacts");
 };

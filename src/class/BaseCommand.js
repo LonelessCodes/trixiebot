@@ -31,7 +31,7 @@ class BaseCommand {
         this._help = null;
         this.aliases = [];
         this.explicit = false;
-        this.setScope(null);
+        this.scope = new CommandScope(CommandScope.DEFAULT).freeze();
     }
 
     async rateLimit(message) {

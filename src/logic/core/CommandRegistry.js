@@ -29,8 +29,30 @@ class CommandRegistry {
         this.registerCommand(alias, new AliasCommand(command, cmd));
     }
 
+    getCommand(command_name) {
+        const command = this.commands.get(command_name);
+        if (command) return command;
+    }
+
+    // Keyword Commands
+
+    registerKeyword(match, command) {
+        if (this.keywords.has(match)) throw new Error("Keyword name already exists");
+
+        this.keywords.set(match, command);
+        return command;
+    }
+
+    getKeyword(content) {
+        for (let [regex, cmd] of this.keywords) {
+            if (typeof regex === "string" && content.includes(regex)) return [regex, cmd];
+            if (regex instanceof RegExp && regex.test(content)) return [regex, cmd];
+        }
+    }
+
     *[Symbol.iterator]() {
         yield* this.commands;
+        yield* this.keywords;
     }
 }
 

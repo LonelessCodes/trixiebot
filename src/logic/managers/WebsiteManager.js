@@ -18,6 +18,9 @@ class WebsiteManager {
     async initializeIPC() {
         await ipc.promiseStart;
 
+        /**
+         * @param {Date} ts 
+         */
         function ts(ts) {
             return ts.toISOString();
         }

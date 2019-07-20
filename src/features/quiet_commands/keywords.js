@@ -1,6 +1,8 @@
 const secureRandom = require("../../modules/secureRandom");
 const Discord = require("discord.js");
 
+const SimpleCommand = require("../../class/SimpleCommand");
+
 const emoticons = [
     "¯(°_o)/¯",
     "(∩ ͡° ͜ʖ ͡°)⊃━☆ﾟ. o ･ ｡ﾟ",
@@ -14,39 +16,16 @@ const emoticons = [
     "(⁄ ⁄•⁄ω⁄•⁄ ⁄)"
 ];
 
-class Keyword {
-    async run(message) {
-        if (message.author.bot) return;
-        
-        await this.call(message);
-    }
-    async call() { }
-}
+module.exports = async function install(cr) {
+    cr.registerKeyword(/@someone\b/gi, new SimpleCommand(async message => {
+        const array = message.guild.members.array();
+        const member = await secureRandom(array);
+        await message.channel.send(`${await secureRandom(emoticons)} ***(${member.displayName})***`);
+    }));
 
-const keywords = [];
+    cr.registerKeyword(/lone pone\b/gi, new SimpleCommand(async message => {
+        const attachment = new Discord.Attachment("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
 
-module.exports = async function install(cr, client) {
-    client.addListener("message", async message => {
-        keywords.forEach(key => key.run(message));
-    });
-
-    keywords.push(new class extends Keyword {
-        async call(message) {
-            if (!/@someone\b/gi.test(message.content)) return;
-
-            const array = message.guild.members.array();
-            const member = await secureRandom(array);
-            await message.channel.send(`${await secureRandom(emoticons)} ***(${member.displayName})***`);
-        }
-    });
-
-    keywords.push(new class extends Keyword {
-        async call(message) {
-            if (!/lone pone\b/gi.test(message.content)) return;
-
-            const attachment = new Discord.Attachment("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
-
-            await message.channel.send(attachment);
-        }
-    });
+        await message.channel.send(attachment);
+    }));
 };

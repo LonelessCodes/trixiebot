@@ -174,7 +174,7 @@
       "name": "shibe",
       "help": {
         "description": "Random SHIBE image :3",
-        "usage": "\n`!shibe`",
+        "usage": "\n`!shibe` *(alias `!shiba`)*",
         "category": "Image"
       }
     },
@@ -303,6 +303,14 @@
       "help": {
         "description": "Ping-Pong-Ping-Pong-Ping-WEE HEEEEE.",
         "usage": "\n`!ping` *(alias `!trixie ping`)*",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "changelog",
+      "help": {
+        "description": "Gets the changes made to TrixieBot in the latest versions",
+        "usage": "\n`!changelog`",
         "category": "Info"
       }
     },

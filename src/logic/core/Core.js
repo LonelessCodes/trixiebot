@@ -55,15 +55,14 @@ class Core {
 
         const files = await walk(path.resolve(__dirname, "..", "..", commands_package));
 
+        let file_count = 0;
         await Promise.all(files.map(async file => {
             if (path.extname(file) !== ".js") return;
-
-            const timer = nanoTimer();
 
             const install = require(path.resolve("../../" + commands_package, file));
             await install(this.processor.REGISTRY, this.client, this.config, this.db);
 
-            log.debug("cmd", `installed time:${(timer.end() / nanoTimer.NS_PER_MS).toFixed(3)}ms file:${path.basename(file)}`);
+            file_count++;
         }));
 
         const install_time = all_timer.end() / nanoTimer.NS_PER_SEC;
@@ -88,7 +87,7 @@ class Core {
 
         const build_time = all_timer.end() / nanoTimer.NS_PER_SEC - install_time;
 
-        log(`Commands installed. install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
+        log(`Commands installed. files:${file_count} commands:${this.processor.REGISTRY.commands.size} install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
     }
 
     async attachListeners() {

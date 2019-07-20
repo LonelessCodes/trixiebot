@@ -3,6 +3,8 @@ const bootup_timer = nanoTimer();
 
 const config = require("./config");
 const log = require("./modules/log");
+const djs_log = log.namespace("discord.js");
+const bannerPrinter = require("./modules/bannerPrinter");
 const info = require("./info");
 const Discord = require("discord.js");
 const getDatabase = require("./modules/getDatabase");
@@ -10,7 +12,8 @@ const ConfigManager = require("./logic/managers/ConfigManager");
 const LocaleManager = require("./logic/managers/LocaleManager");
 const Core = require("./logic/core/Core");
 
-log("Running trixiebot v" + info.VERSION);
+// indicate a new app lifecycle
+bannerPrinter(info.VERSION, Discord.version);
 
 new class App {
     constructor() {
@@ -28,6 +31,7 @@ new class App {
 
     async initialize() {
         this.db = await getDatabase();
+        log.namespace("db", "Connected");
 
         const { Parameter } = ConfigManager;
         this.config = new ConfigManager(this.client, this.db, [
@@ -64,11 +68,13 @@ new class App {
         this.client.db = this.db;
         this.client.config = this.config;
         this.client.locale = this.locale;
+        
+        if (!config.has("discord.token")) throw new Error("No Discord API Token specified in config files");
 
         await new Promise(resolve => {
             this.client.once("ready", () => resolve());
 
-            if (!config.has("discord.token")) throw new Error("No Discord API Token specified in config files");
+            djs_log("Connecting...");
             this.client.login(config.get("discord.token"));
         });
 
@@ -78,8 +84,6 @@ new class App {
     }
 
     attachClientListeners() {
-        const djs_log = log.namespace("discord.js");
-
         this.client.addListener("warn", warn => djs_log.warn(warn));
 
         this.client.addListener("error", error => djs_log.error(
@@ -89,11 +93,7 @@ new class App {
                 error
         ));
 
-        // this.client.addListener("debug", debug => {
-        //     if (/heartbeat/i.test(debug)) return;
-        //     djs_log(debug);
-        // });
-
+        this.client.addListener("ready", () => djs_log("Ready"));
 
         this.client.addListener("disconnect", closeEvent => djs_log(closeEvent));
 

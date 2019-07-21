@@ -323,19 +323,19 @@
       }
     },
     {
-      "name": "e621",
-      "help": {
-        "description": "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
-        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional- Popular by 'day', 'week' or 'month'. Default: 'week'",
-        "category": "Image"
-      }
-    },
-    {
       "name": "fact",
       "help": {
         "description": "Gets random UberFacts fact",
         "usage": "\n`!fact` *(alias `!uberfacts`)*",
         "category": "Utility"
+      }
+    },
+    {
+      "name": "e621",
+      "help": {
+        "description": "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
+        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional- Popular by 'day', 'week' or 'month'. Default: 'week'",
+        "category": "Image"
       }
     },
     {

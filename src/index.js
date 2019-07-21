@@ -1,16 +1,16 @@
-const nanoTimer = require("./modules/NanoTimer");
+const nanoTimer = require("./modules/nanoTimer");
 const bootup_timer = nanoTimer();
 
 const config = require("./config");
-const log = require("./modules/log");
+const log = require("./log");
 const djs_log = log.namespace("discord.js");
-const bannerPrinter = require("./modules/bannerPrinter");
+const bannerPrinter = require("./util/banner/bannerPrinter");
 const info = require("./info");
 const Discord = require("discord.js");
-const getDatabase = require("./modules/getDatabase");
-const ConfigManager = require("./logic/managers/ConfigManager");
-const LocaleManager = require("./logic/managers/LocaleManager");
-const Core = require("./logic/core/Core");
+const database = require("./modules/db/database");
+const ConfigManager = require("./core/managers/ConfigManager");
+const LocaleManager = require("./core/managers/LocaleManager");
+const Core = require("./core/Core");
 
 // indicate a new app lifecycle
 bannerPrinter(info.VERSION, Discord.version);
@@ -30,7 +30,7 @@ new class App {
     }
 
     async initialize() {
-        this.db = await getDatabase();
+        this.db = await database();
         log.namespace("db", "Connected");
 
         const { Parameter } = ConfigManager;
@@ -80,7 +80,7 @@ new class App {
 
         this.core = new Core(this.client, this.config, this.db);
 
-        await this.core.startMainComponents("features");
+        await this.core.startMainComponents("commands");
     }
 
     attachClientListeners() {

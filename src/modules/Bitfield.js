@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Data structure that makes it easy to interact with a bitfield.
  */

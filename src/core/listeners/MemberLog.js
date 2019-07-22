@@ -2,33 +2,46 @@ const { userToString, findDefaultChannel } = require("../../util/util");
 const { immediate } = require("../../util/promises");
 const log = require("../../log").namespace("member log");
 const stats = require("../../modules/stats");
-const guild_stats = require("../../core/managers/GuildStatsManager");
-const { format } = require("../../core/managers/LocaleManager");
+const guild_stats = require("../managers/GuildStatsManager");
+const { format } = require("../managers/LocaleManager");
 
-module.exports = async function install(cr, client, config) {
-    await stats.bot.register("TOTAL_SERVERS");
-    await stats.bot.register("LARGE_SERVERS");
-    await stats.bot.register("TOTAL_USERS");
-    await stats.bot.register("TEXT_CHANNELS");
+class MemberLog {
+    constructor(client, config) {
+        this.client = client;
+        this.config = config;
 
-    const user_count = guild_stats.registerHistogram("users");
-    // const online_user_count = await guild_stats.registerHistogram("online_users");
+        this.TOTAL_SERVERS = stats.bot.register("TOTAL_SERVERS");
+        this.LARGE_SERVERS = stats.bot.register("LARGE_SERVERS");
+        this.TOTAL_USERS = stats.bot.register("TOTAL_USERS");
+        this.TEXT_CHANNELS = stats.bot.register("TEXT_CHANNELS");
 
-    for (const [guildId, guild] of client.guilds)
-        user_count.set(new Date, guildId, null, guild.memberCount);
+        this.user_count = guild_stats.registerHistogram("users");
+        // this.online_user_count = await guild_stats.registerHistogram("online_users");
 
-    const updateGuildStatistics = () => {
-        stats.bot.get("TOTAL_SERVERS").set(client.guilds.size);
-        stats.bot.get("LARGE_SERVERS").set(client.guilds.filter(guild => !!guild.large).size);
-        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
-        stats.bot.get("TEXT_CHANNELS").set(client.channels.filter(guild => guild.type === "text").size);
-    };
-    updateGuildStatistics();
+        for (const [guildId, guild] of client.guilds)
+            this.user_count.set(new Date, guildId, null, guild.memberCount);
+        
+        this.updateGuildStatistics();
 
-    client.addListener("guildCreate", async guild => {
-        await immediate();
+        this.attachListeners();
+    }
 
-        user_count.set(new Date, guild.id, null, guild.memberCount);
+    attachListeners() {
+        this.client.on("guildCreate", this.guildCreate.bind(this));
+        this.client.on("guildDelete", this.guildDelete.bind(this));
+    }
+
+    async updateGuildStatistics() {
+        (await this.TOTAL_SERVERS).set(this.client.guilds.size);
+        (await this.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).size);
+        (await this.TOTAL_USERS).set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        (await this.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").size);
+    }
+
+    async guildCreate(guild) {
+        await immediate(); // guild isn't immediately available
+
+        this.user_count.set(new Date, guild.id, null, guild.memberCount);
 
         const channel = findDefaultChannel(guild);
         if (!channel) return;
@@ -38,21 +51,21 @@ module.exports = async function install(cr, client, config) {
             "I'm TrixieBot, a bot which offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins. My set of commands range from random, simple fun, booru and GIF searching, imageboard commands, great moderation commands and so much more!\n" +
             "Just call `!trixie` if you need my help");
         log.debug("added", `id:${guild.id} name:${JSON.stringify(guild.name)} channels:${guild.channels.size} members:${guild.memberCount}`);
-        updateGuildStatistics();
-    });
+        this.updateGuildStatistics();
+    }
 
-    client.addListener("guildDelete", guild => {
+    async guildDelete(guild) {
         log.debug("removed", `id:${guild.id}`);
-        updateGuildStatistics();
-    });
+        this.updateGuildStatistics();
+    }
 
-    client.addListener("guildMemberAdd", async member => {
+    async guildMemberAdd(member) {
         const guild = member.guild;
 
-        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
-        user_count.set(new Date, guild.id, null, guild.memberCount);
+        stats.bot.get("TOTAL_USERS").set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        this.user_count.set(new Date, guild.id, null, guild.memberCount);
 
-        const guild_config = await config.get(guild.id);
+        const guild_config = await this.config.get(guild.id);
 
         if (!guild_config.welcome.enabled) return;
         if (member.bot && !guild_config.announce.bots) return;
@@ -67,15 +80,15 @@ module.exports = async function install(cr, client, config) {
         });
 
         await channel.send(str);
-    });
+    }
 
-    client.addListener("guildMemberRemove", async member => {
+    async guildMemberRemove(member) {
         const guild = member.guild;
 
-        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
-        user_count.set(new Date, guild.id, null, guild.memberCount);
+        stats.bot.get("TOTAL_USERS").set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        this.user_count.set(new Date, guild.id, null, guild.memberCount);
 
-        const guild_config = await config.get(guild.id);
+        const guild_config = await this.config.get(guild.id);
 
         if (!guild_config.leave.enabled) return;
         if (member.bot && !guild_config.announce.bots) return;
@@ -90,13 +103,13 @@ module.exports = async function install(cr, client, config) {
         });
 
         await channel.send(str);
-    });
+    }
 
-    client.addListener("guildBanAdd", async (guild, user) => {
-        stats.bot.get("TOTAL_USERS").set(client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
-        user_count.set(new Date, guild.id, null, guild.memberCount);
+    async guildBanAdd(guild, user) {
+        stats.bot.get("TOTAL_USERS").set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        this.user_count.set(new Date, guild.id, null, guild.memberCount);
 
-        const guild_config = await config.get(guild.id);
+        const guild_config = await this.config.get(guild.id);
 
         if (!guild_config.ban.enabled) return;
         if (user.bot && !guild_config.announce.bots) return;
@@ -110,5 +123,7 @@ module.exports = async function install(cr, client, config) {
         });
 
         await channel.send(str);
-    });
-};
+    }
+}
+
+module.exports = MemberLog;

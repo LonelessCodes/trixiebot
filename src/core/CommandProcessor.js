@@ -17,7 +17,7 @@ async function onProcessingError(message, err) {
         "ProcessingError {\n" +
         "  content:     " + JSON.stringify(message.content) + "\n" +
         "  channelType: " + message.channel.type + "\n" + 
-        (message.channel.type === "text" ? "  guildId:   " + message.guild.id + "\n" : "") +
+        (message.channel.type === "text" ? "  guildId:     " + message.guild.id + "\n" : "") +
         "  channelId:   " + message.channel.id + "\n" +
         "  userId:      " + message.author.id + "\n" +
         "  error:      ", err, "}"

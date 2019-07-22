@@ -1,18 +1,21 @@
-const config = require("../config");
 const request = require("request-promise-native");
-const log = require("../log").namespace("core");
-const nanoTimer = require("../modules/nanoTimer");
-const { walk } = require("../util/files");
-const helpToJSON = require("../util/commands/helpToJSON");
 const path = require("path");
 const fs = require("fs-extra");
+
+const log = require("../log").namespace("core");
+const config = require("../config");
+const { walk } = require("../util/files");
+const helpToJSON = require("../util/commands/helpToJSON");
+const nanoTimer = require("../modules/nanoTimer");
 const secureRandom = require("../modules/random/secureRandom");
-const WebsiteManager = require("./managers/WebsiteManager");
-const CommandProcessor = require("./CommandProcessor");
+const CalendarEvents = require("../modules/CalendarEvents");
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("./managers/ConfigManager");
+
+const CommandProcessor = require("./CommandProcessor");
+const WebsiteManager = require("./managers/WebsiteManager");
 const UpvotesManager = require("./managers/UpvotesManager");
-const CalendarEvents = require("../modules/CalendarEvents");
+const MemberLog = require("./listeners/MemberLog");
 
 // eslint-disable-next-line no-unused-vars
 const { Client } = require("discord.js");
@@ -33,6 +36,8 @@ class Core {
         this.processor = new CommandProcessor(this.client, this.config, this.db);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.db);
         this.upvotes = new UpvotesManager(this.client, this.db);
+
+        this.member_log = new MemberLog(this.client, this.config);
     }
 
     async startMainComponents(commands_package) {

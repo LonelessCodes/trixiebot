@@ -73,7 +73,7 @@
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development node index.js",
     "setup": "chmod +x install.sh && ./install.sh",
-    "release": "standard-version",
+    "lint": "eslint src *.js",
     "releasemajor": "standard-version --release-as major",
     "releaseminor": "standard-version --release-as minor",
     "releasepatch": "standard-version --release-as patch"

@@ -1,4 +1,6 @@
+# ignore dependencies
 node_modules/
-config/default.yaml
-config/development.yaml
-config/production.yaml
+
+# ignore all config files (REALLY IMPORTANT), except template file
+config/*
+!config/template.yaml

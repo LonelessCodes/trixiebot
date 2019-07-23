@@ -10,7 +10,7 @@ owner_id: "1234" # must be a string
 
 database:
   host: localhost
-  port: 27017
+  port: 27017 # default port
   db: trixiebot
   # optional:
   auth:
@@ -19,13 +19,11 @@ database:
 
 discord:
   token:         XXXX
-  client_id:     "1234" # must be a string
-  client_secret: XXXX
 
-# the dir for user generated files created outside the project root
+# the dir for user generated files created one level up outside the project root
 user_files_dir: trixiefiles
 
-# Optional API Keys and configs
+# Optional API Keys and configs (everything below)
 
 prefix: "!"
 

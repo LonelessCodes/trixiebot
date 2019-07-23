@@ -1,56 +1,67 @@
 # TrixieBot
 
-### [Add TrixieBot to your server now](https://trixie.loneless.art/invite)
+## Using the Official TrixieBot
 
-A feature-rich Discord Bot for pony lovers (or losers, your choice), including integration of:
-
-* Derpibooru
-* e621
-* Giphy
-* Uberfacts
-
-with features of
-
-* point system
-* vote on polls
-* timeouting users
-* and having sexual intercourse with another user
-
-as well as many other great features
+### [Add TrixieBot to your server now](https://trixie.loneless.art/invite) and enjoy it's full set of features with low latency on machines it was specifically designed for.
 
 ---
-## Creating your modified copy of TrixieBot
+Trixie is an all-in-one Discord Bot for pony lovers
 
-If you don't want to be dependant on whenever the original servers TrixieBot is running on are online or you want to create your own fork of TrixieBot, you can of course run your own copy of TrixieBot.
+She offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins.
 
-Copy the repository to your machine so you can edit the code to your requirements.
+## Top Features
+
+* Powerful Custom Commands
+* Full custom low-latency Soundboard
+* A giant set of image commands
+* Picarto, Twitch and Smashcast Stream announcer
+* User- / Server Stats and Analytics
+* Role management
+* 100% customizable (disable / enable everything)
+* Utility and fun stuff
+* Constantly worked on
+* and much more...
+
+---
+## Creating your copy of TrixieBot
+
+**WARNING**: The owner of TrixieBot does not recommend building Trixie as it's not documented and most builds here will be extremely unstable, potentially untested and including unfinished features.
+If you however still want to build your own instance of Trixie or would like to help out improving Trixie and fixing bugs or issueing bug reports, you are very welcome to do so.
+
+### Preparing
+
+Trixie is dependant on:
+* node.js v10.x
+* graphicsmagick
+* ffmpeg
+* mongodb
+
+so make sure to have those installed before working with Trixie. There's a `install.sh` in the project's root that could help with installing what you need if you're on Ubuntu 18.04.
+
+Also, this should be obvious, but for Trixie to work you will need a Discord API key and a bot user account.
+
+Now clone the repository to your machine and install the dependencies.
 
 ```
-git clone https://github.com/LonelessCodes/TrixieBot
-cd TrixieBot
+git clone https://github.com/LonelessCodes/trixiebot.git
+cd trixiebot
 npm install
 ```
 
-Next get into your Discord account's applications panel on https://discordapp.com/developers/applications/me, create a new app and make sure you add a Discord user to it. It will ask you if you want to do it further down.
+This might take one or more minutes, depending on your internet connection and the speed of your machine.
 
-Done that you can add your bot to your server, by copying the client id at the top of the page and pasting it into this link:
+### Setting up
 
-```https://discordapp.com/oauth2/authorize?client_id=KEY&scope=bot```
+In the config folder there's a template.yaml file that includes all settings Trixie needs to run properly. You must create a copy of that file as `default.yaml` or create files for specific NODE_ENV values and fill out all info, or remove optional properties so they won't use the XXXX placeholder keys. Not providing optional values will disable those features though.
 
-You'll be shown a dialog from which you can select which server to add the bot to.
+Trixie creates the database automatically when starting.
 
-The bot doesn't have keys and tokens hard coded into the script, instead in the repository root there's a folder called ```keys``` which holds a bunch of json files that include all the keys used to authenticate with any service the bot uses. 
+### Running
 
-Now with that knowledge go back to the bot settings and copy the token in the bot user section. This is the key used to log into your bot user, so keep it save and don't show it to anyone.
+To run in development mode (beware: development means development. Don't run in public servers!) go `npm run dev` or if you're on windows `node dev`.
 
-The key file to authenticate with Discord is called ```discord.json``` and has only one property, which is ```token``` and holds the bot user token that you just copied. So in the ```keys``` folder create the file ```discord.json``` with content:
+For crash savety and restart on reboot official Trixie uses pm2 with the configs at `pm2dev.json` and `pm2prod.json`.
 
-```
-{
-    "token": "TOKEN"
-}
-```
+### Editing
 
-Remember to double quote the token so JSON reads it as a proper string.
-
-So once you've done all that your bot is basically ready to go. Though you will notice once you start running the bot it will tell you to use the full spectrum of TrixieBot you need to sign up on a few services and get an API key for each service that you'll have to paste into a new key file each. Don't worry though: If you don't want to use those services you don't have to.
+If you're going to edit the code, make sure you're using a proper IDE for code editing. Your best bet might be VS Code.

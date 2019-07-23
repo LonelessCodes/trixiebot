@@ -20,7 +20,7 @@ sudo apt-get install build-essential -y
 sudo apt-get install graphicsmagick -y
 
 # prepare nodejs installation
-curl -sL https://deb.nodesource.com/setup_9.x -o nodesource_setup.sh
+curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh
 sudo apt-get update -y
 

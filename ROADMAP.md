@@ -2,6 +2,7 @@
 
 ## 2019
 
+* One module and db collection for all guild-specific configurations
 * Reinvent Calendar Events to support ranges
     * Implement seasonal commands
 * Custom Commands !commands should always go first, then the rest

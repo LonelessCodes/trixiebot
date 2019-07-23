@@ -46,7 +46,8 @@ class ScopedCommand extends BaseCommand {
 
     /**
      * @param {BitFieldResolvable} scope
-     * @param {BaseCommand} command 
+     * @param {BaseCommand} command
+     * @returns {ScopedCommand}
      */
     registerScope(scope, command) {
         command = command.setScope(scope);

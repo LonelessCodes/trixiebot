@@ -13,7 +13,7 @@ const Category = require("../../util/commands/Category");
 
 figlet.parseFont("univers", fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "figlet", "univers.flf"), "utf8"));
 
-const bad_words_array = (fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "text", "bad_words.txt"), "utf8")).split(",");
+const bad_words_array = fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "text", "bad_words.txt"), "utf8").split(",");
 for (let word of bad_words_array) {
     word = word.replace(/-/g, " ");
     if (!bad_words_array.includes(word)) bad_words_array.push(word);
@@ -21,7 +21,7 @@ for (let word of bad_words_array) {
 
 const regexp = new RegExp(`\\b(${bad_words_array.join("|")})\\b`, "gi");
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const queue = new Queue;
 
     const database = db.collection("santaslist");
@@ -41,7 +41,7 @@ module.exports = async function install(cr, client, config, db) {
             let total_messages = 0;
             let total_user_messages = 0;
             let bad_words = 0;
-            const bad_words_used = new Object;
+            const bad_words_used = {};
             for (let i = 0; i < channels.length; i++) {
                 const channel = channels[i];
 
@@ -72,7 +72,7 @@ module.exports = async function install(cr, client, config, db) {
                     messages += m.size;
                     lastID = m.last().id;
 
-                    if (!(j % 8)) progress.edit(`${progressBar(i / channels.length + (messages / limit) * step, 12, "█", "░")} | Fetching messages...`);
+                    if (!(j % 8)) progress.edit(`${progressBar((i / channels.length) + ((messages / limit) * step), 12, "█", "░")} | Fetching messages...`);
                     j++;
                 }
 
@@ -86,7 +86,7 @@ module.exports = async function install(cr, client, config, db) {
             const embed = new Discord.RichEmbed;
 
             const number = (await figlet(`${Math.round(naughty_percent * 100)}%`, "univers")).split("\n");
-            let str = "```\n" + number.slice(0, number.length - 1).join("\n") + "  Naughty" + "\n```\n";
+            let str = "```\n" + number.slice(0, number.length - 1).join("\n") + "  Naughty\n```\n";
 
             if (naughty_percent >= 0.5) {
                 embed.setColor(CONST.COLOR.ERROR);

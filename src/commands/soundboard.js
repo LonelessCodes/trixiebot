@@ -33,12 +33,12 @@ class ChooseCommand extends TreeCommand {
         this.registerSubCommandAlias("server", "g");
     }
 
-    user() { }
-    server() { }
-    pre() { }
+    user() { /* Do nothing */ }
+    server() { /* Do nothing */ }
+    pre() { /* Do nothing */ }
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     const sbCmd = cr.registerCommand("sb", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.")
@@ -103,7 +103,7 @@ module.exports = async function install(cr) {
         });
 
         await uploader.upload(message.attachments.first(), name.toLowerCase())
-            .catch(err =>{
+            .catch(err => {
                 log.error(err);
                 m.edit(":x: Some error happened and caused some whoopsies");
             });
@@ -144,7 +144,7 @@ module.exports = async function install(cr) {
         }
         async pre(message, name) {
             await uploadSample(message, null, name, (embed, sample) => {
-                embed.setAuthor("Predefined Samples" + " | " + sample.name, message.author.avatarURL);
+                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL);
 
                 embed.addField("Name", sample.name, true);
                 return embed;
@@ -237,7 +237,7 @@ module.exports = async function install(cr) {
         }
         async pre(message, id) {
             await importSample("predefined", message, null, id, (embed, sample) => {
-                embed.setAuthor("Predefined Samples" + " | " + sample.name, message.author.avatarURL);
+                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL);
 
                 embed.addField("Name", sample.name, true);
                 return embed;
@@ -255,7 +255,7 @@ module.exports = async function install(cr) {
                 await message.channel.send("❌ That sample doesn't exist");
                 return;
             }
-            
+
             await soundboard.removeSample(message.author, sample);
 
             await message.channel.send("✅ Successfully deleted!");
@@ -393,7 +393,7 @@ module.exports = async function install(cr) {
 
                     const [, new_balance] = await Promise.all([
                         isUser ? soundboard.setNewSlotsUser(user, new_slots) : soundboard.setNewSlotsGuild(guild, new_slots),
-                        credits.makeTransaction(message.guild, user, -cost, "soundboard/slot", isUser ? "Bought a soundboard slot" : "Bought a soundboard slot for server " + guild.name)
+                        credits.makeTransaction(message.guild, user, -cost, "soundboard/slot", isUser ? "Bought a soundboard slot" : "Bought a soundboard slot for server " + guild.name),
                     ]);
 
                     message.channel.send(":atm: 'Aight! There you go. (:yen: new account balance: **" + credits.getBalanceString(new_balance, name) + "**)");
@@ -412,11 +412,11 @@ module.exports = async function install(cr) {
 
             this.cooldown = {
                 user: new RateLimiter(TimeUnit.HOUR, 1, 2),
-                guild: new RateLimiter(TimeUnit.HOUR, 1, 2)
+                guild: new RateLimiter(TimeUnit.HOUR, 1, 2),
             };
             this.active = {
                 user: new Set,
-                guild: new Set
+                guild: new Set,
             };
         }
         async user(message) {

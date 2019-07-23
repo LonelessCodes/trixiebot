@@ -2,21 +2,24 @@ const { isPlainObject } = require("../../util/util");
 const { CronJob } = require("cron");
 
 // DatabaseCache does not scale well now. Memory usage goes up linear to database size
-// Currently speed is of greater priority than scalability. Will have to change that 
-// when bot gets bigger should limit cache to 1000 most active queries or so 
+// Currently speed is of greater priority than scalability. Will have to change that
+// when bot gets bigger should limit cache to 1000 most active queries or so
 
 const DEFAULTS = {
     maxSize: 500,
     ttl: 0,
-    indexes: {}
+    indexes: {},
 };
 
 class DocumentMapCache {
     /**
      * Creates a new manager for caching database documents
-     * @param {*} collection The database collection to get documents from
+     * @param {any} collection The database collection to get documents from
      * @param {string} keyName The document property to get docs from
-     * @param {{ [x: string]: any }} databaseIndexes The indexes for the collection
+     * @param {Object} [opts] The indexes for the collection
+     * @param {Object} [opts.indexes] The indexes for the collection
+     * @param {number} [opts.ttl] Time to life before cleanup of a document (in cache)
+     * @param {number} [opts.maxSize] Maximum number of docs in cache
      */
     constructor(collection, keyName, opts = {}) {
         opts = Object.assign({}, DEFAULTS, opts);
@@ -98,7 +101,7 @@ class DocumentMapCache {
     _setInternal(key, newdoc) {
         const isNew = !this._documents.has(key);
         if (isNew && this.maxSize > 0 && this._documents.size >= this.maxSize) {
-            const [firstKey,] = this._documents.entries().next().value;
+            const [firstKey] = this._documents.entries().next().value;
             this._deleteInternal(firstKey);
         }
 
@@ -110,7 +113,7 @@ class DocumentMapCache {
 
     _getInternal(key) {
         const doc = this._documents.get(key);
-        
+
         if (doc) this._setTTLTimeout(key);
 
         return doc;
@@ -172,12 +175,12 @@ class DocumentMapCache {
 
         if (get_keys.length > 0) {
             const rows = await this.db.find({ $or: get_keys.map(key => ({ [this.keyName]: key })) });
-            for (let row of rows) 
+            for (let row of rows)
                 this._setInternal(row[this.keyName], row);
 
             if (rows.length !== new Set(get_keys).size) return false;
         }
-        
+
         return true;
     }
 

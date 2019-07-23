@@ -36,7 +36,6 @@ function getCPUInfo() {
     var irq = 0;
 
     for (const cpu of cpus) {
-
         user += cpu.times.user;
         nice += cpu.times.nice;
         sys += cpu.times.sys;
@@ -47,8 +46,8 @@ function getCPUInfo() {
     var total = user + nice + sys + idle + irq;
 
     return {
-        "idle": idle,
-        "total": total
+        idle: idle,
+        total: total,
     };
 }
 
@@ -57,7 +56,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-module.exports = async function install(cr, client) {
+module.exports = function install(cr, client) {
     cr.registerCommand("info", new SimpleCommand(async () => {
         const guilds = client.guilds;
         const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
@@ -72,7 +71,7 @@ module.exports = async function install(cr, client) {
             .addField("Node.js Version", process.version.substr(1), true)
             .addField("Discord.js Version", Discord.version)
 
-            .addField("CPU Usage", ((await getCPUUsage()) * 100).toFixed(0) + "%", true)
+            .addField("CPU Usage", (await getCPUUsage() * 100).toFixed(0) + "%", true)
             .addField("CPU Cores", os.cpus().length.toString(), true)
             .addField("Memory Usage", ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB")
 
@@ -104,7 +103,7 @@ module.exports = async function install(cr, client) {
         await m.edit(pongText + "\n" +
             "```" +
             `⏱ Real Latency:     ${ping}ms\n` +
-            `⏱ Internal Latency: ${internal_ping.toFixed(1)}ms\n` + 
+            `⏱ Internal Latency: ${internal_ping.toFixed(1)}ms\n` +
             `💓 API Latency:      ${Math.round(client.ping)}ms\n` +
             "```");
     }))
@@ -131,8 +130,7 @@ module.exports = async function install(cr, client) {
                 else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));
                 str = "";
                 title = line.replace(/^###+\s+/, "");
-            }
-            else str += line;
+            } else str += line;
         }
         if (title) embed.addField(title, str.trim().replace(/ \* /g, "\n* "));
         else embed.setDescription(str.trim().replace(/ \* /g, "\n* "));

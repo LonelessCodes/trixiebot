@@ -12,7 +12,7 @@ const { toHumanTime } = require("../util/time");
 const { timeout } = require("../util/promises");
 const Paginator = require("../util/commands/Paginator");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     const bankCmd = cr.registerCommand("bank", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.")
@@ -198,7 +198,7 @@ module.exports = async function install(cr) {
         }
     }))
         .setHelp(new HelpContent()
-            .setUsage("", "Display all your transactions from ever!"));    
+            .setUsage("", "Display all your transactions from ever!"));
     bankCmd.registerSubCommandAlias("transactions", "trans");
 
     bankCmd.registerSubCommand("name", new SimpleCommand(async (message, content) => {
@@ -263,7 +263,7 @@ module.exports = async function install(cr) {
         if (time_left > 0) {
             const m = await message.channel.send(`:atm: ${userToString(user)}, daily :yen: credits reset in **${toHumanTime(time_left)}**.`);
             await timeout(1000 * 15);
-            m.delete().catch(() => { });
+            m.delete().catch(() => { /* Do nothing */ });
             return;
         }
 
@@ -284,7 +284,7 @@ module.exports = async function install(cr) {
         str += bonus_chars.join("   ");
 
         if (bonus > 0) str += `\n\nYou completed a streak and added an extra :yen: **${credits.getBalanceString(bonus, currency_name, "bonus")}** (**${total.toLocaleString("en")}** total)!`;
-            
+
         await message.channel.send(str);
     }))
         .setHelp(new HelpContent()

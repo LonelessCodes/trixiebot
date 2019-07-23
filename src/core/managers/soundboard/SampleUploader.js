@@ -43,8 +43,8 @@ class Type {
 
 class SampleUploader extends Events {
     /**
-     * @param {SoundboardManager} manager 
-     * @param {User|Guild} user 
+     * @param {SoundboardManager} manager
+     * @param {User|Guild} user
      */
     constructor(manager, user) {
         super();
@@ -72,8 +72,8 @@ class SampleUploader extends Events {
     }
 
     /**
-     * @param {MessageAttachment} attachment 
-     * @param {string} name 
+     * @param {MessageAttachment} attachment
+     * @param {string} name
      */
     async upload(attachment, name) {
         if (!(await isEnoughDiskSpace())) {
@@ -117,7 +117,9 @@ class SampleUploader extends Events {
 
         const extname = path.extname(attachment.filename);
         if (!SampleUploader.isSupportedExt(extname)) {
-            return this._emitError(`${extname} files are not supported at this time. Try uploading ${SampleUploader.getSupportedFileTypes()} files.`);
+            return this._emitError(
+                `${extname} files are not supported at this time. Try uploading ${SampleUploader.getSupportedFileTypes()} files.`
+            );
         }
 
         if (attachment.filesize > 1000 * 1000 * 4) {
@@ -126,7 +128,9 @@ class SampleUploader extends Events {
 
         this._setStatus("Downloading file...");
 
-        const tmp_file = await new Promise((res, rej) => tmp.file({ prefix: "sample_download_", tries: 3, postfix: path.extname(attachment.filename) }, (err, path, fd, cleanupCallback) => {
+        const tmp_file = await new Promise((res, rej) => tmp.file({
+            prefix: "sample_download_", tries: 3, postfix: path.extname(attachment.filename),
+        }, (err, path, fd, cleanupCallback) => {
             if (err) return rej(err);
             res({ path, fd, cleanupCallback });
         }));
@@ -136,7 +140,7 @@ class SampleUploader extends Events {
         try {
             await new Promise((resolve, reject) => {
                 request(attachment.url, { encoding: null })
-                    .on("error", () => reject())
+                    .on("error", err => reject(err))
                     .on("response", response => {
                         response.pipe(tmp_file_stream);
                         tmp_file_stream.on("finish", () => tmp_file_stream.close(() => resolve()));
@@ -155,7 +159,10 @@ class SampleUploader extends Events {
 
             if (!SampleUploader.isSupportedExt(type.ext)) {
                 tmp_file.cleanupCallback();
-                return this._emitError(`${type.mime} files are not supported at this time. Try uploading ${SampleUploader.getSupportedFileTypes()} files.`);
+                return this._emitError(
+                    `${type.mime} files are not supported at this time. ` +
+                    `Try uploading ${SampleUploader.getSupportedFileTypes()} files.`
+                );
             }
         } catch (err) {
             tmp_file.cleanupCallback();
@@ -171,7 +178,7 @@ class SampleUploader extends Events {
             if (duration * 1000 > SampleUploader.MAX_DURATION) {
                 tmp_file.cleanupCallback();
                 return this._emitError(`The soundclip cannot be longer than ${toHumanTime(SampleUploader.MAX_DURATION)}`);
-            }                                                                   
+            }
         } catch (err) {
             tmp_file.cleanupCallback();
             throw err;
@@ -207,7 +214,7 @@ class SampleUploader extends Events {
                     guilds: [],
                     plays: 0,
                     created_at: new Date,
-                    modified_at: new Date
+                    modified_at: new Date,
                 });
             } else if (this.scope === "guild") {
                 sample = new GuildSample(this.manager, {
@@ -219,7 +226,7 @@ class SampleUploader extends Events {
                     guilds: [this.guild.id],
                     plays: 0,
                     created_at: new Date,
-                    modified_at: new Date
+                    modified_at: new Date,
                 });
             }
         } else {
@@ -228,7 +235,7 @@ class SampleUploader extends Events {
                 filename: attachment.filename,
                 plays: 0,
                 created_at: new Date,
-                modified_at: new Date
+                modified_at: new Date,
             });
         }
 
@@ -250,7 +257,7 @@ class SampleUploader extends Events {
 
             // const ogg_encoder = new ogg.Encoder;
 
-            await new Promise((res, rej) => {                
+            await new Promise((res, rej) => {
                 // ogg_encoder.pipe(fs.createWriteStream(sample.file))
                 //     .on("error", err => rej(err))
                 //     .on("close", () => res());
@@ -260,7 +267,7 @@ class SampleUploader extends Events {
                 //     .pipe(opus_encoder)
                 //     .pipe(ogg_encoder.stream())
                 //     .on("error", err => rej(err));
-                
+
                 ffmpeg(tmp_file.path)
                     .audioCodec("libopus")
                     .audioBitrate(96)
@@ -302,7 +309,7 @@ class SampleUploader extends Events {
                     guilds: sample.guilds,
                     plays: sample.plays,
                     created_at: sample.created_at,
-                    modified_at: sample.modified_at
+                    modified_at: sample.modified_at,
                 }));
                 break;
             case "guild":
@@ -316,7 +323,7 @@ class SampleUploader extends Events {
                     guilds: sample.guilds,
                     plays: sample.plays,
                     created_at: sample.created_at,
-                    modified_at: sample.modified_at
+                    modified_at: sample.modified_at,
                 }));
                 break;
             case "predefined":
@@ -325,7 +332,7 @@ class SampleUploader extends Events {
                     filename: sample.filename,
                     plays: sample.plays,
                     created_at: sample.created_at,
-                    modified_at: sample.modified_at
+                    modified_at: sample.modified_at,
                 }));
                 this.manager.predefined_samples = Promise.resolve([...(await this.manager.predefined_samples), sample]);
                 break;
@@ -344,6 +351,8 @@ class SampleUploader extends Events {
     }
 }
 SampleUploader.MAX_DURATION = 30000;
-SampleUploader.SUPPORTED_FILES = [new Type("mp3"), new Type("audio/x-aiff"), new Type("ogg"), new Type("audio/opus"), new Type("wav"), new Type("flac")];
+SampleUploader.SUPPORTED_FILES = [
+    new Type("mp3"), new Type("audio/x-aiff"), new Type("ogg"), new Type("audio/opus"), new Type("wav"), new Type("flac"),
+];
 
 module.exports = SampleUploader;

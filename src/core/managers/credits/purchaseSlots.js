@@ -1,6 +1,6 @@
 const credits = require("../CreditsManager");
 
-async function purchaseSlots(message, activeList, cooldown, user, cost, success, cb = async () => {}) {
+async function purchaseSlots(message, activeList, cooldown, user, cost, success, handler = async () => { /* Do nothing */ }) {
     const name = await credits.getName(message.guild);
 
     if (!(await credits.canPurchase(user, cost))) {
@@ -12,7 +12,8 @@ async function purchaseSlots(message, activeList, cooldown, user, cost, success,
 
     activeList.add(user.id);
 
-    await message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === message.author.id, { maxMatches: 1, time: 60000, errors: ["time"] })
+    const opts = { maxMatches: 1, time: 60000, errors: ["time"] };
+    await message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === message.author.id, opts)
         .then(async messages => {
             const m = messages.first();
             if (/^buy$/i.test(m.content)) {
@@ -22,8 +23,8 @@ async function purchaseSlots(message, activeList, cooldown, user, cost, success,
                     message.channel.send(":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
                     return;
                 }
-                
-                const new_balance = await cb(cost);
+
+                const new_balance = await handler(cost);
 
                 message.channel.send(":atm: " + success + " (:yen: new account balance: **" + credits.getBalanceString(new_balance, name) + "**)");
                 return;

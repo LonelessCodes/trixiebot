@@ -26,10 +26,10 @@ async function fetchImages(params) {
     const response = await fetch(url, {
         timeout: 10000,
         headers: {
-            "User-Agent": `TrixieBot/${INFO.VERSION} (by Loneless on e621)`
-        }
+            "User-Agent": `TrixieBot/${INFO.VERSION} (by Loneless on e621)`,
+        },
     }).then(request => request.json());
-    
+
     return response;
 }
 
@@ -96,7 +96,7 @@ async function process(message, msg, type) {
                 tags: encodeURIComponent(query),
                 sf: "id",
                 sd: "desc",
-                limit: 300
+                limit: 300,
             });
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -111,7 +111,7 @@ async function process(message, msg, type) {
                 results.push({
                     image_url: image.file_url,
                     id: image.id,
-                    artist: image.artist
+                    artist: image.artist,
                 });
             }
             break;
@@ -120,7 +120,7 @@ async function process(message, msg, type) {
                 tags: encodeURIComponent(query),
                 sf: "id",
                 sd: "desc",
-                limit: amount
+                limit: amount,
             });
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -137,7 +137,7 @@ async function process(message, msg, type) {
                 results.push({
                     image_url: image.file_url,
                     id: image.id,
-                    artist: image.artist
+                    artist: image.artist,
                 });
             }
             break;
@@ -145,7 +145,7 @@ async function process(message, msg, type) {
             result = await fetchImages({
                 scope: "popular_by_" + popular_order,
                 tags: encodeURIComponent(query),
-                limit: amount
+                limit: amount,
             });
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -162,14 +162,14 @@ async function process(message, msg, type) {
                 results.push({
                     image_url: image.file_url,
                     id: image.id,
-                    artist: image.artist
+                    artist: image.artist,
                 });
             }
             break;
         case "top":
             result = await fetchImages({
                 tags: encodeURIComponent(query),
-                limit: amount
+                limit: amount,
             });
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -186,12 +186,12 @@ async function process(message, msg, type) {
                 results.push({
                     image_url: image.file_url,
                     id: image.id,
-                    artist: image.artist
+                    artist: image.artist,
                 });
             }
             break;
     }
-    
+
     if (results.length === 0) {
         if (warning === "") await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
         else await message.channel.sendTranslated(warning);
@@ -209,13 +209,13 @@ async function process(message, msg, type) {
     await message.channel.send(output);
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     const e621Command = cr.registerCommand("e621", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL, true);
-    
+
     /**
      * SUB COMMANDS
      */
@@ -231,12 +231,12 @@ module.exports = async function install(cr) {
         .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "latest")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
-    
+
     e621Command.registerSubCommand("top", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "top")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
-    
+
     e621Command.registerSubCommand("popular", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, msg) => {
             let popular_order = "week";
@@ -264,7 +264,7 @@ module.exports = async function install(cr) {
 
             const result = await fetchImages({
                 scope: "popular_by_" + popular_order,
-                limit: 100
+                limit: 100,
             });
 
             let whileBreak = 100;
@@ -289,7 +289,7 @@ module.exports = async function install(cr) {
                 results.push({
                     image_url: image.file_url,
                     id: image.id,
-                    artist: image.artist
+                    artist: image.artist,
                 });
             }
 

@@ -4,7 +4,7 @@ const { CronJob } = require("cron");
 class Calendar extends Events {
     constructor(month, date, hour, minute) {
         super();
-        
+
         this.setDate(month, date, hour, minute);
     }
 
@@ -37,9 +37,11 @@ class Calendar extends Events {
         if (this.endJob) this.endJob.stop();
 
         const now = new Date;
-        let cal = new Date(new Date(now.getFullYear(), this.month, this.date, this.hour, this.minute).getTime() + 3600000 * 24);
+        let ms = new Date(now.getFullYear(), this.month, this.date, this.hour, this.minute).getTime();
+        let cal = new Date(ms + (3600000 * 24));
         if (now.getTime() >= cal.getTime()) {
-            cal = new Date(new Date(now.getFullYear() + 1, this.month, this.date, this.hour, this.minute).getTime() + 3600000 * 24);
+            ms = new Date(now.getFullYear() + 1, this.month, this.date, this.hour, this.minute).getTime();
+            cal = new Date(ms + (3600000 * 24));
         }
 
         this.endJob = new CronJob(cal, () => {
@@ -71,7 +73,7 @@ Calendar.MONTH = Object.freeze({
     SEPTEMBER: 8,
     OCTOBER: 9,
     NOVEMBER: 10,
-    DECEMBER: 11
+    DECEMBER: 11,
 });
 
 Calendar.WEEK = Object.freeze({
@@ -81,7 +83,7 @@ Calendar.WEEK = Object.freeze({
     WEDNESDAY: 3,
     THURSDAY: 4,
     FRIDAY: 5,
-    SATURDAY: 6
+    SATURDAY: 6,
 });
 
 module.exports = Calendar;

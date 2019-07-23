@@ -50,11 +50,14 @@ class HelpBuilder extends RichEmbed {
 
             if (help) {
                 if (help.title) {
-                    fields.push({ usage: "", title: help.title.charAt(help.title.length - 1) === ":" ? help.title : help.title + ":" });
+                    fields.push({
+                        usage: "",
+                        title: help.title.charAt(help.title.length - 1) === ":" ? help.title : help.title + ":",
+                    });
                     i++;
                     field = fields[i];
                 }
-                    
+
                 if (help.options === "" && help.usage)
                     field.usage += `\`${prefix}${name}\` - ${help.usage}`;
                 else if (help.options && help.usage)
@@ -97,7 +100,7 @@ class HelpBuilder extends RichEmbed {
                     if (sub_command.category === Category.OWNER) continue;
 
                     const sub_name = name + " " + sub_cmd_name;
-                    
+
                     field.usage += "\n\n";
 
                     func(sub_name, sub_command, name);
@@ -120,7 +123,7 @@ class HelpBuilder extends RichEmbed {
     }
 }
 
-HelpBuilder.sendHelp = async function sendHelp(message, name, command) {
+HelpBuilder.sendHelp = function sendHelp(message, name, command) {
     if (command instanceof AliasCommand) {
         command = command.command;
     }
@@ -128,7 +131,7 @@ HelpBuilder.sendHelp = async function sendHelp(message, name, command) {
     if (!command.help) return;
 
     const embed = new HelpBuilder(message, name, command);
-    return await message.channel.send({ embed });
+    return message.channel.send({ embed });
 };
 
 module.exports = HelpBuilder;

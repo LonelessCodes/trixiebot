@@ -38,7 +38,8 @@ class OverloadCommand extends BaseCommand {
     }
 
     /**
-     * @param {string[]} args 
+     * @param {string[]} args
+     * @returns {BaseCommand}
      */
     getCmd(args) {
         const size = args.length;
@@ -60,8 +61,9 @@ class OverloadCommand extends BaseCommand {
 
     /**
      * Formatted as: 1,2,3 or 2-3, or 2+ or 1,3,5-6
-     * @param {string} args 
-     * @param {BaseCommand} command 
+     * @param {string} args
+     * @param {BaseCommand} command
+     * @returns {OverloadCommand}
      */
     registerOverload(args, command) {
         if (this.overloads.has(args)) throw new Error("Overload already exists");

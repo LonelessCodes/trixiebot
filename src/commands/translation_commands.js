@@ -33,7 +33,7 @@ function translator(type, description) {
         .setScope(CommandScope.ALL);
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("pirate", translator("pirate", "Translate something into pirate-ish"));
     cr.registerCommand("yoda", translator("yoda", "Translate something into yoda-ish"));
     cr.registerCommand("dolan", translator("dolan", "Translate something into dolan duck-ish"));

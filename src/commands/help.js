@@ -14,10 +14,12 @@ const CategoryClass = Category.Category;
 const CommandScope = require("../util/commands/CommandScope");
 
 function sortCommands(commands) {
-    return Array.from(commands.keys()).sort().map(s => `\`${s}\``).join(", ");
+    return Array.from(commands.keys())
+        .sort().map(s => `\`${s}\``)
+        .join(", ");
 }
 
-module.exports = async function install(cr, client, config, database) {
+module.exports = function install(cr, client, config, database) {
     cr.registerCommand("help", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
             let query = content.toLowerCase();
@@ -60,7 +62,7 @@ module.exports = async function install(cr, client, config, database) {
             const prefix = is_guild ? message.prefix : "";
 
             const disabledCommands = is_guild ? await database.collection("disabled_commands").find({
-                guildId: message.guild.id
+                guildId: message.guild.id,
             }).toArray() : [];
 
             const custom_commands = is_guild ? await cr.CC.getCommands(message.guild.id, message.channel.id) : [];
@@ -84,7 +86,9 @@ module.exports = async function install(cr, client, config, database) {
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 
             if (custom_commands.length > 0) {
-                embed.addField("Custom Commands", custom_commands.map(c => c.trigger).sort().map(s => `\`${s}\``).join(", "));
+                embed.addField("Custom Commands", custom_commands.map(c => c.trigger)
+                    .sort().map(s => `\`${s}\``)
+                    .join(", "));
             }
 
             const ordered = [
@@ -99,7 +103,7 @@ module.exports = async function install(cr, client, config, database) {
                 Category.MODERATION,
                 Category.INFO,
                 Category.UTILS,
-                Category.MISC
+                Category.MISC,
             ];
 
             for (const cat of ordered) {

@@ -9,16 +9,16 @@ function pad(num, size) {
 }
 
 const multiplier = {
-    "w": TimeUnit.WEEK.toMillis(1),
-    "d": TimeUnit.DAY.toMillis(1),
-    "h": TimeUnit.HOUR.toMillis(1),
-    "m": TimeUnit.MINUTE.toMillis(1),
-    "s": TimeUnit.SECOND.toMillis(1),
+    w: TimeUnit.WEEK.toMillis(1),
+    d: TimeUnit.DAY.toMillis(1),
+    h: TimeUnit.HOUR.toMillis(1),
+    m: TimeUnit.MINUTE.toMillis(1),
+    s: TimeUnit.SECOND.toMillis(1),
 };
 
 module.exports = new class TimeUtils {
     /**
-     * @param {number} ms 
+     * @param {number} ms Duration in milliseconds
      * @returns {string}
      */
     toHumanTime(ms) {
@@ -28,17 +28,16 @@ module.exports = new class TimeUtils {
             d.days(),
             d.hours(),
             d.minutes(),
-            d.seconds()
+            d.seconds(),
         ];
         for (let i = 0; i < arr.length; i++) {
-            if (arr[i]) // 0 is short for false, so if not 0, go on
-                arr[i] = pad(arr[i], 2) + names[i];
+            if (arr[i] > 0) arr[i] = pad(arr[i], 2) + names[i];
         }
         return arr.filter(str => !!str).join(" ");
     }
 
     /**
-     * @param {string} string
+     * @param {string} string Duration as time string
      * @returns {number}
      */
     parseHumanTime(string) {

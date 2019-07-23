@@ -3,14 +3,16 @@ const Context = require("./Context");
 const { StatementStack, StatementManager } = require("./StatementManager");
 
 const RESERVED_KEYWORDS = [
-    "func", "return", "for", "of", "while", "break", "continue", "if", "then", "else", "reply", "and", "or", "null", "true", "false", "sleep",
+    "func", "return", "for", "of", "while", "break", "continue", "if",
+    "then", "else", "reply", "and", "or", "null", "true", "false", "sleep",
 ];
 const FUTURE_RESERVED_KEYWORDS = [
-    "import", "export"
+    "import", "export",
 ];
 
 /**
- * @param {Item} item 
+ * @param {Item} item
+ * @returns {boolean}
  */
 function toBool(item) {
     let val = true;
@@ -28,7 +30,7 @@ function isBreak(item) {
 }
 
 /**
- * @param {Item|Variable} item 
+ * @param {Item|Variable} item
  * @returns {Item}
  */
 function assign(item) {
@@ -36,7 +38,11 @@ function assign(item) {
     return item;
 }
 
-/** @param {string} str */
+/**
+ * @param {string} str
+ * @param {any} context
+ * @returns {StringLiteral}
+ */
 function createStringLiteral(str, context) {
     str = str
         .substr(1, str.length - 2)
@@ -93,7 +99,7 @@ function convert(obj) {
 
 class Item {
     /**
-     * @param {Literal} key 
+     * @param {Literal} key
      * @returns {Item}
      */
     getProp(key) {
@@ -108,8 +114,8 @@ Item.prototype.proto = Object.create({});
 
 class Func extends Item {
     /**
-     * @param {string} funcName 
-     * @param {Variable[]} args 
+     * @param {string} funcName
+     * @param {Variable[]} args
      * @param {StatementStack} statementStack
      * @param {*} ctx
      */
@@ -251,6 +257,7 @@ class StringLiteral extends Literal {
 
     /**
      * @param {Literal} key
+     * @returns {Item}
      */
     getProp(key) {
         if (key instanceof NumberLiteral) {
@@ -269,31 +276,31 @@ StringLiteral.prototype.proto = Object.create(Literal.prototype.proto);
 StringLiteral.prototype.proto.toString = new NativeFunc(function toString() {
     return new StringLiteral(this.content);
 });
-StringLiteral.prototype.proto.includes = new NativeFunc(function (_, includes) {
+StringLiteral.prototype.proto.includes = new NativeFunc(function includes(_, includes) {
     return new BooleanLiteral(this.content.includes(includes.content));
 });
-StringLiteral.prototype.proto.endsWith = new NativeFunc(function (_, includes) {
+StringLiteral.prototype.proto.endsWith = new NativeFunc(function endsWith(_, includes) {
     return new BooleanLiteral(this.content.endsWith(includes.content));
 });
-StringLiteral.prototype.proto.startsWith = new NativeFunc(function (_, includes) {
+StringLiteral.prototype.proto.startsWith = new NativeFunc(function startsWith(_, includes) {
     return new BooleanLiteral(this.content.startsWith(includes.content));
 });
-StringLiteral.prototype.proto.replace = new NativeFunc(function (_, includes, val) {
+StringLiteral.prototype.proto.replace = new NativeFunc(function replace(_, includes, val) {
     return new StringLiteral(this.content.replace(new RegExp(includes.content, "g"), val.content));
 });
-StringLiteral.prototype.proto.slice = new NativeFunc(function (_, start, end) {
+StringLiteral.prototype.proto.slice = new NativeFunc(function slice(_, start, end) {
     return new StringLiteral(this.content.slice(start ? start.content : undefined, end ? end.content : undefined));
 });
-StringLiteral.prototype.proto.split = new NativeFunc(function (_, by) {
+StringLiteral.prototype.proto.split = new NativeFunc(function split(_, by) {
     return new ArrayLiteral(this.content.split(by.content).map(s => new StringLiteral(s)));
 });
-StringLiteral.prototype.proto.toLowerCase = new NativeFunc(function () {
+StringLiteral.prototype.proto.toLowerCase = new NativeFunc(function toLowerCase() {
     return new StringLiteral(this.content.toLowerCase());
 });
-StringLiteral.prototype.proto.toUpperCase = new NativeFunc(function () {
+StringLiteral.prototype.proto.toUpperCase = new NativeFunc(function toUpperCase() {
     return new StringLiteral(this.content.toUpperCase());
 });
-StringLiteral.prototype.proto.trim = new NativeFunc(function () {
+StringLiteral.prototype.proto.trim = new NativeFunc(function trim() {
     return new StringLiteral(this.content.trim());
 });
 
@@ -310,6 +317,7 @@ class ArrayLiteral extends Literal {
 
     /**
      * @param {Literal} key
+     * @returns {Item}
      */
     getProp(key) {
         if (key instanceof NumberLiteral) {
@@ -358,11 +366,11 @@ async function call(context, func, args) {
 ArrayLiteral.prototype.proto.concat = new NativeFunc(function concat(_, ...arrs) {
     return new ArrayLiteral(this.content.concat(...arrs.map(a => a.content)));
 });
-ArrayLiteral.prototype.proto.fill = new NativeFunc(async function (_, val) {
+ArrayLiteral.prototype.proto.fill = new NativeFunc(function fill(_, val) {
     this.content.fill(val);
     return this;
 });
-ArrayLiteral.prototype.proto.filter = new NativeFunc(async function (context, func) {
+ArrayLiteral.prototype.proto.filter = new NativeFunc(async function filter(context, func) {
     const newArr = [];
     for (let i = 0; i < this.content.length; i++) {
         const val = await call(new Context(context.interpreter, context.args[0]), func, [this.content[i], new NumberLiteral(i)]);
@@ -370,7 +378,7 @@ ArrayLiteral.prototype.proto.filter = new NativeFunc(async function (context, fu
     }
     return new ArrayLiteral(newArr);
 });
-ArrayLiteral.prototype.proto.find = new NativeFunc(async function (context, property, value) {
+ArrayLiteral.prototype.proto.find = new NativeFunc(async function find(context, property, value) {
     if (property && value) {
         value = value.content;
         for (let i = 0; i < this.content.length; i++) {
@@ -385,15 +393,16 @@ ArrayLiteral.prototype.proto.find = new NativeFunc(async function (context, prop
     }
     return new NullLiteral;
 });
-ArrayLiteral.prototype.proto.includes = new NativeFunc(async function (_, value) {
+ArrayLiteral.prototype.proto.includes = new NativeFunc(function includes(_, value) {
     for (let i = 0; i < this.content.length; i++) {
         const item = this.content[i];
         if (item.content === value.content) return new BooleanLiteral(true);
     }
     return new BooleanLiteral(false);
 });
-ArrayLiteral.prototype.proto.join = new NativeFunc(async function (context, seperator = new StringLiteral("")) {
-    seperator = await seperator.getProp(new StringLiteral("toString")).call(new Context(context.interpreter, context.args[0]), seperator);
+ArrayLiteral.prototype.proto.join = new NativeFunc(async function join(context, seperator = new StringLiteral("")) {
+    seperator = await seperator.getProp(new StringLiteral("toString"))
+        .call(new Context(context.interpreter, context.args[0]), seperator);
     seperator = seperator.content || "";
     let str = "";
     let i = 0;
@@ -403,50 +412,50 @@ ArrayLiteral.prototype.proto.join = new NativeFunc(async function (context, sepe
         str += (await item.getProp(new StringLiteral("toString")).call(context, item)).content || "";
         i++;
     }
-    
+
     return new StringLiteral(str);
 });
-ArrayLiteral.prototype.proto.map = new NativeFunc(async function (context, func) {
+ArrayLiteral.prototype.proto.map = new NativeFunc(async function map(context, func) {
     const newArr = [];
     for (let i = 0; i < this.content.length; i++) {
         newArr.push(await call(new Context(context.interpreter, context.args[0]), func, [this.content[i], new NumberLiteral(i)]));
     }
     return new ArrayLiteral(newArr);
 });
-ArrayLiteral.prototype.proto.pop = new NativeFunc(function () {
+ArrayLiteral.prototype.proto.pop = new NativeFunc(function pop() {
     return this.content.pop();
 });
-ArrayLiteral.prototype.proto.push = new NativeFunc(function (_, ...items) {
+ArrayLiteral.prototype.proto.push = new NativeFunc(function push(_, ...items) {
     this.content.push(...items);
     return new NumberLiteral(this.content.length);
 });
-ArrayLiteral.prototype.proto.sum = new NativeFunc(async function () {
+ArrayLiteral.prototype.proto.sum = new NativeFunc(function sum() {
     let sum = 0;
     for (let item of this.content) {
         sum = item.content;
     }
     return new NumberLiteral(sum);
 });
-ArrayLiteral.prototype.proto.average = new NativeFunc(async function () {
+ArrayLiteral.prototype.proto.average = new NativeFunc(function average() {
     let sum = 0;
     for (let item of this.content) {
         sum = item.content;
     }
     return new NumberLiteral(sum / this.content.length);
 });
-ArrayLiteral.prototype.proto.reverse = new NativeFunc(async function () {
+ArrayLiteral.prototype.proto.reverse = new NativeFunc(function reverse() {
     return new ArrayLiteral(this.content.reverse());
 });
-ArrayLiteral.prototype.proto.shift = new NativeFunc(async function () {
+ArrayLiteral.prototype.proto.shift = new NativeFunc(function shift() {
     return this.content.shift();
 });
-ArrayLiteral.prototype.proto.slice = new NativeFunc(async function (_, first, length) {
+ArrayLiteral.prototype.proto.slice = new NativeFunc(function slice(_, first, length) {
     const args = [];
     if (first) args.push(first.content);
     if (length) args.push(length.content);
     return new ArrayLiteral(this.content.slice(...args));
 });
-ArrayLiteral.prototype.proto.every = new NativeFunc(async function (context, func) {
+ArrayLiteral.prototype.proto.every = new NativeFunc(async function every(context, func) {
     for (let i = 0; i < this.content.length; i++) {
         const val = await call(new Context(context.interpreter, context.args[0]), func, [this.content[i], new NumberLiteral(i)]);
         if (val.content)
@@ -454,7 +463,7 @@ ArrayLiteral.prototype.proto.every = new NativeFunc(async function (context, fun
     }
     return new BooleanLiteral(false);
 });
-ArrayLiteral.prototype.proto.sort = new NativeFunc(async function () {
+ArrayLiteral.prototype.proto.sort = new NativeFunc(function sort() {
     this.content.sort((a, b) => {
         if (a.content > b.content) {
             return 1;
@@ -462,20 +471,21 @@ ArrayLiteral.prototype.proto.sort = new NativeFunc(async function () {
         if (a.content < b.content) {
             return -1;
         }
-        return 0; 
+        return 0;
     });
     return this;
 });
-ArrayLiteral.prototype.proto.remove = new NativeFunc(async function (_, i, amount) {
+ArrayLiteral.prototype.proto.remove = new NativeFunc(function remove(_, i, amount) {
     this.content.splice(i.content, amount.content);
     return this;
 });
-ArrayLiteral.prototype.proto.unshift = new NativeFunc(function (_, ...items) {
+ArrayLiteral.prototype.proto.unshift = new NativeFunc(function unshift(_, ...items) {
     this.content.unshift(...items);
     return new NumberLiteral(this.content.length);
 });
-ArrayLiteral.prototype.proto.joinFrom = new NativeFunc(async function (context, from, seperator = new StringLiteral(" ")) {
-    seperator = await seperator.getProp(new StringLiteral("toString")).call(new Context(context.interpreter, context.args[1]), seperator);
+ArrayLiteral.prototype.proto.joinFrom = new NativeFunc(async function joinFrom(context, from, seperator = new StringLiteral(" ")) {
+    seperator = await seperator.getProp(new StringLiteral("toString"))
+        .call(new Context(context.interpreter, context.args[1]), seperator);
     seperator = seperator.content || "";
     let str = "";
 
@@ -487,8 +497,9 @@ ArrayLiteral.prototype.proto.joinFrom = new NativeFunc(async function (context, 
 
     return new StringLiteral(str);
 });
-ArrayLiteral.prototype.proto.joinTo = new NativeFunc(async function (context, to, seperator = new StringLiteral(" ")) {
-    seperator = await seperator.getProp(new StringLiteral("toString")).call(new Context(context.interpreter, context.args[1]), seperator);
+ArrayLiteral.prototype.proto.joinTo = new NativeFunc(async function joinTo(context, to, seperator = new StringLiteral(" ")) {
+    seperator = await seperator.getProp(new StringLiteral("toString"))
+        .call(new Context(context.interpreter, context.args[1]), seperator);
     seperator = seperator.content || "";
     let str = "";
 
@@ -514,6 +525,7 @@ class ObjectLiteral extends Literal {
 
     /**
      * @param {Literal} key
+     * @returns {Item}
      */
     getProp(key) {
         if (key instanceof StringLiteral &&
@@ -573,11 +585,11 @@ class TimeLiteral extends NumberLiteral {
     add(...args) {
         if (args.length === 1 && args[0] instanceof DurationLiteral) this.time.add(args[0].duration);
         else if (args.length === 1 && args[0] instanceof NumberLiteral) this.time.add(args[0].content, "milliseconds");
-        else if (args.length === 2 && args[0] instanceof NumberLiteral && args[1] instanceof StringLiteral) this.time.add(args[0].content, args[1].content); 
+        else if (args.length === 2 && args[0] instanceof NumberLiteral && args[1] instanceof StringLiteral) this.time.add(args[0].content, args[1].content);
         this.content = this.time.valueOf();
         return this;
     }
-    
+
     subtract(...args) {
         if (args.length === 1 && args[0] instanceof DurationLiteral) this.time.subtract(args[0].duration);
         else if (args.length === 1 && args[0] instanceof NumberLiteral) this.time.subtract(args[0].content, "milliseconds");
@@ -591,194 +603,194 @@ TimeLiteral.prototype.proto.toString = new NativeFunc(function toString() {
     return new StringLiteral(this.time.toString());
 });
 
-TimeLiteral.prototype.proto.utc = new NativeFunc(function () {
+TimeLiteral.prototype.proto.utc = new NativeFunc(function utc() {
     return new TimeLiteral(this.time.utc());
 });
-TimeLiteral.prototype.proto.local = new NativeFunc(function () {
+TimeLiteral.prototype.proto.local = new NativeFunc(function local() {
     return new TimeLiteral(this.time.local());
 });
-TimeLiteral.prototype.proto.isValid = new NativeFunc(function () {
+TimeLiteral.prototype.proto.isValid = new NativeFunc(function isValid() {
     return new BooleanLiteral(this.time.isValid());
 });
 
 // GETTING / SETTINGS
 
-TimeLiteral.prototype.proto.getMilliseconds = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getMilliseconds = new NativeFunc(function getMilliseconds() {
     return new NumberLiteral(this.time.milliseconds());
 });
-TimeLiteral.prototype.proto.setMilliseconds = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setMilliseconds = new NativeFunc(function setMilliseconds(_, value) {
     if (value) this.time.milliseconds(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getSeconds = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getSeconds = new NativeFunc(function getSeconds() {
     return new NumberLiteral(this.time.seconds());
 });
-TimeLiteral.prototype.proto.setSeconds = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setSeconds = new NativeFunc(function setSeconds(_, value) {
     if (value) this.time.seconds(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getMinutes = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getMinutes = new NativeFunc(function getMinutes() {
     return new NumberLiteral(this.time.minutes());
 });
-TimeLiteral.prototype.proto.setMinutes = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setMinutes = new NativeFunc(function setMinutes(_, value) {
     if (value) this.time.minutes(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getHours = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getHours = new NativeFunc(function getHours() {
     return new NumberLiteral(this.time.hours());
 });
-TimeLiteral.prototype.proto.setHours = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setHours = new NativeFunc(function setHours(_, value) {
     if (value) this.time.hours(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getDate = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getDate = new NativeFunc(function getDate() {
     return new NumberLiteral(this.time.date());
 });
-TimeLiteral.prototype.proto.setDate = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setDate = new NativeFunc(function setDate(_, value) {
     if (value) this.time.date(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getDay = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getDay = new NativeFunc(function getDay() {
     return new NumberLiteral(this.time.day());
 });
-TimeLiteral.prototype.proto.setDay = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setDay = new NativeFunc(function setDay(_, value) {
     if (value) this.time.day(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getDayOfYear = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getDayOfYear = new NativeFunc(function getDayOfYear() {
     return new NumberLiteral(this.time.dayOfYear());
 });
-TimeLiteral.prototype.proto.setDayOfYear = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setDayOfYear = new NativeFunc(function setDayOfYear(_, value) {
     if (value) this.time.dayOfYear(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getWeek = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getWeek = new NativeFunc(function getWeek() {
     return new NumberLiteral(this.time.week());
 });
-TimeLiteral.prototype.proto.setWeek = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setWeek = new NativeFunc(function setWeek(_, value) {
     if (value) this.time.week(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getMonth = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getMonth = new NativeFunc(function getMonth() {
     return new NumberLiteral(this.time.month());
 });
-TimeLiteral.prototype.proto.setMonth = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setMonth = new NativeFunc(function setMonth(_, value) {
     if (value) this.time.month(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getQuarter = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getQuarter = new NativeFunc(function getQuarter() {
     return new NumberLiteral(this.time.quarter());
 });
-TimeLiteral.prototype.proto.setQuarter = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setQuarter = new NativeFunc(function setQuarter(_, value) {
     if (value) this.time.quarter(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getYear = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getYear = new NativeFunc(function getYear() {
     return new NumberLiteral(this.time.year());
 });
-TimeLiteral.prototype.proto.setYear = new NativeFunc(function (_, value) {
+TimeLiteral.prototype.proto.setYear = new NativeFunc(function setYear(_, value) {
     if (value) this.time.year(value.content);
     return this;
 });
-TimeLiteral.prototype.proto.getWeeksInYear = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getWeeksInYear = new NativeFunc(function getWeeksInYear() {
     return new NumberLiteral(this.time.weeksInYear());
 });
-TimeLiteral.prototype.proto.getDaysInMonth = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getDaysInMonth = new NativeFunc(function getDaysInMonth() {
     return new NumberLiteral(this.time.daysInMonth());
 });
-TimeLiteral.prototype.proto.getTime = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getTime = new NativeFunc(function getTime() {
     return new NumberLiteral(this.time.valueOf());
 });
 
 // MANIPULATING
 
-TimeLiteral.prototype.proto.add = new NativeFunc(function (_, ...args) {
+TimeLiteral.prototype.proto.add = new NativeFunc(function add(_, ...args) {
     this.add(...args);
     return this;
 });
-TimeLiteral.prototype.proto.subtract = new NativeFunc(function (_, ...args) {
+TimeLiteral.prototype.proto.subtract = new NativeFunc(function subtract(_, ...args) {
     this.subtract(...args);
     return this;
 });
-TimeLiteral.prototype.proto.startOf = new NativeFunc(function (_, str) {
+TimeLiteral.prototype.proto.startOf = new NativeFunc(function startOf(_, str) {
     if (str instanceof StringLiteral) this.time.startOf(str.content);
     return this;
 });
-TimeLiteral.prototype.proto.endOf = new NativeFunc(function (_, str) {
+TimeLiteral.prototype.proto.endOf = new NativeFunc(function endOf(_, str) {
     if (str instanceof StringLiteral) this.time.endOf(str.content);
     return this;
 });
-TimeLiteral.prototype.proto.setZone = new NativeFunc(function (_, offset) {
+TimeLiteral.prototype.proto.setZone = new NativeFunc(function setZone(_, offset) {
     if (offset instanceof NumberLiteral || offset instanceof StringLiteral) this.time.utcOffset(offset.content);
     return this;
 });
-TimeLiteral.prototype.proto.getZone = new NativeFunc(function () {
+TimeLiteral.prototype.proto.getZone = new NativeFunc(function getZone() {
     return new NumberLiteral(this.time.utcOffset());
 });
 
 // DISPLAY
 
-TimeLiteral.prototype.proto.format = new NativeFunc(function (_, str) {
+TimeLiteral.prototype.proto.format = new NativeFunc(function format(_, str) {
     if (str instanceof StringLiteral) return new StringLiteral(this.time.format(str.content));
     return new StringLiteral(this.time.format());
 });
-TimeLiteral.prototype.proto.humanize = new NativeFunc(function () {
+TimeLiteral.prototype.proto.humanize = new NativeFunc(function humanize() {
     return new StringLiteral(this.time.format("MMMM Do YYYY, h:mm:ss A"));
 });
-TimeLiteral.prototype.proto.fromNow = new NativeFunc(function (_, postfix) {
+TimeLiteral.prototype.proto.fromNow = new NativeFunc(function fromNow(_, postfix) {
     return new StringLiteral(this.time.fromNow(!!postfix));
 });
-TimeLiteral.prototype.proto.from = new NativeFunc(function (context, time, postfix) {
+TimeLiteral.prototype.proto.from = new NativeFunc(function from(context, time, postfix) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     return new StringLiteral(this.time.from(time.time, !!postfix));
 });
-TimeLiteral.prototype.proto.toNow = new NativeFunc(function (_, postfix) {
+TimeLiteral.prototype.proto.toNow = new NativeFunc(function toNow(_, postfix) {
     return new StringLiteral(this.time.toNow(!!postfix));
 });
-TimeLiteral.prototype.proto.to = new NativeFunc(function (context, time, postfix) {
+TimeLiteral.prototype.proto.to = new NativeFunc(function to(context, time, postfix) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     return new StringLiteral(this.time.to(time.time, !!postfix));
 });
 
-TimeLiteral.prototype.proto.toISOString = new NativeFunc(function () {
+TimeLiteral.prototype.proto.toISOString = new NativeFunc(function toISOString() {
     return new StringLiteral(this.time.toISOString());
 });
 
 // DIFFERENCE
 
-TimeLiteral.prototype.proto.diff = new NativeFunc(function (context, time) {
+TimeLiteral.prototype.proto.diff = new NativeFunc(function diff(context, time) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     return new DurationLiteral(moment.duration(this.time.diff(time.time)));
 });
 
 // QUERY
 
-TimeLiteral.prototype.proto.isBefore = new NativeFunc(function (context, time, scope) {
+TimeLiteral.prototype.proto.isBefore = new NativeFunc(function isBefore(context, time, scope) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isBefore(time.time, scope.content));
     return new BooleanLiteral(this.time.isBefore(time.time));
 });
-TimeLiteral.prototype.proto.isSame = new NativeFunc(function (context, time, scope) {
+TimeLiteral.prototype.proto.isSame = new NativeFunc(function isSame(context, time, scope) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isSame(time.time, scope.content));
     return new BooleanLiteral(this.time.isSame(time.time));
 });
-TimeLiteral.prototype.proto.isAfter = new NativeFunc(function (context, time, scope) {
+TimeLiteral.prototype.proto.isAfter = new NativeFunc(function isAfter(context, time, scope) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isAfter(time.time, scope.content));
     return new BooleanLiteral(this.time.isAfter(time.time));
 });
-TimeLiteral.prototype.proto.isSameOrBefore = new NativeFunc(function (context, time, scope) {
+TimeLiteral.prototype.proto.isSameOrBefore = new NativeFunc(function isSameOrBefore(context, time, scope) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isSameOrBefore(time.time, scope.content));
     return new BooleanLiteral(this.time.isSameOrBefore(time.time));
 });
-TimeLiteral.prototype.proto.isSameOrAfter = new NativeFunc(function (context, time, scope) {
+TimeLiteral.prototype.proto.isSameOrAfter = new NativeFunc(function isSameOrAfter(context, time, scope) {
     if (!(time instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (scope instanceof StringLiteral) return new BooleanLiteral(this.time.isSameOrAfter(time.time, scope.content));
     return new BooleanLiteral(this.time.isSameOrAfter(time.time));
 });
-TimeLiteral.prototype.proto.isBetween = new NativeFunc(function (context, after, before, scope, inclusivity) {
+TimeLiteral.prototype.proto.isBetween = new NativeFunc(function isBetween(context, after, before, scope, inclusivity) {
     if (!(after instanceof TimeLiteral)) throw context.error("First parameter should be a Time object", context.args[0]);
     if (!(before instanceof TimeLiteral)) throw context.error("Second parameter should be a Time object", context.args[1]);
     if (scope instanceof StringLiteral) {
@@ -787,10 +799,10 @@ TimeLiteral.prototype.proto.isBetween = new NativeFunc(function (context, after,
     }
     return new BooleanLiteral(this.time.isBetween(after.time, before.time));
 });
-TimeLiteral.prototype.proto.isDST = new NativeFunc(function () {
+TimeLiteral.prototype.proto.isDST = new NativeFunc(function isDST() {
     return new BooleanLiteral(this.time.isDST());
 });
-TimeLiteral.prototype.proto.isLeapYear = new NativeFunc(function () {
+TimeLiteral.prototype.proto.isLeapYear = new NativeFunc(function isLeapYear() {
     return new BooleanLiteral(this.time.isLeapYear());
 });
 
@@ -844,74 +856,74 @@ DurationLiteral.prototype.proto.toString = new NativeFunc(function toString() {
     return new StringLiteral(this.duration.humanize(false));
 });
 
-DurationLiteral.prototype.proto.humanize = new NativeFunc(function (_, suffix) {
+DurationLiteral.prototype.proto.humanize = new NativeFunc(function humanize(_, suffix) {
     return new StringLiteral(this.duration.humanize(!!suffix));
 });
-DurationLiteral.prototype.proto.getMilliseconds = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getMilliseconds = new NativeFunc(function getMilliseconds() {
     return new NumberLiteral(this.duration.milliseconds());
 });
-DurationLiteral.prototype.proto.asMilliseconds = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asMilliseconds = new NativeFunc(function asMilliseconds() {
     return new NumberLiteral(this.duration.asMilliseconds());
 });
-DurationLiteral.prototype.proto.getSeconds = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getSeconds = new NativeFunc(function getSeconds() {
     return new NumberLiteral(this.duration.seconds());
 });
-DurationLiteral.prototype.proto.asSeconds = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asSeconds = new NativeFunc(function asSeconds() {
     return new NumberLiteral(this.duration.asSeconds());
 });
-DurationLiteral.prototype.proto.getMinutes = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getMinutes = new NativeFunc(function getMinutes() {
     return new NumberLiteral(this.duration.minutes());
 });
-DurationLiteral.prototype.proto.asMinutes = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asMinutes = new NativeFunc(function asMinutes() {
     return new NumberLiteral(this.duration.asMinutes());
 });
-DurationLiteral.prototype.proto.getHours = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getHours = new NativeFunc(function getHours() {
     return new NumberLiteral(this.duration.hours());
 });
-DurationLiteral.prototype.proto.asHours = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asHours = new NativeFunc(function asHours() {
     return new NumberLiteral(this.duration.asHours());
 });
-DurationLiteral.prototype.proto.getDays = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getDays = new NativeFunc(function getDays() {
     return new NumberLiteral(this.duration.days());
 });
-DurationLiteral.prototype.proto.asDays = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asDays = new NativeFunc(function asDays() {
     return new NumberLiteral(this.duration.asDays());
 });
-DurationLiteral.prototype.proto.getWeeks = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getWeeks = new NativeFunc(function getWeeks() {
     return new NumberLiteral(this.duration.weeks());
 });
-DurationLiteral.prototype.proto.asWeeks = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asWeeks = new NativeFunc(function asWeeks() {
     return new NumberLiteral(this.duration.asWeeks());
 });
-DurationLiteral.prototype.proto.getMonths = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getMonths = new NativeFunc(function getMonths() {
     return new NumberLiteral(this.duration.months());
 });
-DurationLiteral.prototype.proto.asMonths = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asMonths = new NativeFunc(function asMonths() {
     return new NumberLiteral(this.duration.asMonths());
 });
-DurationLiteral.prototype.proto.getYears = new NativeFunc(function () {
+DurationLiteral.prototype.proto.getYears = new NativeFunc(function getYears() {
     return new NumberLiteral(this.duration.years());
 });
-DurationLiteral.prototype.proto.asYears = new NativeFunc(function () {
+DurationLiteral.prototype.proto.asYears = new NativeFunc(function asYears() {
     return new NumberLiteral(this.duration.asYears());
 });
 
 
-DurationLiteral.prototype.proto.toISOString = new NativeFunc(function () {
+DurationLiteral.prototype.proto.toISOString = new NativeFunc(function toISOString() {
     return new StringLiteral(this.duration.toISOString());
 });
 
 // MANIPULATION
 
-DurationLiteral.prototype.proto.add = new NativeFunc(function (_, ...args) {
+DurationLiteral.prototype.proto.add = new NativeFunc(function add(_, ...args) {
     this.add(...args);
     return this;
 });
-DurationLiteral.prototype.proto.subtract = new NativeFunc(function (_, ...args) {
+DurationLiteral.prototype.proto.subtract = new NativeFunc(function subtract(_, ...args) {
     this.subtract(...args);
     return this;
 });
-DurationLiteral.prototype.proto.multiply = new NativeFunc(function (_, factor) {
+DurationLiteral.prototype.proto.multiply = new NativeFunc(function multiply(_, factor) {
     this.multiply(factor);
     return this;
 });
@@ -945,7 +957,8 @@ class Variable {
     }
 
     /**
-     * @param {Item} item 
+     * @param {Item} item
+     * @returns {Item}
      */
     update(item) {
         this.value = item;
@@ -983,7 +996,6 @@ class VariableStack extends Map {
                 if (variable) return variable;
             }
         }
-        return;
     }
 
     createVariable(name, ctx, _this) {
@@ -1050,5 +1062,5 @@ module.exports = {
     StatementStack,
     StatementManager,
     Member,
-    convert
+    convert,
 };

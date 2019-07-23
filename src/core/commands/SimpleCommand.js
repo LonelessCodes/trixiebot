@@ -8,11 +8,12 @@ const { Message } = require("discord.js");
 const { NanoTimer } = require("../../modules/NanoTimer");
 
 class SimpleCommand extends BaseCommand {
+    // eslint-disable-next-line valid-jsdoc
     /**
-     * @param {(message: Message, content: string, add: { pass_through: any, command_name: string, timer: NanoTimer }) => any} func 
-     * @param {CommandPermission} permissions 
+     * @param {(message: Message, content: string, add: { pass_through: any, command_name: string, timer: NanoTimer }) => *} func
+     * @param {CommandPermission} permissions
      */
-    constructor(func = async () => {}, permissions) {
+    constructor(func = async () => { /* Do nothing */ }, permissions) {
         super(permissions);
 
         this.func = func;

@@ -12,7 +12,7 @@ class NanoTimer {
     }
     end() {
         this._diff = process.hrtime(this._begin);
-        return this._diff[0] * NS_PER_SEC + this._diff[1];
+        return (this._diff[0] * NS_PER_SEC) + this._diff[1];
     }
 }
 

@@ -1,15 +1,14 @@
 const secureRandom = require("../modules/random/secureRandom");
 
 module.exports = new class ArrayUtils {
-    async randomItem(arr) {
-        return await secureRandom(arr);
+    randomItem(arr) {
+        return secureRandom(arr);
     }
 
     lastItem(arr) {
         return arr[arr.length - 1];
     }
 
-    
     findAndRemove(arr, elem) {
         const i = arr.indexOf(elem);
         if (i > -1) arr.splice(i, 1);
@@ -23,8 +22,9 @@ module.exports = new class ArrayUtils {
                 if (index < array.length) {
                     const r = roller(array[index], index, () => next());
                     if (r.then) r.then(() => next());
-                } else {
-                    if (end) { end(); resolve(); }
+                } else if (end) {
+                    end();
+                    resolve();
                 }
             };
             if (array.length === 0) {

@@ -6,7 +6,7 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("leavevc", new SimpleCommand(async message => {
         const audio = AudioManager.getGuild(message.guild);
 
@@ -22,7 +22,7 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setDescription("Make Trixie leave the voice channel!"))
         .setCategory(Category.AUDIO);
-    
+
     cr.registerAlias("leavevc", "leave");
     cr.registerAlias("leavevc", "begone");
 
@@ -30,7 +30,7 @@ module.exports = async function install(cr) {
         const audio = AudioManager.getGuild(message.guild);
 
         try {
-            await audio.stop();
+            audio.stop();
             await message.react("👍");
         } catch (err) {
             await message.react("❌");
@@ -41,7 +41,7 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setDescription("Stop whatever Trixie is saying in VC"))
         .setCategory(Category.AUDIO);
-    
+
     cr.registerAlias("stopvc", "stop");
 
     cr.registerCommand("joinvc", new SimpleCommand(async message => {
@@ -63,6 +63,6 @@ module.exports = async function install(cr) {
         .setHelp(new HelpContent()
             .setDescription("Stop whatever Trixie is saying in VC"))
         .setCategory(Category.AUDIO);
-        
+
     cr.registerAlias("joinvc", "join");
 };

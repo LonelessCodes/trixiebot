@@ -1,7 +1,7 @@
 const Symbol = require("../../../../modules/Symbol");
 
 class StatementStack {
-    /** @param {Symbol[]} arr */
+    /** @param {symbol[]} arr */
     constructor(arr = []) {
         this._arr = arr;
     }
@@ -66,7 +66,8 @@ class StatementManager {
     }
 
     /**
-     * @param {StatementStack} stack 
+     * @param {StatementStack} stack
+     * @returns {number}
      */
     pushChange(stack) {
         return this._arr.push(stack);

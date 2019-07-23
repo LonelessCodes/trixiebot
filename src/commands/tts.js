@@ -9,7 +9,7 @@ const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     if (!config.has("voicerss.key")) return log.namespace("config", "Found no API token for voicerss - Disabled tts command");
 
     const logtts = log.namespace("tts cmd");
@@ -42,7 +42,7 @@ module.exports = async function install(cr) {
                 const connection = await audio.connect(message.member);
                 const request = await fetch(url);
                 if (!request.ok) throw new ConnectError("HTTP Request Error");
-                
+
                 const stream = request.body;
 
                 const dispatcher = connection.playStream(stream, { passes: 2 });

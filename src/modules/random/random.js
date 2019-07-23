@@ -11,6 +11,6 @@ module.exports = function random(...args) {
         }
     } else if (args.length === 2) {
         return args[0] === args[1] ||
-            args[0] === args[1] - 1 ? 0 : (Math.random() * (args[1] - args[0]) + args[0]);
+            args[0] === args[1] - 1 ? 0 : (Math.random() * (args[1] - args[0])) + args[0];
     }
 };

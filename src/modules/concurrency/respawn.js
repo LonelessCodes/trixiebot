@@ -3,39 +3,38 @@ const { fork, exec, spawn } = require("child_process");
 const ps = require("ps-tree");
 const os = require("os");
 
-const kill = function (pid, sig) {
+function kill(pid, sig) {
     if (os.platform() === "win32") {
         exec("taskkill /pid " + pid + " /T /F");
         return;
     }
-    ps(pid, function (_, pids) {
-        pids = (pids || []).map(function (item) {
-            return parseInt(item.PID, 10);
-        });
+    ps(pid, (_, pids) => {
+        pids = (pids || []).map(item => parseInt(item.PID, 10));
 
         pids.push(pid);
 
-        pids.forEach(function (pid) {
+        pids.forEach(pid => {
             try {
                 process.kill(pid, sig);
             } catch (err) {
-                // do nothing
+                // Do nothing
             }
         });
     });
-};
-const defaultSleep = function (sleep) {
+}
+
+function defaultSleep(sleep) {
     sleep = Array.isArray(sleep) ? sleep : [sleep || 1000];
-    return function (restarts) {
+    return function getSleep(restarts) {
         return sleep[restarts - 1] || sleep[sleep.length - 1];
     };
-};
+}
 
 class Monitor extends events.EventEmitter {
     constructor(command, opts) {
         super();
 
-        this.id = null; // for respawn-group
+        this.id = null; // For respawn-group
 
         this.status = "stopped";
         this.command = command;
@@ -52,9 +51,7 @@ class Monitor extends events.EventEmitter {
         this.stderr = opts.stderr;
         this.silent = opts.silent;
         this.windowsVerbatimArguments = opts.windowsVerbatimArguments;
-        this.spawnFn = opts.fork
-            ? fork
-            : spawn;
+        this.spawnFn = opts.fork ? fork : spawn;
 
         this.crashed = false;
         this.sleep = typeof opts.sleep === "function" ? opts.sleep : defaultSleep(opts.sleep);
@@ -79,17 +76,13 @@ class Monitor extends events.EventEmitter {
 
         if (!this.child) return this._stopped();
 
-        const self = this;
-        const child = self.child;
-        const sigkill = function () {
-            kill(child.pid, "SIGKILL");
-            self.emit("force-kill");
+        const sigkill = () => {
+            kill(this.child.pid, "SIGKILL");
+            this.emit("force-kill");
         };
 
         let wait;
-        const onexit = function () {
-            clearTimeout(wait);
-        };
+        const onexit = () => clearTimeout(wait);
 
         if (this.kill !== false) {
             wait = setTimeout(sigkill, this.kill);
@@ -102,87 +95,86 @@ class Monitor extends events.EventEmitter {
     restart() {
         if (this.status === "running") return this;
 
-        const self = this;
         let restarts = 0;
         let clock = 60000;
 
-        const loop = function () {
-            const cmd = typeof self.command === "function" ? self.command() : self.command;
-            const child = self.spawnFn(cmd[0], cmd.slice(1), {
-                cwd: self.cwd,
-                env: { ...process.env, ...self.env },
-                uid: self.uid,
-                gid: self.gid,
-                stdio: self.stdio,
-                silent: self.silent,
-                windowsVerbatimArguments: self.windowsVerbatimArguments
+        const loop = () => {
+            const cmd = typeof this.command === "function" ? this.command() : this.command;
+            const child = this.spawnFn(cmd[0], cmd.slice(1), {
+                cwd: this.cwd,
+                env: { ...process.env, ...this.env },
+                uid: this.uid,
+                gid: this.gid,
+                stdio: this.stdio,
+                silent: this.silent,
+                windowsVerbatimArguments: this.windowsVerbatimArguments,
             });
 
-            self.started = new Date();
-            self.status = "running";
-            self.child = child;
-            self.pid = child.pid;
-            self.emit("spawn", child);
+            this.started = new Date();
+            this.status = "running";
+            this.child = child;
+            this.pid = child.pid;
+            this.emit("spawn", child);
 
             child.setMaxListeners(0);
 
             if (child.stdout) {
-                child.stdout.on("data", function (data) {
-                    self.emit("stdout", data);
+                child.stdout.on("data", data => {
+                    this.emit("stdout", data);
                 });
 
-                if (self.stdout) {
-                    child.stdout.pipe(self.stdout);
+                if (this.stdout) {
+                    child.stdout.pipe(this.stdout);
                 }
             }
 
             if (child.stderr) {
-                child.stderr.on("data", function (data) {
-                    self.emit("stderr", data);
+                child.stderr.on("data", data => {
+                    this.emit("stderr", data);
                 });
 
-                if (self.stderr) {
-                    child.stderr.pipe(self.stderr);
+                if (this.stderr) {
+                    child.stderr.pipe(this.stderr);
                 }
             }
 
-            child.on("message", function (message) {
-                self.emit("message", message);
+            child.on("message", message => {
+                this.emit("message", message);
             });
 
-            const clear = function () {
-                if (self.child !== child) return false;
-                self.child = null;
-                self.pid = 0;
+            const clear = () => {
+                if (this.child !== child) return false;
+                this.child = null;
+                this.pid = 0;
                 return true;
             };
 
-            child.on("error", function (err) {
-                self.emit("warn", err); // too opionated? maybe just forward err
+            child.on("error", err => {
+                this.emit("warn", err); // Too opionated? maybe just forward err
                 if (!clear()) return;
-                if (self.status === "stopping") return self._stopped();
-                self._crash();
+                if (this.status === "stopping") return this._stopped();
+                this._crash();
             });
 
-            child.on("exit", function (code, signal) {
-                self.emit("exit", code, signal);
+            child.on("exit", (code, signal) => {
+                this.emit("exit", code, signal);
                 if (!clear()) return;
-                if (self.status === "stopping") return self._stopped();
+                if (this.status === "stopping") return this._stopped();
 
-                clock -= (Date.now() - (self.started ? self.started.getTime() : 0));
+                clock -= Date.now() - (this.started ? this.started.getTime() : 0);
 
                 if (clock <= 0) {
                     clock = 60000;
                     restarts = 0;
                 }
 
-                if (++restarts > self.maxRestarts && self.maxRestarts !== -1) return self._crash();
+                if (++restarts > this.maxRestarts && this.maxRestarts !== -1) return this._crash();
 
-                self.status = "sleeping";
-                self.emit("sleep");
+                this.status = "sleeping";
+                this.emit("sleep");
 
-                const restartTimeout = self.sleep(restarts);
-                self.timeout = setTimeout(loop, restartTimeout);
+                const restartTimeout = this.sleep(restarts);
+                this.timeout = setTimeout(loop, restartTimeout);
             });
         };
 
@@ -210,7 +202,7 @@ class Monitor extends events.EventEmitter {
             command: this.command,
             cwd: this.cwd,
             env: this.env,
-            data: this.data
+            data: this.data,
         };
 
         if (!doc.id) delete doc.id;
@@ -238,10 +230,14 @@ class Monitor extends events.EventEmitter {
     }
 }
 
-/** @type {(command: string[], opts: {}) => Monitor} */
-const respawn = function (command, opts) {
+/**
+ * @param {string[]} command
+ * @param {{}} opts
+ * @returns {Monitor}
+ */
+function respawn(command, opts) {
     if (typeof command !== "function" && !Array.isArray(command)) return respawn(command.command, command);
     return new Monitor(command, opts || {});
-};
+}
 
 module.exports = respawn;

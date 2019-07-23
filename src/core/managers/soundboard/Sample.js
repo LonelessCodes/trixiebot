@@ -2,12 +2,12 @@ const path = require("path");
 const fs = require("fs-extra");
 const prism = require("prism-media");
 // eslint-disable-next-line no-unused-vars
-const { User, Guild, VoiceConnection } = require("discord.js");
+const { User, Guild, VoiceConnection, StreamDispatcher } = require("discord.js");
 
 class Sample {
     /**
-     * @param {SoundboardManager} manager 
-     * @param {{}} doc 
+     * @param {SoundboardManager} manager
+     * @param {{}} doc
      */
     constructor(manager, doc) {
         this.manager = manager;
@@ -38,10 +38,11 @@ class Sample {
 
     /**
      * @param {VoiceConnection} connection
+     * @returns {Promise<StreamDispatcher, Error>}
      */
     _play(connection) {
         /*
-        The opus encoder and decoder for ffmpeg is preeeeeeetty broken, so 
+        The opus encoder and decoder for ffmpeg is preeeeeeetty broken, so
         therefore we rather directly use the ogg demuxer from the prism library
         and pipe it through to the websocket
         */
@@ -63,7 +64,7 @@ class Sample {
     }
 
     /**
-     * @param {VoiceConnection} connection 
+     * @param {VoiceConnection} connection
      */
     async play(connection) {
         const dispatcher = await this._play(connection);
@@ -73,12 +74,14 @@ class Sample {
 
     /**
      * @param {User} user
+     * @returns {boolean}
      */
     isOwner(user) {
         return this.owners.some(id => id === user.id);
     }
     /**
      * @param {Guild} guild
+     * @returns {boolean}
      */
     isGuild(guild) {
         return this.guilds.some(id => id === guild.id);
@@ -105,7 +108,7 @@ class PredefinedSample extends Sample {
     }
 
     /**
-     * @param {VoiceConnection} connection 
+     * @param {VoiceConnection} connection
      */
     async play(connection) {
         const dispatcher = await this._play(connection);
@@ -141,6 +144,7 @@ class UserSample extends Sample {
 
     /**
      * @param {User} user
+     * @returns {boolean}
      */
     isCreator(user) {
         return this.creator === user.id;
@@ -167,6 +171,7 @@ class GuildSample extends Sample {
 
     /**
      * @param {Guild} guild
+     * @returns {boolean}
      */
     isCreator(guild) {
         return this.guild === guild.id;
@@ -177,5 +182,5 @@ module.exports = {
     Sample,
     PredefinedSample,
     UserSample,
-    GuildSample
+    GuildSample,
 };

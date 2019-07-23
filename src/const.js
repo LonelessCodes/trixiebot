@@ -4,6 +4,6 @@ module.exports = Object.freeze({
         SECONDARY: 0x9f84bd,
         SUCCESS: 0x67c23a,
         WARNING: 0xe6a23c,
-        ERROR: 0xd8315b
-    }
+        ERROR: 0xd8315b,
+    },
 });

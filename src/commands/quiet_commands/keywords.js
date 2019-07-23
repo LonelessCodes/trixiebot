@@ -13,10 +13,10 @@ const emoticons = [
     "(◕‿◕✿)",
     "(╯°□°）╯︵ ┻━┻",
     "༼ つ ◕_◕ ༽つ",
-    "(⁄ ⁄•⁄ω⁄•⁄ ⁄)"
+    "(⁄ ⁄•⁄ω⁄•⁄ ⁄)",
 ];
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerKeyword(/@someone\b/gi, new SimpleCommand(async message => {
         const array = message.guild.members.array();
         const member = await secureRandom(array);

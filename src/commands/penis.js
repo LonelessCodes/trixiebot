@@ -8,7 +8,7 @@ const MessageMentions = require("../util/commands/MessageMentions");
 
 const Paginator = require("../util/commands/Paginator");
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const database = db.collection("penis");
 
     const penisCommand = cr.registerCommand("penis", new TreeCommand)
@@ -45,25 +45,23 @@ module.exports = async function install(cr, client, config, db) {
 
         const doc = await database.findOne({ userId: member.user.id });
         if (!doc) {
-            const random = (await secureRandom()) - 0.2;
+            const random = await secureRandom() - 0.2;
             const length = Math.pow((random > 0 ?
-                (Math.pow(random, 1.4) + 0.2) * 15 + 3 :
-                (random + 0.2) * 15 + 3) / 20, 1.4) * 20 + 1.5;
-            const girth = Math.pow(((await secureRandom()) + (random - 0.1) * 2) * 0.3, 2) * 8 + 6;
+                ((Math.pow(random, 1.4) + 0.2) * 15) + 3 :
+                (((random + 0.2) * 15) + 3) / 20, 1.4) * 20) + 1.5;
+            const girth = (Math.pow((await secureRandom() + ((random - 0.1) * 2)) * 0.3, 2) * 8) + 6;
 
             await database.insertOne({
                 userId: member.user.id,
                 girth,
-                length
+                length,
             });
 
             await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-            return;
         } else {
             const { length, girth } = doc;
 
             await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-            return;
         }
     }));
 

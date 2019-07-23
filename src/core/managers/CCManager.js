@@ -15,7 +15,7 @@ const TYPE = Object.freeze({
     STARTS_WITH: 1,
     CONTAINS: 2,
     REGEX: 3,
-    EXACT_MATCH: 4
+    EXACT_MATCH: 4,
 });
 
 class Trigger {
@@ -35,11 +35,12 @@ class Trigger {
     }
 
     /**
-     * @param {string} command_name 
-     * @param {boolean} prefix_used 
-     * @param {string} raw_content 
+     * @param {string} command_name
+     * @param {boolean} prefix_used
+     * @param {string} raw_content
+     * @returns {boolean}
      */
-    async test(command_name, prefix_used, raw_content) {
+    test(command_name, prefix_used, raw_content) {
         switch (this.type) {
             case TYPE.COMMAND:
                 if (prefix_used)
@@ -83,7 +84,7 @@ class WebCommand {
             code: row.code,
             compile_errors: row.compile_errors,
             unread_errors,
-            disabled_channels: row.disabled_channels
+            disabled_channels: row.disabled_channels,
         };
     }
 }
@@ -156,7 +157,8 @@ class CCManager {
             const m = await this.getMessage(guild, messageId);
             if (!m) return;
 
-            if (m.author.id !== this.client.user.id || !m.channel.permissionsFor(guild.me).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES))
+            if (m.author.id !== this.client.user.id ||
+                !m.channel.permissionsFor(guild.me).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES))
                 return;
 
             await m.delete();
@@ -178,8 +180,7 @@ class CCManager {
                 message = await m.edit({ embed: new Discord.RichEmbed(embed) });
             } else if (content) {
                 message = await m.edit(content);
-            }
-            else message = m;
+            } else message = m;
 
             this.setMessage(message);
 
@@ -195,16 +196,16 @@ class CCManager {
 
             for (let emoji of emojis) {
                 if (guild.emojis.has(emoji)) {
-                    await m.react(guild.emojis.get(emoji)).catch(() => { });
+                    await m.react(guild.emojis.get(emoji)).catch(() => { /* Do nothing */ });
                 } else {
                     const e = toEmoji.get(emoji);
-                    if (e) await m.react(e).catch(() => { });
-                    else await m.react(emoji).catch(() => { });
+                    if (e) await m.react(e).catch(() => { /* Do nothing */ });
+                    else await m.react(emoji).catch(() => { /* Do nothing */ });
                 }
             }
         });
 
-        this.cpc.answer("getRole", async ({ guildId, roleId }) => {
+        this.cpc.answer("getRole", ({ guildId, roleId }) => {
             if (!this.client.guilds.has(guildId)) return;
             const guild = this.client.guilds.get(guildId);
 
@@ -212,7 +213,7 @@ class CCManager {
             return new Role(guild.roles.get(roleId));
         });
 
-        this.cpc.answer("role.getMembers", async ({ guildId, roleId }) => {
+        this.cpc.answer("role.getMembers", ({ guildId, roleId }) => {
             if (!this.client.guilds.has(guildId)) return [];
             const guild = this.client.guilds.get(guildId);
 
@@ -223,7 +224,7 @@ class CCManager {
             return members.map(m => new Member(m));
         });
 
-        this.cpc.answer("getMember", async ({ guildId, memberId }) => {
+        this.cpc.answer("getMember", ({ guildId, memberId }) => {
             if (!this.client.guilds.has(guildId)) return;
             const guild = this.client.guilds.get(guildId);
 
@@ -233,7 +234,7 @@ class CCManager {
             return new Member(member);
         });
 
-        this.cpc.answer("member.getRoles", async ({ guildId, memberId }) => {
+        this.cpc.answer("member.getRoles", ({ guildId, memberId }) => {
             if (!this.client.guilds.has(guildId)) return [];
             const guild = this.client.guilds.get(guildId);
 
@@ -244,7 +245,7 @@ class CCManager {
             return roles.map(m => new Role(m));
         });
 
-        this.cpc.answer("getChannel", async ({ guildId, channelId }) => {
+        this.cpc.answer("getChannel", ({ guildId, channelId }) => {
             if (!this.client.guilds.has(guildId)) return;
             const guild = this.client.guilds.get(guildId);
 
@@ -269,9 +270,7 @@ class CCManager {
                 if (!invite) return;
 
                 return invite.url;
-            } catch (_) {
-                return;
-            }
+            } catch (_) { /* Do nothing */ }
         });
 
         this.cpc.answer("channel.send", async ({ guildId, channelId, content, embed }) => {
@@ -294,11 +293,9 @@ class CCManager {
                 this.setMessage(message);
                 return new Message(message);
             }
-
-            return;
         });
 
-        this.cpc.answer("guild.getMembers", async ({ guildId }) => {
+        this.cpc.answer("guild.getMembers", ({ guildId }) => {
             if (!this.client.guilds.has(guildId)) return [];
             const guild = this.client.guilds.get(guildId);
             const members = guild.members.array();
@@ -306,7 +303,7 @@ class CCManager {
             return members.map(m => new Member(m));
         });
 
-        this.cpc.answer("guild.getRoles", async ({ guildId }) => {
+        this.cpc.answer("guild.getRoles", ({ guildId }) => {
             if (!this.client.guilds.has(guildId)) return [];
             const guild = this.client.guilds.get(guildId);
 
@@ -315,7 +312,7 @@ class CCManager {
             return roles.map(m => new Role(m));
         });
 
-        this.cpc.answer("guild.getChannels", async ({ guildId }) => {
+        this.cpc.answer("guild.getChannels", ({ guildId }) => {
             if (!this.client.guilds.has(guildId)) return [];
             const guild = this.client.guilds.get(guildId);
 
@@ -324,7 +321,7 @@ class CCManager {
             return channels.map(m => new Channel(m));
         });
 
-        this.cpc.answer("guild.getEmojis", async ({ guildId }) => {
+        this.cpc.answer("guild.getEmojis", ({ guildId }) => {
             if (!this.client.guilds.has(guildId)) return [];
             const guild = this.client.guilds.get(guildId);
 
@@ -358,7 +355,10 @@ class CCManager {
     async get(guild, { command_name, prefix_used, raw_content }) {
         const guildId = guild.id;
         if (!this.trigger_cache.has(guildId)) {
-            const rows = await this.database.find({ guildId, enabled: true }, { type: 1, trigger: 1, id: 1, case_sensitive: 1 }).toArray();
+            const rows = await this.database.find(
+                { guildId, enabled: true },
+                { type: 1, trigger: 1, id: 1, case_sensitive: 1 }
+            ).toArray();
 
             const triggers = [];
             for (let row of rows) {
@@ -408,8 +408,8 @@ class CCManager {
         const query = { guildId, enabled: true, type: TYPE.COMMAND };
         if (channelId) query.disabled_channels = {
             $not: {
-                $all: [channelId]
-            }
+                $all: [channelId],
+            },
         };
 
         return await this.database.find(query).toArray();

@@ -8,7 +8,7 @@ const CommandScope = require("../util/commands/CommandScope");
 
 const coin = ["heads", "tails"];
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("coin", new SimpleCommand(async (message, content) => {
         let bet = content.toLowerCase();
         if (bet === "") {

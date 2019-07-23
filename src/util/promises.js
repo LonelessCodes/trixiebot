@@ -1,6 +1,6 @@
 module.exports = new class PromisesUtils {
     /**
-     * @param {number} ms
+     * @param {number} ms Delay in milliseconds
      * @returns {Promise<void>}
      */
     timeout(ms) {

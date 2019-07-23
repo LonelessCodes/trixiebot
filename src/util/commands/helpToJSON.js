@@ -46,7 +46,10 @@ function helpToJSON(config, name, command) {
 
         if (help) {
             if (help.title) {
-                fields.push({ usage: "", title: help.title.charAt(help.title.length - 1) === ":" ? help.title : help.title + ":" });
+                fields.push({
+                    usage: "",
+                    title: help.title.charAt(help.title.length - 1) === ":" ? help.title : help.title + ":",
+                });
                 i++;
                 field = fields[i];
             }
@@ -104,7 +107,7 @@ function helpToJSON(config, name, command) {
         usage = usage.replace(/\n{2,}/g, "\n\n");
 
         if (usage !== "")
-            str += (title ? ("**" + title + "**") : "") + "\n" + format(usage, { prefix });
+            str += (title ? "**" + title + "**" : "") + "\n" + format(usage, { prefix });
     }
 
     json.usage = str;

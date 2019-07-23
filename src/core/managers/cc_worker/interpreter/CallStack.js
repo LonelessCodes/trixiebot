@@ -41,7 +41,7 @@ class CallStack {
 
 class CallTrace {
     /**
-     * @param {Position} pos 
+     * @param {Position} pos
      */
     constructor(pos) {
         this.name = "(anonymous)";
@@ -71,5 +71,5 @@ class Position {
 module.exports = {
     CallStack,
     CallTrace,
-    Position
+    Position,
 };

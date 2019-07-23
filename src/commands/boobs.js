@@ -22,7 +22,7 @@ async function randomBoob(reconnectTries = 0) {
     return file;
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("boobs", new SimpleCommand(async () => {
         const url = await randomBoob();
         return new Discord.RichEmbed()

@@ -10,14 +10,15 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
 class Poll {
+    // eslint-disable-next-line valid-jsdoc
     /**
      * A new Poll handling all the functionality of a trixie poll
-     * @param {Discord.Guild} guild 
-     * @param {Discord.TextChannel} channel 
-     * @param {Discord.GuildMember} creator 
-     * @param {Date} endDate 
-     * @param {{ [x: string]: number; }} votes 
-     * @param {Discord.Collection<any, Discord.GuildMember>} users 
+     * @param {Discord.Guild} guild
+     * @param {Discord.TextChannel} channel
+     * @param {Discord.GuildMember} creator
+     * @param {Date} endDate
+     * @param {{ [x: string]: number; }} votes
+     * @param {Discord.Collection<any, Discord.GuildMember>} users
      */
     constructor(db, guild, channel, creator, endDate, votes, users) {
         this.db = db;
@@ -36,9 +37,9 @@ class Poll {
         // insert into database
         if (!(await this.db.findOne({
             guildId: this.guild.id,
-            channelId: this.channel.id
+            channelId: this.channel.id,
         }))) {
-            // all the way up in the message handler we checked if DB includes 
+            // all the way up in the message handler we checked if DB includes
             // this channel already.So now we can go the efficient insert way
             await this.db.insertOne({
                 guildId: this.guild.id,
@@ -46,7 +47,7 @@ class Poll {
                 creatorId: this.creator.id,
                 votes: this.votes,
                 users: Array.from(this.users.keys()), // get all ids from the Collection
-                endDate: this.endDate
+                endDate: this.endDate,
             });
         }
 
@@ -63,7 +64,7 @@ class Poll {
 
         await this.db.deleteOne({
             guildId: this.guild.id,
-            channelId: this.channel.id
+            channelId: this.channel.id,
         });
         Poll.polls.splice(Poll.polls.indexOf(this));
 
@@ -73,7 +74,7 @@ class Poll {
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setDescription(await this.channel.translate("But no one voted :c"));
             await this.channel.sendTranslated("{{user}} Poll ended!", {
-                user: this.creator.toString()
+                user: this.creator.toString(),
             }, { embed });
             return;
         }
@@ -81,18 +82,21 @@ class Poll {
         const result = this.options
             .map(option => ({
                 text: option,
-                votes: this.votes[option]
+                votes: this.votes[option],
             }))
             .sort((a, b) => b.votes - a.votes);
 
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         for (const vote of result) embed.addField(vote.text, progressBar(vote.votes / total, 20, "█", "░"));
-        embed.setFooter(LocaleManager.locale(await this.channel.locale()).translate("{{votesCount}} vote").ifPlural("{{votesCount}} votes").format({
-            votesCount: total
-        }).fetch(total));
+        embed.setFooter(LocaleManager
+            .locale(await this.channel.locale())
+            .translate("{{votesCount}} vote")
+            .ifPlural("{{votesCount}} votes")
+            .format({ votesCount: total })
+            .fetch(total));
 
         await this.channel.sendTranslated("{{user}} Poll ended!", {
-            user: this.creator.toString()
+            user: this.creator.toString(),
         }, { embed });
     }
 
@@ -104,12 +108,12 @@ class Poll {
 
         this.db.updateOne({
             guildId: this.guild.id,
-            channelId: this.channel.id
+            channelId: this.channel.id,
         }, {
             $set: {
                 votes: this.votes,
-                users: Array.from(this.users.keys())
-            }
+                users: Array.from(this.users.keys()),
+            },
         });
 
         return true;
@@ -148,14 +152,14 @@ module.exports = async function install(cr, client, config, db) {
 
         const creator = guild.members.get(poll.creatorId) || {
             id: poll.creatorId,
-            toString() { return `<@${poll.creatorId}>`; }
+            toString() { return `<@${poll.creatorId}>`; },
         };
 
         const endDate = poll.endDate;
 
         const votes = poll.votes;
 
-        const users = new Discord.Collection(poll.users.map(userId => 
+        const users = new Discord.Collection(poll.users.map(userId =>
             [userId, guild.members.get(userId)]
         ));
 
@@ -220,7 +224,7 @@ module.exports = async function install(cr, client, config, db) {
             await message.channel.send(await message.channel.translate("@here Poll is starting! {{timeLeft}} left to vote", {
                 timeLeft: `**${toHumanTime(duration)}**`,
             }) + "\n" + await message.channel.translate("You vote by simply posting {{options}} in this channel", {
-                options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``
+                options: `\`${options.slice(0, -1).join("`, `")}\` or \`${options.slice(-1)[0]}\``,
             }));
         }))
         .setHelp(new HelpContent()

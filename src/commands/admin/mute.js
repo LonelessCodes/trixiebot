@@ -7,7 +7,7 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const database = db.collection("mute");
 
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
@@ -31,7 +31,7 @@ module.exports = async function install(cr, client, config, db) {
                 for (const word of muted_words) {
                     if (msg.indexOf(word) === -1) continue;
 
-                    await message.delete().catch(() => { });
+                    await message.delete().catch(() => { /* Do nothing */ });
                     return;
                 }
             }
@@ -46,16 +46,14 @@ module.exports = async function install(cr, client, config, db) {
         .setCategory(Category.MODERATION)
         .setPermissions(permission)
         .setIgnore(false);
-    
+
     const removeCommand = new OverloadCommand()
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
             const word = content.trim().toLowerCase();
 
             await database.deleteOne({ guildId: message.guild.id, word });
 
-            await message.channel.sendTranslated("Removed muted word \"{{word}}\" successfully", {
-                word
-            });
+            await message.channel.sendTranslated("Removed muted word \"{{word}}\" successfully", { word });
         }))
         .setHelp(new HelpContent()
             .setUsage("<phrase>")
@@ -98,9 +96,7 @@ module.exports = async function install(cr, client, config, db) {
 
             await database.insertOne({ guildId: message.guild.id, word });
 
-            await message.channel.sendTranslated("Got it! Blacklisted use of \"{{word}}\"", {
-                word
-            });
+            await message.channel.sendTranslated("Got it! Blacklisted use of \"{{word}}\"", { word });
         }));
 
     muteWordCommand.registerSubCommandAlias("*", "add");

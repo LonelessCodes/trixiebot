@@ -5,7 +5,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("catfact", new SimpleCommand(async () => {
         /** @type {} */
         const request = await fetch("https://cat-fact.herokuapp.com/facts/random");

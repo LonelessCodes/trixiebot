@@ -7,7 +7,7 @@ const options = {
     fit: "box",
     width: 31,
     height: 32,
-    color: false
+    color: false,
 };
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -15,7 +15,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     const ascii_cmd = new SimpleCommand(async (message, content, { command_name }) => {
         const urls = [];
         const match = content.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
@@ -31,16 +31,16 @@ module.exports = async function install(cr) {
 
         await new Promise((resolve, reject) => {
             const req = request(urls[0], { timeout: 5000, encoding: null }, (err, res, body) => {
+                if (err) return reject(new Error("Couldn't download the image"));
+
                 const type = filetype(body);
 
                 if (!/jpg|png|gif/.test(type.ext)) {
-                    return reject("The image must be JPG, PNG or GIF");
+                    return reject(new Error("The image must be JPG, PNG or GIF"));
                 }
 
-                asciiPromise(body, options, async (err, ascii) => {
-                    if (err) {
-                        return reject("Soooooooooooooooooooooooooomething went wrong");
-                    }
+                asciiPromise(body, options, (err, ascii) => {
+                    if (err) return reject(new Error("Soooooooooooooooooooooooooomething went wrong"));
 
                     resolve("```\n" + ascii + "\n```");
                 });
@@ -48,24 +48,24 @@ module.exports = async function install(cr) {
 
             req.on("error", () => {
                 req.destroy();
-                return reject("Request failed");
+                return reject(new Error("Request failed"));
             });
             req.on("response", res => {
                 if (res.statusCode !== 200) {
                     res.destroy();
-                    return reject("Request failed");
+                    return reject(new Error("Request failed"));
                 }
 
                 const header = res.headers["content-type"].split("/")[1];
                 if (!header || !/jpg|jpeg|png|gif/.test(header)) {
                     res.destroy();
-                    return reject("The image must be JPG, PNG or GIF");
+                    return reject(new Error("The image must be JPG, PNG or GIF"));
                 }
             });
         }).then(body =>
             message.channel.send(body)
         ).catch(err =>
-            message.channel.send(err)
+            message.channel.send(err.message)
         );
     });
 

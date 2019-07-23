@@ -6,7 +6,7 @@ const Category = require("../util/commands/Category");
 const MessageMentions = require("../util/commands/MessageMentions");
 const CommandScope = require("../util/commands/CommandScope");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("smol", new SimpleCommand(async (message, content) => {
         const is_guild = message.channel.type === "text";
         const mention = is_guild ? new MessageMentions(content, message.guild).members.first() : undefined;

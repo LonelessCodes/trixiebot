@@ -73,8 +73,8 @@ module.exports = class LocaleManager {
         this.db = db.collection("locale");
         this._cache = new DocumentMapCache(this.db, "guildId", {
             indexes: {
-                "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
-            }
+                removedFrom: { expireAfterSeconds: 7 * 24 * 3600, sparse: true },
+            },
         });
         this.locales = locales;
 
@@ -114,7 +114,7 @@ module.exports = class LocaleManager {
         if (channelId && typeof channelId !== "string") {
             let config = {
                 global: channelId.global,
-                channels: channelId.channels
+                channels: channelId.channels,
             };
             await this._cache.set(guildId, config);
         } else {
@@ -169,14 +169,20 @@ module.exports.locale = function locale(code) {
     return new Cursor({ locale: code });
 };
 
-module.exports.autoTranslate = async function (channel, str, format) {
-    return translate(str).locale(await channel.locale()).format(format).fetch() || str;
+module.exports.autoTranslate = async function autoTranslate(channel, str, format) {
+    return translate(str)
+        .locale(await channel.locale())
+        .format(format)
+        .fetch() || str;
 };
 
-module.exports.autoTranslateChannel = async function (str, format) {
-    return translate(str).locale(await this.locale()).format(format).fetch() || str;
+module.exports.autoTranslateChannel = async function autoTranslateChannel(str, format) {
+    return translate(str)
+        .locale(await this.locale())
+        .format(format)
+        .fetch() || str;
 };
 
-module.exports.sendTranslated = async function (str, format, embed) {
+module.exports.sendTranslated = async function sendTranslated(str, format, embed) {
     return await this.send(await module.exports.autoTranslateChannel.apply(this, [str, format]), embed);
 };

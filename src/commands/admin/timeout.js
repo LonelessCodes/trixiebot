@@ -14,9 +14,9 @@ const Category = require("../../util/commands/Category");
 const MessageMentions = require("../../util/commands/MessageMentions");
 
 /** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
-const timeout_notices = new Object;
+const timeout_notices = {};
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const database = db.collection("timeout");
     database.createIndex("expiresAt", { expireAfterSeconds: 0 });
     const database_messages = db.collection("timeout_messages");
@@ -34,19 +34,18 @@ module.exports = async function install(cr, client, config, db) {
                 const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
                 if (timeleft > 0) {
                     const content = message.content;
-                    message.delete().catch(() => { });
+                    message.delete().catch(() => { /* Do nothing */ });
 
                     const expiresIn = toHumanTime(timeleft);
 
                     const timeoutNotice = await message.channel.translate("{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}", {
                         userMention: message.member.toString(),
-                        timeLeft: `__**${expiresIn}**__`
+                        timeLeft: `__**${expiresIn}**__`,
                     });
 
                     if (timeout_notices[message.channel.id].time &&
                         (timeout_notices[message.channel.id].last ||
-                            timeout_notices[message.channel.id].time.getTime() + 60000 * 10 > Date.now())) {
-
+                            timeout_notices[message.channel.id].time.getTime() + (60000 * 10) > Date.now())) {
                         timeout_notices[message.channel.id].time = new Date;
                         timeout_notices[message.channel.id].message.delete();
                         timeout_notices[message.channel.id].message =
@@ -60,7 +59,7 @@ module.exports = async function install(cr, client, config, db) {
                         guildId: message.guild.id,
                         memberId: message.author.id,
                         message: content,
-                        timeoutEnd: timeout_entry.expiresAt
+                        timeoutEnd: timeout_entry.expiresAt,
                     });
 
                     timeout_notices[message.channel.id] = {
@@ -72,8 +71,9 @@ module.exports = async function install(cr, client, config, db) {
                     return;
                 } else if (timeleft <= 0) {
                     // mongodb has some problems with syncing the expiresAt index properly.
-                    // It can take up to a minute for it to remove the document, so we just remove it manually if it hasn't been cleared already
-                    await database.deleteOne({ _id: timeout_entry._id }).catch(() => { });
+                    // It can take up to a minute for it to remove the document, so we just
+                    // remove it manually if it hasn't been cleared already
+                    await database.deleteOne({ _id: timeout_entry._id }).catch(() => { /* Do nothing */ });
                 }
             }
 
@@ -94,18 +94,18 @@ module.exports = async function install(cr, client, config, db) {
         for (const member of members) {
             await database_messages.updateMany({
                 guildId: message.guild.id,
-                memberId: member.id
+                memberId: member.id,
             }, {
                 $set: {
-                    timeoutEnd: new Date
-                }
+                    timeoutEnd: new Date,
+                },
             });
         }
 
         const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
 
         await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
-            users: members.map(member => userToString(member)).join(" ")
+            users: members.map(member => userToString(member)).join(" "),
         });
 
         await Promise.all(promises);
@@ -120,11 +120,11 @@ module.exports = async function install(cr, client, config, db) {
         for (const timeout of timeouts) {
             await database_messages.updateMany({
                 guildId: message.guild.id,
-                memberId: timeout.memberId
+                memberId: timeout.memberId,
             }, {
                 $set: {
-                    timeoutEnd: new Date
-                }
+                    timeoutEnd: new Date,
+                },
             });
         }
 
@@ -207,11 +207,11 @@ module.exports = async function install(cr, client, config, db) {
             for (const member of members) {
                 await database_messages.updateMany({
                     guildId: message.guild.id,
-                    memberId: member.id
+                    memberId: member.id,
                 }, {
                     $set: {
-                        timeoutEnd: expiresAt
-                    }
+                        timeoutEnd: expiresAt,
+                    },
                 });
             }
 
@@ -223,7 +223,7 @@ module.exports = async function install(cr, client, config, db) {
                 .ifPlural("{{users}} are now timeouted for the next {{timeLeft}}")
                 .fetch(members.size), {
                 users: members.map(member => userToString(member)).join(" "),
-                timeLeft: timestr
+                timeLeft: timestr,
             }));
 
             await Promise.all(promises);

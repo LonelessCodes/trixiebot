@@ -29,7 +29,7 @@ const insertedSemiColon = {
     image: ";",
     startOffset: NaN,
     endOffset: NaN,
-    automaticallyInserted: true
+    automaticallyInserted: true,
 };
 
 class CCParser extends Parser {
@@ -134,14 +134,14 @@ function hasTokenLabel(obj) {
 const parser = new CCParser(ALL_TOKENS, {
     outputCst: true,
     ignoredIssues: {
-        Statement: { OR: true }
+        Statement: { OR: true },
     },
     errorMessageProvider: {
         buildMismatchTokenMessage({ actual, expected }) {
             const hasLabel = hasTokenLabel(expected);
-            const expectedMsg = hasLabel
-                ? `--> ${tokenLabel(expected)} <--`
-                : `token of type --> ${tokenName(expected)} <--`;
+            const expectedMsg = hasLabel ?
+                `--> ${tokenLabel(expected)} <--` :
+                `token of type --> ${tokenName(expected)} <--`;
 
             return `unexpected token: Expecting ${expectedMsg}, but found ->${actual.image}<-`;
         },
@@ -151,7 +151,7 @@ const parser = new CCParser(ALL_TOKENS, {
             return `redundant input: expecting end of file, but found ->${firstRedundant.image}<-`;
         },
 
-        buildNoViableAltMessage({ expectedPathsPerAlt, actual, customUserDescription, }) {
+        buildNoViableAltMessage({ expectedPathsPerAlt, actual, customUserDescription }) {
             const errPrefix = "unexpected token: ";
             const actualText = actual[0].image;
             const errSuffix = "\nbut found: ->" + actualText + "<-";
@@ -195,9 +195,9 @@ const parser = new CCParser(ALL_TOKENS, {
                     `expecting at least one of these possible token sequences:\n  <${nextValidTokenSequences.join(", ")}>`;
 
                 return errPrefix + calculatedDescription + errSuffix;
-            } 
-        }
-    }
+            }
+        },
+    },
 });
 
 const $ = parser;
@@ -212,7 +212,7 @@ $.RULE("PrimaryExpression", () => {
             { ALT: () => $.SUBRULE($.ArrayLiteral) },
             { ALT: () => $.SUBRULE($.ObjectLiteral) },
             { ALT: () => $.SUBRULE($.FunctionExpression) },
-            { ALT: () => $.SUBRULE($.ParenExpression) }
+            { ALT: () => $.SUBRULE($.ParenExpression) },
         ])
     );
 });
@@ -269,11 +269,11 @@ $.RULE("PropertyDefinition", () => {
                 $.SUBRULE($.PropertyName);
                 $.CONSUME(t.Colon);
                 $.SUBRULE($.AssignmentExpression, $value);
-            }
+            },
         },
         {
-            ALT: () => $.SUBRULE($.MethodDefinition)
-        }
+            ALT: () => $.SUBRULE($.MethodDefinition),
+        },
     ]);
 });
 
@@ -282,7 +282,7 @@ $.RULE("PropertyDefinition", () => {
 $.RULE("PropertyName", () => {
     $.OR([
         { ALT: () => $.CONSUME(t.IdentifierName) },
-        { ALT: () => $.CONSUME(t.StringLiteral) }
+        { ALT: () => $.CONSUME(t.StringLiteral) },
     ]);
 });
 
@@ -312,20 +312,20 @@ $.RULE("MemberExpression", () => {
                         $.CONSUME(t.OpenBracket);
                         $.SUBRULE($.AssignmentExpression, $key);
                         $.CONSUME(t.CloseBracket);
-                    }
+                    },
                 },
                 {
                     NAME: "$dot", ALT: () => {
                         $.CONSUME(t.Dot);
                         $.CONSUME(t.IdentifierName, $key);
-                    }
+                    },
                 },
                 {
                     NAME: "$call", ALT: () => {
                         $.SUBRULE($.Arguments);
-                    }
-                }
-            ]
+                    },
+                },
+            ],
         });
     });
 });
@@ -353,7 +353,7 @@ $.RULE("UpdateExpression", () => {
                         { ALT: () => $.CONSUME(t.Decrement, { LABEL: "$postfix" }) },
                     ]);
                 });
-            }
+            },
         },
         {
             ALT: () => {
@@ -362,7 +362,7 @@ $.RULE("UpdateExpression", () => {
                     { ALT: () => $.CONSUME2(t.Decrement, { LABEL: "$prefix" }) },
                 ]);
                 $.SUBRULE2($.MemberExpression, $right);
-            }
+            },
         },
     ]);
 });
@@ -374,12 +374,12 @@ $.RULE("UnaryExpression", () => {
                 $.OR2([
                     { ALT: () => $.CONSUME(t.OP_Plus, { LABEL: "$unary" }) },
                     { ALT: () => $.CONSUME(t.OP_Minus, { LABEL: "$unary" }) },
-                    { ALT: () => $.CONSUME(t.Exclamation, { LABEL: "$unary" }) }
+                    { ALT: () => $.CONSUME(t.Exclamation, { LABEL: "$unary" }) },
                 ]);
                 $.SUBRULE($.UnaryExpression, $left);
-            }
+            },
         },
-        { ALT: () => $.SUBRULE($.UpdateExpression, $left) }
+        { ALT: () => $.SUBRULE($.UpdateExpression, $left) },
     ]);
 });
 
@@ -553,7 +553,7 @@ $.RULE("ForIterationStatement", () => {
                 $.OPTION3(() => {
                     $.SUBRULE2($.AssignmentExpression, $right);
                 });
-            }
+            },
         },
         {
             ALT: () => {
@@ -561,8 +561,8 @@ $.RULE("ForIterationStatement", () => {
                 $.CONSUME(t.OfTok);
                 // maybe use PrimaryExpression
                 $.SUBRULE3($.AssignmentExpression, $value);
-            }
-        }
+            },
+        },
     ]);
     $.CONSUME(t.CloseParen);
     $.SUBRULE($.Statement, $body);

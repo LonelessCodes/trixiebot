@@ -23,8 +23,8 @@ class TreeCommand extends BaseCommand {
             is_default = true;
         }
         if (!command)
-            return; //Use SimpleTreeCommand then?
-        
+            return; // Use SimpleTreeCommand then?
+
         if (!command.permissions.test(message.member || message.author)) {
             await command.noPermission(message);
             return;
@@ -34,7 +34,9 @@ class TreeCommand extends BaseCommand {
             return;
         }
 
-        await command.run(message, command_name + (is_default ? "" : " " + args[0]), is_default ? content : args[1], pass_through, timer);
+        command_name += (is_default ? "" : " " + args[0]);
+        content = is_default ? content : args[1];
+        await command.run(message, command_name, content, pass_through, timer);
     }
 
     registerSubCommand(id, command) {

@@ -33,16 +33,16 @@ async function getData(message, content, database, databaseSlots) {
 
     const owner_waifus = await database.find({
         ownerId: message.author.id,
-        guildId: message.guild.id
+        guildId: message.guild.id,
     }).toArray();
 
     const owner_of_me = await database.findOne({
         waifuId: message.author.id,
-        guildId: message.guild.id
+        guildId: message.guild.id,
     });
 
     const slots = await databaseSlots.findOne({
-        waifuId: message.author.id
+        waifuId: message.author.id,
     });
 
     return {
@@ -51,7 +51,7 @@ async function getData(message, content, database, databaseSlots) {
         owner_waifus,
         owner_of_me,
         all_waifus,
-        slots: slots ? slots.slots : DEFAULT_SLOTS
+        slots: slots ? slots.slots : DEFAULT_SLOTS,
     };
 }
 
@@ -63,7 +63,7 @@ const MAX_SLOTS = 15;
 //   waifuId,
 //   guildId }
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const database = db.collection("waifu");
     const databaseSlots = db.collection("waifu_slots");
 
@@ -82,7 +82,7 @@ module.exports = async function install(cr, client, config, db) {
             const {
                 mentioned_member,
                 owner_waifus,
-                slots
+                slots,
             } = await getData(message, content, database, databaseSlots);
 
             if (!mentioned_member) {
@@ -107,7 +107,7 @@ module.exports = async function install(cr, client, config, db) {
 
             const owner = await database.findOne({
                 guildId: message.guild.id,
-                waifuId: mentioned_member.user.id
+                waifuId: mentioned_member.user.id,
             });
             if (owner) {
                 const owner_member = message.guild.members.get(owner.ownerId);
@@ -122,12 +122,12 @@ module.exports = async function install(cr, client, config, db) {
             await database.insertOne({
                 guildId: message.guild.id,
                 ownerId: message.author.id,
-                waifuId: mentioned_member.user.id
+                waifuId: mentioned_member.user.id,
             });
             await message.channel.send({
                 embed: new Discord.RichEmbed()
                     .setColor(CONST.COLOR.PRIMARY)
-                    .setAuthor(`Successful claim!!! Deep snug with ${userToString(mentioned_member, true)} incoming!`, mentioned_member.user.avatarURL)
+                    .setAuthor(`Successful claim!!! Deep snug with ${userToString(mentioned_member, true)} incoming!`, mentioned_member.user.avatarURL),
             });
         }
     }).setHelp(new HelpContent().setUsage("<@mention>", "Claim the person you mentioned if not already claimed."));
@@ -136,7 +136,7 @@ module.exports = async function install(cr, client, config, db) {
         async call(message, content) {
             const {
                 mentioned_member,
-                owner_waifus
+                owner_waifus,
             } = await getData(message, content, database, databaseSlots);
 
             if (!mentioned_member) {
@@ -152,7 +152,7 @@ module.exports = async function install(cr, client, config, db) {
             await database.deleteOne({
                 guildId: message.guild.id,
                 ownerId: message.author.id,
-                waifuId: mentioned_member.user.id
+                waifuId: mentioned_member.user.id,
             });
             await message.channel.send("Good bye bb :C");
         }
@@ -162,8 +162,8 @@ module.exports = async function install(cr, client, config, db) {
         constructor() {
             super();
 
-            this.cooldown_guild = new Array;
-            this.cooldown_user = new Array;
+            this.cooldown_guild = [];
+            this.cooldown_user = [];
         }
 
         async call(message, content) {
@@ -171,7 +171,7 @@ module.exports = async function install(cr, client, config, db) {
                 mentioned_member,
                 owner_waifus,
                 all_waifus,
-                slots
+                slots,
             } = await getData(message, content, database, databaseSlots);
 
             if (slots - owner_waifus.length === 0) {
@@ -253,25 +253,23 @@ module.exports = async function install(cr, client, config, db) {
             if (random > 95) {
                 await database.updateOne({
                     guildId: message.guild.id,
-                    waifuId: waifuUser.user.id
+                    waifuId: waifuUser.user.id,
                 }, {
                     $set: {
-                        ownerId: message.author.id
-                    }
+                        ownerId: message.author.id,
+                    },
                 });
                 await m2.edit("... ***ATTACC***", {
                     embed: new Discord.RichEmbed()
                         .setColor(CONST.COLOR.PRIMARY)
-                        .setAuthor(`Successful steal!!! ${userToString(waifuUser, true)} now belongs to you!`, waifuUser.user.avatarURL)
+                        .setAuthor(`Successful steal!!! ${userToString(waifuUser, true)} now belongs to you!`, waifuUser.user.avatarURL),
                 });
                 await timeout(60000);
-                await m1.delete().catch(() => { });
-                return;
+                await m1.delete().catch(() => { /* Do nothing */ });
             } else {
                 await m2.edit(`${userToString(waifuUser)} had got wind of your plans and dashed off at the next chance :c`);
                 await timeout(60000);
-                await m1.delete().catch(() => { });
-                return;
+                await m1.delete().catch(() => { /* Do nothing */ });
             }
         }
     }).setHelp(new HelpContent()
@@ -282,12 +280,12 @@ module.exports = async function install(cr, client, config, db) {
         constructor() {
             super();
 
-            this.cooldown_user = new Array;
+            this.cooldown_user = [];
         }
 
         async call(message) {
             const {
-                owner_of_me
+                owner_of_me,
             } = await getData(message, null, database, databaseSlots);
 
             if (!owner_of_me) {
@@ -332,23 +330,21 @@ because bees don...`);
             if (random > 95) {
                 await database.deleteOne({
                     guildId: message.guild.id,
-                    waifuId: message.author.id
+                    waifuId: message.author.id,
                 });
                 await message.channel.send("... ***ATTACC***\nThe leash tore and you are dashing off in the free world", {
                     embed: new Discord.RichEmbed()
                         .setColor(CONST.COLOR.PRIMARY)
-                        .setAuthor(`Successful escape!!! ${userToString(message.member, true)} is now free!`, message.author.avatarURL)
+                        .setAuthor(`Successful escape!!! ${userToString(message.member, true)} is now free!`, message.author.avatarURL),
                 });
                 await timeout(60000);
-                await m1.delete().catch(() => { });
-                await m2.delete().catch(() => { });
-                return;
+                await m1.delete().catch(() => { /* Do nothing */ });
+                await m2.delete().catch(() => { /* Do nothing */ });
             } else {
                 await message.channel.send(`${userToString(ownerUser)} reacted quickly and grabs you by your arm. "One day..." you mumble to yourself.`);
                 await timeout(60000);
-                await m1.delete().catch(() => { });
-                await m2.delete().catch(() => { });
-                return;
+                await m1.delete().catch(() => { /* Do nothing */ });
+                await m2.delete().catch(() => { /* Do nothing */ });
             }
         }
     }).setHelp(new HelpContent()
@@ -358,7 +354,7 @@ because bees don...`);
         async call(message, content) {
             const {
                 mentions,
-                owner_waifus
+                owner_waifus,
             } = await getData(message, content, database, databaseSlots);
 
             if (mentions.members.size !== 2) {
@@ -392,7 +388,7 @@ because bees don...`);
 
             const trade_waifu = await database.findOne({
                 waifuId: other_waifu.user.id,
-                guildId: message.guild.id
+                guildId: message.guild.id,
             });
             if (trade_waifu.ownerId === message.author.id) {
                 await message.channel.send(`${userToString(other_waifu)} belongs to you. But second @mention should be someone else's waifu.`);
@@ -407,13 +403,13 @@ because bees don...`);
 
             await message.channel.send(`${userToString(other_owner)}, do you agree to trade your ${userToString(other_waifu)} with ${userToString(my_waifu)}? \`yes\`, \`no\`?`);
 
-            const messages = await message.channel.awaitMessages((message) => {
+            const messages = await message.channel.awaitMessages(message => {
                 if (message.author.id !== other_owner.user.id) return false;
                 if (!/^(yes|no)\b/i.test(message.content)) return false;
                 return true;
             }, {
                 maxMatches: 1,
-                time: 4 * 60 * 1000
+                time: 4 * 60 * 1000,
             });
 
             if (messages.size === 0) {
@@ -436,7 +432,7 @@ because bees don...`);
                     .setColor(CONST.COLOR.PRIMARY)
                     .setTitle("Trading")
                     .setDescription(`${userToString(my_waifu)}** :arrow_right: ${userToString(other_owner)}**` +
-                        `**${userToString(message.member)}** :arrow_left: **${userToString(other_waifu)}**`)
+                        `**${userToString(message.member)}** :arrow_left: **${userToString(other_waifu)}**`),
             });
         }
     }).setHelp(new HelpContent()
@@ -481,7 +477,7 @@ because bees don...`);
             await purchaseSlots(message, this.active, this.cooldown_user, user, cost, "'Aight! There you go. Who will be your new waifu?", async cost => {
                 const [, new_balance] = await Promise.all([
                     databaseSlots.updateOne({ waifuId: user.id }, { $set: { slots: new_slots } }, { upsert: true }),
-                    credits.makeTransaction(message.guild, user, -cost, "waifu/slot", "Bought a waifu slot")
+                    credits.makeTransaction(message.guild, user, -cost, "waifu/slot", "Bought a waifu slot"),
                 ]);
                 return new_balance;
             });
@@ -511,7 +507,7 @@ because bees don...`);
             const {
                 owner_waifus,
                 owner_of_me,
-                slots
+                slots,
             } = await getData(message, null, database, databaseSlots);
 
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);

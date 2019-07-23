@@ -7,8 +7,8 @@ class RandomChance {
 
     /**
      * Add items to the chances
-     * @param {any} item 
-     * @param {number} distribution 
+     * @param {any} item
+     * @param {number} distribution
      */
     add(item, distribution = 1) {
         for (let i = 0; i < distribution; i++) this.array.push(item);
@@ -16,10 +16,10 @@ class RandomChance {
 
     /**
      * Pick a random item from the chances list
-     * @returns {any}
+     * @returns {Promise<any>}
      */
-    async random() {
-        return await secureRandom(this.array);
+    random() {
+        return secureRandom(this.array);
     }
 }
 

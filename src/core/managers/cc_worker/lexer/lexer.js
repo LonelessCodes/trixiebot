@@ -8,6 +8,6 @@ module.exports = new Lexer(ALL_TOKENS, {
             const text = fullText.substr(startOffset, length);
             // return `->${text}<-, skipped ${length} characters`;
             return `->${text}<-`;
-        }
-    }
+        },
+    },
 });

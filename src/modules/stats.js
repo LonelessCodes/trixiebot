@@ -62,13 +62,13 @@ class BotStats extends EventEmitter {
     async broadcastStats() {
         await ipc.promiseStart;
 
-        ipc.answer("getBotStats", async () => {
+        ipc.answer("getBotStats", () => {
             const json = this.toJSON();
             json.UPTIME = Math.floor(process.uptime() / 60);
 
             return {
                 success: true,
-                stats: json
+                stats: json,
             };
         });
     }
@@ -113,8 +113,8 @@ class WebStats extends EventEmitter {
         super();
 
         this.NAME = Object.freeze({
-            "ACTIVE_WEB_USERS": "ACTIVE_WEB_USERS",
-            "TOTAL_WEB_USERS": "TOTAL_WEB_USERS"
+            ACTIVE_WEB_USERS: "ACTIVE_WEB_USERS",
+            TOTAL_WEB_USERS: "TOTAL_WEB_USERS",
         });
 
         /** @type {Map<string, Stat>} */
@@ -137,7 +137,7 @@ class WebStats extends EventEmitter {
                 if (!this.has(name)) continue;
                 this.get(name).set(stats[name]);
             }
-        }).catch(() => { });
+        }).catch(() => { /* Do nothing */ });
 
         setTimeout(() => this.awaitStats(), 10000);
     }
@@ -161,5 +161,5 @@ class WebStats extends EventEmitter {
 
 module.exports = {
     web: new WebStats,
-    bot: new BotStats
+    bot: new BotStats,
 };

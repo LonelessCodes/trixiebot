@@ -8,17 +8,17 @@ const { User, Guild, TextChannel, Message, MessageReaction, RichEmbed } = requir
 
 class SampleList extends Events {
     /**
-     * 
-     * @param {User} user 
-     * @param {Guild} guild 
-     * @param {{
-        total: number;
-        predefined: PredefinedSample[];
-        user: UserSample[];
-        guild: GuildSample[];
-        }} samples
-     * @param {number} max_slots 
-     * @param {number} timeout 
+     * @param {User} user
+     * @param {Guild} guild
+     * @param {Object} samples
+     * @param {number} samples.total
+     * @param {PredefinedSample[]} samples.predefined
+     * @param {UserSample[]} samples.user
+     * @param {GuildSample[]} samples.guild
+     * @param {Object} max_slots
+     * @param {number} max_slots.guild
+     * @param {number} max_slots.user
+     * @param {number} timeout
      */
     constructor(user, guild, samples, max_slots = { guild: 0, user: 0 }, timeout = 60000 * 2) {
         super();
@@ -64,8 +64,8 @@ class SampleList extends Events {
 
     /**
      * Begins pagination on page 1 as a new Message in the provided TextChannel
-     * 
-     * @param {TextChannel} channel 
+     *
+     * @param {TextChannel} channel
      */
     async display(channel) {
         this.initialize(await channel.send(this.renderEmbed()));
@@ -76,29 +76,52 @@ class SampleList extends Events {
 
         const embed = basicEmbed("Available Samples", this.user);
 
-        embed.setDescription("Play a sample with `" + this.guild.config.prefix + "sb <sample name>`. View more info about a sample by typing `" + this.guild.config.prefix + "sb info u <sample name>` for user samples and `" + this.guild.config.prefix + "sb info s <sample name>` for server samples.");
+        const prefix = this.guild.config.prefix;
+        embed.setDescription(
+            "Play a sample with `" + prefix + "sb <sample name>`. " +
+            "View more info about a sample by typing `" + prefix + "sb info u <sample name>` for user samples and `" +
+            prefix + "sb info s <sample name>` for server samples."
+        );
 
         if (withEmoji) {
-            if (samples.predefined.length > 0) embed.addField("Predefined Samples", samples.predefined.map(s => this.ids.get(s.name) + " `" + s.name + "`").join(", "));
-            if (samples.guild.length > 0) embed.addField("Server Samples", samples.guild.map(s => this.ids.get(s.id) + " `" + s.name + "`").join(", ") + "\n" + "Taken Slots: " + samples.guild.length + " | All Slots: " + this.max_slots.guild);
-            if (samples.user.length > 0) embed.addField("User Samples", samples.user.map(s => this.ids.get(s.id) + " `" + s.name + "`").join(", ") + "\n" + "Taken Slots: " + samples.user.length + " | All Slots: " + this.max_slots.user);
+            if (samples.predefined.length > 0) embed.addField(
+                "Predefined Samples",
+                samples.predefined.map(s => this.ids.get(s.name) + " `" + s.name + "`").join(", ")
+            );
+            if (samples.guild.length > 0) embed.addField(
+                "Server Samples",
+                samples.guild.map(s => this.ids.get(s.id) + " `" + s.name + "`").join(", ") + "\nTaken Slots: " + samples.guild.length + " | All Slots: " + this.max_slots.guild
+            );
+            if (samples.user.length > 0) embed.addField(
+                "User Samples",
+                samples.user.map(s => this.ids.get(s.id) + " `" + s.name + "`").join(", ") + "\nTaken Slots: " + samples.user.length + " | All Slots: " + this.max_slots.user
+            );
         } else {
-            if (samples.predefined.length > 0) embed.addField("Predefined Samples", samples.predefined.map(s => "`" + s.name + "`").join(", "));
-            if (samples.guild.length > 0) embed.addField("Server Samples", samples.guild.map(s => "`" + s.name + "`").join(", ") + "\n" + "Taken Slots: " + samples.guild.length + " | All Slots: " + this.max_slots.guild);
-            if (samples.user.length > 0) embed.addField("User Samples", samples.user.map(s => "`" + s.name + "`").join(", ") + "\n" + "Taken Slots: " + samples.user.length + " | All Slots: " + this.max_slots.user);
+            if (samples.predefined.length > 0) embed.addField(
+                "Predefined Samples",
+                samples.predefined.map(s => "`" + s.name + "`").join(", ")
+            );
+            if (samples.guild.length > 0) embed.addField(
+                "Server Samples",
+                samples.guild.map(s => "`" + s.name + "`").join(", ") + "\nTaken Slots: " + samples.guild.length + " | All Slots: " + this.max_slots.guild
+            );
+            if (samples.user.length > 0) embed.addField(
+                "User Samples",
+                samples.user.map(s => "`" + s.name + "`").join(", ") + "\nTaken Slots: " + samples.user.length + " | All Slots: " + this.max_slots.user
+            );
         }
 
         return { embed };
     }
 
     /**
-     * @param {Message} message 
-     * @param {number} page_num 
+     * @param {Message} message
+     * @param {number} page_num
      */
     async initialize(message) {
         this.pagination(message);
         for (const [, emoji] of this.ids) {
-            await message.react(emoji).catch(() => { });
+            await message.react(emoji).catch(() => { /* Do nothing */ });
         }
     }
 
@@ -110,7 +133,8 @@ class SampleList extends Events {
         const collector = message.createReactionCollector(
             (reaction, user) => {
                 if (user.bot) return false;
-                if (this.guild.me.voiceChannelID && this.guild.me.voiceChannelID !== this.guild.member(user).voiceChannelID) return false;
+                if (this.guild.me.voiceChannelID &&
+                    this.guild.me.voiceChannelID !== this.guild.member(user).voiceChannelID) return false;
                 return this.map.has(reaction.emoji.name);
             },
             { time: this.timeout, max: 1 }
@@ -142,10 +166,10 @@ class SampleList extends Events {
     }
 
     /**
-     * @param {Message} message 
+     * @param {Message} message
      */
     async end(message) {
-        await message.clearReactions().catch(() => { });
+        await message.clearReactions().catch(() => { /* Do nothing */ });
         await message.edit(this.renderEmbed(false));
         this.emit("end", message);
     }
@@ -178,7 +202,7 @@ SampleList.EMOJIS = [
     "♠️",
     "♥️",
     "♦️",
-    "♣️"
+    "♣️",
 ];
 
 module.exports = SampleList;

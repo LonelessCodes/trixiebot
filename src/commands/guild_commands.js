@@ -13,13 +13,11 @@ function sort(data) {
     return data.map(entry => {
         entry.ts = entry.ts.getTime();
         return entry;
-    }).sort((a, b) => {
-        return b.ts > a.ts
-            ? -1
-            : b.ts < a.ts
-                ? 1
-                : 0;
-    });
+    }).sort((a, b) =>
+        b.ts > a.ts ?
+            -1 :
+            b.ts < a.ts ? 1 : 0
+    );
 }
 
 function findFirstIndex(arr, cb) {
@@ -29,11 +27,12 @@ function findFirstIndex(arr, cb) {
     return arr.length;
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
- * 
- * @param {Date} start 
- * @param {Date} end 
- * @param {{ ts: Date, value: number }[][]} param2 
+ * @param {Date} start
+ * @param {Date} end
+ * @param {{ ts: Date, value: number }[][]} param2
+ * @returns {string}
  */
 function getString(start, end, [commands = [], messages = [], users = []]) {
     let str = "";
@@ -67,11 +66,12 @@ function getString(start, end, [commands = [], messages = [], users = []]) {
     return str;
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
- * 
- * @param {Date} start 
- * @param {number} divider 
- * @param {{ ts: Date, value: number }[][]} param2 
+ * @param {Date} start
+ * @param {number} divider
+ * @param {{ ts: Date, value: number }[][]} param2
+ * @returns {string}
  */
 function getAverageString(start, divider, [commands = [], messages = [], users = []]) {
     let str = "";
@@ -82,7 +82,7 @@ function getAverageString(start, divider, [commands = [], messages = [], users =
 
     if (commands.length) commands = commands.slice(findFirstIndex(commands, findIndex));
     if (messages.length) messages = messages.slice(findFirstIndex(messages, findIndex));
-    if (users.length)    users    =    users.slice(findFirstIndex(users, findIndex));
+    if (users.length) users = users.slice(findFirstIndex(users, findIndex));
 
     str += `${(messages.reduce((sum, entry) => sum + entry.value, 0) / divider).toFixed(2)} Messages`;
 
@@ -118,7 +118,7 @@ function generateTimeFrames() {
     return { now, today, yesterday, week, month, quartal };
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("stats", new SimpleCommand(async message => {
         const guildId = message.guild.id;
 
@@ -158,7 +158,7 @@ module.exports = async function install(cr) {
 
         const results = await Promise.all([
             guild_stats.get("commands").getRangeUser(quartal, null, guildId, user.id).then(sort),
-            guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort)
+            guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort),
         ]);
 
         const embed = basicEmbed(await message.channel.translate("Statistics"), member);
@@ -177,7 +177,7 @@ module.exports = async function install(cr) {
             .setUsage("<?@user>", "")
             .addParameterOptional("@user", "The member c:"))
         .setCategory(Category.INFO);
-    
+
     cr.registerCommand("serverinfo", new SimpleCommand(async message => {
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);

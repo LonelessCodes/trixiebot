@@ -1,5 +1,5 @@
 class HelpContent {
-    constructor(description = null, parameters = new Map, options = null, usage = null, related = new Array) {
+    constructor(description = null, parameters = new Map, options = null, usage = null, related = []) {
         this.title = null;
         this.description = description;
         this.parameters = parameters;
@@ -21,7 +21,7 @@ class HelpContent {
     addParameter(parameter_name, content) {
         this.parameters.set(parameter_name, {
             content,
-            optional: false
+            optional: false,
         });
         return this;
     }
@@ -29,7 +29,7 @@ class HelpContent {
     addParameterOptional(parameter_name, content) {
         this.parameters.set(parameter_name, {
             content,
-            optional: true
+            optional: true,
         });
         return this;
     }

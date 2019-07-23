@@ -8,7 +8,7 @@ const Category = require("../../util/commands/Category");
 
 const Paginator = require("../../util/commands/Paginator");
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const database = db.collection("deleted_messages");
     database.createIndex("deletedAt", { expireAfterSeconds: 7 * 24 * 3600 });
     database.createIndex("editedAt", { expireAfterSeconds: 3 * 24 * 3600 });
@@ -31,17 +31,17 @@ module.exports = async function install(cr, client, config, db) {
                 attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
                 createdAt: message.createdAt,
                 deletedAt: new Date,
-                deleted: true
+                deleted: true,
             },
             $push: {
                 edits: {
                     content: message.content,
-                    editedAt: message.editedAt || message.createdAt
-                }
+                    editedAt: message.editedAt || message.createdAt,
+                },
             },
             $unset: {
-                editedAt: 1
-            }
+                editedAt: 1,
+            },
         }, { upsert: true });
     });
 
@@ -61,14 +61,14 @@ module.exports = async function install(cr, client, config, db) {
                 attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
                 createdAt: message.createdAt,
                 editedAt: new_message.editedAt,
-                deleted: false
+                deleted: false,
             },
             $push: {
                 edits: {
                     content: message.content,
-                    editedAt: message.editedAt || message.createdAt
-                }
-            }
+                    editedAt: message.editedAt || message.createdAt,
+                },
+            },
         }, { upsert: true });
     });
 
@@ -84,7 +84,7 @@ module.exports = async function install(cr, client, config, db) {
             .setUsage("", "List all deleted messages from the last 7 days"))
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN);
-    
+
     deletedCommand.registerSubCommand("clear", new SimpleCommand(async message => {
         await database.deleteMany({ guildId: message.guild.id });
 
@@ -95,7 +95,7 @@ module.exports = async function install(cr, client, config, db) {
 
     deletedCommand.registerDefaultCommand(new SimpleCommand(async message => {
         const messages = await database.find({
-            guildId: message.guild.id
+            guildId: message.guild.id,
         }).toArray();
 
         if (messages.length === 0) {
@@ -104,7 +104,7 @@ module.exports = async function install(cr, client, config, db) {
         }
 
         const page_limit = 10;
-        
+
         const items = [];
         for (const deleted_message of messages.filter(m => "deletedAt" in m).sort((a, b) => b.deletedAt - a.deletedAt)) {
             let str = "";
@@ -124,6 +124,10 @@ module.exports = async function install(cr, client, config, db) {
             items.push(str);
         }
 
-        new Paginator("Deleted Messages", `Messages deleted or edited by users: **${items.length}**\n`, page_limit, items, message.author, { guild: message.guild }).display(message.channel);
+        new Paginator(
+            "Deleted Messages",
+            `Messages deleted or edited by users: **${items.length}**\n`,
+            page_limit, items, message.author, { guild: message.guild }
+        ).display(message.channel);
     }));
 };

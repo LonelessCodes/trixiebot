@@ -1,9 +1,11 @@
 const chevrotain = require("chevrotain");
 const { Lexer } = chevrotain;
 
+// eslint-disable-next-line valid-jsdoc
 /**
  *  Utility to avoid manually building the ALL_TOKENS array
  * @param {chevrotain.ITokenConfig & { matched?: (match: RegExpExecArray) => any}} options
+ * @returns {RegExpExecArray}
  */
 function createToken(options) {
     const { matched, pattern } = options;
@@ -47,10 +49,15 @@ const IdentifierName = createToken({ name: "IdentifierName", pattern: Lexer.NA }
 const Keyword = createToken({
     name: "Keyword",
     pattern: Lexer.NA,
-    categories: IdentifierName
+    categories: IdentifierName,
 });
 
-const keyword = (name, match, opts = {}) => createToken({ name, pattern: new RegExp("\\b" + match + "\\b"), categories: Keyword, ...opts });
+const keyword = (name, match, opts = {}) => createToken({
+    name,
+    pattern: new RegExp("\\b" + match + "\\b"),
+    categories: Keyword,
+    ...opts,
+});
 
 // const VarTok = keyword("VarTok", "var");
 const FuncTok = keyword("FuncTok", "func");
@@ -171,7 +178,8 @@ exports.ALL_TOKENS = [
 
     Decrement, Increment,
 
-    AssignOperator, Equal, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision, OP_AssignPercent, OP_AssignExponent,
+    AssignOperator, Equal, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision,
+    OP_AssignPercent, OP_AssignExponent,
 
     AdditiveOperator, OP_Plus, OP_Minus,
     MultiOperator, OP_Multiple, OP_Division, OP_Percent,
@@ -183,7 +191,8 @@ exports.ALL_TOKENS = [
 
     IdentifierName,
     // Keywords
-    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, SleepTok, ReplyTok,
+    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok,
+    ContinueTok, IfTok, ThenTok, ElseTok, SleepTok, ReplyTok,
     LogicOperator, AndTok, OrTok,
 
     // Last
@@ -202,7 +211,8 @@ exports.tokens = {
 
     Decrement, Increment,
 
-    AssignOperator, Equal, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision, OP_AssignPercent, OP_AssignExponent,
+    AssignOperator, Equal, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision,
+    OP_AssignPercent, OP_AssignExponent,
 
     AdditiveOperator, OP_Plus, OP_Minus,
     MultiOperator, OP_Multiple, OP_Division, OP_Percent,
@@ -214,7 +224,8 @@ exports.tokens = {
 
     IdentifierName,
     // Keywords
-    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok, ContinueTok, IfTok, ThenTok, ElseTok, SleepTok, ReplyTok,
+    Keyword, /* VarTok ,*/ FuncTok, ReturnTok, ForTok, OfTok, WhileTok, BreakTok,
+    ContinueTok, IfTok, ThenTok, ElseTok, SleepTok, ReplyTok,
     LogicOperator, AndTok, OrTok,
 
     // Last

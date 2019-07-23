@@ -3,7 +3,8 @@ const nanoid = require("nanoid/generate");
 class SampleID {
     /**
      * Checks if a string is a valid SampleID string
-     * @param {string} id 
+     * @param {string} id
+     * @returns {boolean}
      */
     static isId(id) {
         return SampleID.REGEX.test(id);

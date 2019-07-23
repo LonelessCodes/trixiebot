@@ -89,7 +89,7 @@ async function process(key, message, msg, type) {
 
     // join to a query string
     const query = tags.map(t => encodeURIComponent(t)).join(",").replace(/\s+/g, "+");
-    
+
     const results = [];
     const promises = [];
     let responses = [];
@@ -101,14 +101,14 @@ async function process(key, message, msg, type) {
                 sf: "id",
                 sd: "asc",
                 perpage: amount,
-                key
+                key,
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 results.push({
                     image_url: image.representations.large,
                     id: image.id,
-                    artist: getArtist(image.tags)
+                    artist: getArtist(image.tags),
                 });
             }
             break;
@@ -118,14 +118,14 @@ async function process(key, message, msg, type) {
                 sf: "id",
                 sd: "desc",
                 perpage: amount,
-                key
+                key,
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 results.push({
                     image_url: image.representations.large,
                     id: image.id,
-                    artist: getArtist(image.tags)
+                    artist: getArtist(image.tags),
                 });
             }
             break;
@@ -135,30 +135,30 @@ async function process(key, message, msg, type) {
                 sf: "score",
                 sd: "desc",
                 perpage: amount,
-                key
+                key,
             });
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 results.push({
                     image_url: image.representations.large,
                     id: image.id,
-                    artist: getArtist(image.tags)
+                    artist: getArtist(image.tags),
                 });
             }
             break;
         case "random":
             result = await fetchDerpi({
                 q: query,
-                key
+                key,
             });
             for (let i = 0; i < Math.min(amount, result.total); i++) {
                 const promise = fetchDerpi({
                     q: query,
                     random_image: "true",
-                    key
+                    key,
                 }).then(response => fetchDerpi({
                     scope: response.id,
-                    key
+                    key,
                 }));
                 promises.push(promise);
             }
@@ -168,7 +168,7 @@ async function process(key, message, msg, type) {
                 results.push({
                     image_url: image.representations.large,
                     id: image.id,
-                    artist: getArtist(image.tags)
+                    artist: getArtist(image.tags),
                 });
             }
             break;
@@ -181,13 +181,13 @@ async function process(key, message, msg, type) {
     }
 
     /*
-    Credit MUST always be given to the site in the form of a link. 
+    Credit MUST always be given to the site in the form of a link.
 
-    If images are used, the artist MUST always be credited (if provided) 
-    and the original source URL MUST be displayed alongside the image, 
-    either in textual form or as a link. A link to the Derpibooru page 
+    If images are used, the artist MUST always be credited (if provided)
+    and the original source URL MUST be displayed alongside the image,
+    either in textual form or as a link. A link to the Derpibooru page
     is optional but recommended; we recommend the derpibooru.org domain
-    as a canonical domain. The https protocol MUST be specified on all 
+    as a canonical domain. The https protocol MUST be specified on all
     URIs; Derpibooru does not support plaintext HTTP connections.
 
     (from Derpibooru API License)
@@ -204,7 +204,7 @@ async function process(key, message, msg, type) {
     await message.channel.send(output);
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
     const key = config.get("derpibooru.key");

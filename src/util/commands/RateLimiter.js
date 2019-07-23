@@ -13,7 +13,7 @@ class RateLimit {
 
     decTries() {
         if (this.triesLeft === 0) return;
-        
+
         this.triesLeft--;
 
         setTimeout(() => this.incTries(), this.cooldown);
@@ -59,8 +59,8 @@ class RateLimit {
 class RateLimiter {
     /**
      * @param {TimeUnit} timeUnit The timeunit you'll input the RL time in. For example, TimeUnit#SECONDS.
-     * @param {number}   max      How many times before you get ratelimited.
-     * @param {number}   cooldown  How much time until the ratelimit gets lifted.
+     * @param {number}   cooldown How many times before you get ratelimited.
+     * @param {number}   max      How much time until the ratelimit gets lifted.
      */
     constructor(timeUnit, cooldown, max) {
         this.max = max || 1;
@@ -78,7 +78,7 @@ class RateLimiter {
             this.rateLimitedUsers.set(key, rateLimit);
         }
 
-        // go over everyone and check if cooldown over, to delete and save memory
+        // Go over everyone and check if cooldown over, to delete and save memory
         for (const [key, rl] of this.rateLimitedUsers) {
             if (rl.isCooldownOver()) this.rateLimitedUsers.delete(key);
         }
@@ -101,7 +101,7 @@ class RateLimiter {
             return false;
         }
 
-        // go over everyone and check if cooldown over, to delete and save memory
+        // Go over everyone and check if cooldown over, to delete and save memory
         for (const [key, rl] of this.rateLimitedUsers) {
             if (rl.isCooldownOver()) this.rateLimitedUsers.delete(key);
         }

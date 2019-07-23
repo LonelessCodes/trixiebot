@@ -19,11 +19,11 @@ const extnames = {
     ".css": "css",
     ".html": "html",
     ".md": "markdown",
-    ".json": "json"
+    ".json": "json",
 };
 
 // eslint-disable-next-line no-unused-vars
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     cr.registerCommand("file", new class extends BaseCommand {
         async noPermission(message) { await message.channel.sendTranslated("no"); }
 
@@ -47,7 +47,7 @@ module.exports = async function install(cr, client, config, db) {
             }
 
             const language = extnames[path.extname(msg)] || "";
-            const highWaterMark = 2000 - 2 * 4 - language.length;
+            const highWaterMark = 2000 - (2 * 4) - language.length;
 
             let tmp = await fs.readFile(file, { encoding: "utf8" });
 
@@ -67,7 +67,7 @@ module.exports = async function install(cr, client, config, db) {
         let escaped = resolveStdout("Out:\n" + content.stdout + "\nErr:\n" + content.stderr);
 
         while (escaped.length > 0) {
-            let lastIndex = escaped.substring(0, 2000 - 2 * 3).lastIndexOf("\n");
+            let lastIndex = escaped.substring(0, 2000 - (2 * 3)).lastIndexOf("\n");
             const result = escaped.substring(0, lastIndex).replace(/`/g, "´");
             escaped = escaped.substring(lastIndex + 1);
             await message.channel.send(`\`\`\`${result}\`\`\``);
@@ -82,17 +82,19 @@ module.exports = async function install(cr, client, config, db) {
         log(`Evaluated ${msg} and sent result`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.registerCommand("broadcast", new SimpleCommand(async (message, msg) => {
+    cr.registerCommand("broadcast", new SimpleCommand((message, msg) => {
         client.guilds.forEach(guild => {
             if (!guild.available) return;
             const defaultChannel = findDefaultChannel(guild);
             if (!defaultChannel) return;
-            defaultChannel.send("Broadcast from creator", { embed: new Discord.RichEmbed().setDescription(msg) }).catch(() => { });
+            defaultChannel.send("Broadcast from creator", {
+                embed: new Discord.RichEmbed().setDescription(msg),
+            }).catch(() => { /* Do nothing */ });
         });
         log(`Broadcasted message ${msg}`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.registerCommand("send", new SimpleCommand(async (message, msg) => {
+    cr.registerCommand("send", new SimpleCommand((message, msg) => {
         const s = splitArgs(msg, 2);
         const guild = client.guilds.get(s[0]);
         if (!guild.available) return;

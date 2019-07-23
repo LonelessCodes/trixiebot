@@ -10,22 +10,19 @@ const CommandScope = require("../util/commands/CommandScope");
 
 const usernameRegExp = /@([\w-]+)\b/g;
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     if (!config.has("tumblr.key")) return log.namespace("config", "Found no API token for Tumblr - Disabled mlpquote command");
 
     let quotes = [];
     getTumblrBlog(config.get("tumblr.key"), "incorrectmylittleponyquotes.tumblr.com")
-        .then(posts => {
-            return posts
-                .filter(post => post.tags.includes("incorrect my little pony quotes"))
-                .map(post => post.body.trim())
-                .filter(post => /\w+:/gi.test(post))
-                .map(quote => quote
-                    .replace(usernameRegExp, (match, username) => `<http://${username}.tumblr.com>`));
-        })
+        .then(posts => posts
+            .filter(post => post.tags.includes("incorrect my little pony quotes"))
+            .map(post => post.body.trim())
+            .filter(post => /\w+:/gi.test(post))
+            .map(quote => quote.replace(usernameRegExp, (_, username) => `<http://${username}.tumblr.com>`)))
         .then(q => quotes = q)
         .then(() => log.namespace("mlpquote cmd")("Quotes loaded:", quotes.length))
-        .catch(() => { });
+        .catch(() => { /* Do nothing */ });
 
     cr.registerCommand("mlpquote", new SimpleCommand(async message => {
         if (quotes.length === 0) {
@@ -40,6 +37,6 @@ module.exports = async function install(cr) {
         .setCategory(Category.MLP)
         .dontList()
         .setScope(CommandScope.ALL);
-    
+
     cr.registerAlias("mlpquote", "mlpquotes");
 };

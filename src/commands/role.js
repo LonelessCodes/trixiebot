@@ -17,7 +17,7 @@ function findRoleInServer(guild, role) {
 
 async function rolesMessage(guild, channel, db) {
     const roles = await db.find({
-        guildId: guild.id
+        guildId: guild.id,
     }).toArray();
 
     const available_roles = new Map;
@@ -60,7 +60,7 @@ async function rolesMessage(guild, channel, db) {
     }
 }
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const database = db.collection("roles");
 
     const roleCommand = cr.registerCommand("role", new TreeCommand)
@@ -104,46 +104,44 @@ module.exports = async function install(cr, client, config, db) {
                     member.removeRole(role_obj);
                 }
                 await message.channel.sendTranslated("Role removed.");
-            } else {
-                if (permission) {
-                    const role_obj = findRoleInServer(message.guild, content);
-                    if (!role_obj) {
-                        await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                        return;
-                    }
-
-                    if (!message.member.roles.has(role_obj.id)) {
-                        await message.channel.sendTranslated("Can't remove a role without having it first.");
-                        return;
-                    }
-
-                    await message.member.removeRole(role_obj);
-                    await message.channel.sendTranslated("Role removed.");
-                } else {
-                    const role_obj = findRoleInServer(message.guild, content);
-                    if (!role_obj) {
-                        await message.channel.send(await message.channel.translate("This role doesn't exist so you can't have it.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        return;
-                    }
-
-                    const role_query = await database.findOne({
-                        guildId: message.guild.id,
-                        roleId: role_obj.id
-                    });
-
-                    if (!role_query) {
-                        await message.channel.send(await message.channel.translate("You don't have permission to remove this role.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        return;
-                    }
-
-                    if (!message.member.roles.has(role_obj.id)) {
-                        await message.channel.sendTranslated("Can't remove a role without having it first.");
-                        return;
-                    }
-
-                    await message.member.removeRole(role_obj);
-                    await message.channel.sendTranslated("Role removed.");
+            } else if (permission) {
+                const role_obj = findRoleInServer(message.guild, content);
+                if (!role_obj) {
+                    await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
+                    return;
                 }
+
+                if (!message.member.roles.has(role_obj.id)) {
+                    await message.channel.sendTranslated("Can't remove a role without having it first.");
+                    return;
+                }
+
+                await message.member.removeRole(role_obj);
+                await message.channel.sendTranslated("Role removed.");
+            } else {
+                const role_obj = findRoleInServer(message.guild, content);
+                if (!role_obj) {
+                    await message.channel.send(await message.channel.translate("This role doesn't exist so you can't have it.") + " " + await rolesMessage(message.guild, message.channel, database));
+                    return;
+                }
+
+                const role_query = await database.findOne({
+                    guildId: message.guild.id,
+                    roleId: role_obj.id,
+                });
+
+                if (!role_query) {
+                    await message.channel.send(await message.channel.translate("You don't have permission to remove this role.") + " " + await rolesMessage(message.guild, message.channel, database));
+                    return;
+                }
+
+                if (!message.member.roles.has(role_obj.id)) {
+                    await message.channel.sendTranslated("Can't remove a role without having it first.");
+                    return;
+                }
+
+                await message.member.removeRole(role_obj);
+                await message.channel.sendTranslated("Role removed.");
             }
         }))
         .setHelp(new HelpContent()
@@ -162,7 +160,7 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsageTitle("Admin Area")
             .setUsage("", "Configure roles that everyone can add"));
-    
+
     roleConfig.registerSubCommand("add", new SimpleCommand(async (message, content) => {
         const args = findArgs(content);
         const role_query = args[0];
@@ -182,17 +180,17 @@ module.exports = async function install(cr, client, config, db) {
 
         await database.updateOne({
             guildId: message.guild.id,
-            roleId: role_obj.id
+            roleId: role_obj.id,
         }, {
             $set: {
-                category
-            }
+                category,
+            },
         }, { upsert: true });
         await message.channel.sendTranslated("Made the role available for everyone! It's free real estate");
     }))
         .setHelp(new HelpContent()
             .setUsage("<role> <?category>", "Add a role to the public configuration"));
-    
+
     roleConfig.registerSubCommand("remove", new SimpleCommand(async (message, content) => {
         const args = findArgs(content);
         const role = args[0];
@@ -211,7 +209,7 @@ module.exports = async function install(cr, client, config, db) {
 
         await database.deleteOne({
             guildId: message.guild.id,
-            roleId: role_obj.id
+            roleId: role_obj.id,
         });
         await message.channel.sendTranslated("Removed the role from the config. Ouchie wouchie ;~;");
     }))
@@ -257,46 +255,44 @@ module.exports = async function install(cr, client, config, db) {
                     await member.addRole(role_obj);
                 }
                 await message.channel.sendTranslated("Role added! /)");
-            } else {
-                if (permission) {
-                    const role_obj = findRoleInServer(message.guild, content);
-                    if (!role_obj) {
-                        await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
-                        return;
-                    }
-
-                    if (message.member.roles.has(role_obj.id)) {
-                        await message.channel.sendTranslated("You already have this role! Yay?");
-                        return;
-                    }
-
-                    await message.member.addRole(role_obj);
-                    await message.channel.sendTranslated("Role added! /)");
-                } else {
-                    const role_obj = findRoleInServer(message.guild, content);
-                    if (!role_obj) {
-                        await message.channel.send(await message.channel.translate("Uh apparently this server doesn't have this role available right now.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        return;
-                    }
-
-                    const role_query = await database.findOne({
-                        guildId: message.guild.id,
-                        roleId: role_obj.id
-                    });
-
-                    if (!role_query) {
-                        await message.channel.send(await message.channel.translate("Hmm... I couldn't really find your role.") + " " + await rolesMessage(message.guild, message.channel, database));
-                        return;
-                    }
-
-                    if (message.member.roles.has(role_obj.id)) {
-                        await message.channel.sendTranslated("You already have this role! Yay?");
-                        return;
-                    }
-
-                    await message.member.addRole(role_obj);
-                    await message.channel.sendTranslated("Role added! /)");
+            } else if (permission) {
+                const role_obj = findRoleInServer(message.guild, content);
+                if (!role_obj) {
+                    await message.channel.sendTranslated("Uh apparently this server doesn't have this role available right now.");
+                    return;
                 }
+
+                if (message.member.roles.has(role_obj.id)) {
+                    await message.channel.sendTranslated("You already have this role! Yay?");
+                    return;
+                }
+
+                await message.member.addRole(role_obj);
+                await message.channel.sendTranslated("Role added! /)");
+            } else {
+                const role_obj = findRoleInServer(message.guild, content);
+                if (!role_obj) {
+                    await message.channel.send(await message.channel.translate("Uh apparently this server doesn't have this role available right now.") + " " + await rolesMessage(message.guild, message.channel, database));
+                    return;
+                }
+
+                const role_query = await database.findOne({
+                    guildId: message.guild.id,
+                    roleId: role_obj.id,
+                });
+
+                if (!role_query) {
+                    await message.channel.send(await message.channel.translate("Hmm... I couldn't really find your role.") + " " + await rolesMessage(message.guild, message.channel, database));
+                    return;
+                }
+
+                if (message.member.roles.has(role_obj.id)) {
+                    await message.channel.sendTranslated("You already have this role! Yay?");
+                    return;
+                }
+
+                await message.member.addRole(role_obj);
+                await message.channel.sendTranslated("Role added! /)");
             }
         }));
     roleCommand.registerSubCommandAlias("*", "add");

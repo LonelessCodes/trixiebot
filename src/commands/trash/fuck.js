@@ -9,8 +9,8 @@ const RateLimiter = require("../../util/commands/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
 const MessageMentions = require("../../util/commands/MessageMentions");
 
-module.exports = async function install(cr, client, config, db) {
-    const added_recently = new Array();
+module.exports = function install(cr, client, config, db) {
+    const added_recently = [];
 
     const database = db.collection("fuck");
 
@@ -57,7 +57,7 @@ module.exports = async function install(cr, client, config, db) {
                 text,
                 lowercase: text.toLowerCase(),
                 author: message.author.tag,
-                authorId: message.author.id
+                authorId: message.author.id,
             });
             added_recently.push(message.author.id);
             setTimeout(() => {

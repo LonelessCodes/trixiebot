@@ -10,13 +10,15 @@ const nanoTimer = require("../modules/nanoTimer");
 const { Message, Permissions } = require("discord.js");
 
 /**
- * @param {Message} message 
+ * @param {Message} message
+ * @param {Error} err
+ * @returns {void}
  */
 async function onProcessingError(message, err) {
     log.error(
         "ProcessingError {\n" +
         "  content:     " + JSON.stringify(message.content) + "\n" +
-        "  channelType: " + message.channel.type + "\n" + 
+        "  channelType: " + message.channel.type + "\n" +
         (message.channel.type === "text" ? "  guildId:     " + message.guild.id + "\n" : "") +
         "  channelId:   " + message.channel.id + "\n" +
         "  userId:      " + message.author.id + "\n" +
@@ -24,8 +26,9 @@ async function onProcessingError(message, err) {
     );
 
     try {
-        if (INFO.DEV) await message.channel.sendTranslated(`Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...\n\`${err.name}: ${err.message}\``);
-        else await message.channel.sendTranslated("Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...");
+        const err_message = "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...";
+        if (INFO.DEV) await message.channel.sendTranslated(err_message + `\n\`${err.name}: ${err.message}\``);
+        else await message.channel.sendTranslated(err_message);
     } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
 }
 
@@ -46,7 +49,7 @@ class CommandProcessor {
     }
 
     /**
-     * @param {Message} message 
+     * @param {Message} message
      */
     async onMessage(message) {
         const timer = nanoTimer();
@@ -93,11 +96,12 @@ class CommandProcessor {
             prefix_used = false;
         }
 
-        const msg = Object.assign(Object.create(message), message, { prefix, prefix_used });
+        message = Object.assign(Object.create(message), message, { prefix, prefix_used });
 
-        const [command_name, processed_content] = splitArgs(raw_content, 2);
+        const [command_name_raw, processed_content] = splitArgs(raw_content, 2);
+        const command_name = command_name_raw.toLowerCase();
 
-        const executed = await this.DISPATCHER.process(msg, command_name.toLowerCase(), processed_content, prefix, prefix_used, timer);
+        const executed = await this.DISPATCHER.process(message, command_name, processed_content, prefix, prefix_used, timer);
 
         // const diff = timer.end();
         // commandTime.observe(diff);
@@ -107,7 +111,7 @@ class CommandProcessor {
         if (!executed) return;
 
         stats.bot.get("COMMANDS_EXECUTED").inc(1);
-        
+
         if (message.channel.type === "text")
             await guild_stats.get("commands").add(new Date, message.guild.id, message.channel.id, message.author.id, command_name);
     }

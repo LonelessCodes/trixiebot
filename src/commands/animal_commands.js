@@ -50,18 +50,18 @@ async function randomBird() {
     return result[0];
 }
 
-module.exports = async function install(cr) {
-    cr.registerCommand("cat", new SimpleCommand(async message => {
-        return await message.channel.translate("meow") + " " + catFace() + " " + await randomCat();
-    }))
+module.exports = function install(cr) {
+    cr.registerCommand("cat", new SimpleCommand(async message =>
+        await message.channel.translate("meow") + " " + catFace() + " " + await randomCat()
+    ))
         .setHelp(new HelpContent().setDescription("Random cat image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("cat", "kitty");
 
-    cr.registerCommand("dog", new SimpleCommand(async message => {
-        return await message.channel.translate("woof") + " " + dogFace() + " " + await randomDog();
-    }))
+    cr.registerCommand("dog", new SimpleCommand(async message =>
+        await message.channel.translate("woof") + " " + dogFace() + " " + await randomDog()
+    ))
         .setHelp(new HelpContent().setDescription("Random dog image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
@@ -70,9 +70,9 @@ module.exports = async function install(cr) {
     cr.registerAlias("dog", "bork");
     cr.registerAlias("dog", "pup");
 
-    cr.registerCommand("fox", new SimpleCommand(async message => {
-        return await message.channel.translate("yip") + " " + "🦊" + " " + await randomFox();
-    }))
+    cr.registerCommand("fox", new SimpleCommand(async message =>
+        await message.channel.translate("yip") + " 🦊 " + await randomFox()
+    ))
         .setHelp(new HelpContent().setDescription("Random fox image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
@@ -80,17 +80,17 @@ module.exports = async function install(cr) {
     cr.registerAlias("fox", "foxi");
     cr.registerAlias("fox", "weff");
 
-    cr.registerCommand("shibe", new SimpleCommand(async message => {
-        return await message.channel.translate("weff") + " " + dogFace() + " " + await randomShibe();
-    }))
+    cr.registerCommand("shibe", new SimpleCommand(async message =>
+        await message.channel.translate("weff") + " " + dogFace() + " " + await randomShibe()
+    ))
         .setHelp(new HelpContent().setDescription("Random SHIBE image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("shibe", "shiba");
 
-    cr.registerCommand("bird", new SimpleCommand(async message => {
-        return await message.channel.translate("peep") + " " + "ovo" + " " + await randomBird();
-    }))
+    cr.registerCommand("bird", new SimpleCommand(async message =>
+        await message.channel.translate("peep") + " ovo " + await randomBird()
+    ))
         .setHelp(new HelpContent().setDescription("Random Birb image ovo"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);

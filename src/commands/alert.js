@@ -25,7 +25,7 @@ async function nsfwThumb(url) {
 
     return await new Promise((res, rej) => {
         gm(in_stream, "thumb.jpg")
-            .size({ bufferStream: true }, function (err, size) {
+            .size({ bufferStream: true }, function size(err, size) {
                 if (err) return rej(err);
                 this.resize(420, 236)
                     .blur(35, 9)
@@ -46,7 +46,7 @@ async function nsfwThumb(url) {
 
 class StreamProcessor extends EventEmitter {
     /**
-     * @param {Manager} manager 
+     * @param {Manager} manager
      */
     constructor(manager) {
         super();
@@ -69,16 +69,16 @@ class StreamProcessor extends EventEmitter {
         return await this.database.findOne({
             service: this.name,
             guildId: guild.id,
-            userId: userId
+            userId: userId,
         });
     }
 
     formatURL() { return ""; }
 
-    async addChannel(config) {
+    addChannel(config) {
         return new Channel(this.manager, this, config.channel, config);
     }
-    async removeChannel(config) {
+    removeChannel(config) {
         const oldChannel = this.online.findIndex(oldChannel =>
             oldChannel.channel.guild.id === config.channel.guild.id &&
             oldChannel.userId === config.userId);
@@ -122,7 +122,7 @@ class Picarto extends StreamProcessor {
     }
 
     formatURL(channel, fat = false) {
-        if (fat) return this.url + "/" + "**" + channel.name + "**";
+        if (fat) return this.url + "/**" + channel.name + "**";
         else return "https://" + this.url + "/" + channel.name;
     }
 
@@ -140,14 +140,14 @@ class Picarto extends StreamProcessor {
             const stream = this.manager.getConfigs(this);
 
             stream.addListener("data", config => this.checkChange(picartoOnline, config));
-            stream.once("end", () => { });
+            stream.once("end", () => { /* Do nothing */ });
             stream.once("error", err => { log(err); });
         } catch (_) { _; } // Picarto is down
     }
 
     /**
-     * @param {any[]} picartoOnline 
-     * @param {Channel} savedConfig 
+     * @param {any[]} picartoOnline
+     * @param {Channel} savedConfig
      */
     async checkChange(picartoOnline, savedConfig) {
         const oldChannel = this.online.find(oldChannel =>
@@ -156,7 +156,7 @@ class Picarto extends StreamProcessor {
 
         let channelPage = picartoOnline.find(channelPage => savedConfig.userId === channelPage.user_id.toString());
         if (!channelPage) {
-            // remove the channel from the recently online list                
+            // remove the channel from the recently online list
             if (savedConfig.messageId || oldChannel) this.emit("offline", oldChannel || savedConfig);
         } else {
             // if the channel was not recently online, set it online
@@ -173,7 +173,7 @@ class Picarto extends StreamProcessor {
                     nsfw: channelPage.adult,
                     category: channelPage.category,
                     tags: channelPage.tags,
-                    thumbnail: channelPage.thumbnails.web_large
+                    thumbnail: channelPage.thumbnails.web_large,
                 });
 
                 this.emit("online", onlineChannel);
@@ -226,7 +226,7 @@ class Twitch extends StreamProcessor {
     }
 
     formatURL(channel, fat = false) {
-        if (fat) return this.url + "/" + "**" + channel.name + "**";
+        if (fat) return this.url + "/**" + channel.name + "**";
         else return "https://" + this.url + "/" + channel.name;
     }
 
@@ -248,7 +248,7 @@ class Twitch extends StreamProcessor {
 
         const channelPage = online_channels.find(channelPage => config.userId === channelPage.channel.id.toString());
         if (!channelPage) {
-            // remove the channel from the recently online list                
+            // remove the channel from the recently online list
             if (config.messageId || oldChannel) this.emit("offline", oldChannel || config);
         } else {
             // if the channel was not recently online, set it online
@@ -316,7 +316,7 @@ class Piczel extends StreamProcessor {
     }
 
     formatURL(channel, fat = false) {
-        if (fat) return this.url + "/watch/" + "**" + channel.name + "**";
+        if (fat) return this.url + "/watch/**" + channel.name + "**";
         else return "https://" + this.url + "/watch/" + channel.name;
     }
 
@@ -334,23 +334,23 @@ class Piczel extends StreamProcessor {
             const stream = this.manager.getConfigs(this);
 
             stream.addListener("data", config => this.checkChange(piczelOnline, config));
-            stream.once("end", () => { });
+            stream.once("end", () => { /* Do nothing */ });
             stream.once("error", err => { log(err); });
         } catch (_) { _; } // Piczel is down
     }
 
     /**
-     * @param {any} piczelOnline 
-     * @param {Channel} savedConfig 
+     * @param {any} piczelOnline
+     * @param {Channel} savedConfig
      */
-    async checkChange(piczelOnline, savedConfig) {
+    checkChange(piczelOnline, savedConfig) {
         const oldChannel = this.online.find(oldChannel =>
             savedConfig.userId === oldChannel.userId &&
             savedConfig.channel.guild.id === oldChannel.channel.guild.id);
 
         const channelPage = piczelOnline.find(channelPage => savedConfig.userId === channelPage.user.id.toString());
         if (!channelPage) {
-            // remove the channel from the recently online list                
+            // remove the channel from the recently online list
             if (savedConfig.messageId || oldChannel) this.emit("offline", oldChannel || savedConfig);
         } else {
             // if the channel was not recently online, set it online
@@ -362,7 +362,7 @@ class Piczel extends StreamProcessor {
                 avatar: channelPage.user.avatar ? channelPage.user.avatar.avatar.url : null,
                 nsfw: channelPage.adult,
                 tags: channelPage.tags,
-                thumbnail: `https://piczel.tv/static/thumbnail/stream_${channelPage.id}.jpg`
+                thumbnail: `https://piczel.tv/static/thumbnail/stream_${channelPage.id}.jpg`,
             });
 
             this.emit("online", onlineChannel);
@@ -419,7 +419,7 @@ class Smashcast extends StreamProcessor {
     }
 
     formatURL(channel, fat = false) {
-        if (fat) return this.url + "/" + "**" + channel.name + "**";
+        if (fat) return this.url + "/**" + channel.name + "**";
         else return "https://" + this.url + "/" + channel.name;
     }
 
@@ -445,7 +445,7 @@ class Smashcast extends StreamProcessor {
 
         const stream = online_channels.find(stream => config.userId === stream.media_user_id);
         if (!stream) {
-            // remove the channel from the recently online list                
+            // remove the channel from the recently online list
             if (config.messageId || oldChannel) this.emit("offline", oldChannel || config);
         } else {
             // if the channel was not recently online, set it online
@@ -462,7 +462,7 @@ class Smashcast extends StreamProcessor {
                 thumbnail: media_base + stream.media_thumbnail_large,
                 language: stream.media_countries ? stream.media_countries[0] : null,
                 category: stream.category_name,
-                nsfw: !!stream.media_mature
+                nsfw: !!stream.media_mature,
             });
 
             this.emit("online", onlineChannel);
@@ -524,7 +524,7 @@ class ChannelQueryCursor {
     }
 
     /**
-     * @param {any} config 
+     * @param {any} config
      * @returns {Channel}
      */
     process(config) {
@@ -562,6 +562,7 @@ class Manager extends EventEmitter {
         this.db_config = db.collection("alert_config");
         this.client = client;
 
+        /** @type {StreamProcessor[]} */
         this.services = [];
         this.services_mapped = {};
 
@@ -574,7 +575,7 @@ class Manager extends EventEmitter {
                     this.online.splice(this.online.indexOf(oldChannel), 1);
 
                     await this.database.updateOne({
-                        _id: oldChannel._id
+                        _id: oldChannel._id,
                     }, { $set: { messageId: null } });
 
                     if (await this.isCleanup(oldChannel.channel.guild))
@@ -591,7 +592,7 @@ class Manager extends EventEmitter {
 
                     const onlineMessage = await channel.channel.sendTranslated("{{user}} is live on {{service}}!", {
                         user: channel.name,
-                        service: channel.service.display_name
+                        service: channel.service.display_name,
                     }, { embed });
 
                     channel.setMessage(onlineMessage);
@@ -599,12 +600,12 @@ class Manager extends EventEmitter {
                     this.online.push(channel);
 
                     await this.database.updateOne({
-                        _id: channel._id
+                        _id: channel._id,
                     }, {
                         $set: {
                             name: channel.name,
-                            messageId: onlineMessage.id
-                        }
+                            messageId: onlineMessage.id,
+                        },
                     });
                 });
                 this.services.push(service);
@@ -622,6 +623,8 @@ class Manager extends EventEmitter {
     }
 
     /**
+     * @param {Discord.TextChannel} channel
+     * @param {string} url
      * @returns {Config}
      */
     async parseConfig(channel, url) {
@@ -635,7 +638,7 @@ class Manager extends EventEmitter {
     }
 
     /**
-     * @param {Config} config 
+     * @param {Config} config
      */
     async addChannel(config) {
         for (let service of this.services) {
@@ -647,7 +650,7 @@ class Manager extends EventEmitter {
                 channelId: config.channel.id,
                 userId: config.userId,
                 name: config.name,
-                messageId: null
+                messageId: null,
             });
 
             return await service.addChannel(config);
@@ -655,7 +658,7 @@ class Manager extends EventEmitter {
     }
 
     /**
-     * @param {Config} config 
+     * @param {Config} config
      */
     async removeChannel(config) {
         for (let service of this.services) {
@@ -671,7 +674,7 @@ class Manager extends EventEmitter {
 
     async getChannels(guild) {
         const configs = await this.database.find({
-            guildId: guild.id
+            guildId: guild.id,
         }).toArray();
 
         const channels = [];
@@ -691,7 +694,7 @@ class Manager extends EventEmitter {
         return channels;
     }
 
-    async getOnlineChannels(guild) {
+    getOnlineChannels(guild) {
         return this.online.filter(online => online.channel.guild.id === guild.id);
     }
 
@@ -746,11 +749,11 @@ class Channel {
     async delete() {
         if (!this.messageId) return;
 
-        const onlineMessage = await this.channel.fetchMessage(this.messageId).catch(() => { });
+        const onlineMessage = await this.channel.fetchMessage(this.messageId).catch(() => { /* Do nothing */ });
         this.messageId = null;
         if (!onlineMessage || !(onlineMessage.deletable && !onlineMessage.deleted)) return;
 
-        await onlineMessage.delete().catch(() => { });
+        await onlineMessage.delete().catch(() => { /* Do nothing */ });
     }
 }
 
@@ -783,14 +786,14 @@ class OnlineChannel extends Channel {
 
     async delete() {
         if (this.messageId && !this.message) {
-            const onlineMessage = await this.channel.fetchMessage(this.messageId).catch(() => { });
+            const onlineMessage = await this.channel.fetchMessage(this.messageId).catch(() => { /* Do nothing */ });
             this.messageId = null;
             if (!onlineMessage) return;
             this.message = onlineMessage;
         }
 
         if (this.message.deletable && !this.message.deleted)
-            await this.message.delete().catch(() => { });
+            await this.message.delete().catch(() => { /* Do nothing */ });
 
         this.messageId = null;
         this.message = null;
@@ -804,11 +807,9 @@ class OnlineChannel extends Channel {
         if (this.tags && this.tags.length > 0) footer.push(`Tags: ${this.tags.join(", ")}`);
 
         const blur = this.thumbnail ?
-            this.channel.nsfw ?
+            !this.channel.nsfw ?
+                this.nsfw :
                 false :
-                this.nsfw ?
-                    true :
-                    false :
             false;
         /** @type {Discord.Attachment} */
 
@@ -823,8 +824,8 @@ class OnlineChannel extends Channel {
         const thumbnail = can_use_blur ?
             "attachment://thumb.jpg" :
             !blur && this.thumbnail ?
-                `${this.thumbnail}?${Date.now()}`
-                : null;
+                `${this.thumbnail}?${Date.now()}` :
+                null;
         const embed = new Discord.RichEmbed()
 
             .setColor(this.service.color || CONST.COLOR.PRIMARY)
@@ -897,7 +898,7 @@ module.exports = async function install(cr, client, _, db) {
         /** @type {Map<any, Channel>} */
         const sorted_by_channels = new Map;
         for (const s_channel of s_channels)
-            sorted_by_channels.set(s_channel.channel, [...(sorted_by_channels.get(s_channel.channel) || []), s_channel]);
+            sorted_by_channels.set(s_channel.channel, [...sorted_by_channels.get(s_channel.channel) || [], s_channel]);
 
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
         for (const [g_channel, s_channels] of sorted_by_channels) {
@@ -919,7 +920,7 @@ module.exports = async function install(cr, client, _, db) {
 
             if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
                 await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
-                    url
+                    url,
                 });
                 return;
             }
@@ -941,7 +942,7 @@ module.exports = async function install(cr, client, _, db) {
             await manager.removeChannel(config);
 
             await message.channel.sendTranslated("Stopped alerting for {{name}}", {
-                name: config.name
+                name: config.name,
             });
         }))
         .setHelp(new HelpContent().setUsage("<page url>", "unsubscribe Trixie from a Picarto channel"));
@@ -980,7 +981,7 @@ module.exports = async function install(cr, client, _, db) {
             }
             if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
                 await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
-                    url
+                    url,
                 });
                 return;
             }
@@ -1006,7 +1007,7 @@ module.exports = async function install(cr, client, _, db) {
             await manager.addChannel(config);
 
             await message.channel.sendTranslated("Will be alerting y'all there when {{name}} goes online!", {
-                name: config.name
+                name: config.name,
             });
         }));
 

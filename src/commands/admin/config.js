@@ -14,10 +14,10 @@ const types_human = new Map([
     [Boolean, "true or false"],
     [Discord.TextChannel, "\\#Channel"],
     [Discord.Role, "Role Name"],
-    [Discord.GuildMember, "\\@User"]
+    [Discord.GuildMember, "\\@User"],
 ]);
 
-module.exports = async function install(cr, client, config) {
+module.exports = function install(cr, client, config) {
     cr.registerCommand("config", new OverloadCommand)
         .setHelp(new HelpContent()
             .setUsage("<?parameter> <?value>", "view the Trixie's config in this server")
@@ -59,7 +59,7 @@ module.exports = async function install(cr, client, config) {
 
             const find = () => {
                 let rtn;
-                const find = function find(p) {
+                const find = p => {
                     if (p.name instanceof Array) return p.name.find(find);
                     if (p.name === arg) rtn = p;
                 };
@@ -80,9 +80,10 @@ module.exports = async function install(cr, client, config) {
                 const human_readable = parameter.human(value);
                 embed.addField("Currently:", `\`${human_readable}\``);
                 embed.addField("Update:", `\`${message.prefix}config ${parameter.name} <new value>\``);
-                embed.addField("Allowed Types:", parameter.types.map(t => {
-                    return types_human.get(t) || `\`${t}\``;
-                }).join(", ") + (parameter.allowEmpty ? " or `none`" : ""));
+                embed.addField("Allowed Types:", parameter.types
+                    .map(t => types_human.get(t) || `\`${t}\``)
+                    .join(", ") +
+                    (parameter.allowEmpty ? " or `none`" : ""));
             }
 
             await message.channel.send({ embed });
@@ -95,7 +96,7 @@ module.exports = async function install(cr, client, config) {
 
             const find = () => {
                 let rtn;
-                const find = function find(p) {
+                const find = p => {
                     if (p.name instanceof Array) return p.name.find(find);
                     if (p.name === args[0]) rtn = p;
                 };
@@ -110,7 +111,10 @@ module.exports = async function install(cr, client, config) {
             } else if (!parameter.check(value)) {
                 embed.setColor(CONST.COLOR.ERROR);
                 embed.setDescription(await message.channel.translate("New value has a wrong format. Should be {{format}}", {
-                    format: parameter.types.map(t => types_human.get(t) || `\`${t}\``).join(", ") + parameter.allowEmpty ? " or `none`" : ""
+                    format: parameter.types
+                        .map(t => types_human.get(t) || `\`${t}\``)
+                        .join(", ") +
+                        (parameter.allowEmpty ? " or `none`" : ""),
                 }));
             } else {
                 embed.setColor(CONST.COLOR.PRIMARY);
@@ -151,9 +155,10 @@ module.exports = async function install(cr, client, config) {
             const human_readable = parameter.human(value);
             embed.addField("Currently:", `\`${human_readable}\``);
             embed.addField("Update:", `\`${message.prefix}${parameter.name} <new value>\``);
-            embed.addField("Allowed Types:", parameter.types.map(t => {
-                return types_human.get(t) || `\`${t}\``;
-            }).join(", ") + (parameter.allowEmpty ? " or `none`" : ""));
+            embed.addField("Allowed Types:", parameter.types
+                .map(t => types_human.get(t) || `\`${t}\``)
+                .join(", ") +
+                (parameter.allowEmpty ? " or `none`" : ""));
 
             await message.channel.send({ embed });
         }))
@@ -167,7 +172,10 @@ module.exports = async function install(cr, client, config) {
             if (!parameter.check(value)) {
                 embed.setColor(CONST.COLOR.ERROR);
                 embed.setDescription(await message.channel.translate("New value has a wrong format. Should be {{format}}", {
-                    format: parameter.types.map(t => types_human.get(t) || `\`${t}\``).join(", ") + parameter.allowEmpty ? " or `none`" : ""
+                    format: parameter.types
+                        .map(t => types_human.get(t) || `\`${t}\``)
+                        .join(", ") +
+                        (parameter.allowEmpty ? " or `none`" : ""),
                 }));
             } else {
                 embed.setColor(CONST.COLOR.PRIMARY);

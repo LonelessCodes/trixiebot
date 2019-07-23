@@ -10,10 +10,10 @@ const hugs = [
     "(づ｡◕‿‿◕｡)づ{{user}}",
     "(つ≧▽≦)つ{{user}}",
     "(つ≧▽≦)つ{{user}}",
-    "(づ￣ ³￣)づ{{user}} ⊂(´・ω・｀⊂)"
+    "(づ￣ ³￣)づ{{user}} ⊂(´・ω・｀⊂)",
 ];
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("hug", new TextActionCommand("Hug someone!!!", hugs, "Hugging yourself? How about huggig someone you love!"))
         .setAllowEveryone(true);
     cr.registerAlias("hug", "hugs");
@@ -29,7 +29,7 @@ module.exports = async function install(cr) {
         "(*´･з･){{user}}",
         "(〃ﾟ3ﾟ〃){{user}}",
         "～(^з^)-♡{{user}}",
-        "*kisses {{user}}*"
+        "*kisses {{user}}*",
     ], "Aww, *kisses*"))
         .setAllowEveryone(true);
 
@@ -39,7 +39,7 @@ module.exports = async function install(cr) {
         "(¬_¬”)-cԅ(‾⌣‾ԅ)",
         "{{user}}ԅ( ˘ω˘ ԅ)",
         "{{user}}ԅ(≖‿≖ ;ԅ)",
-        "{{user}}ԅ(‹o›Д‹o›ԅ)"
+        "{{user}}ԅ(‹o›Д‹o›ԅ)",
     ], "Aww, *kisses*"))
         .setAllowEveryone(true);
 
@@ -54,7 +54,7 @@ module.exports = async function install(cr) {
         "(☞^o^) ☞ {{user}}",
         "☞๏็ັཪ๏็๎☞ {{user}}",
         "( ━☞´◔‿ゝ◔`)━☞ {{user}}",
-        "(☞三☞ ఠ ਉ ఠ))☞三☞ {{user}}"
+        "(☞三☞ ఠ ਉ ఠ))☞三☞ {{user}}",
     ], ">:3 *points at u*"))
         .setAllowEveryone(true);
 

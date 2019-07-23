@@ -8,8 +8,8 @@ const MessageMentions = require("../util/commands/MessageMentions");
 
 const { userToString } = require("../util/util");
 
-module.exports = async function install(cr) {
-    cr.registerCommand("whois", new SimpleCommand(async (message, content) => {
+module.exports = function install(cr) {
+    cr.registerCommand("whois", new SimpleCommand((message, content) => {
         const member = new MessageMentions(content, message.guild).members.first() || message.member;
 
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);

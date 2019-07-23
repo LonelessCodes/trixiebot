@@ -26,7 +26,7 @@ class UpvotesManager extends EventEmitter {
                 this.db.insertOne({
                     userId: id,
                     site: site,
-                    timestamp
+                    timestamp,
                 });
             }
 
@@ -102,7 +102,7 @@ class UpvotesManager extends EventEmitter {
                 this.emit("vote", {
                     id: data.id,
                     site: UpvotesManager.discordbotlist,
-                    timestamp: Date.now() - millis
+                    timestamp: Date.now() - millis,
                 });
                 return this._returnResponse(res, 200, "Webhook successfully received");
             }
@@ -123,7 +123,7 @@ class UpvotesManager extends EventEmitter {
                     type: data.type,
                     query: data.query,
                     site: UpvotesManager.discordbots,
-                    timestamp
+                    timestamp,
                 });
                 if (data.isWeekend) {
                     this.emit("vote", {
@@ -131,7 +131,7 @@ class UpvotesManager extends EventEmitter {
                         type: data.type,
                         query: data.query,
                         site: UpvotesManager.discordbots,
-                        timestamp
+                        timestamp,
                     });
                 }
                 return this._returnResponse(res, 200, "Webhook successfully received");
@@ -146,7 +146,7 @@ class UpvotesManager extends EventEmitter {
                 this.emit("vote", {
                     id: data.user.id,
                     site: UpvotesManager.botlistspace,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
                 return this._returnResponse(res, 200, "Webhook successfully received");
             }
@@ -161,11 +161,11 @@ class UpvotesManager extends EventEmitter {
                     id: data.user,
                     type: data.type,
                     site: UpvotesManager.botsfordiscord,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
                 return this._returnResponse(res, 200, "Webhook successfully received");
             }
-            
+
             case UpvotesManager.test: {
                 const config_path = "webhook.secrets." + UpvotesManager.test;
                 if (!config.has(config_path)) return;
@@ -177,7 +177,7 @@ class UpvotesManager extends EventEmitter {
                     id: data.user,
                     type: data.type,
                     site: UpvotesManager.test,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
                 return this._returnResponse(res, 200, "Webhook successfully received");
             }

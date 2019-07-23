@@ -9,7 +9,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("mlp", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async (message, query) => {
             const searchRequest = await fetch(`http://mlp.wikia.com/api/v1/Search/List?query=${encodeURIComponent(query)}&format=json&limit=1`);
@@ -38,7 +38,7 @@ module.exports = async function install(cr) {
 
             const info = parser("table.infobox > tbody").first();
 
-            const fields = new Array;
+            const fields = [];
             let title = "";
             if (info.toArray().length) {
                 title = info.find("tr > th")
@@ -49,26 +49,34 @@ module.exports = async function install(cr) {
                         .find("span")
                         .text() || "", str => ` ${str}`);
 
-                info.find("tr").slice(3).filter(function () {
-                    return parser(this).children().length > 1;
-                }).slice(0, 10).each(function () {
-                    const found = parser(this).find("td");
-                    if (!found.toArray().length) return;
+                info.find("tr")
+                    .slice(3)
+                    .filter(function filter() {
+                        return parser(this).children().length > 1;
+                    })
+                    .slice(0, 10)
+                    .each(function each() {
+                        const found = parser(this).find("td");
+                        if (!found.toArray().length) return;
 
-                    const key = found.first().text();
-                    if (/other links/i.test(key)) return;
+                        const key = found.first().text();
+                        if (/other links/i.test(key)) return;
 
-                    let value = found.slice(1).text().split("\n").map(s => s.trim()).join("\n");
-                    if (key.replace(/[\n\r]/g, "") === "" || value.replace(/[\n\r]/g, "") === "") return;
-                    if (value.length > 512) {
-                        value = value.slice(0, 512 - 3) + "...";
-                    }
+                        let value = found.slice(1)
+                            .text()
+                            .split("\n")
+                            .map(s => s.trim())
+                            .join("\n");
+                        if (key.replace(/[\n\r]/g, "") === "" || value.replace(/[\n\r]/g, "") === "") return;
+                        if (value.length > 512) {
+                            value = value.slice(0, 512 - 3) + "...";
+                        }
 
-                    fields.push({
-                        key,
-                        value
+                        fields.push({
+                            key,
+                            value,
+                        });
                     });
-                });
             } else {
                 title = abstract.title;
             }
@@ -89,7 +97,7 @@ module.exports = async function install(cr) {
                         embed.thumbnail = {
                             url: thumb.data("src"),
                             width: thumb.attr("width"),
-                            height: thumb.attr("height")
+                            height: thumb.attr("height"),
                         };
                     } else {
                         embed.setThumbnail(abstract.thumbnail);
@@ -110,6 +118,6 @@ module.exports = async function install(cr) {
             .addParameter("query", "what you would like to look up"))
         .setCategory(Category.MLP)
         .setScope(CommandScope.ALL, true);
-    
+
     cr.registerAlias("mlp", "pony");
 };

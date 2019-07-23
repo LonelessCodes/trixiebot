@@ -4,8 +4,8 @@ const { Collection, User, Guild, Client, GuildMember, Role } = require("discord.
 class MessageMentions {
     /**
      * New Custom message mention finder
-     * @param {string} content 
-     * @param {Guild} guild 
+     * @param {string} content
+     * @param {Guild} guild
      */
     constructor(content, guild) {
         /**
@@ -62,12 +62,13 @@ class MessageMentions {
             for (let displayName of str.split(MessageMentions.USER_TAG_PATTERN)) {
                 displayName = displayName.trim();
                 if (displayName === "") continue;
-                
+
                 const member = guild.members.find(member => member.displayName.startsWith(displayName));
                 if (member) this.users.set(member.user.id, member.user);
                 else {
                     const displayNameLowercase = displayName.toLowerCase();
-                    const member = guild.members.find(member => member.displayName.toLowerCase().startsWith(displayNameLowercase));
+                    const member = guild.members.find(member =>
+                        member.displayName.toLowerCase().startsWith(displayNameLowercase));
                     if (member) this.users.set(member.user.id, member.user);
                 }
             }

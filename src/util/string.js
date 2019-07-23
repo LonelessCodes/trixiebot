@@ -1,11 +1,12 @@
 const PATTERNS = Object.freeze({
-    SPLIT: /\s+/
+    SPLIT: /\s+/,
 });
 
 module.exports = new class StringUtils {
     /**
-     * @param {string} raw 
-     * @param {number} expectedSize 
+     * @param {string} raw Original array
+     * @param {number} expectedSize Size of the new array
+     * @returns {string}
      */
     normalizeArray(raw, expectedSize) {
         /**
@@ -22,10 +23,10 @@ module.exports = new class StringUtils {
     splitArgs(args, expectedArgs = 0) {
         if (expectedArgs < 1) return [args];
 
-        const raw = new Array;
+        const raw = [];
 
         let i = 0;
-        while(i < expectedArgs - 1) {
+        while (i < expectedArgs - 1) {
             const match = PATTERNS.SPLIT.exec(args);
             if (!match) {
                 break;
@@ -40,7 +41,7 @@ module.exports = new class StringUtils {
     }
 
     findArgs(str) {
-        const array = new Array;
+        const array = [];
         let tmp = "";
         let inquote = false;
         let quote = "";
@@ -85,7 +86,8 @@ module.exports = new class StringUtils {
     }
 
     /**
-     * @param {string} string 
+     * @param {string} string String to escape
+     * @returns {string}
      */
     resolveStdout(string) {
         return string.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");

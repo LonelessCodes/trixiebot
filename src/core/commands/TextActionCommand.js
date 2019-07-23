@@ -31,9 +31,9 @@ class TextActionCommand extends BaseCommand {
 
         if (mentions.everyone) {
             await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
-            return;
+        } else {
+            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), userToString(mention)));
         }
-        else await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), userToString(mention)));
     }
 
     setAllowEveryone(v) {

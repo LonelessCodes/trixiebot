@@ -13,12 +13,12 @@ function parseParserErrors(errors) {
     return errors.map(err => new ParserError(err));
 }
 
-async function compileCC(code) {
+function compileCC(code) {
     // Tokenize the input
     const lexer_result = lexer.tokenize(code);
     if (lexer_result.errors.length > 0)
         throw parseTokenizerErrors(lexer_result.errors);
-    
+
     // 2. Parse the Tokens vector.
     parser.input = lexer_result.tokens;
     parser.text_input = code;
@@ -26,8 +26,8 @@ async function compileCC(code) {
 
     if (parser.errors.length > 0)
         throw parseParserErrors(parser.errors);
-    
-    return cst; 
+
+    return cst;
 }
 
 async function runCC(commandId, code, cst, message) {
@@ -47,37 +47,25 @@ async function runCC(commandId, code, cst, message) {
     }
 }
 
-cpc.answer("lint", async ({ code }) => {
+cpc.answer("lint", ({ code }) => {
     try {
-        await compileCC(code);
-        return {
-            errors: []
-        };
+        compileCC(code);
+        return { errors: [] };
     } catch (errs) {
-        return {
-            errors: errs
-        };
+        return { errors: errs };
     }
 });
 
-cpc.answer("compile", async payload => {
+cpc.answer("compile", payload => {
     const { code } = payload;
 
     try {
-        return {
-            cst: await compileCC(code),
-            errors: []
-        };
-    } catch (errs) { 
-        return {
-            cst: undefined,
-            errors: errs
-        };
+        return { cst: compileCC(code), errors: [] };
+    } catch (errs) {
+        return { cst: undefined, errors: errs };
     }
 });
 
-cpc.answer("run", async ({ id, code, cst, message }) => {
-    return await runCC(id, code, cst, message);
-});
+cpc.answer("run", ({ id, code, cst, message }) => runCC(id, code, cst, message));
 
 cpc.send("ready");

@@ -11,88 +11,88 @@ const CommandScope = require("../util/commands/CommandScope");
 const replies = new RandomChance();
 replies.add({
     text: "It is certain",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "Yes – definitely",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "Without a doubt",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "Outlook good",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "Ye",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "You may rely on it",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "As I see it, yes",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "Most likely",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "Signs point to yes",
-    type: 1
+    type: 1,
 }, 2);
 replies.add({
     text: "It is decidedly so",
-    type: 1
+    type: 1,
 }, 2);
 
 replies.add({
     text: "Very doubtful",
-    type: -1
+    type: -1,
 }, 4);
 replies.add({
     text: "My sources say no",
-    type: -1
+    type: -1,
 }, 4);
 replies.add({
     text: "Outlook not so good",
-    type: -1
+    type: -1,
 }, 4);
 replies.add({
     text: "Don't count on it",
-    type: -1
+    type: -1,
 }, 4);
 replies.add({
     text: "No",
-    type: -1
+    type: -1,
 }, 4);
 
 replies.add({
     text: "Cannot predict now",
-    type: 0
+    type: 0,
 }, 1);
 replies.add({
     text: "Better not tell you now",
-    type: 0
+    type: 0,
 }, 1);
 replies.add({
     text: "Concentrate and ask again",
-    type: 0
+    type: 0,
 }, 1);
 replies.add({
     text: "Reply hazy, try again",
-    type: 0
+    type: 0,
 }, 1);
 replies.add({
     text: "Ask again later",
-    type: 0
+    type: 0,
 }, 1);
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     cr.registerCommand("8ball", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async message => {
             /** @type {{ text: string; type: number; }} */

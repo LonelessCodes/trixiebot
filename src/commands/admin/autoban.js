@@ -40,8 +40,10 @@ async function byID(database, message, id) {
 const TAG_PATTERN = /^([^@#:]{2,32})#([0-9]{4})$/;
 
 /**
- * @param {Message} message 
- * @param {string} name 
+ * @param {any} database
+ * @param {Message} message
+ * @param {string} name
+ * @returns {void}
  */
 async function byName(database, message, name) {
     const match = name.match(TAG_PATTERN);
@@ -93,7 +95,7 @@ async function byRegex(database, message, regex) {
     await message.channel.send({ embed });
 }
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = function install(cr, client, config, db) {
     const database = db.collection("autoban");
     database.createIndex({ guildId: 1, action: 1, type: 1, content: 1 }, { unique: 1 });
 
@@ -148,7 +150,7 @@ module.exports = async function install(cr, client, config, db) {
             if (!conditions.length) {
                 await message.channel.send({
                     embed: basicEmbed("Autobans", message.guild)
-                        .setDescription("No autoban configs yet. Add some by using `!autoban <userID|username#0000|glob>`")
+                        .setDescription("No autoban configs yet. Add some by using `!autoban <userID|username#0000|glob>`"),
                 });
                 return;
             }
@@ -197,13 +199,13 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsageTitle("Remove configs:")
             .setUsage("<?thing>", "remove an autoban again. If no args given, returns a numbered list of autobans to choose from"))
-        
+
         .registerOverload("0", new SimpleCommand(async message => {
             const conditions = await database.find({ guildId: message.guild.id }).toArray();
             if (!conditions.length) {
                 await message.channel.send({
                     embed: basicEmbed("Autobans", message.guild)
-                        .setDescription("No autoban configs yet. Add some by using `!autoban <userID|username#0000|glob>`")
+                        .setDescription("No autoban configs yet. Add some by using `!autoban <userID|username#0000|glob>`"),
                 });
                 return;
             }
@@ -217,7 +219,7 @@ module.exports = async function install(cr, client, config, db) {
                 { number_items: true, guild: message.guild }
             ).display(message.channel);
 
-            const msgs = await message.channel.awaitMessages(m => m.author.id === message.author.id && /[0-9]+/.test(m.content), { maxMatches: 1,  time: 60000 });
+            const msgs = await message.channel.awaitMessages(m => m.author.id === message.author.id && /[0-9]+/.test(m.content), { maxMatches: 1, time: 60000 });
             if (msgs.size > 0) {
                 const m = msgs.first();
                 const num = parseInt(m.content) - 1;

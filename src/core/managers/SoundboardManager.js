@@ -46,8 +46,8 @@ class SoundboardManager {
         this.MAX_SLOTS = 10;
     }
 
-    async getPredefinedSamples() {
-        return await this.predefined_samples;
+    getPredefinedSamples() {
+        return this.predefined_samples;
     }
 
     async getPredefinedSample(name) {
@@ -57,20 +57,20 @@ class SoundboardManager {
 
     /**
      * Get all available samples in a server including predefined, server and user samples
-     * @param {Guild} guild 
-     * @param {User} user 
+     * @param {Guild} guild
+     * @param {User} user
      */
     async getAvailableSamples(guild, user) {
         const predefined_samples = await this.getPredefinedSamples();
 
         const docs = await this.samples.then(db => db.find({
             $or: [{
-                guilds: guild.id
+                guilds: guild.id,
             }, {
-                owners: user.id
-            }]
+                owners: user.id,
+            }],
         }).toArray());
-        
+
         /** @type {UserSample[]} */
         const user_samples = [];
         /** @type {GuildSample[]} */
@@ -105,7 +105,7 @@ class SoundboardManager {
             total,
             predefined: predefined_samples,
             user: user_samples,
-            guild: guild_samples
+            guild: guild_samples,
         };
     }
 
@@ -117,11 +117,11 @@ class SoundboardManager {
     async getSample(guild, user, name) {
         const doc = await this.samples.then(db => db.findOne({
             $or: [{
-                owners: user.id
+                owners: user.id,
             }, {
-                guilds: guild.id
+                guilds: guild.id,
             }],
-            name: name
+            name: name,
         }));
         if (doc) {
             switch (doc.scope) {
@@ -141,7 +141,7 @@ class SoundboardManager {
         const doc = await this.samples.then(db => db.findOne({
             owners: user.id,
             scope: "user",
-            name: name
+            name: name,
         }));
         if (!doc) return;
         return new UserSample(this, doc);
@@ -151,18 +151,18 @@ class SoundboardManager {
         const doc = await this.samples.then(db => db.findOne({
             guilds: guild.id,
             scope: "guild",
-            name: name
+            name: name,
         }));
         if (!doc) return;
         return new GuildSample(this, doc);
     }
 
     /**
-     * @param {string} id 
+     * @param {string} id
      */
     async getSampleById(id) {
         const doc = await this.samples.then(db => db.findOne({
-            id
+            id,
         }));
         if (!doc) return;
         switch (doc.scope) {
@@ -174,7 +174,8 @@ class SoundboardManager {
     }
 
     /**
-     * @param {User} user 
+     * @param {User} user
+     * @returns {SampleUploader}
      */
     getSampleUploader(user) {
         return new SampleUploader(this, user);
@@ -203,7 +204,7 @@ class SoundboardManager {
                 filename: sample.filename,
                 created_at: sample.created_at,
                 modified_at: new Date,
-                last_played_at: sample.last_played_at
+                last_played_at: sample.last_played_at,
             });
             await fs.ensureDir(path.dirname(predefined.file));
             await fs.copyFile(sample.file, predefined.file);
@@ -213,7 +214,7 @@ class SoundboardManager {
                 filename: predefined.filename,
                 created_at: predefined.created_at,
                 modified_at: predefined.modified_at,
-                last_played_at: predefined.last_played_at
+                last_played_at: predefined.last_played_at,
             });
             this.predefined_samples = Promise.resolve([...(await this.predefined_samples), predefined]);
             return predefined;
@@ -245,7 +246,7 @@ class SoundboardManager {
             const db = await this.predefined;
             await db.deleteOne({ name: sample.name });
             const predefined = await this.predefined_samples;
-            const index = predefined.findIndex(p => p.name = sample.name);
+            const index = predefined.findIndex(p => p.name === sample.name);
             if (index >= 0) predefined.splice(index, 1);
             this.predefined_samples = Promise.resolve(predefined);
             await fs.unlink(sample.file);
@@ -263,7 +264,8 @@ class SoundboardManager {
 
     async setNewSlotsUser(user, new_slots) {
         if (new_slots > this.MAX_SLOTS) return new_slots;
-        const slots = await this.slots.then(db => db.updateOne({ user: user.id }, { $set: { slots: new_slots }}, { upsert: true }));
+        const slots = await this.slots.then(db => db
+            .updateOne({ user: user.id }, { $set: { slots: new_slots } }, { upsert: true }));
         return slots.slots;
     }
 
@@ -278,7 +280,8 @@ class SoundboardManager {
 
     async setNewSlotsGuild(guild, new_slots) {
         if (new_slots > this.MAX_SLOTS) return new_slots;
-        const slots = await this.slots.then(db => db.updateOne({ guild: guild.id }, { $set: { slots: new_slots } }, { upsert: true }));
+        const slots = await this.slots.then(db => db
+            .updateOne({ guild: guild.id }, { $set: { slots: new_slots } }, { upsert: true }));
         return slots.slots;
     }
 }

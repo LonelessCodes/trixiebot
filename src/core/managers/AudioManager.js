@@ -3,7 +3,7 @@ const { Guild, GuildMember, Collection, VoiceChannel, VoiceConnection } = requir
 const EventEmitter = require("events");
 
 /**
- * @param {VoiceConnection} connection 
+ * @param {VoiceConnection} connection
  */
 async function disconnect(connection) {
     await connection.disconnect();
@@ -18,7 +18,7 @@ class ConnectError extends Error { }
 
 class VCGuild extends EventEmitter {
     /**
-     * @param {Guild} guild 
+     * @param {Guild} guild
      */
     constructor(guild) {
         super();
@@ -39,15 +39,15 @@ class VCGuild extends EventEmitter {
         if (!this.vc.connection) return false;
         return true;
     }
-    
+
     get playing() {
         if (!this.vc) return false;
         if (!this.vc.connection) return false;
         return this.vc.connection.speaking;
     }
-    
+
     /**
-     * @param {GuildMember} member 
+     * @param {GuildMember} member
      */
     async connect(member) {
         if (!this.vc) {
@@ -79,7 +79,7 @@ class VCGuild extends EventEmitter {
         if (!this.vc) return;
 
         if (this.vc.connection) {
-            await this.stop();
+            this.stop();
             if (this.vc && this.vc.connection) await disconnect(this.vc.connection);
         }
         // disconnect could trigger vc.connection.on("disconnect"), which will call leave
@@ -92,7 +92,7 @@ class VCGuild extends EventEmitter {
         this.emit("leave");
     }
 
-    async stop() {
+    stop() {
         if (!this.connected) return;
         if (!this.vc.connection.dispatcher) return;
         this.vc.connection.dispatcher.end();
@@ -110,6 +110,7 @@ class VCGuild extends EventEmitter {
     /**
      * @param {GuildMember} oldMember
      * @param {GuildMember} newMember
+     * @returns {void}
      */
     voiceStateUpdate(oldMember, newMember) {
         if (!this.connected) return;
@@ -137,7 +138,7 @@ class AudioManager {
     }
 
     /**
-     * @param {Guild} guild 
+     * @param {Guild} guild
      * @returns {VCGuild}
      */
     getGuild(guild) {
@@ -149,6 +150,7 @@ class AudioManager {
 
     /**
      * @param {Guild} guild
+     * @returns {boolean}
      */
     hasGuild(guild) {
         return this.guilds.has(guild.id);

@@ -3,6 +3,9 @@ const chalk = require("chalk");
 /**
  * Fits the length of the input string to the specified length.
  * E.g. Useful to fit a 6bit string (each char either 1 or 0) to an 8bit string
+ * @param {any} input
+ * @param {number} length
+ * @returns {string}
  */
 function toString(input, length) {
     input = typeof input.toString === "function" ? input.toString() : input;
@@ -52,30 +55,31 @@ class Logger extends Function {
     }
 
     /**
-     * @param  {...any} messages 
+     * @param  {...any} messages
      */
     warn(...messages) {
         console.warn(getTimeString(), chalk.yellow("warn"), ...this.ns, ...messages);
     }
 
     /**
-     * @param  {...any} messages 
+     * @param  {...any} messages
      */
     error(...messages) {
         console.error(getTimeString(), chalk.bgRed.white.bold("error"), ...this.ns, ...messages);
     }
 
     /**
-     * @param {string} context 
-     * @param  {...any} messages 
+     * @param {string} context
+     * @param  {...any} messages
      */
     debug(context, ...messages) {
         console.debug(getTimeString(), ...this.ns, chalk.cyan.bold(context + ":"), ...messages);
     }
 
     /**
-     * @param {string} ns 
-     * @param  {...any} args 
+     * @param {string} ns
+     * @param  {...any} args
+     * @returns {Logger}
      */
     namespace(ns, ...args) {
         const logger = new Logger([...this._ns, ns]);

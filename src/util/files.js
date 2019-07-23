@@ -5,7 +5,7 @@ const log = require("../log");
 
 class FilesUtils {
     /**
-     * @param {string} dir 
+     * @param {string} dir Directory path to walk over
      * @returns {Promise<string[]>}
      */
     walk(dir) {

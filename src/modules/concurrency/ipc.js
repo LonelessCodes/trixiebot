@@ -16,7 +16,6 @@ server.connected = false;
 server.started = false;
 
 server.promiseStart = new Promise(resolve => {
-
     server.on("start", () => {
         server.started = true;
 
@@ -31,17 +30,16 @@ server.promiseStart = new Promise(resolve => {
             server.connected = false;
             ipc.log(`## disconnected from ${socketId} ##`);
         });
-        
+
         resolve();
     });
-    
 });
 
 server.start();
 
 function getSocket() {
     if (server.sockets.length === 0) return null;
-    return server.sockets[server.sockets.length - 1]; // getting the newest connected socket
+    return server.sockets[server.sockets.length - 1]; // Getting the newest connected socket
 }
 
 const oldEmit = server.emit.bind(server);
@@ -50,14 +48,14 @@ function emit(message_bus, ...data) {
 }
 server.emit = emit.bind(server);
 
-server.answer = function answer(message_bus, callback) {
+server.answer = function answer(message_bus, handler) {
     server.on(message_bus, async (message, socket) => {
         const { id, data } = message;
 
-        const response = await callback(data);
+        const response = await handler(data);
         oldEmit(socket, message_bus, {
             id,
-            data: response
+            data: response,
         });
     });
 };
@@ -65,7 +63,7 @@ server.answer = function answer(message_bus, callback) {
 server.awaitAnswer = function awaitAnswer(message_bus, data) {
     return new Promise((resolve, reject) => {
         const socket = getSocket();
-        if (!socket) reject();
+        if (!socket) return reject(new Error("Not connected to any socket"));
 
         const id = uuid.v1();
 
@@ -80,7 +78,7 @@ server.awaitAnswer = function awaitAnswer(message_bus, data) {
 
         oldEmit(socket, message_bus, {
             id,
-            data
+            data,
         });
     });
 };

@@ -5,6 +5,30 @@ const guild_stats = require("./GuildStatsManager");
 const AliasCommand = require("../commands/AliasCommand");
 const Category = require("../../util/commands/Category");
 
+function cleanContent(str, guild) {
+    return str
+        .replace(/@(everyone|here)/g, "@\u200b$1")
+        .replace(/<@!?[0-9]+>/g, input => {
+            const id = input.replace(/<|!|>|@/g, "");
+
+            const member = guild.members.get(id);
+            if (member) {
+                return `@${member.displayName}`;
+            } else {
+                const user = guild.client.users.get(id);
+                return user ? `@${user.username}` : input;
+            }
+        })
+        .replace(/<#[0-9]+>/g, input => {
+            const channel = guild.client.channels.get(input.replace(/<|#|>/g, ""));
+            return channel ? `#${channel.name}` : input;
+        })
+        .replace(/<@&[0-9]+>/g, input => {
+            const role = guild.roles.get(input.replace(/<|@|>|&/g, ""));
+            return role ? `@${role.name}` : input;
+        });
+}
+
 class WebsiteManager {
     constructor(REGISTRY, client, config, database) {
         this.REGISTRY = REGISTRY;
@@ -19,13 +43,14 @@ class WebsiteManager {
         await ipc.promiseStart;
 
         /**
-         * @param {Date} ts 
+         * @param {Date} ts
+         * @returns {string}
          */
         function ts(ts) {
             return ts.toISOString();
         }
 
-        ipc.answer("checkGuilds", async guildIds => guildIds.filter(guildId => this.client.guilds.has(guildId)));
+        ipc.answer("checkGuilds", guildIds => guildIds.filter(guildId => this.client.guilds.has(guildId)));
 
         ipc.answer("overview", async guildId => {
             const month = new Date;
@@ -48,14 +73,14 @@ class WebsiteManager {
                     data: results[0].map(a => {
                         a.ts = ts(a.ts);
                         return a;
-                    })
+                    }),
                 },
                 messages: {
                     type: guild_stats.get("messages").type,
                     data: results[1].map(a => {
                         a.ts = ts(a.ts);
                         return a;
-                    })
+                    }),
                 },
                 users: {
                     type: guild_stats.get("users").type,
@@ -65,34 +90,33 @@ class WebsiteManager {
                     }),
                     before: results[3] ? {
                         ...results[3],
-                        ts: ts(results[3].ts)
-                    } : undefined
+                        ts: ts(results[3].ts),
+                    } : undefined,
                 },
             };
         });
 
-        const getChannels = guildId => {
-            return this.client.guilds.get(guildId).channels.array().sort((a, b) =>
-                a.position - b.position
-            ).filter(c => c.type === "text").map(c => ({
-                id: c.id,
-                name: c.name
-            }));
-        };
+        const getChannels = guildId =>
+            this.client.guilds.get(guildId).channels.array().sort((a, b) => a.position - b.position)
+                .filter(c => c.type === "text")
+                .map(c => ({
+                    id: c.id,
+                    name: c.name,
+                }));
 
         ipc.answer("commands", async guildId => {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
             const disabledCommands = await this.db.collection("disabled_commands").findOne({
-                guildId
+                guildId,
             });
 
             const disabledChannels = await this.db.collection("disabled_commands_channels").find({
-                guildId
+                guildId,
             }).toArray();
 
-            const commands = new Array;
+            const commands = [];
             const config = await this.config.get(guildId);
             for (let [name, command] of this.REGISTRY.commands) {
                 if (command instanceof AliasCommand) continue;
@@ -107,7 +131,7 @@ class WebsiteManager {
                 commands.push({
                     name,
                     enabled,
-                    disabled_channels: disabled_channels ? disabled_channels.channels : []
+                    disabled_channels: disabled_channels ? disabled_channels.channels : [],
                 });
             }
 
@@ -115,7 +139,7 @@ class WebsiteManager {
                 prefix: config.prefix,
                 commands,
                 channels: getChannels(guildId),
-                success: true
+                success: true,
             };
         });
 
@@ -132,25 +156,27 @@ class WebsiteManager {
 
             await this.db.collection("disabled_commands_channels").updateOne({
                 guildId,
-                command: commandName
+                command: commandName,
             }, { $set: { channels: disabled_channels } }, { upsert: true });
 
             if (enabled == undefined) {
                 return { success: false };
             } else if (enabled) {
                 await this.db.collection("disabled_commands").updateOne({
-                    guildId
+                    guildId,
                 }, { $pull: { commands: commandName } });
                 return { success: true, enabled: true, disabled_channels };
             } else {
                 await this.db.collection("disabled_commands").updateOne({
-                    guildId
+                    guildId,
                 }, { $addToSet: { commands: commandName } }, { upsert: true });
                 return { success: true, enabled: false, disabled_channels };
             }
         });
 
-        ////// CUSTOM COMMANDS
+        /*
+         * ==== CUSTOM COMMANDS ====
+         */
 
         ipc.answer("cc:get", async guildId => {
             if (!this.client.guilds.has(guildId))
@@ -164,21 +190,21 @@ class WebsiteManager {
                 prefix: config.prefix,
                 commands: commands,
                 channels: getChannels(guildId),
-                success: true
+                success: true,
             };
         });
 
         ipc.answer("cc:new", async ({ guildId, type, trigger, case_sensitive, code, disabled_channels }) => {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
-            
+
             try {
                 const command = await this.REGISTRY.CC.addCommand(guildId, {
-                    type, trigger, case_sensitive, code, disabled_channels
+                    type, trigger, case_sensitive, code, disabled_channels,
                 });
                 return {
                     command,
-                    success: true
+                    success: true,
                 };
             } catch (err) {
                 return { success: false };
@@ -188,17 +214,17 @@ class WebsiteManager {
         ipc.answer("cc:update", async ({ guildId, commandId, type, trigger, case_sensitive, code, disabled_channels }) => {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
-            
+
             if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
                 return { success: false };
 
             try {
                 const command = await this.REGISTRY.CC.updateCommand(guildId, commandId, {
-                    type, trigger, case_sensitive, code, disabled_channels
+                    type, trigger, case_sensitive, code, disabled_channels,
                 });
                 return {
                     command,
-                    success: true
+                    success: true,
                 };
             } catch (err) {
                 return { success: false };
@@ -215,7 +241,7 @@ class WebsiteManager {
             try {
                 return {
                     success: true,
-                    enabled: await this.REGISTRY.CC.enableCommand(guildId, commandId, enabled)
+                    enabled: await this.REGISTRY.CC.enableCommand(guildId, commandId, enabled),
                 };
             } catch (err) {
                 return { success: false };
@@ -232,7 +258,7 @@ class WebsiteManager {
             try {
                 await this.REGISTRY.CC.removeCommand(guildId, commandId);
                 return {
-                    success: true
+                    success: true,
                 };
             } catch (err) {
                 return { success: false };
@@ -253,7 +279,7 @@ class WebsiteManager {
                         e.ts = ts(e.ts);
                         return e;
                     }),
-                    success: true
+                    success: true,
                 };
             } catch (err) {
                 return { errors: [], success: false };
@@ -264,33 +290,9 @@ class WebsiteManager {
             const { errors } = await this.REGISTRY.CC.cpc.awaitAnswer("lint", { code });
             return {
                 success: true,
-                errors
+                errors,
             };
         });
-
-        const cleanContent = (str, guild) => {
-            return str
-                .replace(/@(everyone|here)/g, "@\u200b$1")
-                .replace(/<@!?[0-9]+>/g, input => {
-                    const id = input.replace(/<|!|>|@/g, "");
-
-                    const member = guild.members.get(id);
-                    if (member) {
-                        return `@${member.displayName}`;
-                    } else {
-                        const user = this.client.users.get(id);
-                        return user ? `@${user.username}` : input;
-                    }
-                })
-                .replace(/<#[0-9]+>/g, input => {
-                    const channel = this.client.channels.get(input.replace(/<|#|>/g, ""));
-                    return channel ? `#${channel.name}` : input;
-                })
-                .replace(/<@&[0-9]+>/g, input => {
-                    const role = guild.roles.get(input.replace(/<|@|>|&/g, ""));
-                    return role ? `@${role.name}` : input;
-                });
-        };
 
         ipc.answer("deleted", async guildId => {
             if (!this.client.guilds.has(guildId))
@@ -310,17 +312,17 @@ class WebsiteManager {
                     user: user ? userToString(user, true) : row.name, // "unknown-user" for backwards compatability support
                     channel: {
                         id: channel ? channel.id : row.channelId,
-                        name: channel ? channel.name : "deleted-channel"
+                        name: channel ? channel.name : "deleted-channel",
                     },
                     edits: row.edits.map(e => ({ content: cleanContent(e.content, guild), editedAt: ts(e.editedAt) })),
                     attachments: row.attachments,
-                    deletedAt: ts(row.deletedAt)
+                    deletedAt: ts(row.deletedAt),
                 });
             }
 
             return {
                 deleted,
-                success: true
+                success: true,
             };
         });
 
@@ -333,7 +335,7 @@ class WebsiteManager {
 
             return {
                 deleted: [],
-                success: true
+                success: true,
             };
         });
 
@@ -352,12 +354,12 @@ class WebsiteManager {
                     id: channel.id,
                     name: channel.name,
                     position: channel.position,
-                    locale: locale.channels[key]
+                    locale: locale.channels[key],
                 });
             }
 
             const disabled_channels = await this.db.collection("disabled_channels").findOne({
-                guildId
+                guildId,
             });
 
             return {
@@ -365,26 +367,23 @@ class WebsiteManager {
                 settings: config,
                 locale: {
                     global: locale.global,
-                    channels: channels.sort((a, b) => {
-                        return a.position - b.position;
-                    }).map(c => {
-                        return {
+                    channels: channels
+                        .sort((a, b) => a.position - b.position)
+                        .map(c => ({
                             id: c.id,
                             name: c.name,
-                            locale: c.locale
-                        };
-                    })
+                            locale: c.locale,
+                        })),
                 },
                 disabled: disabled_channels ? disabled_channels.channels : [],
-                channels: this.client.guilds.get(guildId).channels.array().sort((a, b) => {
-                    return a.position - b.position;
-                }).filter(c => c.type === "text").map(c => {
-                    return {
+                channels: this.client.guilds.get(guildId).channels.array()
+                    .sort((a, b) => a.position - b.position)
+                    .filter(c => c.type === "text")
+                    .map(c => ({
                         id: c.id,
-                        name: c.name
-                    };
-                }),
-                locales: this.client.locale.locales
+                        name: c.name,
+                    })),
+                locales: this.client.locale.locales,
             };
         });
 
@@ -392,7 +391,7 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
-            // locale
+            // Locale
             const locale_json = {};
             locale_json.global = locale.global;
             locale_json.channels = {};
@@ -403,10 +402,10 @@ class WebsiteManager {
 
             await this.client.locale.set(guildId, locale_json);
 
-            // config
+            // Config
             await this.config.set(guildId, settings);
 
-            // disabled
+            // Disabled
             const disabledTrue = [];
             for (const channelId of disabled) {
                 if (this.client.guilds.get(guildId).channels.has(channelId)) {
@@ -415,10 +414,10 @@ class WebsiteManager {
             }
 
             await this.db.collection("disabled_channels").updateOne({
-                guildId
+                guildId,
             }, { $set: { channels: disabledTrue } }, { upsert: true });
 
-            // get values
+            // Get values
             const config = await this.config.get(guildId);
             locale = await this.client.locale.get(guildId);
 
@@ -430,7 +429,7 @@ class WebsiteManager {
                     id: channel.id,
                     name: channel.name,
                     position: channel.position,
-                    locale: locale.channels[key]
+                    locale: locale.channels[key],
                 });
             }
 
@@ -439,17 +438,15 @@ class WebsiteManager {
                 settings: config,
                 locale: {
                     global: locale.global,
-                    channels: channels.sort((a, b) => {
-                        return a.position - b.position;
-                    }).map(c => {
-                        return {
+                    channels: channels
+                        .sort((a, b) => a.position - b.position)
+                        .map(c => ({
                             id: c.id,
                             name: c.name,
-                            locale: c.locale
-                        };
-                    })
+                            locale: c.locale,
+                        })),
                 },
-                disabled: disabledTrue
+                disabled: disabledTrue,
             };
         });
 
@@ -461,15 +458,15 @@ class WebsiteManager {
             await this.client.locale.delete(guildId);
 
             await this.db.collection("disabled_channels").deleteOne({
-                guildId
+                guildId,
             });
 
             await this.db.collection("disabled_commands_channels").deleteOne({
-                guildId
+                guildId,
             });
 
             await this.db.collection("disabled_commands").deleteOne({
-                guildId
+                guildId,
             });
 
             const config = await this.config.get(guildId);
@@ -483,7 +480,7 @@ class WebsiteManager {
                     id: channel.id,
                     name: channel.name,
                     position: channel.position,
-                    locale: locale.channels[key]
+                    locale: locale.channels[key],
                 });
             }
 
@@ -492,23 +489,21 @@ class WebsiteManager {
                 settings: config,
                 locale: {
                     global: locale.global,
-                    channels: channels.sort((a, b) => {
-                        return a.position - b.position;
-                    }).map(c => {
-                        return {
+                    channels: channels
+                        .sort((a, b) => a.position - b.position)
+                        .map(c => ({
                             id: c.id,
                             name: c.name,
-                            locale: c.locale
-                        };
-                    })
+                            locale: c.locale,
+                        })),
                 },
-                disabled: []
+                disabled: [],
             };
         });
 
         // ADMIN
 
-        ipc.answer("admin:isadmin", async userId => {
+        ipc.answer("admin:isadmin", userId => {
             const user = this.client.users.get(userId);
             if (!user) return false;
 
@@ -524,21 +519,21 @@ class WebsiteManager {
                 fucks = await this.db.collection("fuck").find({
                     verified: {
                         $not: {
-                            $eq: true
-                        }
-                    }
+                            $eq: true,
+                        },
+                    },
                 }).toArray();
             }
 
             return {
                 success: true,
-                fucks
+                fucks,
             };
         });
 
         ipc.answer("admin:verifyFuck", async ({ fuckId, verified }) => {
             await this.db.collection("fuck").updateOne({
-                _id: fuckId
+                _id: fuckId,
             }, { $set: { verified: !!verified } });
 
             return { success: true };
@@ -546,7 +541,7 @@ class WebsiteManager {
 
         ipc.answer("admin:deleteFuck", async _id => {
             await this.db.collection("fuck").deleteOne({
-                _id
+                _id,
             });
 
             return { success: true };

@@ -50,7 +50,7 @@ class RuntimeError {
         this.message = message;
         this.vals = vals;
         this.stack = stack;
-        
+
         if (stack[0].pos.offset == null) return this;
         /**  render a useful string representation  */
         const excerpt = getExcerpt(input, stack[0].pos.offset);

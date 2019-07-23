@@ -2,14 +2,6 @@
   "prefix": "!",
   "commands": [
     {
-      "name": "8ball",
-      "help": {
-        "description": "An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy",
-        "usage": "\n`!8ball <question>` *(alias `!tellme`)*\n`question` - The question you are eager to ask",
-        "category": "Misc"
-      }
-    },
-    {
       "name": "hug",
       "help": {
         "description": "Hug someone!!!",
@@ -144,6 +136,14 @@
         "description": "nomnom someone",
         "usage": "\n`!nom <@user>` *(alias `!nomnom`)*",
         "category": "Action"
+      }
+    },
+    {
+      "name": "8ball",
+      "help": {
+        "description": "An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy",
+        "usage": "\n`!8ball <question>` *(alias `!tellme`)*\n`question` - The question you are eager to ask",
+        "category": "Misc"
       }
     },
     {
@@ -291,6 +291,14 @@
       }
     },
     {
+      "name": "derpi",
+      "help": {
+        "description": "Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
+        "usage": "\n`!derpi` *(alias `!db`)*\n\n`!derpi random <?amount> <query>` *(alias `!derpi`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)\n\n`!derpi top <?amount> <query>`\n\n`!derpi latest <?amount> <query>`\n\n`!derpi first <?amount> <query>`",
+        "category": "Image"
+      }
+    },
+    {
       "name": "info",
       "help": {
         "description": "Gets the bot technical information. Nothing all that interesting.",
@@ -312,30 +320,6 @@
         "description": "Gets the changes made to TrixieBot in the latest versions",
         "usage": "\n`!changelog`",
         "category": "Info"
-      }
-    },
-    {
-      "name": "derpi",
-      "help": {
-        "description": "Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
-        "usage": "\n`!derpi` *(alias `!db`)*\n\n`!derpi random <?amount> <query>` *(alias `!derpi`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)\n\n`!derpi top <?amount> <query>`\n\n`!derpi latest <?amount> <query>`\n\n`!derpi first <?amount> <query>`",
-        "category": "Image"
-      }
-    },
-    {
-      "name": "e621",
-      "help": {
-        "description": "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
-        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional- Popular by 'day', 'week' or 'month'. Default: 'week'",
-        "category": "Image"
-      }
-    },
-    {
-      "name": "fact",
-      "help": {
-        "description": "Gets random UberFacts fact",
-        "usage": "\n`!fact` *(alias `!uberfacts`)*",
-        "category": "Utility"
       }
     },
     {
@@ -420,19 +404,19 @@
       }
     },
     {
-      "name": "sb",
-      "help": {
-        "description": "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.",
-        "usage": "\n`!sb <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!soundboard`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\n**Manage Your Soundboards:**\n`!sb upload <?scope> <sound name>` - Upload a sound clip to Trixie. Attach the audio file to the message when sending *(alias `!sb u`)*\n`scope` - optional- `user` or `server`\n`sound name` - Name of the new sound clip\n\n`!sb import <?scope> <id>` - Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `!sb info <sound name>` *(alias `!sb i`)*\n`id` - The unique ID of a soundclip\n\n`!sb delete <?scope> <sound name>` - Delete a soundclip from your or your server's soundboard. *(alias `!sb d`)*\n`sound name` - The name of the soundclip to delete\n\n`!sb info <?scope> <sound name|id>` - View info about a sound clip and get it's unique ID, for people to be able to play it as well\n`sound name` - The name of the sound clip to view more info about\n`id` - The id of the sound clip to view more info about instead of sound name\n\n**Buy New Slots:**\n`!sb buyslot <?scope>` - Buy additional soundboard slots with Trixie's currency *(alias `!sb b`)*\n\n",
-        "category": "Audio"
-      }
-    },
-    {
       "name": "smol",
       "help": {
         "description": "Make teeeeny tiny text",
         "usage": "\n`!smol <string|user>` *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
         "category": "Text"
+      }
+    },
+    {
+      "name": "sb",
+      "help": {
+        "description": "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.",
+        "usage": "\n`!sb <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!soundboard`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\n**Manage Your Soundboards:**\n`!sb upload <?scope> <sound name>` - Upload a sound clip to Trixie. Attach the audio file to the message when sending *(alias `!sb u`)*\n`scope` - optional- `user` or `server`\n`sound name` - Name of the new sound clip\n\n`!sb import <?scope> <id>` - Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `!sb info <sound name>` *(alias `!sb i`)*\n`id` - The unique ID of a soundclip\n\n`!sb delete <?scope> <sound name>` - Delete a soundclip from your or your server's soundboard. *(alias `!sb d`)*\n`sound name` - The name of the soundclip to delete\n\n`!sb info <?scope> <sound name|id>` - View info about a sound clip and get it's unique ID, for people to be able to play it as well\n`sound name` - The name of the sound clip to view more info about\n`id` - The id of the sound clip to view more info about instead of sound name\n\n**Buy New Slots:**\n`!sb buyslot <?scope>` - Buy additional soundboard slots with Trixie's currency *(alias `!sb b`)*\n\n",
+        "category": "Audio"
       }
     },
     {
@@ -511,11 +495,35 @@
       }
     },
     {
+      "name": "fact",
+      "help": {
+        "description": "Gets random UberFacts fact",
+        "usage": "\n`!fact` *(alias `!uberfacts`)*",
+        "category": "Utility"
+      }
+    },
+    {
       "name": "whois",
       "help": {
         "description": "Receive information about a user or about yourself",
         "usage": "\n`!whois <@user>`\n`@user` - optional- If given, return info about that user, otherwise return info about yourself",
         "category": "Info"
+      }
+    },
+    {
+      "name": "e621",
+      "help": {
+        "description": "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
+        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional- Popular by 'day', 'week' or 'month'. Default: 'week'",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "naughty",
+      "help": {
+        "description": "It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!",
+        "usage": "\n`!naughty` *(alias `!nice`)*",
+        "category": "Analysis"
       }
     },
     {
@@ -605,14 +613,6 @@
       }
     },
     {
-      "name": "naughty",
-      "help": {
-        "description": "It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!",
-        "usage": "\n`!naughty` *(alias `!nice`)*",
-        "category": "Analysis"
-      }
-    },
-    {
       "name": "face",
       "help": {
         "description": "Get a random ASCII face",
@@ -653,22 +653,6 @@
       }
     },
     {
-      "name": "flip",
-      "help": {
-        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
-        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "unflip",
-      "help": {
-        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
-        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
-        "category": "Action"
-      }
-    },
-    {
       "name": "fuck",
       "help": {
         "explicit": true,
@@ -683,6 +667,22 @@
         "description": "well\nyeah",
         "usage": "\n`!larson`",
         "category": "Image"
+      }
+    },
+    {
+      "name": "flip",
+      "help": {
+        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
+        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "unflip",
+      "help": {
+        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
+        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
+        "category": "Action"
       }
     },
     {

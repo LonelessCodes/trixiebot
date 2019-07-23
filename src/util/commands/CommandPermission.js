@@ -10,19 +10,20 @@ function ucFirst(string) {
 
 const NAMES = new Map;
 for (const key in FLAGS) {
-    NAMES.set(FLAGS[key], key.split(/_/g).map(v => ucFirst(v.toLowerCase())).join(" ")); // most hacky but perfect
+    NAMES.set(FLAGS[key], key.split(/_/g).map(v => ucFirst(v.toLowerCase())).join(" ")); // Most hacky but perfect
 }
 
 class CommandPermission {
     /**
-     * @param {Array<number>} permissions 
+     * @param {Array<number>} permissions
      */
     constructor(permissions) {
         this.permissions = permissions;
     }
 
     /**
-     * @param {GuildMember|User} member 
+     * @param {GuildMember|User} member
+     * @returns {boolean}
      */
     test(member) {
         for (const permission of this.permissions) {
@@ -39,12 +40,13 @@ class CommandPermission {
 CommandPermission.USER = new CommandPermission([]);
 CommandPermission.ADMIN = new class extends CommandPermission {
     /**
-     * @param {GuildMember|User} member 
+     * @param {GuildMember|User} member
+     * @returns {boolean}
      */
     test(member) {
         if (member instanceof User) return false;
-        return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) 
-            || module.exports.OWNER.test(member);
+        return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) ||
+            module.exports.OWNER.test(member);
     }
     toString() {
         return "Administrator or Manage Server";

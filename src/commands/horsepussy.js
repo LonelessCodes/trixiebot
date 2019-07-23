@@ -27,7 +27,7 @@ async function get(params) {
     string = string.join("&");
 
     const result = await fetch(`https://derpibooru.org/${scope}.json?key=${config.get("derpibooru.key")}&${string}`, {
-        timeout: 10000
+        timeout: 10000,
     });
     return await result.json();
 }
@@ -36,14 +36,16 @@ const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "
 
 const tags = ["pony", "vulva", "-penis", "nudity", "-photo", ...filter_tags.map(tag => "-" + tag), "upvotes.gte:150"];
 
-const query = tags.map(t => encodeURIComponent(t)).join(",").replace(/\s+/g, "+").toLowerCase();
+const query = tags.map(t => encodeURIComponent(t))
+    .join(",").replace(/\s+/g, "+")
+    .toLowerCase();
 
 async function process(message) {
     const image = await get({
         q: query,
-        random_image: "true"
+        random_image: "true",
     }).then(({ id }) => get({
-        scope: id
+        scope: id,
     }));
 
     const artist = getArtist(image.tags);
@@ -56,7 +58,7 @@ async function process(message) {
     await message.channel.send(str);
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
     cr.registerCommand("horsepussy", new SimpleCommand(message => process(message)))

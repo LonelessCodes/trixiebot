@@ -16,8 +16,8 @@ class CleverbotError extends Error { }
 class Session {
     /**
      * Creates a new cleverbot session
-     * @param {Cleverbot} client 
-     * @param {string} nick 
+     * @param {Cleverbot} client
+     * @param {string} nick
      */
     constructor(client, nick) {
         this.client = client;
@@ -25,7 +25,7 @@ class Session {
     }
 
     /**
-     * @param {string} input 
+     * @param {string} input
      */
     async ask(input) {
         const body = await request.post({
@@ -33,14 +33,13 @@ class Session {
                 user: this.client.user,
                 key: this.client.key,
                 nick: this.nick,
-                text: input
-            }
+                text: input,
+            },
         });
 
         if (JSON.parse(body).status == "success") {
             return JSON.parse(body).response;
-        }
-        else {
+        } else {
             throw new CleverbotError(JSON.parse(body).status);
         }
     }
@@ -49,13 +48,13 @@ class Session {
 class Cleverbot {
     /**
      * Creates a new Cleverbot API instance
-     * @param {string} user 
-     * @param {string} key 
+     * @param {string} user
+     * @param {string} key
      */
     constructor(user, key) {
         this.user = user;
         this.key = key;
-        /**@type {Set<string>} */
+        /** @type {Set<string>} */
         this._cache = new Set;
     }
 
@@ -72,8 +71,8 @@ class Cleverbot {
             form: {
                 user: this.user,
                 key: this.key,
-                nick: nick
-            }
+                nick: nick,
+            },
         });
 
         /** @type {string} */
@@ -89,18 +88,16 @@ class Cleverbot {
             nick = JSON.parse(body).nick;
             this._cache.add(nick);
             return new Session(this, nick);
-        }
-        else if (status == "Error: reference name already exists") {
+        } else if (status == "Error: reference name already exists") {
             this._cache.add(nick);
             return new Session(this, nick);
-        }
-        else {
+        } else {
             throw new CleverbotError(status);
         }
     }
 }
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     if (!config.has("cleverbot.user") || !config.has("cleverbot.key")) return log.namespace("config", "Found no API credentials for Cleverbot.io - Disabled chat command");
 
     const bot = new Cleverbot(config.get("cleverbot.user"), config.get("cleverbot.key"));
@@ -127,6 +124,6 @@ module.exports = async function install(cr) {
             .setDescription("Talk with Trixie1!!! (using a cleverbot integration)"))
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
-    
+
     cr.registerAlias("chat", "cleverbot");
 };

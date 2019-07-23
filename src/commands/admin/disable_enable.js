@@ -4,7 +4,7 @@ const TreeCommand = require("../../core/commands/TreeCommand");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 
-module.exports = async function install(cr, client, config, database) {
+module.exports = function install(cr, client, config, database) {
     /**
      * DISABLE
      */
@@ -22,9 +22,9 @@ module.exports = async function install(cr, client, config, database) {
         }
 
         await database.collection("disabled_channels").updateOne({
-            guildId: message.guild.id
+            guildId: message.guild.id,
         }, {
-            $addToSet: { channels: [...channels.array().map(c => c.id)] }
+            $addToSet: { channels: [...channels.array().map(c => c.id)] },
         }, { upsert: true });
 
         await message.channel.send(`Channels ${channels.map(c => c.toString()).join(", ")} will no longer listen to commands`);
@@ -48,9 +48,9 @@ module.exports = async function install(cr, client, config, database) {
         }
 
         await database.collection("disabled_commands").updateOne({
-            guildId: message.guild.id
+            guildId: message.guild.id,
         }, {
-            $addToSet: { commands: [...commands] }
+            $addToSet: { commands: [...commands] },
         }, { upsert: true });
 
         await message.channel.send(`Commands ${commands.join(", ")} will no longer listen`);
@@ -74,9 +74,9 @@ module.exports = async function install(cr, client, config, database) {
         }
 
         await database.collection("disabled_channels").updateOne({
-            guildId: message.guild.id
+            guildId: message.guild.id,
         }, {
-            $pull: { channels: [...channels.array().map(c => c.id)] }
+            $pull: { channels: [...channels.array().map(c => c.id)] },
         });
 
         await message.channel.send(`Channels ${channels.map(c => c.toString()).join(", ")} will listen to commands again`);
@@ -100,12 +100,15 @@ module.exports = async function install(cr, client, config, database) {
         }
 
         await database.collection("disabled_commands").updateOne({
-            guildId: message.guild.id
+            guildId: message.guild.id,
         }, {
-            $pull: { commands: [...commands] }
+            $pull: { commands: [...commands] },
         });
 
-        await message.channel.send((dontExist.length > 0 ? `Commands ${dontExist.join(", ")} don't exist, but ` : "Commands ") + `${commands.join(", ")} will no longer listen to commands`);
+        await message.channel.send(
+            (dontExist.length > 0 ? `Commands ${dontExist.join(", ")} don't exist, but ` : "Commands ") +
+            `${commands.join(", ")} will no longer listen to commands`
+        );
     })).setHelp(new HelpContent()
         .setDescription("Enable a command again")
         .setUsage("<command name>")

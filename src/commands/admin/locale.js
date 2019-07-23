@@ -7,7 +7,7 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
-module.exports = async function install(cr, client) {
+module.exports = function install(cr, client) {
     cr.registerCommand("locale", new OverloadCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie supports multiple different languages, including " + client.locale.locales.map(v => `\`${v}\``).join(", ") + ". Here you can set them in your server")
@@ -23,7 +23,7 @@ module.exports = async function install(cr, client) {
             const embed = new Discord.RichEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
                 .addField("global", locale.global);
-            
+
             const channels = locale.channels || {};
             for (const channelId in channels) {
                 if (message.guild.channels.has(channelId)) {
@@ -36,7 +36,7 @@ module.exports = async function install(cr, client) {
             if (!/^(global|default)$/i.test(content) && !client.locale.locales.includes(content.toLowerCase())) {
                 await message.channel.sendTranslated("Locale '{{locale}}' is not supported :c Try {{locales}}", {
                     locale: content,
-                    locales: client.locale.locales.map(v => `\`${v}\``).join(", ")
+                    locales: client.locale.locales.map(v => `\`${v}\``).join(", "),
                 });
                 return;
             }
@@ -45,14 +45,14 @@ module.exports = async function install(cr, client) {
             if (!channel) {
                 await client.locale.set(message.guild.id, content.toLowerCase());
                 await message.channel.sendTranslated("Changed locale for the server to {{locale}}", {
-                    locale: await client.locale.get(message.guild.id)
+                    locale: await client.locale.get(message.guild.id),
                 });
             } else {
                 const locale = content.split(" ")[0];
                 await client.locale.set(message.guild.id, channel.id, locale.toLowerCase());
                 await message.channel.sendTranslated("Changed locale for {{channel}} to {{locale}}", {
                     channel: channel.toString(),
-                    locale: await client.locale.get(message.guild.id, channel.id)
+                    locale: await client.locale.get(message.guild.id, channel.id),
                 });
             }
         }));

@@ -44,12 +44,12 @@ class Parameter {
             if (typeof type === "number" && type === parseFloat(value)) return type;
         }
 
-        if (this.types.includes(Boolean) && /true|false|yes|no/i.test(value)) return /true|yes/i.test(value) ? true : false;
+        if (this.types.includes(Boolean) && /true|false|yes|no/i.test(value)) return /true|yes/i.test(value);
         if (this.types.includes(Number) && !Number.isNaN(parseFloat(value))) return parseFloat(value);
         if (this.types.includes(String)) return value;
 
         if (this.types.includes(TextChannel)) return value.substr(2, value.length - 3);
-        
+
         return value;
     }
 
@@ -85,9 +85,9 @@ class Parameter {
 class ConfigManager {
     /**
      * Initiate new guild configurations manager. Prefix, locale, etc.
-     * @param {Client} client 
-     * @param {Db} db 
-     * @param {Parameter[]} parameters 
+     * @param {Client} client
+     * @param {Db} db
+     * @param {Parameter[]} parameters
      */
     constructor(client, db, parameters) {
         this.client = client;
@@ -95,8 +95,8 @@ class ConfigManager {
         this.db = db.collection("guild_config");
         this._cache = new DocumentMapCache(this.db, "guildId", {
             indexes: {
-                "removedFrom": { expireAfterSeconds: 7 * 24 * 3600, sparse: true }
-            }
+                removedFrom: { expireAfterSeconds: 7 * 24 * 3600, sparse: true },
+            },
         });
 
         const values = {};
@@ -141,7 +141,7 @@ class ConfigManager {
     }
 
     async get(guildId, parameter) {
-        // will fire instantly if loaded already, are wait 
+        // will fire instantly if loaded already, are wait
         // till all configurations are initially loaded into memory
         let config = await this._cache.get(guildId);
         if (!config) config = Object.assign({}, this.default_config, { guildId });
@@ -157,8 +157,7 @@ class ConfigManager {
                 path = path[param];
             }
             return path;
-        }
-        else return config;
+        } else return config;
     }
 
     async set(guildId, values = {}) {
@@ -178,7 +177,7 @@ class ConfigManager {
         for (const key in values) {
             index(config, key, values[key]);
         }
-        
+
         this._cache.set(guildId, Object.assign({}, this.default_config, config, { guildId }));
     }
 }

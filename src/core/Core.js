@@ -22,8 +22,7 @@ const { Client } = require("discord.js");
 
 class Core {
     /**
-     * 
-     * @param {Client} client 
+     * @param {Client} client
      * @param {ConfigManager} config
      * @param {Db} db
      */
@@ -70,31 +69,32 @@ class Core {
         }));
 
         const install_time = all_timer.end() / nanoTimer.NS_PER_SEC;
-        
+
         log("Building commands.json");
 
         const jason = {
             prefix: this.config.default_config.prefix,
-            commands: []
+            commands: [],
         };
 
         for (const [name, cmd] of this.processor.REGISTRY.commands) {
             if (!cmd.help) continue;
             jason.commands.push({
                 name,
-                help: helpToJSON(this.config.default_config, name, cmd)
+                help: helpToJSON(this.config.default_config, name, cmd),
             });
         }
 
-        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), JSON.stringify(jason, null, 2));
-        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), JSON.stringify(jason, null, 2));
+        const str = JSON.stringify(jason, null, 2);
+        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str);
+        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str);
 
-        const build_time = all_timer.end() / nanoTimer.NS_PER_SEC - install_time;
+        const build_time = (all_timer.end() / nanoTimer.NS_PER_SEC) - install_time;
 
         log(`Commands installed. files:${file_count} commands:${this.processor.REGISTRY.commands.size} install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
     }
 
-    async attachListeners() {
+    attachListeners() {
         this.client.addListener("message", message => this.processor.onMessage(message));
     }
 
@@ -142,17 +142,17 @@ class Core {
             promises.push(request.post(`https://divinediscordbots.com/bot/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {
-                    Authorization: config.get("botlists.divinediscordbots_com")
-                }
+                    Authorization: config.get("botlists.divinediscordbots_com"),
+                },
             }).catch(err => err));
-        
+
         if (config.has("botlists.botsfordiscord_com"))
             promises.push(request.post(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: config.get("botlists.botsfordiscord_com")
-                }
+                    Authorization: config.get("botlists.botsfordiscord_com"),
+                },
             }).catch(err => err));
 
         if (config.has("botlists.discord_bots_gg"))
@@ -160,8 +160,8 @@ class Core {
                 json: { guildCount: server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: config.get("botlists.discord_bots_gg")
-                }
+                    Authorization: config.get("botlists.discord_bots_gg"),
+                },
             }).catch(err => err));
 
         if (config.has("botlists.botlist_space"))
@@ -169,8 +169,8 @@ class Core {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: config.get("botlists.botlist_space")
-                }
+                    Authorization: config.get("botlists.botlist_space"),
+                },
             }).catch(err => err));
 
         if (config.has("botlists.ls_terminal_ink"))
@@ -178,8 +178,8 @@ class Core {
                 json: { bot: { count: server_count } },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: config.get("botlists.ls_terminal_ink")
-                }
+                    Authorization: config.get("botlists.ls_terminal_ink"),
+                },
             }).catch(err => err));
 
         if (config.has("botlists.discordbotlist_com"))
@@ -187,12 +187,12 @@ class Core {
                 json: {
                     guilds: server_count,
                     users: this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0),
-                    voice_connections: this.client.voiceConnections.size
+                    voice_connections: this.client.voiceConnections.size,
                 },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: "Bot " + config.get("botlists.discordbotlist_com")
-                }
+                    Authorization: "Bot " + config.get("botlists.discordbotlist_com"),
+                },
             }).catch(err => err));
 
         if (config.has("botlists.discordbots_org"))
@@ -200,8 +200,8 @@ class Core {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: config.get("botlists.discordbots_org")
-                }
+                    Authorization: config.get("botlists.discordbots_org"),
+                },
             }).catch(err => err));
 
         await Promise.all(promises);

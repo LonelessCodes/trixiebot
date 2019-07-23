@@ -33,13 +33,13 @@ module.exports = new class Utils {
     basicEmbed(title, user, color = CONST.COLOR.PRIMARY) {
         if (user instanceof Discord.Guild) return new Discord.RichEmbed()
             .setColor(color)
-            .setAuthor(user.name + " | " + title, user.iconURL);
+            .setAuthor(`${user.name} | ${title}`, user.iconURL);
         if (user instanceof Discord.GuildMember) user = user.user;
         return new Discord.RichEmbed()
             .setColor(color)
-            .setAuthor(module.exports.userToString(user, true) + " | " + title, user.avatarURL);
+            .setAuthor(`${module.exports.userToString(user, true)} | ${title}`, user.avatarURL);
     }
-    
+
     progressBar(v, length, a, b) {
         if (Number.isNaN(v)) v = 0;
         if (!Number.isFinite(v)) v = 0;

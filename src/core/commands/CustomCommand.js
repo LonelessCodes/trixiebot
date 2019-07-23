@@ -8,9 +8,10 @@ const BSON = require("bson");
 const { Message: CCMessage } = require("../managers/cc_utils/cc_classes");
 
 class CustomCommand extends BaseCommand {
+    // eslint-disable-next-line valid-jsdoc
     /**
-     * @param {*} manager 
-     * @param {{ id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; last_read: Date; created_at: Date; modified_at: Date; disabled_channels: string[]; enabled: boolean; }} row
+     * @param {*} manager
+     * @param {{ id: string, guildId: string, type: number, trigger: string, case_sensitive: boolean, code: string, cst?: BSON.Binary, compile_errors: any[], last_read: Date, created_at: Date, modified_at: Date, disabled_channels: string[], enabled: boolean }} row
      */
     constructor(manager, row) {
         super();
@@ -20,8 +21,10 @@ class CustomCommand extends BaseCommand {
         this.manager = manager;
     }
 
+    // eslint-disable-next-line valid-jsdoc
     /**
-     * @param {{ id: string; guildId: string; type: number; trigger: string; case_sensitive: boolean; code: string; cst?: BSON.Binary; compile_errors: any[]; last_read: Date; created_at: Date; modified_at: Date; disabled_channels: string[]; enabled: boolean; }} row
+     * @param {{ id: string, guildId: string, type: number, trigger: string, case_sensitive: boolean, code: string, cst?: BSON.Binary, compile_errors: any[], last_read: Date, created_at: Date, modified_at: Date, disabled_channels: string[], enabled: boolean }} row
+     * @returns {void}
      */
     update(row) {
         this.id = row.id;
@@ -61,7 +64,7 @@ class CustomCommand extends BaseCommand {
             this.update({
                 compile_errors: errors,
                 cst: null,
-                _cst: null
+                _cst: null,
             });
             await this.manager.database.updateOne({ id: this.id }, { $set: { compile_errors: errors, cst: null } });
             throw errors;
@@ -70,15 +73,15 @@ class CustomCommand extends BaseCommand {
         this.update({
             compile_errors: [],
             cst: null,
-            _cst: cst
+            _cst: cst,
         });
         await this.manager.database.updateOne({ id: this.id }, { $set: { compile_errors: [], cst: BSON.serialize(cst) } });
     }
 
     /**
-     * @param {Message} message 
-     * @param {string} command_name 
-     * @param {string} content 
+     * @param {Message} message
+     * @param {string} command_name
+     * @param {string} content
      */
     async run(message, command_name, content) {
         if (!this.cst) return;
@@ -96,8 +99,8 @@ class CustomCommand extends BaseCommand {
                 createdAt: guild.createdTimestamp,
                 icon: guild.iconURL,
                 memberCount: guild.memberCount,
-                ownerId: guild.ownerID
-            }
+                ownerId: guild.ownerID,
+            },
         };
 
         const { error, embed, content: cont } =
@@ -116,7 +119,7 @@ class CustomCommand extends BaseCommand {
                 commandId: this.id,
                 guildId: this.guildId,
                 name: "Unknown Error",
-                message: "Not an error thrown by the actual TrixieScript runtime, but by the interpreter"
+                message: "Not an error thrown by the actual TrixieScript runtime, but by the interpreter",
             };
 
             log.namespace("cc interpreter").error(error);

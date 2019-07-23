@@ -10,13 +10,13 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-module.exports = async function install(cr) {
+module.exports = function install(cr) {
     if (!config.has("twitter")) return log.namespace("config", "Found no API credentials for Twitter - Disabled fact command");
 
     const twitter = new Twit(config.get("twitter"));
     const get = promisify(twitter.get).bind(twitter);
 
-    const facts = new Promise(async function loadTweets(resolve) {
+    const facts = new Promise(async resolve => {
         const facts = new Set();
 
         let tweets_available = true;
@@ -29,7 +29,7 @@ module.exports = async function install(cr) {
                 include_rts: false,
                 exclude_replies: true,
                 trim_user: true,
-                max_id: smallest_id || void 0
+                max_id: smallest_id || undefined,
             });
             if (!newest_id) newest_id = data[0].id_str;
             if (data.length <= 1) tweets_available = false;
@@ -53,6 +53,6 @@ module.exports = async function install(cr) {
             .setDescription("Gets random UberFacts fact"))
         .setCategory(Category.UTILS)
         .setScope(CommandScope.ALL, true);
-    
+
     cr.registerAlias("fact", "uberfacts");
 };

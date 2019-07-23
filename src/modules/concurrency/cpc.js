@@ -25,10 +25,10 @@ class CPC extends EventEmitter {
             this.child.send({ bus, payload });
     }
 
-    answer(busWanted, callback) {
+    answer(busWanted, handler) {
         this.child.on("message", async ({ bus: busGotten, id, payload }) => {
             if (busWanted !== busGotten) return;
-            const response = await callback(payload);
+            const response = await handler(payload);
             if (this.child.send)
                 this.child.send({ bus: busGotten, id, payload: response });
         });
@@ -55,7 +55,7 @@ class CPC extends EventEmitter {
                 p,
                 timeout(opts.timeout).then(() => {
                     throw new Error("Exceeded ipc timeout.");
-                })
+                }),
             ]);
         }
         return p;

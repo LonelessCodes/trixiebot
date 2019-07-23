@@ -1,3 +1,4 @@
+/* eslint-disable brace-style */
 const { timeout } = require("../../../../util/promises");
 const { parseHumanTime } = require("../../../../util/time");
 const { splitArgs } = require("../../../../util/string");
@@ -39,7 +40,7 @@ const {
     Channel,
     Role,
 
-    convert
+    convert,
 } = require("./classes");
 
 const GLOBALS = require("./globals");
@@ -66,6 +67,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         this.callStack = new CallStack;
     }
 
+    // eslint-disable-next-line valid-jsdoc
     /**
      * @param {string} msg
      * @param {{ [key: string]: any }} vals
@@ -94,7 +96,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         this.callStack.clear();
     }
 
-    ///////// Main functions //////////
+    // /////// Main functions //////////
 
     async PrimaryExpression(ctx) {
         if (ctx.Identifier) {
@@ -235,7 +237,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         this.statementStack.push(ctx);
 
         const name = await this.visit(ctx.PropertyName);
-        const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
+        const args = ctx.FormalParameterList ? await this.visit(ctx.FormalParameterList) : [];
         const func = new Func(name, args, this.statementStack.clone(), ctx.FunctionBody[0]);
 
         this.statementStack.pop();
@@ -283,7 +285,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         if (val instanceof NullLiteral) {
             const name = await key.getProp(new StringLiteral("toString")).call(new Context(this, ctx.$key), key);
             throw this.error("Cannot read property '" + (name ? name.content : "[no toString func]") + "' of null", ctx.$key);
-        } else if(val instanceof Member) {
+        } else if (val instanceof Member) {
             val = new Member(val, key, val.value.getProp(key));
         } else {
             val = new Member(val, key, val.getProp(key));
@@ -313,19 +315,19 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
     async Arguments(ctx) {
         const args = [];
         const pos = [];
-        for (let arg of (ctx.$args || [])) {
+        for (let arg of ctx.$args || []) {
             const val = assign(await this.visit(arg));
             args.push(val);
             pos.push(arg);
         }
         return {
             args,
-            pos
+            pos,
         };
     }
 
     async UpdateExpression(ctx) {
-        if (ctx.$left && !ctx.$postfix)  return await this.visit(ctx.$left);
+        if (ctx.$left && !ctx.$postfix) return await this.visit(ctx.$left);
 
         if (ctx.$right && ctx.$prefix) {
             const right = await this.visit(ctx.$right);
@@ -373,7 +375,10 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
             }
         }
 
-        throw this.error("Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)", ctx.$postfix || ctx.$prefix);
+        throw this.error(
+            "Cannot increment/decrement a staticly defined literal (Number, String, etc. that is not declared as a variable)",
+            ctx.$postfix || ctx.$prefix
+        );
     }
 
     async UnaryExpression(ctx) {
@@ -420,14 +425,18 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
             switch (ctx.$op[i].image) {
                 case "*":
-                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                    if (left instanceof DurationLiteral &&
+                        right instanceof NumberLiteral &&
+                        !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
                         left = left.clone().multiply(right);
                         break;
                     }
                     left = new NumberLiteral(left.content * right.content);
                     break;
                 case "/":
-                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                    if (left instanceof DurationLiteral &&
+                        right instanceof NumberLiteral &&
+                        !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
                         left = left.clone().multiply(1 / right);
                         break;
                     }
@@ -455,17 +464,17 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
             switch (ctx.$op[i].image) {
                 case "+":
                     if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
-                        if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral)){
+                        if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral)) {
                             left = left.clone().add(right);
                             break;
                         }
                         left = new NumberLiteral(left.content + right.content);
                     } else {
                         const leftprop = left.getProp(new StringLiteral("toString"));
-                        const rightprop = right.getProp(new StringLiteral("toString"));
+                        const rigtprop = right.getProp(new StringLiteral("toString"));
                         left = new StringLiteral(
-                            (leftprop ? (await leftprop.call(new Context(this, ctx.$left), left).content) : "[no toString func]") +
-                            (rightprop ? (await rightprop.call(new Context(this, ctx.$right), right).content) : "[no toString func]")
+                            (leftprop ? await leftprop.call(new Context(this, ctx.$left), left).content : "[no toString func]") +
+                            (rigtprop ? await rigtprop.call(new Context(this, ctx.$right), right).content : "[no toString func]")
                         );
                     }
                     break;
@@ -541,10 +550,10 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
             switch (ctx.$op[i].image) {
                 case "==":
-                    left = new Boolean(left.content === right.content);
+                    left = new BooleanLiteral(left.content === right.content);
                     break;
                 case "!=":
-                    left = new Boolean(left.content !== right.content);
+                    left = new BooleanLiteral(left.content !== right.content);
                     break;
             }
         }
@@ -620,7 +629,6 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
             switch (ctx.$op[0].image) {
                 case "=":
                     return variable.update(right);
-                // eslint-disable-next-line no-case-declarations
                 case "+=": {
                     if (left instanceof NumberLiteral && right instanceof NumberLiteral) {
                         if (!(right instanceof TimeLiteral) && (left instanceof TimeLiteral || left instanceof DurationLiteral))
@@ -630,8 +638,8 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                     const leftprop = left.getProp(new StringLiteral("toString"));
                     const rightprop = right.getProp(new StringLiteral("toString"));
                     return variable.update(new StringLiteral(
-                        (leftprop ? (await leftprop.call(new Context(this, ctx.$left), left).content) : "[no toString func]") +
-                        (rightprop ? (await rightprop.call(new Context(this, ctx.$right), right).content) : "[no toString func]")
+                        (leftprop ? await leftprop.call(new Context(this, ctx.$left), left).content : "[no toString func]") +
+                        (rightprop ? await rightprop.call(new Context(this, ctx.$right), right).content : "[no toString func]")
                     ));
                 }
                 case "-=":
@@ -641,12 +649,16 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                     }
                     return variable.update(new NumberLiteral(left.content - right.content));
                 case "*=":
-                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                    if (left instanceof DurationLiteral &&
+                        right instanceof NumberLiteral &&
+                        !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
                         return left.multiply(right);
                     }
                     return variable.update(new NumberLiteral(left.content * right.content));
                 case "/=":
-                    if (left instanceof DurationLiteral && right instanceof NumberLiteral && !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
+                    if (left instanceof DurationLiteral &&
+                        right instanceof NumberLiteral &&
+                        !(right instanceof TimeLiteral || right instanceof DurationLiteral)) {
                         return left.multiply(1 / right);
                     }
                     return variable.update(new NumberLiteral(left.content / right.content));
@@ -693,9 +705,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         return variable.update(value);
     }
 
-    EmptyStatement() {
-        return;
-    }
+    EmptyStatement() { /* Do nothing */ }
 
     async ExpressionStatement(ctx) {
         await this.visit(ctx.AssignmentExpression);
@@ -847,7 +857,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
             throw this.error("Missing sleeping duration", ctx.SleepTok);
         }
 
-        // it isn't very elegant, but throwing the reply value is easiest way 
+        // it isn't very elegant, but throwing the reply value is easiest way
         // to get the result straight away
         const value = assign(await this.visit(ctx.$value));
 
@@ -867,7 +877,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
     async ReplyStatement(ctx) {
         if (!ctx.$value) return new ReplyInterrupt;
 
-        // it isn't very elegant, but throwing the reply value is easiest way 
+        // it isn't very elegant, but throwing the reply value is easiest way
         // to get the result straight away
         const value = assign(await this.visit(ctx.$value));
         throw new ReplyInterrupt(value);
@@ -880,7 +890,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
 
         const variable = this.varsPerStatement.createVariable(name, ctx, this);
 
-        const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
+        const args = ctx.FormalParameterList ? await this.visit(ctx.FormalParameterList) : [];
 
         const func = new Func(name, args, this.statementStack.clone(), ctx.FunctionBody[0]);
 
@@ -888,7 +898,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
     }
 
     async FunctionExpression(ctx) {
-        const args = ctx.FormalParameterList ? (await this.visit(ctx.FormalParameterList)) : [];
+        const args = ctx.FormalParameterList ? await this.visit(ctx.FormalParameterList) : [];
 
         return new Func(null, args, this.statementStack.clone(), ctx.FunctionBody[0]);
     }
@@ -912,8 +922,8 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
     }
 
     /**
-     * @param {{}} ctx 
-     * @param {{ args }} message 
+     * @param {{}} ctx
+     * @param {{ args }} message
      */
     async Program(ctx, { msg, args, guild, content, command_name }) {
         this.statementStack.pushChange(new StatementStack([]));
@@ -961,7 +971,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                             if (match) str = str.slice(match[0].length);
 
                             if (str === "") break;
-                            
+
                             let item = new NullLiteral;
                             switch (type) {
                                 case GLOBALS.Boolean:
@@ -1026,15 +1036,12 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                         }
 
                         return new ArrayLiteral(arr);
-
                     } else {
                         return new NullLiteral;
                     }
                 });
 
-                const $react = new NativeFunc("$react", async function (context, ...args) {
-                    return $msg.content.react.call(context, $msg, args);
-                });
+                const $react = new NativeFunc("$react", (context, ...args) => $msg.content.react.call(context, $msg, args));
 
                 const $guild = await Guild(this, guild);
 

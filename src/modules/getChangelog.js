@@ -16,7 +16,7 @@ module.exports = async function getChangelog() {
         return {
             body: body.replace(/##? \[\d+.\d+.\d+\w?\] \(\d{4}-\d{2}-\d{2}\)/g, "").trim(),
             version: /##? \[(\d+.\d+.\d+\w?)\]/g.exec(body)[1],
-            date: /##? \[\d+.\d+.\d+\w?\] \((\d{4}-\d{2}-\d{2})\)/g.exec(body)[1]
+            date: /##? \[\d+.\d+.\d+\w?\] \((\d{4}-\d{2}-\d{2})\)/g.exec(body)[1],
         };
     });
 

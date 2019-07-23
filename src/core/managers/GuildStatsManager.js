@@ -10,7 +10,7 @@ class Base {
         };
         this.$project = {
             value: 1,
-            ts: "$_id"
+            ts: "$_id",
         };
     }
 
@@ -18,7 +18,8 @@ class Base {
 
     getTS(timestamp) {
         const ts = new Date(timestamp);
-        ts.setHours(ts.getHours() + 1); // means it will increment the value until that hour changes. So the value then represents the value at that time
+        // means it will increment the value until that hour changes. So the value then represents the value at that time
+        ts.setHours(ts.getHours() + 1);
         ts.setMinutes(0, 0, 0);
         return ts;
     }
@@ -26,7 +27,7 @@ class Base {
     async getRangeOfAll(start, end, { channelId, userId, data }) {
         const query = {
             type: this.type,
-            id: this.id
+            id: this.id,
         };
         if (start || end) {
             query.ts = {};
@@ -45,7 +46,7 @@ class Base {
             channelId: row.channelId,
             userId: row.userId,
             data: row.data,
-            value: row.value
+            value: row.value,
         }));
     }
 
@@ -60,8 +61,8 @@ class Base {
                     type: this.type,
                     id: this.id,
                     ...$match,
-                    $and: query
-                }
+                    $and: query,
+                },
             },
             { $group: { ...this.$group, ...$group } },
             { $project: { ...this.$project, ...$project } },
@@ -88,12 +89,12 @@ class Base {
             {
                 _id: {
                     ts: "$ts",
-                    userId: "$userId"
-                }
+                    userId: "$userId",
+                },
             },
             {
                 ts: "$_id.ts",
-                userId: "$_id.userId"
+                userId: "$_id.userId",
             }
         );
     }
@@ -108,12 +109,12 @@ class Base {
             {
                 _id: {
                     ts: "$ts",
-                    channelId: "$channelId"
-                }
+                    channelId: "$channelId",
+                },
             },
             {
                 ts: "$_id.ts",
-                channelId: "$_id.channelId"
+                channelId: "$_id.channelId",
             }
         );
     }
@@ -128,12 +129,12 @@ class Base {
             {
                 _id: {
                     ts: "$ts",
-                    data: "$data"
-                }
+                    data: "$data",
+                },
             },
             {
                 ts: "$_id.ts",
-                data: "$_id.data"
+                data: "$_id.data",
             }
         );
     }
@@ -148,12 +149,12 @@ class Base {
             {
                 _id: {
                     ts: "$ts",
-                    data: "$data"
-                }
+                    data: "$data",
+                },
             },
             {
                 ts: "$_id.ts",
-                data: "$_id.data"
+                data: "$_id.data",
             }
         );
     }
@@ -181,12 +182,11 @@ class Histogram extends Base {
     get type() { return "value"; }
 
     async getOldVal(query) {
-        let old_val = undefined;
+        let old_val;
         if (!this.values.has(query.guildId)) {
             const row = await this.getLastItemBefore(query.ts, query.guildId, query.data);
             if (row) old_val = row.value;
-        }
-        else {
+        } else {
             const map = this.values.get(query.guildId);
             if (!map.has(query.data || "")) {
                 const row = await this.getLastItemBefore(query.ts, query.guildId, query.data);
@@ -238,13 +238,16 @@ class Histogram extends Base {
             id: this.id,
             guildId,
             ts: {
-                $lte: end
-            }
+                $lte: end,
+            },
         };
         if (data) query.data = data;
 
-        const rows = await this.db.then(db => db.find(query).sort({ "ts": -1 }).limit(1).project(this.$project).toArray());
-        
+        const rows = await this.db.then(db => db.find(query)
+            .sort({ ts: -1 }).limit(1)
+            .project(this.$project)
+            .toArray());
+
         if (rows[0]) {
             delete rows[0]._id;
             return rows[0];
@@ -263,7 +266,7 @@ class Counter extends Base {
             id: this.id,
             guildId,
             channelId,
-            userId
+            userId,
         };
         if (data) query.data = data;
 
@@ -281,20 +284,20 @@ class Counter extends Base {
                     type: this.type,
                     id: this.id,
                     ...$match,
-                    $and: query
-                }
+                    $and: query,
+                },
             },
             {
                 $group: {
                     _id: "",
-                    sum: { $sum: "$value" }
-                }
+                    sum: { $sum: "$value" },
+                },
             },
             {
                 $project: {
                     _id: 0,
-                    sum: "$value"
-                }
+                    sum: "$value",
+                },
             }
         ).toArray());
 
@@ -332,8 +335,9 @@ class GuildStatsManager {
     }
 
     /**
-     * @param {string} id 
-     * @param {Counter|Histogram} cursor 
+     * @param {string} id
+     * @param {Counter|Histogram} cursor
+     * @returns {Counter|Histogram}
      */
     _register(id, cursor) {
         this._map.set(id, cursor);

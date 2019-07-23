@@ -6,21 +6,28 @@ const { User, Guild, TextChannel, Message, MessageReaction, RichEmbed } = requir
 
 class Paginator extends Events {
     /**
-     * @param {string} title
-     * @param {string} content
-     * @param {number} items_per_page 
-     * @param {string[]} items 
-     * @param {User} user
-     * @param {Object} opts
-     * @param {number} [opts.timeout]
-     * @param {boolean} [opts.show_page_numbers] 
-     * @param {boolean} [opts.allow_text_input]
-     * @param {boolean} [opts.wrap_page_ends]
-     * @param {boolean} [opts.number_items]
-     * @param {Guild} [opts.guild]
-     * @param {[string, string]} [opts.prefix_suffix]
+     * @param {string} title The title of the embed
+     * @param {string} content The message text
+     * @param {number} items_per_page Max items per page
+     * @param {string[]} items The items to show
+     * @param {User} user The user object of the instantiator
+     * @param {Object} [opts] Options for the paginator
+     * @param {number} [opts.timeout] Time to wait for interactions before destroying Paginator
+     * @param {boolean} [opts.show_page_numbers] Wether to show page numbers
+     * @param {boolean} [opts.allow_text_input] Wether to allow inputting page numbers to navigate to them
+     * @param {boolean} [opts.wrap_page_ends] Wether should wrap around back to the first page if clicking "next" on last page
+     * @param {boolean} [opts.number_items] Wether to number the items
+     * @param {Guild} [opts.guild] If Paginator is for something guild related
+     * @param {[string, string]} [opts.prefix_suffix] What to prefix and or suffix to the list of each page
      */
-    constructor(title, content, items_per_page, items, user, { timeout = 60000, show_page_numbers = true, wrap_page_ends = true, number_items = false, guild = null, prefix_suffix = ["", ""] } = {}) {
+    constructor(title, content, items_per_page, items, user, {
+        timeout = 60000,
+        show_page_numbers = true,
+        wrap_page_ends = true,
+        number_items = false,
+        guild = null,
+        prefix_suffix = ["", ""],
+    } = {}) {
         super();
 
         this.title = title;
@@ -43,8 +50,8 @@ class Paginator extends Events {
 
     /**
      * Begins pagination on page 1 as a new Message in the provided TextChannel
-     * 
-     * @param {TextChannel} channel 
+     * @param {TextChannel} channel The channel to render the Paginator in
+     * @returns {Paginator}
      */
     display(channel) {
         this.paginate(channel, 1);
@@ -52,36 +59,37 @@ class Paginator extends Events {
     }
 
     /**
-     * @param {TextChannel} channel 
-     * @param {number} page_num 
+     * @param {TextChannel} channel
+     * @param {number} page_num
+     * @returns {void}
      */
     async paginate(channel, page_num) {
         if (page_num < 1)
             page_num = 1;
         else if (page_num > this.page_count)
             page_num = this.page_count;
-        
+
         const msg = this.renderPage(page_num);
         this.initialize(await channel.send(...msg), page_num);
     }
 
     /**
-     * @param {Message} message 
-     * @param {number} page_num 
+     * @param {Message} message
+     * @param {number} page_num
      */
     async paginateMessage(message, page_num) {
         if (page_num < 1)
             page_num = 1;
         else if (page_num > this.page_count)
             page_num = this.page_count;
-        
+
         const msg = this.renderPage(page_num);
         this.initialize(await message.edit(...msg), page_num);
     }
 
     /**
-     * @param {Message} message 
-     * @param {number} page_num 
+     * @param {Message} message
+     * @param {number} page_num
      */
     async initialize(message, page_num) {
         this.message = message;
@@ -100,12 +108,7 @@ class Paginator extends Events {
      * @param {Message} message
      * @param {number} page_num
      */
-    async pagination(message, page_num) {
-        // if (this.allow_text_input || (this.left_text != null && this.right_text != null)) {
-        //     this.paginationWithTextInput(message, page_num);
-        // } else {
-        //     this.paginationWithoutTextInput(message, page_num);
-        // }
+    pagination(message, page_num) {
         this.paginationWithoutTextInput(message, page_num);
     }
 
@@ -128,7 +131,8 @@ class Paginator extends Events {
 
     /**
      * @param {MessageReaction} reaction
-     * @param {User} user 
+     * @param {User} user
+     * @returns {boolean}
      */
     checkReaction(reaction, user) {
         if (user.id !== this.user.id) return false;
@@ -154,13 +158,13 @@ class Paginator extends Events {
         let new_page_num = page_num;
         switch (reaction.emoji.name) {
             case Paginator.LEFT:
-                if (new_page_num == 1 && this.wrap_page_ends)
+                if (new_page_num === 1 && this.wrap_page_ends)
                     new_page_num = this.page_count + 1;
                 if (new_page_num > 1)
                     new_page_num--;
                 break;
             case Paginator.RIGHT:
-                if (new_page_num == this.page_count && this.wrap_page_ends)
+                if (new_page_num === this.page_count && this.wrap_page_ends)
                     new_page_num = 0;
                 if (new_page_num < this.page_count)
                     new_page_num++;
@@ -193,7 +197,7 @@ class Paginator extends Events {
         const end = this.strings.length < page_num * this.items_per_page ?
             this.strings.length :
             page_num * this.items_per_page;
-        
+
         const rows = [this.prefix_suffix[0]];
         for (let i = start; i < end; i++) {
             let str = "";
@@ -205,24 +209,24 @@ class Paginator extends Events {
         embed.setDescription(rows.join("\n"));
 
         if (this.show_page_numbers) embed.setFooter(`Page ${page_num}/${this.page_count}`);
-        
+
         return [
             this.content,
-            { embed }
+            { embed },
         ];
     }
 
     /**
-     * @param {Message} message 
+     * @param {Message} message
      */
     async end(message = this.message) {
-        await message.clearReactions().catch(() => { });
+        await message.clearReactions().catch(() => { /* Do nothing */ });
         this.emit("end", message);
     }
 }
 
 // ◀ ⏹ ▶
-Paginator.LEFT = "◀"; 
+Paginator.LEFT = "◀";
 Paginator.STOP = "⏹";
 Paginator.RIGHT = "▶";
 

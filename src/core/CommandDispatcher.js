@@ -71,10 +71,10 @@ class CommandDispatcher {
     }
 
     /**
-     * @param {Message} message 
-     * @param {string} command_name 
-     * @param {string} content 
-     * @param {CustomCommand} command 
+     * @param {Message} message
+     * @param {string} command_name
+     * @param {string} content
+     * @param {CustomCommand} command
      */
     async processCC(message, command_name, content, command) {
         if (message.guild && !message.member) message.member = message.guild.member(message.author) || null;
@@ -89,8 +89,8 @@ class CommandDispatcher {
         const disabledChannels = await this.disabled_channels.findOne({
             guildId: message.guild.id,
             channels: {
-                $all: [message.channel.id]
-            }
+                $all: [message.channel.id],
+            },
         });
         if (disabledChannels) return false;
 
@@ -127,6 +127,8 @@ class CommandDispatcher {
      * @param {boolean} prefix_used
      * @param {BaseCommand} command
      * @param {NanoTimer} timer
+     * @param {string|RegExp} keyword
+     * @returns {boolean}
      */
     async processCommand(message, command_name, content, prefix_used, command, timer, keyword) {
         const c_type = message.channel.type;
@@ -155,22 +157,22 @@ class CommandDispatcher {
                         this.disabled_commands.findOne({
                             guildId: message.guild.id,
                             commands: {
-                                $all: [command_name]
-                            }
+                                $all: [command_name],
+                            },
                         }),
                         this.disabled_channels.findOne({
                             guildId: message.guild.id,
                             channels: {
-                                $all: [message.channel.id]
-                            }
+                                $all: [message.channel.id],
+                            },
                         }),
                         this.disabled_commands_channels.findOne({
                             guildId: message.guild.id,
                             command: command_name,
                             channels: {
-                                $all: [message.channel.id]
-                            }
-                        })
+                                $all: [message.channel.id],
+                            },
+                        }),
                     ]);
 
                     if (disabledCommands) return false;
@@ -187,8 +189,8 @@ class CommandDispatcher {
                     const disabledChannels = await this.disabled_channels.findOne({
                         guildId: message.guild.id,
                         channels: {
-                            $all: [message.channel.id]
-                        }
+                            $all: [message.channel.id],
+                        },
                     });
 
                     const category = command.category;
@@ -250,7 +252,7 @@ class CommandDispatcher {
             return true;
         } else {
             if (!keyword) log.debug("Command", debugString(command_name, message));
-            else          log.debug("Keyword", debugString(keyword,      message));
+            else log.debug("Keyword", debugString(keyword, message));
 
             const pass_through = await promises.get(command.id);
             // const command_result = await command.run(message, command_name, content, pass_through);

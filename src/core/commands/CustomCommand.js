@@ -1,4 +1,5 @@
 const { findArgs } = require("../../util/string");
+const log = require("../../log");
 const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
 const { Message, RichEmbed } = require("discord.js");
@@ -102,12 +103,25 @@ class CustomCommand extends BaseCommand {
         const { error, embed, content: cont } =
             await this.manager.run(message, { id: this.id, code: this.code, cst: this.cst, message: msg });
 
-        if (error) {
+        if (error && error.name === "RuntimeError") {
             error.ts = new Date;
             error.commandId = this.id;
             error.guildId = this.guildId;
 
             await this.manager.errors_db.insertOne(error);
+            return;
+        } else if (error) {
+            const err = {
+                ts: new Date,
+                commandId: this.id,
+                guildId: this.guildId,
+                name: "Unknown Error",
+                message: "Not an error thrown by the actual TrixieScript runtime, but by the interpreter"
+            };
+
+            log.namespace("cc interpreter").error(error);
+
+            await this.manager.errors_db.insertOne(err);
             return;
         }
 

@@ -479,14 +479,6 @@
       }
     },
     {
-      "name": "twitraffle",
-      "help": {
-        "description": "Analyse a Twitter raffle by URL",
-        "usage": "\n`!twitraffle <url>`\n`url` - optional- The URL to the Tweet to analyse",
-        "category": "Utility"
-      }
-    },
-    {
       "name": "leavevc",
       "help": {
         "description": "Make Trixie leave the voice channel!",

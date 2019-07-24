@@ -1,6 +1,26 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [2.9.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.3...v2.9.0) (2019-07-24)
+
+
+### Bug Fixes
+
+* message collector, permissionsFor fixes ([d3ec01c](https://bitbucket.org/Loneless/trixiebot/commit/d3ec01c))
+* **cc errors:** handle non-runtime errors ([959e69c](https://bitbucket.org/Loneless/trixiebot/commit/959e69c))
+* **cc manager:** put custom commands type command first before any keyword commands ([0b127ae](https://bitbucket.org/Loneless/trixiebot/commit/0b127ae))
+
+
+### Features
+
+* create better keyword registry (need to work on this implementation) ([add14bc](https://bitbucket.org/Loneless/trixiebot/commit/add14bc))
+* implement CommandScope ([bae7908](https://bitbucket.org/Loneless/trixiebot/commit/bae7908))
+* implemented CommandScope for commands that can be executed in not just guilds ([71c2678](https://bitbucket.org/Loneless/trixiebot/commit/71c2678))
+* **cli:** add ascii banner ([c970647](https://bitbucket.org/Loneless/trixiebot/commit/c970647))
+* **scoped cmds:** make all commands that don't need guilds available in dm ([559f5d3](https://bitbucket.org/Loneless/trixiebot/commit/559f5d3))
+
+
 
 <a name="2.8.3"></a>
 ## [2.8.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.2...v2.8.3) (2019-07-13)

@@ -1,8 +1,14 @@
 # TrixieBot
 
+<div>
+
+<img src="https://discordbots.org/api/widget/397037692963258368.png" width="250" style="float:right; margin-left: .5rem" />
+
 ## Using the Official TrixieBot
 
 ***[Add TrixieBot to your server now](https://trixie.loneless.art/invite) and enjoy it's full set of features with low latency on machines it was specifically designed for.***
+
+</div>
 
 ---
 Trixie is an all-in-one Discord Bot for pony lovers
@@ -65,3 +71,13 @@ For crash savety and restart on reboot official Trixie uses pm2 with the configs
 ### Editing
 
 If you're going to edit the code, make sure you're using a proper IDE for code editing. Your best bet might be VS Code.
+
+# License
+
+TrixieBot is licensed under the [GNU General Public License v3.0](LICENSE)
+
+Copyright (C) 2018-2019 Christian Schäfer / Loneless
+
+```
+Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
+```

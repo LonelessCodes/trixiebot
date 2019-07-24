@@ -30,29 +30,29 @@ prefix: "!"
 website_url: https://trixie.loneless.art
 invite_url:  https://trixie.loneless.art/invite
 
-derpibooru:
+derpibooru: # derpibooru.org
   key:  XXXX
 
-cleverbot:
+cleverbot: # cleverbot.io
   user: XXXX
   key:  XXXX
 
-giphy:
+giphy: # giphy.com
   key:  XXXX
 
-twitch:
+twitch: # twitch.tv
   client_id:     XXXX
 
-twitter:
+twitter: # twitter.com
   consumer_key:         XXXX
   consumer_secret:      XXXX
   access_token:         XXXX
   access_token_secret:  XXXX
 
-voicerss:
+voicerss: # voicerss.org
   key: XXXX
 
-tumblr: 
+tumblr: # tumblr.com
   key: XXXX
 
 # the vote webhook secrets

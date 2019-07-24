@@ -236,7 +236,7 @@ class Twitch extends StreamProcessor {
 
         const set = new Set(channels.map(c => c.userId));
 
-        const online_channels = await this.twitch.streams.getStreams(Array.from(set));
+        const online_channels = await this.twitch.kraken.streams.getStreams(Array.from(set));
 
         for (let config of channels) await this.checkChange(config, online_channels).catch(err => log.error(err));
     }

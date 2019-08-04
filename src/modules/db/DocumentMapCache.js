@@ -34,7 +34,7 @@ class DocumentMapCache {
      * @param {string} keyName The document property to get docs from
      * @param {Object} [opts] The indexes for the collection
      * @param {Object} [opts.indexes] The indexes for the collection
-     * @param {number} [opts.ttl] Time to life before cleanup of a document (in cache)
+     * @param {number} [opts.ttl] Time to life before cleanup of a document in seconds (in cache)
      * @param {number} [opts.maxSize] Maximum number of docs in cache
      */
     constructor(collection, keyName, opts = {}) {

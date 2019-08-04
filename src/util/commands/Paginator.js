@@ -18,7 +18,7 @@ const { userToString } = require("../util");
 const CONST = require("../../const");
 const Events = require("events");
 // eslint-disable-next-line no-unused-vars
-const { User, Guild, TextChannel, Message, MessageReaction, RichEmbed } = require("discord.js");
+const { User, Guild, TextChannel, Message, MessageReaction, RichEmbed, Permissions } = require("discord.js");
 
 class Paginator extends Events {
     /**
@@ -191,7 +191,8 @@ class Paginator extends Events {
         }
 
         try {
-            reaction.remove(this.user);
+            if (message.channel.permissionsFor(this.guild.me).has(Permissions.FLAGS.MANAGE_MESSAGES))
+                reaction.remove(this.user);
         } catch (_) { _; }
 
         const m = await message.edit(...this.renderPage(new_page_num));

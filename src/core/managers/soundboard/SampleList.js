@@ -20,7 +20,7 @@ const AudioManager = require("../AudioManager");
 // eslint-disable-next-line no-unused-vars
 const { PredefinedSample, UserSample, GuildSample } = require("./Sample");
 // eslint-disable-next-line no-unused-vars
-const { User, Guild, TextChannel, Message, MessageReaction, RichEmbed } = require("discord.js");
+const { User, Guild, TextChannel, Message, MessageReaction, Permissions } = require("discord.js");
 
 class SampleList extends Events {
     /**
@@ -175,7 +175,8 @@ class SampleList extends Events {
         } catch (_) { _; }
 
         try {
-            reaction.remove(this.user);
+            if (message.channel.permissionsFor(this.guild.me).has(Permissions.FLAGS.MANAGE_MESSAGES))
+                reaction.remove(this.user);
         } catch (_) { _; }
 
         this.pagination(message);

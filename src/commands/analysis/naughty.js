@@ -14,12 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { userToString } = require("../../util/util");
+const { userToString, progressBar } = require("../../util/util");
 const CONST = require("../../const");
 const Queue = require("../../modules/Queue");
 const fs = require("fs-extra");
 const path = require("path");
-const { promisify, progressBar } = require("util");
+const { promisify } = require("util");
 const figlet = promisify(require("figlet"));
 const Discord = require("discord.js");
 

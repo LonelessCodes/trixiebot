@@ -72,9 +72,9 @@ client.addListener("resume", replayed => djs_log(`Replayed ${replayed} events`))
 // Initialize Bot
 initialize(client)
     .then(() => log.namespace("app", "Ready uwu.", `bootup_time:${(bootup_timer.end() / nanoTimer.NS_PER_SEC).toFixed(3)}s`))
-    .catch(err => {
+    .catch(async err => {
         log.error("Failed to log in", err);
-        process.exit(1);
+        await exit(1);
     });
 
 async function initialize(client) {
@@ -130,3 +130,13 @@ async function initialize(client) {
 
     await core.startMainComponents("commands");
 }
+
+async function exit(code = 0) {
+    log("Gracefully exiting...");
+
+    await client.destroy();
+    process.exit(code);
+}
+
+process.once("SIGTERM", exit);
+process.once("SIGINT", exit);

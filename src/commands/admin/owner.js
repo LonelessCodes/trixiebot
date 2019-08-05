@@ -125,4 +125,13 @@ module.exports = function install(cr, client, config, db) {
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.FLAGS.DM);
+
+    cr.registerCommand("reboot", new SimpleCommand(async message => {
+        await message.channel.send("Gracefully rebooting...");
+
+        await client.destroy();
+        process.exit();
+    }))
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.ALL);
 };

@@ -99,14 +99,11 @@ module.exports = class LocaleManager {
 
     addListeners() {
         this.client.addListener("guildCreate", async guild => {
-            const config = await this._cache.get(guild.id);
-            if (config && config.removedFrom instanceof Date)
-                await this._cache.set(guild.id, Object.assign({}, config, { removedFrom: undefined }));
+            await this._cache.update(guild.id, { removedFrom: undefined });
         });
 
         this.client.addListener("guildDelete", async guild => {
-            const config = await this._cache.get(guild.id);
-            if (config) await this._cache.set(guild.id, Object.assign({}, config, { removedFrom: new Date }));
+            await this._cache.update(guild.id, { removedFrom: new Date });
         });
     }
 
@@ -114,8 +111,8 @@ module.exports = class LocaleManager {
         let config = await this._cache.get(guildId);
         if (!config) config = { global: "en", channels: {} };
         if (typeof config.global !== "string" || !isPlainObject(config.channels)) {
-            config.global = config.global || "en";
-            config.channels = config.channels || {};
+            config.global = typeof config.global !== "string" ? "en" : config.global;
+            config.channels = !isPlainObject(config.channels) ? {} : config.channels;
             await this._cache.set(guildId, config);
         }
 

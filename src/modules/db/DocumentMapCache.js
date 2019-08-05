@@ -210,6 +210,34 @@ class DocumentMapCache {
 
         this.checkIndexes(key);
     }
+
+    async update(key, values = {}) {
+        if (!isPlainObject(values)) throw new Error("Values is not of type Object or typeof Document");
+        if (this.keyName in values) throw new Error("Cannot update mapped key");
+
+        const isNew = !this._documents.has(key);
+        if (isNew && this.maxSize > 0 && this._documents.size >= this.maxSize) {
+            const [firstKey] = this._documents.entries().next().value;
+            this._deleteInternal(firstKey);
+        }
+
+        let doc;
+        if (isNew) {
+            const in_db = await this.db.findOne({ [this.keyName]: key });
+            if (!in_db) return;
+
+            doc = Object.assign(in_db, values);
+        } else {
+            doc = this._getInternal(key);
+        }
+
+        this._documents.set(key, doc);
+        this._setTTLTimeout(key);
+
+        await this.db.updateOne({ [this.keyName]: key }, { $set: values });
+
+        this.checkIndexes(key);
+    }
 }
 
 module.exports = DocumentMapCache;

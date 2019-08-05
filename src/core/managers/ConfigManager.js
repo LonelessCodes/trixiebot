@@ -144,15 +144,11 @@ class ConfigManager {
 
     addListeners() {
         this.client.addListener("guildCreate", async guild => {
-            const config = await this._cache.get(guild.id);
-            if (config &&
-                config.removedFrom instanceof Date)
-                await this._cache.set(guild.id, Object.assign({}, config, { removedFrom: undefined }));
+            await this._cache.update(guild.id, { removedFrom: undefined });
         });
 
         this.client.addListener("guildDelete", async guild => {
-            const config = await this._cache.get(guild.id);
-            if (config) await this._cache.set(guild.id, Object.assign({}, config, { removedFrom: new Date }));
+            await this._cache.update(guild.id, { removedFrom: new Date });
         });
     }
 
@@ -160,7 +156,7 @@ class ConfigManager {
         // will fire instantly if loaded already, are wait
         // till all configurations are initially loaded into memory
         let config = await this._cache.get(guildId);
-        if (!config) config = Object.assign({}, this.default_config, { guildId });
+        if (!config) config = Object.assign({}, this.default_config);
         else config = Object.assign({}, this.default_config, config);
 
         delete config.guildId;

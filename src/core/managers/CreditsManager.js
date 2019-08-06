@@ -306,6 +306,5 @@ class CreditsManager {
 }
 
 CreditsManager.MAX_STREAK = 5;
-CreditsManager.STREAK_TIME = 1000 * 3600 * 6;
 
 module.exports = new CreditsManager;

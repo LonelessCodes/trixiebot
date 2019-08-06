@@ -102,8 +102,8 @@ class Core {
         }
 
         const str = JSON.stringify(jason, null, 2);
-        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str);
-        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str);
+        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str, { mode: 0o666 });
+        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str, { mode: 0o666 });
 
         const build_time = (all_timer.end() / nanoTimer.NS_PER_SEC) - install_time;
 

@@ -15,6 +15,7 @@
  */
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
+const OverloadCommand = require("../core/commands/OverloadCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
@@ -217,26 +218,27 @@ module.exports = function install(cr) {
             .setUsage("", "Display all your transactions from ever!"));
     bankCmd.registerSubCommandAlias("transactions", "trans");
 
-    bankCmd.registerSubCommand("name", new SimpleCommand(async (message, content) => {
-        const guild = message.guild;
-        const [singular, plural] = splitArgs(content, 2);
-
-        if (singular === "") {
-            const name = await credits.getName(guild);
+    bankCmd.registerSubCommand("setname", new OverloadCommand)
+        .registerOverload("0", new SimpleCommand(async message => {
+            const name = await credits.getName(message.guild);
 
             await message.channel.send(`Current configuration:\nSingular: **${name.singular}**\nPlural: **${name.plural}**\n\nExample: **${credits.getBalanceString(Math.floor(Math.random() * 50), name)}**`);
-            return;
-        }
+        }))
+        .registerOverload("1-2", new SimpleCommand(async (message, content) => {
+            const guild = message.guild;
+            const [singular, plural] = splitArgs(content, 2);
 
-        await credits.setName(guild, singular, plural === "" ? undefined : plural);
+            await credits.setName(guild, singular, plural === "" ? undefined : plural);
 
-        await message.channel.send("Nice! Okay, try it out now");
-    }))
+            await message.channel.send("Nice! Okay, try it out now");
+        }))
         .setHelp(new HelpContent()
             .setUsage("<?singular> <?plural>", "Change the name of the currency. If not given any arguments, view the current configuration")
             .addParameterOptional("singular", "Sets the singular of the currency name")
             .addParameterOptional("plural", "Sets the plural of the currency name. If omitted, singular name will be used for everything"))
         .setPermissions(CommandPermissions.ADMIN);
+
+    bankCmd.registerSubCommandAlias("setname", "name");
 
     bankCmd.registerSubCommand("set", new SimpleCommand(async (message, content) => {
         const member = message.mentions.members.first();
@@ -285,7 +287,7 @@ module.exports = function install(cr) {
 
         const currency_name = await credits.getName(message.guild);
 
-        const bonus = credits.isBonus(streak) ? 100 : 0;
+        const bonus = credits.isBonus(streak) ? 150 : 0;
         const total = dailies + bonus;
 
         await credits.makeTransaction(message.guild, user, total, "dailies", "Collected dailies");

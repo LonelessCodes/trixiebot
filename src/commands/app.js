@@ -52,13 +52,26 @@ module.exports = function install(cr, client) {
             .setAuthor("TrixieBot", client.user.avatarURL, INFO.WEBSITE)
             .setDescription("**Trixie is an all-in-one Discord Bot for pony lovers**\n\n" +
                 "She offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins.\n\n" +
-                "Her set of commands range from utility stuff, simple fun, imageboard commands, custom commands, soundboards, to even a full web dashboard to configure Trixie and watch the growth of your server and so much more!\n" +
+                "Her set of commands range from utility stuff, simple fun, imageboard commands, custom commands, soundboards, to even a full web dashboard to configure Trixie and watch the growth of your server and so much more!\n\n" +
                 "For a list of all commands, go `" + m.prefix + "help`.\n\n" +
-                (INFO.WEBSITE ? "Website " + INFO.WEBSITE + "\n" +
-                "Web Dashboard " + INFO.WEBSITE + "/dashboard" : ""))
+                (INFO.WEBSITE ?
+                    "Website " + INFO.WEBSITE + "\n" +
+                    "Web Dashboard " + INFO.WEBSITE + "/dashboard\n" :
+                    "") +
+                "Contributing: https://github.com/LonelessCodes/trixiebot")
             .setFooter(`TrixieBot v${INFO.VERSION}`),
     })))
         .setHelp(new HelpContent().setDescription("First command to call."))
+        .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
+
+    cr.registerCommand("github", new TextCommand("Help the development of TrixieBot on https://github.com/LonelessCodes/trixiebot :heart::heart::heart:"))
+        .setHelp(new HelpContent().setDescription("Get a link to TrixieBot's Github repo."))
+        .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
+
+    cr.registerCommand("reportbug", new TextCommand("Report bugs and feature requests at https://github.com/LonelessCodes/trixiebot/issues"))
+        .setHelp(new HelpContent().setDescription("Get a link to Trixie's bug report page."))
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 };

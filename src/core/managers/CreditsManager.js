@@ -15,6 +15,7 @@
  */
 
 const database = require("../../modules/db/database");
+const moment = require("moment");
 const secureRandom = require("../../modules/random/secureRandom");
 // eslint-disable-next-line no-unused-vars
 const { GuildMember, User, Guild } = require("discord.js");
@@ -190,23 +191,31 @@ class CreditsManager {
     async getDailies(user) {
         if (user instanceof GuildMember) user = user.user;
 
+        /** @type {{ userId: string; lastDaily: Date; streak: number; }} */
         let lastDaily = await this.dailies.then(db => db.findOne({
             userId: user.id,
         }));
 
         /** @type {number} */
-        const dailies = await secureRandom([150, 170, 200]);
+        const dailies = await secureRandom([150, 175, 200]);
 
         if (lastDaily) {
-            const time_left = lastDaily.lastDaily.getTime() + CreditsManager.COOLDOWN - Date.now();
+            const last = moment(lastDaily.lastDaily);
+            const start_of_next_day = last.startOf("day").add(1, "days");
+            const end_of_next_day = last.clone().add(1, "days");
+            const now = moment();
 
-            if (time_left > 0) return {
-                time_left,
-                dailies: 0,
-                streak: 0,
-            };
+            if (now.isBefore(start_of_next_day)) {
+                const time_left = start_of_next_day.diff(now);
 
-            else if (time_left < -CreditsManager.STREAK_TIME) {
+                return {
+                    time_left,
+                    dailies: 0,
+                    streak: 0,
+                };
+            }
+
+            if (now.isSameOrAfter(end_of_next_day)) {
                 await this.dailies.then(db => db.updateOne({
                     userId: user.id,
                 }, { $set: { streak: 1, lastDaily: new Date } }));
@@ -297,7 +306,6 @@ class CreditsManager {
 }
 
 CreditsManager.MAX_STREAK = 5;
-CreditsManager.COOLDOWN = 1000 * 3600 * 22; // 22 hours
 CreditsManager.STREAK_TIME = 1000 * 3600 * 6;
 
 module.exports = new CreditsManager;

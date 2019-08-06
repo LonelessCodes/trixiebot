@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.11.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.10.0...v2.11.0) (2019-08-06)
+
+
+### Bug Fixes
+
+* **naughty cmd:** fixed progress bar ([594fada](https://bitbucket.org/Loneless/trixiebot/commit/594fada))
+
+
+### Features
+
+* add DocumentMapCache#update ([a16884e](https://bitbucket.org/Loneless/trixiebot/commit/a16884e))
+* **daily command:** finally calculate daily streaks by individual dates they were collected ([e898761](https://bitbucket.org/Loneless/trixiebot/commit/e898761))
+* add github and reportbug commands ([7c6008e](https://bitbucket.org/Loneless/trixiebot/commit/7c6008e))
+* gracefully shut down bot on reboot and kill signals ([1baad00](https://bitbucket.org/Loneless/trixiebot/commit/1baad00))
+
+
+
 <a name="2.10.0"></a>
 ## [2.10.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.9.1...v2.10.0) (2019-07-25)
 

@@ -14,10 +14,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Calendar = require("./Calendar");
+const CalendarRange = require("./CalendarRange");
+const CalendarStatus = require("./CalendarStatus");
 
-module.exports = {
-    HALLOWEEN: new Calendar(Calendar.MONTH.OCTOBER, 30),
-    CHRISTMAS: new Calendar(Calendar.MONTH.DECEMBER, 25),
-    NEW_YEARS: new Calendar(Calendar.MONTH.JANUARY, 1),
-};
+module.exports = [
+    // 0-24 Oct. 30th
+    new CalendarStatus(new CalendarRange("0 0 0 30 9 *", "0 0 0 31 9 *"), "Happy Halloween!"),
+    // 0:00 25th - 24:00 26th Dec
+    new CalendarStatus(new CalendarRange("0 0 0 25 11 *", "0 0 0 27 11 *"), "Merry Christmas!"),
+    // 18:00 - 24:00 31st Dec
+    new CalendarStatus(new CalendarRange("0 0 18 31 11 *", "0 0 0 1 0 *"), "Merry New Year's Eve!"),
+    // 0-24 1st Jan
+    new CalendarStatus(new CalendarRange("0 0 0 1 0 *", "0 0 0 2 0 *"), "Happy New Year!"),
+];

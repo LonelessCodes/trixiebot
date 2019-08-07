@@ -23,8 +23,8 @@ const config = require("../config");
 const { walk } = require("../util/files");
 const helpToJSON = require("../util/commands/helpToJSON");
 const nanoTimer = require("../modules/nanoTimer");
-const secureRandom = require("../modules/random/secureRandom");
-const CalendarEvents = require("../modules/CalendarEvents");
+const random = require("../modules/random/random");
+const calendar_events = require("../modules/calendar_events");
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("./managers/ConfigManager");
 
@@ -56,9 +56,10 @@ class Core {
     }
 
     async startMainComponents(commands_package) {
-        for (const voice of this.client.voiceConnections.array()) {
-            voice.disconnect();
-        }
+        for (const voice of this.client.voiceConnections.array()) voice.disconnect();
+
+        await this.client.user.setStatus("dnd");
+        await this.client.user.setActivity("!trixie | Booting...", { type: "PLAYING" });
 
         await this.loadCommands(commands_package);
         await this.attachListeners();
@@ -70,21 +71,18 @@ class Core {
         if (!commands_package) throw new Error("Cannot load commands if not given a path to look at!");
 
         log("Installing Commands...");
-        const all_timer = nanoTimer();
 
-        const files = await walk(path.resolve(__dirname, "..", commands_package));
+        const timer = nanoTimer();
 
-        let file_count = 0;
+        const files = await walk(path.resolve(__dirname, "..", commands_package))
+            .then(files => files.filter(file => path.extname(file) === ".js"));
+
         await Promise.all(files.map(async file => {
-            if (path.extname(file) !== ".js") return;
-
             const install = require(path.resolve("../" + commands_package, file));
             await install(this.processor.REGISTRY, this.client, this.config, this.db);
-
-            file_count++;
         }));
 
-        const install_time = all_timer.end() / nanoTimer.NS_PER_SEC;
+        const install_time = timer.end() / nanoTimer.NS_PER_SEC;
 
         log("Building commands.json");
 
@@ -105,9 +103,9 @@ class Core {
         await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str, { mode: 0o666 });
         await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str, { mode: 0o666 });
 
-        const build_time = (all_timer.end() / nanoTimer.NS_PER_SEC) - install_time;
+        const build_time = (timer.end() / nanoTimer.NS_PER_SEC) - install_time;
 
-        log(`Commands installed. files:${file_count} commands:${this.processor.REGISTRY.commands.size} install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
+        log(`Commands installed. files:${files.length} commands:${this.processor.REGISTRY.commands.size} install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
     }
 
     attachListeners() {
@@ -120,26 +118,27 @@ class Core {
         const statuses = await fs.readFile(path.join(__dirname, "../../assets/text/statuses.txt"), "utf8")
             .then(txt => txt.split("\n").filter(s => s !== ""));
 
-        const updateStatus = async () => {
+        const updateStatus = () => {
             clearTimeout(timeout);
             timeout = setTimeout(updateStatus, 20 * 60000);
 
-            let status = "";
-            if (CalendarEvents.CHRISTMAS.isToday()) status = "Merry Christmas!";
-            else if (CalendarEvents.HALLOWEEN.isToday()) status = "Happy Halloween!";
-            else if (CalendarEvents.NEW_YEARS.isToday()) status = "Happy New Year!";
-            else status = await secureRandom(statuses);
+            let status = null;
+            for (let event of calendar_events) {
+                if (!event.isToday()) continue;
+
+                status = event.getStatus();
+                break;
+            }
+
+            status = status || random(statuses);
 
             this.client.user.setStatus("online");
             this.client.user.setActivity(`!trixie | ${status}`, { type: "PLAYING" });
         };
 
-        CalendarEvents.CHRISTMAS.on("start", updateStatus);
-        CalendarEvents.CHRISTMAS.on("end", updateStatus);
-        CalendarEvents.HALLOWEEN.on("start", updateStatus);
-        CalendarEvents.HALLOWEEN.on("end", updateStatus);
-        CalendarEvents.NEW_YEARS.on("start", updateStatus);
-        CalendarEvents.NEW_YEARS.on("end", updateStatus);
+        for (let event of calendar_events) {
+            event.on("start", updateStatus).on("end", updateStatus);
+        }
 
         updateStatus();
     }

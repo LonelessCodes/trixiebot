@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// eslint-disable-next-line no-unused-vars
+const BaseCommand = require("./commands/BaseCommand");
 const AliasCommand = require("./commands/AliasCommand");
 const CCManager = require("./managers/CCManager");
 

@@ -1,6 +1,22 @@
-# Changelog
+# Change Log
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="2.11.1"></a>
+## [2.11.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.0...v2.11.1) (2019-08-07)
+
+
+### Bug Fixes
+
+* revert to old version of standard-version to fix changelog generation ([87c0ebe](https://bitbucket.org/Loneless/trixiebot/commits/87c0ebe))
+
+
+### Features
+
+* implement seasonal commands ([9c25b54](https://bitbucket.org/Loneless/trixiebot/commits/9c25b54))
+* new way to do special statuses at specific times ([f905e19](https://bitbucket.org/Loneless/trixiebot/commits/f905e19))
+
+
 
 <a name="2.11.0"></a>
 ## [2.11.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.10.0...v2.11.0) (2019-08-06)

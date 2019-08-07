@@ -20,6 +20,7 @@ const LocaleManager = require("../managers/LocaleManager");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const CommandScope = require("../../util/commands/CommandScope");
 const RateLimiter = require("../../util/commands/RateLimiter");
+const CalendarRange = require("../../modules/CalendarRange");
 const TimeUnit = require("../../modules/TimeUnit");
 
 // give each Channel and Guild class a locale function, which returns the locale config for this
@@ -48,6 +49,7 @@ class BaseCommand {
         this.aliases = [];
         this.explicit = false;
         this.scope = new CommandScope(CommandScope.DEFAULT).freeze();
+        this.season = new CalendarRange;
     }
 
     async rateLimit(message) {
@@ -128,6 +130,15 @@ class BaseCommand {
         if (!this.scope.has(CommandScope.FLAGS.GUILD) && channel.type === "text") return false;
         if (!this.scope.has(CommandScope.FLAGS.DM) && channel.type === "dm") return false;
         return true;
+    }
+
+    setSeason(range) {
+        this.season = range || new CalendarRange;
+        return this;
+    }
+
+    isInSeason() {
+        return this.season.isToday();
     }
 
     get help() {

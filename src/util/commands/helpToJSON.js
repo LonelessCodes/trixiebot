@@ -105,6 +105,7 @@ function helpToJSON(config, name, command) {
             for (const [sub_cmd_name, sub_command] of command.sub_commands) {
                 if (sub_command instanceof AliasCommand) continue;
                 if (!sub_command.scope.has(CommandScope.FLAGS.GUILD)) continue;
+                if (!sub_command.isInSeason()) continue; // Hoping to create json periodically to work
                 if (sub_cmd_name === "*") continue;
 
                 const sub_name = name + " " + sub_cmd_name;

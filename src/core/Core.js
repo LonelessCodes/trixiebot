@@ -25,6 +25,8 @@ const helpToJSON = require("../util/commands/helpToJSON");
 const nanoTimer = require("../modules/nanoTimer");
 const random = require("../modules/random/random");
 const calendar_events = require("../modules/calendar_events");
+const AliasCommand = require("./commands/AliasCommand");
+const CommandScope = require("../util/commands/CommandScope");
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("./managers/ConfigManager");
 
@@ -92,7 +94,10 @@ class Core {
         };
 
         for (const [name, cmd] of this.processor.REGISTRY.commands) {
+            if (cmd instanceof AliasCommand) continue;
             if (!cmd.help) continue;
+            if (!cmd.hasScope(CommandScope.FLAGS.GUILD)) continue;
+            if (!cmd.isInSeason()) continue;
             jason.commands.push({
                 name,
                 help: helpToJSON(this.config.default_config, name, cmd),

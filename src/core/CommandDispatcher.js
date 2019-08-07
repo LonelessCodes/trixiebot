@@ -156,6 +156,7 @@ class CommandDispatcher {
         }
 
         if (!command.hasScope(message.channel)) return;
+        if (!command.isInSeason()) return;
 
         // is the case of cases, Owner should be able to use Owner commands everywhere, regardless of timeouts and other problems
         const isOwnerCommand = command && command.category && command.category === Category.OWNER && isOwner(message.author);

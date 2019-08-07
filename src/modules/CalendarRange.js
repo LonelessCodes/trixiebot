@@ -19,21 +19,25 @@ const Events = require("events");
 
 class CalendarRange extends Events {
     /**
-     * @param {string} start
-     * @param {string} end
+     * @param {string|undefined} start
+     * @param {string|undefined} end
      */
     constructor(start, end) {
         super();
 
-        this.start = start;
-        this.end = end;
+        if (start && end) {
+            this.start = start;
+            this.end = end;
 
-        this.start_job = new CronJob(this.start, this.startTick.bind(this), null, true);
-        this.end_job = new CronJob(this.end, this.endTick.bind(this), null, true);
+            this.start_job = new CronJob(this.start, this.startTick.bind(this), null, true);
+            this.end_job = new CronJob(this.end, this.endTick.bind(this), null, true);
 
-        this.active = false;
+            this.active = false;
 
-        this.checkJobs();
+            this.checkJobs();
+        } else {
+            this.active = true;
+        }
     }
 
     checkJobs() {

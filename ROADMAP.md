@@ -3,9 +3,6 @@
 ## 2019
 
 * One module and db collection for all guild-specific configurations
-* Reinvent Calendar Events to support ranges
-    * Implement seasonal commands
-* Custom Commands !commands should always go first, then the rest
 * Make basic custom commands work
 * New Approach at Localization
 * Cache more Database stuff that's possibly impacting performance or makes too many calls that could impact performance 
@@ -14,4 +11,5 @@
 * Marketplace (incl. purchasable roles)
 * CC fix Logical Expression logic
 * repair toString on arrays
-* ban, kick und tempban commands
+* ban, kick und tempban commands. warn/strike commands
+* mod log

@@ -26,6 +26,7 @@ const Discord = require("discord.js");
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
+const CalendarRange = require("../../modules/CalendarRange");
 
 figlet.parseFont("univers", fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "figlet", "univers.flf"), "utf8"));
 
@@ -140,6 +141,6 @@ module.exports = function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setDescription("It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!"))
         .setCategory(Category.ANALYSIS)
-        .dontList();
+        .setSeason(new CalendarRange("0 0 0 1 11 *", "0 0 0 27 11 *"));
     cr.registerAlias("naughty", "nice");
 };

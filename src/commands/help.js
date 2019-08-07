@@ -22,6 +22,8 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
 const AliasCommand = require("../core/commands/AliasCommand");
+// eslint-disable-next-line no-unused-vars
+const BaseCommand = require("../core/commands/BaseCommand");
 const HelpBuilder = require("../util/commands/HelpBuilder");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
@@ -40,6 +42,7 @@ module.exports = function install(cr, client, config, database) {
         .registerOverload("1+", new SimpleCommand(async (message, content) => {
             let query = content.toLowerCase();
             let path = [];
+            /** @type {Map<string, BaseCommand>} */
             let cmd_map = cr.commands;
             while (cmd_map != null) {
                 let found = false;
@@ -53,6 +56,7 @@ module.exports = function install(cr, client, config, database) {
                         command = command.command;
                     }
                     if (!command.hasScope(message.channel)) continue;
+                    if (!command.isInSeason()) continue;
 
                     path.push(name);
 
@@ -89,6 +93,7 @@ module.exports = function install(cr, client, config, database) {
             for (const [name, command] of cr.commands) {
                 if (command instanceof AliasCommand) continue;
                 if (!command.hasScope(message.channel)) continue;
+                if (!command.isInSeason()) continue;
                 if (disabledCommands.some(row => row.name === name)) continue;
                 if (!message.channel.nsfw && command.explicit) continue;
                 if (!command.list) continue;

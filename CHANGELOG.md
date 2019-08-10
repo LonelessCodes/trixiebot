@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.11.2"></a>
+## [2.11.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.1...v2.11.2) (2019-08-10)
+
+
+### Bug Fixes
+
+* **sb list:** replace non-emojis in set and fill up to max amount of samples ([5b3f842](https://bitbucket.org/Loneless/trixiebot/commits/5b3f842))
+* **status:** didn't floor random array index ([acb83d4](https://bitbucket.org/Loneless/trixiebot/commits/acb83d4))
+
+
+
 <a name="2.11.1"></a>
 ## [2.11.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.0...v2.11.1) (2019-08-07)
 

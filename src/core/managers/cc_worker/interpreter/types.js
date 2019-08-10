@@ -1,6 +1,7 @@
 const moment = require("moment");
 const Context = require("./Context");
 const { StatementStack, StatementManager } = require("./StatementManager");
+const regex_regex = require("../regex");
 
 const RESERVED_KEYWORDS = [
     "func", "return", "for", "of", "while", "break", "continue", "if",
@@ -70,6 +71,21 @@ function createStringLiteral(str, context) {
         })
         .replace(/\\/g, "");
     return new StringLiteral(str);
+}
+
+/**
+ * @param {string} str
+ * @param {any} context
+ * @returns {RegExpLiteral}
+ */
+function createRegExpLiteral(str, context) {
+    const [, pattern, flags = ""] = regex_regex.exec(str);
+    try {
+        const regex = new RegExp(pattern, flags.toLowerCase());
+        return new RegExpLiteral(regex);
+    } catch (err) {
+        throw context.error(err.message);
+    }
 }
 
 function convert(obj) {
@@ -286,12 +302,14 @@ StringLiteral.prototype.proto.startsWith = new NativeFunc(function startsWith(_,
     return new BooleanLiteral(this.content.startsWith(includes.content));
 });
 StringLiteral.prototype.proto.replace = new NativeFunc(function replace(_, includes, val) {
-    return new StringLiteral(this.content.replace(new RegExp(includes.content, "g"), val.content));
+    if (!(includes instanceof StringLiteral) && !(includes instanceof RegExpLiteral)) throw _.error("First argument must be of either String or RegExp");
+    return new StringLiteral(this.content.replace(includes.content, val.content));
 });
 StringLiteral.prototype.proto.slice = new NativeFunc(function slice(_, start, end) {
     return new StringLiteral(this.content.slice(start ? start.content : undefined, end ? end.content : undefined));
 });
 StringLiteral.prototype.proto.split = new NativeFunc(function split(_, by) {
+    if (!(by instanceof StringLiteral) && !(by instanceof RegExpLiteral)) throw _.error("First argument must be of either String or RegExp");
     return new ArrayLiteral(this.content.split(by.content).map(s => new StringLiteral(s)));
 });
 StringLiteral.prototype.proto.toLowerCase = new NativeFunc(function toLowerCase() {
@@ -302,6 +320,58 @@ StringLiteral.prototype.proto.toUpperCase = new NativeFunc(function toUpperCase(
 });
 StringLiteral.prototype.proto.trim = new NativeFunc(function trim() {
     return new StringLiteral(this.content.trim());
+});
+
+class RegExpLiteral extends Literal {
+    constructor(content) {
+        if (!content) throw new TypeError("'content' should be a RegExp");
+        super(content);
+        /** @type {RegExp} */
+        this.content;
+    }
+
+    clone() {
+        return new RegExpLiteral(this.content);
+    }
+}
+RegExpLiteral.prototype.proto = Object.create(Literal.prototype.proto);
+RegExpLiteral.prototype.proto.toString = new NativeFunc(function toString() {
+    return new StringLiteral(this.content.toString());
+});
+RegExpLiteral.prototype.proto.flags = new NativeFunc(function flags() {
+    return new StringLiteral(this.content.flags);
+});
+RegExpLiteral.prototype.proto.dotAll = new NativeFunc(function dotAll() {
+    return new BooleanLiteral(this.content.dotAll);
+});
+RegExpLiteral.prototype.proto.global = new NativeFunc(function global() {
+    return new BooleanLiteral(this.content.global);
+});
+RegExpLiteral.prototype.proto.ignoreCase = new NativeFunc(function ignoreCase() {
+    return new BooleanLiteral(this.content.ignoreCase);
+});
+RegExpLiteral.prototype.proto.multiline = new NativeFunc(function multiline() {
+    return new BooleanLiteral(this.content.multiline);
+});
+RegExpLiteral.prototype.proto.source = new NativeFunc(function source() {
+    return new StringLiteral(this.content.source);
+});
+RegExpLiteral.prototype.proto.sticky = new NativeFunc(function sticky() {
+    return new BooleanLiteral(this.content.sticky);
+});
+RegExpLiteral.prototype.proto.unicode = new NativeFunc(function unicode() {
+    return new BooleanLiteral(this.content.unicode);
+});
+
+RegExpLiteral.prototype.proto.exec = new NativeFunc(function exec(_, str) {
+    if (!(str instanceof StringLiteral)) throw _.error("First argument must be a String");
+    const arr = this.content.exec(str.content);
+    if (!arr) return new NullLiteral;
+    return new StringLiteral(new ArrayLiteral(arr.map(s => new StringLiteral(s))));
+});
+RegExpLiteral.prototype.proto.test = new NativeFunc(function test(_, str) {
+    if (!(str instanceof StringLiteral)) throw _.error("First argument must be a String");
+    return new BooleanLiteral(this.content.test(str.content));
 });
 
 class ArrayLiteral extends Literal {
@@ -1040,6 +1110,7 @@ module.exports = {
     isReturn,
     isBreak,
     createStringLiteral,
+    createRegExpLiteral,
     Item,
     Func,
     NativeFunc,
@@ -1048,6 +1119,7 @@ module.exports = {
     BooleanLiteral,
     NumberLiteral,
     StringLiteral,
+    RegExpLiteral,
     ArrayLiteral,
     ObjectLiteral,
     TimeLiteral,

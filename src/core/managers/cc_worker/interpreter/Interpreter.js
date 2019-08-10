@@ -13,6 +13,7 @@ const {
     isReturn,
     isBreak,
     createStringLiteral,
+    createRegExpLiteral,
     NullLiteral,
     BooleanLiteral,
     NumberLiteral,
@@ -172,6 +173,8 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
                     return new NumberLiteral(parseInt(image.substr(2), 2));
                 case "StringLiteral":
                     return createStringLiteral(image, new Context(this, Literal));
+                case "RegExpLiteral":
+                    return createRegExpLiteral(image, new Context(this, Literal));
             }
         } else if (ctx.ArrayLiteral) {
             return await this.visit(ctx.ArrayLiteral);

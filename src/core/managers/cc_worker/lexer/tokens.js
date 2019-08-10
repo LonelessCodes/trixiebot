@@ -1,5 +1,6 @@
 const chevrotain = require("chevrotain");
 const { Lexer } = chevrotain;
+const regex_regex = require("../regex");
 
 // eslint-disable-next-line valid-jsdoc
 /**
@@ -164,13 +165,19 @@ const StringLiteral = createToken({
     pattern: /(?:"([^"\n]*)")|(?:'([^'\n]*)')/,
 });
 
+const RegExpLiteral = createToken({
+    categories: Literal,
+    name: "RegExpLiteral",
+    pattern: regex_regex,
+});
+
 const Identifier = createToken({ name: "Identifier", pattern: /([A-Za-z_$][A-Za-z0-9_$]*)/, categories: IdentifierName });
 
 exports.ALL_TOKENS = [
     // First
     WhiteSpace, LineTerminator, SingleLineComment, MultiLineComment,
 
-    Literal, StringLiteral, NullTok, BooleanLiteral, TrueTok, FalseTok,
+    Literal, RegExpLiteral, StringLiteral, NullTok, BooleanLiteral, TrueTok, FalseTok,
     NumbericLiteral, HexLiteral, OctalLiteral, BinaryLiteral, DecimalLiteral,
 
     Punctuator, OpenCurly, CloseCurly, OpenParen, CloseParen, OpenBracket, CloseBracket,
@@ -178,7 +185,7 @@ exports.ALL_TOKENS = [
 
     Decrement, Increment,
 
-    AssignOperator, Equal, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision,
+    AssignOperator, OP_AssignPlus, OP_AssignMinus, OP_AssignMultiple, OP_AssignDivision,
     OP_AssignPercent, OP_AssignExponent,
 
     AdditiveOperator, OP_Plus, OP_Minus,
@@ -188,6 +195,8 @@ exports.ALL_TOKENS = [
     CompareOperator,
     RelationOperator, LessThanEqual, GreaterThanEqual, LessThan, GreaterThan,
     EqualityOperator, Compare_NotEqual, Compare_Equal,
+
+    Equal,
 
     IdentifierName,
     // Keywords
@@ -203,7 +212,7 @@ exports.tokens = {
     // First
     WhiteSpace, LineTerminator, SingleLineComment, MultiLineComment,
 
-    Literal, StringLiteral, NullTok, BooleanLiteral, TrueTok, FalseTok,
+    Literal, RegExpLiteral, StringLiteral, NullTok, BooleanLiteral, TrueTok, FalseTok,
     NumbericLiteral, HexLiteral, OctalLiteral, BinaryLiteral, DecimalLiteral,
 
     Punctuator, OpenCurly, CloseCurly, OpenParen, CloseParen, OpenBracket, CloseBracket,

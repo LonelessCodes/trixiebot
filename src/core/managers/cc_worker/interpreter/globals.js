@@ -11,7 +11,7 @@ const database = require("../../../../modules/db/database")()
     });
 const BSON = require("bson");
 
-const VERSION = new c.StringLiteral("1");
+const VERSION = new c.StringLiteral("1.1.0");
 
 // Literal Functions
 
@@ -40,6 +40,15 @@ const Number = new c.NativeFunc(function number(_, arg0) {
 
 const String = new c.NativeFunc(function string(_, arg0) {
     return new c.StringLiteral(new global.String(arg0 ? arg0.content : ""));
+});
+
+const RegExp = new c.NativeFunc(function regexp(_, pattern, flags = new c.StringLiteral("")) {
+    try {
+        const regex = new global.RegExp(pattern.content, flags.content.toLowerCase());
+        return new c.RegExpLiteral(regex);
+    } catch (err) {
+        throw _.error(err.message);
+    }
 });
 
 const Array = new c.NativeFunc(function array(_, arg0) {
@@ -432,6 +441,7 @@ module.exports = {
     Boolean,
     Number,
     String,
+    RegExp,
     Array,
     Object,
 

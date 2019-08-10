@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.12.0"></a>
+# [2.12.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.2...v2.12.0) (2019-08-10)
+
+
+### Features
+
+* **cc:** add RegExp support!! ([b0d56be](https://bitbucket.org/Loneless/trixiebot/commits/b0d56be))
+
+
+
 <a name="2.11.2"></a>
 ## [2.11.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.1...v2.11.2) (2019-08-10)
 

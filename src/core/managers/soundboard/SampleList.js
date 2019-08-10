@@ -61,6 +61,7 @@ class SampleList extends Events {
             i++;
         }
         for (const sample of this.samples.guild) {
+            if (i >= SampleList.EMOJIS.length) break;
             const emoji = SampleList.EMOJIS[i];
             if (!this.ids.has(sample.id)) {
                 this.ids.set(sample.id, emoji);
@@ -69,6 +70,7 @@ class SampleList extends Events {
             }
         }
         for (const sample of this.samples.user) {
+            if (i >= SampleList.EMOJIS.length) break;
             const emoji = SampleList.EMOJIS[i];
             if (!this.ids.has(sample.id)) {
                 this.ids.set(sample.id, emoji);
@@ -209,6 +211,12 @@ SampleList.EMOJIS = [
     "🆎",
     "🅱",
     "🆑",
+    "🇦",
+    "🇧",
+    "🇨",
+    "🇩",
+    "🇪",
+    "🇫",
     "❤",
     "🧡",
     "💛",
@@ -216,10 +224,10 @@ SampleList.EMOJIS = [
     "💙",
     "💜",
     "🖤",
-    "♠️",
-    "♥️",
-    "♦️",
-    "♣️",
+    "⚪",
+    "⚫",
+    "🔴",
+    "🔵",
 ];
 
 module.exports = SampleList;

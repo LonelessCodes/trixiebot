@@ -367,7 +367,7 @@ RegExpLiteral.prototype.proto.exec = new NativeFunc(function exec(_, str) {
     if (!(str instanceof StringLiteral)) throw _.error("First argument must be a String");
     const arr = this.content.exec(str.content);
     if (!arr) return new NullLiteral;
-    return new StringLiteral(new ArrayLiteral(arr.map(s => new StringLiteral(s))));
+    return new ArrayLiteral(Array.from(arr).map(s => new StringLiteral(s)));
 });
 RegExpLiteral.prototype.proto.test = new NativeFunc(function test(_, str) {
     if (!(str instanceof StringLiteral)) throw _.error("First argument must be a String");

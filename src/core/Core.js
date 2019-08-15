@@ -104,6 +104,14 @@ class Core {
             });
         }
 
+        // by sorting we're getting around an always different order of commands, which
+        // confuses git
+        jason.commands = jason.commands.sort((a, b) => {
+            if (a.name < b.name) { return -1; }
+            if (a.name > b.name) { return 1; }
+            return 0;
+        });
+
         const str = JSON.stringify(jason, null, 2);
         await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str, { mode: 0o666 });
         await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str, { mode: 0o666 });

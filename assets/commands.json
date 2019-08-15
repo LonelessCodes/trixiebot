@@ -10,172 +10,37 @@
       }
     },
     {
-      "name": "hug",
+      "name": "alert",
       "help": {
-        "description": "Hug someone!!!",
-        "usage": "\n`!hug <@user>` *(alias `!hugs`)*",
-        "category": "Action"
+        "description": "Make Trixie announce streamers when they go live.\nSupported are Picarto, Piczel, Twitch and Smashcast.",
+        "permissions": "Manage Channels",
+        "usage": "\n`!alert <page url> <?channel>` - Subscribe Trixie to a streaming channel! *(alias `!alert add`)*\n`page url` - copy the url of the stream page and paste it in here\n`channel` - optional- the channel to post the alert to later. If omitted will be this channel\n\n`!alert list` - list all active streaming alerts\n\n`!alert remove <page url>` - unsubscribe Trixie from a Picarto channel\n\n`!alert compact` - toggle compact online announcements\n\n`!alert cleanup` - toggle cleaning up online announcements",
+        "category": "Utility"
       }
     },
     {
-      "name": "pat",
+      "name": "ascii",
       "help": {
-        "description": "*patpat*",
-        "usage": "\n`!pat <@user>`",
-        "category": "Action"
+        "description": "Generates ascii art from an image",
+        "usage": "\n`!ascii <?url>`\n`url` - optional- Url to an image. Or add an attachment to your message",
+        "category": "Misc"
       }
     },
     {
-      "name": "kiss",
+      "name": "autoban",
       "help": {
-        "description": "Kiss someone -3-",
-        "usage": "\n`!kiss <@user>`",
-        "category": "Action"
+        "description": "Autoban allows admins to make sure to keep specific users out of the server, even if they create a new account.\n\nGlob is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.\nPatterns use the RegEx specification. Infos on RegEx can be found here: https://regexr.com/. A good sandbox for RegEx tooling is https://regex101.com/",
+        "permissions": "Ban Members",
+        "usage": "\n`!autoban <? userID|username#0000|username>` - view the autoban patterns of this server *(alias `!autoban list`)*\n`userID|username#0000|username` - optional- If given, add an autoban configuration\n\n`!autoban id <userID>` - add an autoban config banning the user with this specific, unique userID\n\n`!autoban name <username#0000|username>` - add an autoban config banning the user with this user tag (username#0000) or, if passed a username only, this username (case insensitive)\n\n`!autoban glob <glob>` - add an autoban config banning users matching this glob pattern (always case insensitive)\n\n`!autoban regexp <regexp>` - add an autoban config banning users matching this RegEx pattern (always with i and u flags) *(alias `!autoban regex`)*\n\n**Remove configs:**\n`!autoban remove <?thing>` - remove an autoban again. If no args given, returns a numbered list of autobans to choose from",
+        "category": "Moderation"
       }
     },
     {
-      "name": "touch",
+      "name": "bank",
       "help": {
-        "description": "Touch someone o.o\"",
-        "usage": "\n`!touch <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "point",
-      "help": {
-        "description": "Point at someone",
-        "usage": "\n`!point <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "poke",
-      "help": {
-        "description": "Poke poke",
-        "usage": "\n`!poke <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "slap",
-      "help": {
-        "description": "Slap someone real dirty >:c",
-        "usage": "\n`!slap <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "bite",
-      "help": {
-        "description": "Ouchie! Bite someone",
-        "usage": "\n`!bite <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "lick",
-      "help": {
-        "explicit": true,
-        "description": "Lick someone clean!",
-        "usage": "\n`!lick <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "tickle",
-      "help": {
-        "description": "Nuuuu I'm so ticklish!!!! >~<\nTickle someone",
-        "usage": "\n`!tickle <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "smile",
-      "help": {
-        "description": "Smile at someone",
-        "usage": "\n`!smile <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "stare",
-      "help": {
-        "description": "Stare at someone :eyes:",
-        "usage": "\n`!stare <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "holdhands",
-      "help": {
-        "description": "Hold hands with a cutie",
-        "usage": "\n`!holdhands <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "cuddle",
-      "help": {
-        "description": "Cuddle someone and give them a warm feeling",
-        "usage": "\n`!cuddle <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "snuggle",
-      "help": {
-        "description": "Snuggle someone and die from the cuteness!!! >3<",
-        "usage": "\n`!snuggle <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "nuzzle",
-      "help": {
-        "description": "Nuzzle someone",
-        "usage": "\n`!nuzzle <@user>`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "nom",
-      "help": {
-        "description": "nomnom someone",
-        "usage": "\n`!nom <@user>` *(alias `!nomnom`)*",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "cat",
-      "help": {
-        "description": "Random cat image :3",
-        "usage": "\n`!cat` *(alias `!kitty`)*",
-        "category": "Image"
-      }
-    },
-    {
-      "name": "dog",
-      "help": {
-        "description": "Random dog image :3",
-        "usage": "\n`!dog` *(alias `!doggo`, `!puppy`, `!bork`, `!pup`)*",
-        "category": "Image"
-      }
-    },
-    {
-      "name": "fox",
-      "help": {
-        "description": "Random fox image :3",
-        "usage": "\n`!fox` *(alias `!foxie`, `!foxi`, `!weff`)*",
-        "category": "Image"
-      }
-    },
-    {
-      "name": "shibe",
-      "help": {
-        "description": "Random SHIBE image :3",
-        "usage": "\n`!shibe` *(alias `!shiba`)*",
-        "category": "Image"
+        "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
+        "category": "Currency"
       }
     },
     {
@@ -187,51 +52,26 @@
       }
     },
     {
-      "name": "donate",
+      "name": "bite",
       "help": {
-        "description": "**TrixieBot costs $12 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤",
-        "usage": "\n`!donate`",
-        "category": "Info"
+        "description": "Ouchie! Bite someone",
+        "usage": "\n`!bite <@user>`",
+        "category": "Action"
       }
     },
     {
-      "name": "version",
+      "name": "blackjack",
       "help": {
-        "description": "Returns the currently running version of TrixieBot",
-        "usage": "\n`!version` *(alias `!v`)*",
-        "category": "Info"
+        "usage": "\n`!blackjack <bet>` - Play a round of blackjack *(alias `!bj`)*\n`bet` - The money you're willing to bet. Between 10 and 2000",
+        "category": "Currency"
       }
     },
     {
-      "name": "invite",
+      "name": "blep",
       "help": {
-        "description": "Gives a link to invite TrixieBot to your own server.",
-        "usage": "\n`!invite`",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "vote",
-      "help": {
-        "description": "Vote for TrixieBot on bot listing sites! Pls",
-        "usage": "\n`!vote`",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "trixie",
-      "help": {
-        "description": "First command to call.",
-        "usage": "\n`!trixie`",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "ascii",
-      "help": {
-        "description": "Generates ascii art from an image",
-        "usage": "\n`!ascii <?url>`\n`url` - optional- Url to an image. Or add an attachment to your message",
-        "category": "Misc"
+        "description": "Blep the chat :3",
+        "usage": "\n`!blep`",
+        "category": "Action"
       }
     },
     {
@@ -244,10 +84,11 @@
       }
     },
     {
-      "name": "blackjack",
+      "name": "cat",
       "help": {
-        "usage": "\n`!blackjack <bet>` - Play a round of blackjack *(alias `!bj`)*\n`bet` - The moneyy you're willing to bet. Between 10 and 1000",
-        "category": "Currency"
+        "description": "Random cat image :3",
+        "usage": "\n`!cat` *(alias `!kitty`)*",
+        "category": "Image"
       }
     },
     {
@@ -256,6 +97,14 @@
         "description": "Get you a cat fact that will help you raise your babies better <3",
         "usage": "\n`!catfact`",
         "category": "Misc"
+      }
+    },
+    {
+      "name": "changelog",
+      "help": {
+        "description": "Gets the changes made to TrixieBot in the latest versions",
+        "usage": "\n`!changelog`",
+        "category": "Info"
       }
     },
     {
@@ -275,6 +124,14 @@
       }
     },
     {
+      "name": "cider",
+      "help": {
+        "description": "Serve the chat some cider",
+        "usage": "\n`!cider`",
+        "category": "My Little Pony"
+      }
+    },
+    {
       "name": "coin",
       "help": {
         "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
@@ -282,11 +139,19 @@
       }
     },
     {
-      "name": "bank",
+      "name": "config",
       "help": {
-        "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
-        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank name <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
-        "category": "Currency"
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!config <?parameter> <?value>` - view the Trixie's config in this server *(alias `!cfg`, `!opts`)*\n`parameter` - optional- view only this parameter's config\n`value` - optional- set a parameter in Trixie's config. \"default\" for default config",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "cuddle",
+      "help": {
+        "description": "Cuddle someone and give them a warm feeling",
+        "usage": "\n`!cuddle <@user>`",
+        "category": "Action"
       }
     },
     {
@@ -298,27 +163,12 @@
       }
     },
     {
-      "name": "info",
+      "name": "deleted",
       "help": {
-        "description": "Gets the bot technical information. Nothing all that interesting.",
-        "usage": "\n`!info`",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "ping",
-      "help": {
-        "description": "Ping-Pong-Ping-Pong-Ping-WEE HEEEEE.",
-        "usage": "\n`!ping` *(alias `!trixie ping`)*",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "changelog",
-      "help": {
-        "description": "Gets the changes made to TrixieBot in the latest versions",
-        "usage": "\n`!changelog`",
-        "category": "Info"
+        "description": "Trixie can collect deleted for up to 7 days, so you always know what's going on in your server behind your back.\nCommand enabled by default. Soon option to turn it off",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!deleted` - List all deleted messages from the last 7 days\n\n`!deleted clear` - Clears list of deleted messages",
+        "category": "Moderation"
       }
     },
     {
@@ -330,11 +180,62 @@
       }
     },
     {
+      "name": "disable",
+      "help": {
+        "description": "Disable Trixie from listening to some commands or channels",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "dog",
+      "help": {
+        "description": "Random dog image :3",
+        "usage": "\n`!dog` *(alias `!doggo`, `!puppy`, `!bork`, `!pup`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "dolan",
+      "help": {
+        "description": "Translate something into dolan duck-ish",
+        "rateLimiter": "2 times in 1 hours",
+        "usage": "\n`!dolan <text>`\n`text` - The text to translate",
+        "category": "Text"
+      }
+    },
+    {
+      "name": "donate",
+      "help": {
+        "description": "**TrixieBot costs $12 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤",
+        "usage": "\n`!donate`",
+        "category": "Info"
+      }
+    },
+    {
       "name": "e621",
       "help": {
         "description": "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
         "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional- Popular by 'day', 'week' or 'month'. Default: 'week'",
         "category": "Image"
+      }
+    },
+    {
+      "name": "enable",
+      "help": {
+        "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "face",
+      "help": {
+        "description": "Get a random ASCII face",
+        "usage": "\n`!face`",
+        "category": "Misc"
       }
     },
     {
@@ -346,6 +247,31 @@
       }
     },
     {
+      "name": "flip",
+      "help": {
+        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
+        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "fox",
+      "help": {
+        "description": "Random fox image :3",
+        "usage": "\n`!fox` *(alias `!foxie`, `!foxi`, `!weff`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "fuck",
+      "help": {
+        "explicit": true,
+        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.",
+        "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
+        "category": "Action"
+      }
+    },
+    {
       "name": "gif",
       "help": {
         "usage": "\n`!gif <query>` - returns the top result for the given `query` *(alias `!gif top`)*\n`query` - What type of gif you want to have\n\n`!gif random <query>` - returns a random gif for the given `query`\n\n`!gif trending` - returns a random trending gif",
@@ -353,26 +279,10 @@
       }
     },
     {
-      "name": "stats",
+      "name": "github",
       "help": {
-        "description": "Get some stats about the alive-ness of this server",
-        "usage": "\n`!stats`",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "userstats",
-      "help": {
-        "description": "Get some stats about how active someone is on the server",
-        "usage": "\n`!userstats <?@user>`\n`@user` - optional- The member c:",
-        "category": "Info"
-      }
-    },
-    {
-      "name": "serverinfo",
-      "help": {
-        "description": "Receive information about this server",
-        "usage": "\n`!serverinfo`",
+        "description": "Get a link to TrixieBot's Github repo.",
+        "usage": "\n`!github`",
         "category": "Info"
       }
     },
@@ -385,12 +295,118 @@
       }
     },
     {
+      "name": "holdhands",
+      "help": {
+        "description": "Hold hands with a cutie",
+        "usage": "\n`!holdhands <@user>`",
+        "category": "Action"
+      }
+    },
+    {
       "name": "horsepussy",
       "help": {
         "explicit": true,
         "description": "Get some gud quality horse pussi OwO",
         "usage": "\n`!horsepussy` *(alias `!horsepussi`, `!ponypussy`, `!ponypussi`, `!ponepussi`, `!ponypoossy`)*",
         "category": "Image"
+      }
+    },
+    {
+      "name": "hug",
+      "help": {
+        "description": "Hug someone!!!",
+        "usage": "\n`!hug <@user>` *(alias `!hugs`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "info",
+      "help": {
+        "description": "Gets the bot technical information. Nothing all that interesting.",
+        "usage": "\n`!info`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "invite",
+      "help": {
+        "description": "Gives a link to invite TrixieBot to your own server.",
+        "usage": "\n`!invite`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "joinvc",
+      "help": {
+        "description": "Stop whatever Trixie is saying in VC",
+        "usage": "\n`!joinvc` *(alias `!join`)*",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "kiss",
+      "help": {
+        "description": "Kiss someone -3-",
+        "usage": "\n`!kiss <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "larson",
+      "help": {
+        "description": "well\nyeah",
+        "usage": "\n`!larson`",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "leavevc",
+      "help": {
+        "description": "Make Trixie leave the voice channel!",
+        "usage": "\n`!leavevc` *(alias `!leave`, `!begone`)*",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "lenny",
+      "help": {
+        "description": "( ͡° ͜ʖ ͡°)",
+        "usage": "\n`!lenny`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "lick",
+      "help": {
+        "explicit": true,
+        "description": "Lick someone clean!",
+        "usage": "\n`!lick <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "locale",
+      "help": {
+        "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional- set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional- set a channel to be a unique locale",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "mlem",
+      "help": {
+        "description": "Mlem the chat :3",
+        "usage": "\n`!mlem`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "mlp",
+      "help": {
+        "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
+        "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
+        "category": "My Little Pony"
       }
     },
     {
@@ -402,11 +418,36 @@
       }
     },
     {
-      "name": "mlp",
+      "name": "muteword",
       "help": {
-        "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
-        "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
-        "category": "My Little Pony"
+        "description": "Mute/Blacklist specific words in this server",
+        "permissions": "Manage Messages",
+        "usage": "\n`!muteword <phrase>` *(alias `!muteword add`)*\n`phrase` - Word or phrase to be muted/blacklisted\n\n`!muteword remove <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted\n\n`!muteword clear` - Remove all muted words\n\n`!muteword list` - list all muted words and phrases",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "nom",
+      "help": {
+        "description": "nomnom someone",
+        "usage": "\n`!nom <@user>` *(alias `!nomnom`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "nuzzle",
+      "help": {
+        "description": "Nuzzle someone",
+        "usage": "\n`!nuzzle <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "pat",
+      "help": {
+        "description": "*patpat*",
+        "usage": "\n`!pat <@user>`",
+        "category": "Action"
       }
     },
     {
@@ -419,27 +460,11 @@
       }
     },
     {
-      "name": "sb",
+      "name": "ping",
       "help": {
-        "description": "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.",
-        "usage": "\n`!sb <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!soundboard`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\n**Manage Your Soundboards:**\n`!sb upload <?scope> <sound name>` - Upload a sound clip to Trixie. Attach the audio file to the message when sending *(alias `!sb u`)*\n`scope` - optional- `user` or `server`\n`sound name` - Name of the new sound clip\n\n`!sb import <?scope> <id>` - Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `!sb info <sound name>` *(alias `!sb i`)*\n`id` - The unique ID of a soundclip\n\n`!sb delete <?scope> <sound name>` - Delete a soundclip from your or your server's soundboard. *(alias `!sb d`)*\n`sound name` - The name of the soundclip to delete\n\n`!sb info <?scope> <sound name|id>` - View info about a sound clip and get it's unique ID, for people to be able to play it as well\n`sound name` - The name of the sound clip to view more info about\n`id` - The id of the sound clip to view more info about instead of sound name\n\n**Buy New Slots:**\n`!sb buyslot <?scope>` - Buy additional soundboard slots with Trixie's currency *(alias `!sb b`)*\n\n",
-        "category": "Audio"
-      }
-    },
-    {
-      "name": "role",
-      "help": {
-        "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
-        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\n**Admin Area:**\n`!role config` - Configure roles that everyone can add\n\n`!role config add <role> <?category>` - Add a role to the public configuration\n\n`!role config remove <role>` - Remove a role from the public configuration\n`role` - The \"quoted\" role name of the role you want to remove\n`category` - optional- The \"quoted\" name of the category you want to add the role to. Not given will be \"Other\"",
-        "category": "Utility"
-      }
-    },
-    {
-      "name": "smol",
-      "help": {
-        "description": "Make teeeeny tiny text",
-        "usage": "\n`!smol <string|user>` *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
-        "category": "Text"
+        "description": "Ping-Pong-Ping-Pong-Ping-WEE HEEEEE.",
+        "usage": "\n`!ping` *(alias `!trixie ping`)*",
+        "category": "Info"
       }
     },
     {
@@ -452,21 +477,180 @@
       }
     },
     {
-      "name": "yoda",
+      "name": "point",
       "help": {
-        "description": "Translate something into yoda-ish",
-        "rateLimiter": "2 times in 1 hours",
-        "usage": "\n`!yoda <text>`\n`text` - The text to translate",
+        "description": "Point at someone",
+        "usage": "\n`!point <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "poke",
+      "help": {
+        "description": "Poke poke",
+        "usage": "\n`!poke <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "poll",
+      "help": {
+        "description": "Create a poll that users can vote on",
+        "usage": "\n`!poll <duration> <option 1>, <option 2>, ..., <option n>`\n`duration` - Duration of the poll. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`option` - a comma seperated list of options to vote for",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "prefix",
+      "help": {
+        "description": "Alias for `{{prefix}}config prefix <?value>`",
+        "permissions": "Administrator or Manage Server",
+        "usage": "\n`!prefix <?prefix>` - view Trixie's prefix in this server\n`prefix` - optional- set the prefix in Trixie's config. \"default\" for default prefix `(!)`",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "reportbug",
+      "help": {
+        "description": "Get a link to Trixie's bug report page.",
+        "usage": "\n`!reportbug`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "role",
+      "help": {
+        "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
+        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\n**Admin Area:**\n`!role config` - Configure roles that everyone can add\n\n`!role config add <role> <?category>` - Add a role to the public configuration\n\n`!role config remove <role>` - Remove a role from the public configuration\n`role` - The \"quoted\" role name of the role you want to remove\n`category` - optional- The \"quoted\" name of the category you want to add the role to. Not given will be \"Other\"",
+        "category": "Utility"
+      }
+    },
+    {
+      "name": "sb",
+      "help": {
+        "description": "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.",
+        "usage": "\n`!sb <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!soundboard`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\n**Manage Your Soundboards:**\n`!sb upload <?scope> <sound name>` - Upload a sound clip to Trixie. Attach the audio file to the message when sending *(alias `!sb u`)*\n`scope` - optional- `user` or `server`\n`sound name` - Name of the new sound clip\n\n`!sb import <?scope> <id>` - Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `!sb info <sound name>` *(alias `!sb i`)*\n`id` - The unique ID of a soundclip\n\n`!sb delete <?scope> <sound name>` - Delete a soundclip from your or your server's soundboard. *(alias `!sb d`)*\n`sound name` - The name of the soundclip to delete\n\n`!sb info <?scope> <sound name|id>` - View info about a sound clip and get it's unique ID, for people to be able to play it as well\n`sound name` - The name of the sound clip to view more info about\n`id` - The id of the sound clip to view more info about instead of sound name\n\n**Buy New Slots:**\n`!sb buyslot <?scope>` - Buy additional soundboard slots with Trixie's currency *(alias `!sb b`)*\n\n",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "serverinfo",
+      "help": {
+        "description": "Receive information about this server",
+        "usage": "\n`!serverinfo`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "shibe",
+      "help": {
+        "description": "Random SHIBE image :3",
+        "usage": "\n`!shibe` *(alias `!shiba`)*",
+        "category": "Image"
+      }
+    },
+    {
+      "name": "shrug",
+      "help": {
+        "description": "¯\\_(ツ)_/¯",
+        "usage": "\n`!shrug`",
+        "category": "Misc"
+      }
+    },
+    {
+      "name": "slap",
+      "help": {
+        "description": "Slap someone real dirty >:c",
+        "usage": "\n`!slap <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "smile",
+      "help": {
+        "description": "Smile at someone",
+        "usage": "\n`!smile <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "smol",
+      "help": {
+        "description": "Make teeeeny tiny text",
+        "usage": "\n`!smol <string|user>` *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
         "category": "Text"
       }
     },
     {
-      "name": "dolan",
+      "name": "snuggle",
       "help": {
-        "description": "Translate something into dolan duck-ish",
-        "rateLimiter": "2 times in 1 hours",
-        "usage": "\n`!dolan <text>`\n`text` - The text to translate",
-        "category": "Text"
+        "description": "Snuggle someone and die from the cuteness!!! >3<",
+        "usage": "\n`!snuggle <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "stare",
+      "help": {
+        "description": "Stare at someone :eyes:",
+        "usage": "\n`!stare <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "stats",
+      "help": {
+        "description": "Get some stats about the alive-ness of this server",
+        "usage": "\n`!stats`",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "stopvc",
+      "help": {
+        "description": "Stop whatever Trixie is saying in VC",
+        "usage": "\n`!stopvc` *(alias `!stop`)*",
+        "category": "Audio"
+      }
+    },
+    {
+      "name": "tableflip",
+      "help": {
+        "description": "(╯°□°）╯︵ Tableflip",
+        "usage": "\n`!tableflip` *(alias `!tf`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "tickle",
+      "help": {
+        "description": "Nuuuu I'm so ticklish!!!! >~<\nTickle someone",
+        "usage": "\n`!tickle <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "timeout",
+      "help": {
+        "permissions": "Manage Messages",
+        "usage": "\n`!timeout <time> <user mention 1> <user mention 2> ...`\n`time` - timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`user mention` - user to timeout. Multiple users possible\n\n`!timeout remove <user mention 1> <user mention 2> ...`\n`user mention` - user to remove timeout from. Multiple users possible\n\n`!timeout clear` - remove all timeouts\n\n`!timeout list` - list all timeouts present at the moment",
+        "category": "Moderation"
+      }
+    },
+    {
+      "name": "touch",
+      "help": {
+        "description": "Touch someone o.o\"",
+        "usage": "\n`!touch <@user>`",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "trixie",
+      "help": {
+        "description": "First command to call.",
+        "usage": "\n`!trixie`",
+        "category": "Info"
       }
     },
     {
@@ -486,27 +670,50 @@
       }
     },
     {
-      "name": "leavevc",
+      "name": "unflip",
       "help": {
-        "description": "Make Trixie leave the voice channel!",
-        "usage": "\n`!leavevc` *(alias `!leave`, `!begone`)*",
-        "category": "Audio"
+        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
+        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
+        "category": "Action"
       }
     },
     {
-      "name": "stopvc",
+      "name": "unmute",
       "help": {
-        "description": "Stop whatever Trixie is saying in VC",
-        "usage": "\n`!stopvc` *(alias `!stop`)*",
-        "category": "Audio"
+        "permissions": "Manage Messages",
+        "usage": "\n`!unmute <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted"
       }
     },
     {
-      "name": "joinvc",
+      "name": "untableflip",
       "help": {
-        "description": "Stop whatever Trixie is saying in VC",
-        "usage": "\n`!joinvc` *(alias `!join`)*",
-        "category": "Audio"
+        "description": "That's right, put it back where it was ノ( ゜-゜ノ)",
+        "usage": "\n`!untableflip` *(alias `!utf`)*",
+        "category": "Action"
+      }
+    },
+    {
+      "name": "userstats",
+      "help": {
+        "description": "Get some stats about how active someone is on the server",
+        "usage": "\n`!userstats <?@user>`\n`@user` - optional- The member c:",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "version",
+      "help": {
+        "description": "Returns the currently running version of TrixieBot",
+        "usage": "\n`!version` *(alias `!v`)*",
+        "category": "Info"
+      }
+    },
+    {
+      "name": "vote",
+      "help": {
+        "description": "Vote for TrixieBot on bot listing sites! Pls",
+        "usage": "\n`!vote`",
+        "category": "Info"
       }
     },
     {
@@ -526,211 +733,12 @@
       }
     },
     {
-      "name": "autoban",
+      "name": "yoda",
       "help": {
-        "description": "Autoban allows admins to make sure to keep specific users out of the server, even if they create a new account.\n\nGlob is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.\nPatterns use the RegEx specification. Infos on RegEx can be found here: https://regexr.com/. A good sandbox for RegEx tooling is https://regex101.com/",
-        "permissions": "Ban Members",
-        "usage": "\n`!autoban <? userID|username#0000|username>` - view the autoban patterns of this server *(alias `!autoban list`)*\n`userID|username#0000|username` - optional- If given, add an autoban configuration\n\n`!autoban id <userID>` - add an autoban config banning the user with this specific, unique userID\n\n`!autoban name <username#0000|username>` - add an autoban config banning the user with this user tag (username#0000) or, if passed a username only, this username (case insensitive)\n\n`!autoban glob <glob>` - add an autoban config banning users matching this glob pattern (always case insensitive)\n\n`!autoban regexp <regexp>` - add an autoban config banning users matching this RegEx pattern (always with i and u flags) *(alias `!autoban regex`)*\n\n**Remove configs:**\n`!autoban remove <?thing>` - remove an autoban again. If no args given, returns a numbered list of autobans to choose from",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "config",
-      "help": {
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!config <?parameter> <?value>` - view the Trixie's config in this server *(alias `!cfg`, `!opts`)*\n`parameter` - optional- view only this parameter's config\n`value` - optional- set a parameter in Trixie's config. \"default\" for default config",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "prefix",
-      "help": {
-        "description": "Alias for `{{prefix}}config prefix <?value>`",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!prefix <?prefix>` - view Trixie's prefix in this server\n`prefix` - optional- set the prefix in Trixie's config. \"default\" for default prefix `(!)`",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "deleted",
-      "help": {
-        "description": "Trixie can collect deleted for up to 7 days, so you always know what's going on in your server behind your back.\nCommand enabled by default. Soon option to turn it off",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!deleted` - List all deleted messages from the last 7 days\n\n`!deleted clear` - Clears list of deleted messages",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "disable",
-      "help": {
-        "description": "Disable Trixie from listening to some commands or channels",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "enable",
-      "help": {
-        "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "locale",
-      "help": {
-        "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
-        "permissions": "Administrator or Manage Server",
-        "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional- set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional- set a channel to be a unique locale",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "muteword",
-      "help": {
-        "description": "Mute/Blacklist specific words in this server",
-        "permissions": "Manage Messages",
-        "usage": "\n`!muteword <phrase>` *(alias `!muteword add`)*\n`phrase` - Word or phrase to be muted/blacklisted\n\n`!muteword remove <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted\n\n`!muteword clear` - Remove all muted words\n\n`!muteword list` - list all muted words and phrases",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "unmute",
-      "help": {
-        "permissions": "Manage Messages",
-        "usage": "\n`!unmute <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted"
-      }
-    },
-    {
-      "name": "timeout",
-      "help": {
-        "permissions": "Manage Messages",
-        "usage": "\n`!timeout <time> <user mention 1> <user mention 2> ...`\n`time` - timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`user mention` - user to timeout. Multiple users possible\n\n`!timeout remove <user mention 1> <user mention 2> ...`\n`user mention` - user to remove timeout from. Multiple users possible\n\n`!timeout clear` - remove all timeouts\n\n`!timeout list` - list all timeouts present at the moment",
-        "category": "Moderation"
-      }
-    },
-    {
-      "name": "naughty",
-      "help": {
-        "description": "It's shortly before Christmas again! Have you been good this year, or will your potty mouth on Discord leave you with lump of coal in your stocking on Christmas day? It’s time to find out!",
-        "usage": "\n`!naughty` *(alias `!nice`)*",
-        "category": "Analysis"
-      }
-    },
-    {
-      "name": "face",
-      "help": {
-        "description": "Get a random ASCII face",
-        "usage": "\n`!face`",
-        "category": "Misc"
-      }
-    },
-    {
-      "name": "lenny",
-      "help": {
-        "description": "( ͡° ͜ʖ ͡°)",
-        "usage": "\n`!lenny`",
-        "category": "Misc"
-      }
-    },
-    {
-      "name": "shrug",
-      "help": {
-        "description": "¯\\_(ツ)_/¯",
-        "usage": "\n`!shrug`",
-        "category": "Misc"
-      }
-    },
-    {
-      "name": "tableflip",
-      "help": {
-        "description": "(╯°□°）╯︵ Tableflip",
-        "usage": "\n`!tableflip` *(alias `!tf`)*",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "untableflip",
-      "help": {
-        "description": "That's right, put it back where it was ノ( ゜-゜ノ)",
-        "usage": "\n`!untableflip` *(alias `!utf`)*",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "flip",
-      "help": {
-        "description": "Aw heck I'm gonna flip you upside down!\nFlips a text or username upside down like a good boi",
-        "usage": "\n`!flip <user|string>`\n`user|string` - user or text to flip",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "unflip",
-      "help": {
-        "description": "Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble",
-        "usage": "\n`!unflip <user|string>`\n`user|string` - user or text to unflip",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "fuck",
-      "help": {
-        "explicit": true,
-        "description": "Do something lewddd to another user.\nAll texts were submitted by other users. TrixieBot didn't take any part in creating those texts and we do our best efforts to remove harmful submissions, therefore all submissions must first be verified by one of my owners.",
-        "usage": "\n`!fuck <user>`\n`user` - the username of the user to fuck\n\n`!fuck add <text>` - Add your own phrase\n`text` - the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `!fuck add rides ${name}'s skin bus into tuna town`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "larson",
-      "help": {
-        "description": "well\nyeah",
-        "usage": "\n`!larson`",
-        "category": "Image"
-      }
-    },
-    {
-      "name": "mlem",
-      "help": {
-        "description": "Mlem the chat :3",
-        "usage": "\n`!mlem`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "blep",
-      "help": {
-        "description": "Blep the chat :3",
-        "usage": "\n`!blep`",
-        "category": "Action"
-      }
-    },
-    {
-      "name": "cider",
-      "help": {
-        "description": "Serve the chat some cider",
-        "usage": "\n`!cider`",
-        "category": "My Little Pony"
-      }
-    },
-    {
-      "name": "alert",
-      "help": {
-        "description": "Make Trixie announce streamers when they go live.\nSupported are Picarto, Piczel, Twitch and Smashcast.",
-        "permissions": "Manage Channels",
-        "usage": "\n`!alert <page url> <?channel>` - Subscribe Trixie to a streaming channel! *(alias `!alert add`)*\n`page url` - copy the url of the stream page and paste it in here\n`channel` - optional- the channel to post the alert to later. If omitted will be this channel\n\n`!alert list` - list all active streaming alerts\n\n`!alert remove <page url>` - unsubscribe Trixie from a Picarto channel\n\n`!alert compact` - toggle compact online announcements\n\n`!alert cleanup` - toggle cleaning up online announcements",
-        "category": "Utility"
-      }
-    },
-    {
-      "name": "poll",
-      "help": {
-        "description": "Create a poll that users can vote on",
-        "usage": "\n`!poll <duration> <option 1>, <option 2>, ..., <option n>`\n`duration` - Duration of the poll. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`option` - a comma seperated list of options to vote for",
-        "category": "Misc"
+        "description": "Translate something into yoda-ish",
+        "rateLimiter": "2 times in 1 hours",
+        "usage": "\n`!yoda <text>`\n`text` - The text to translate",
+        "category": "Text"
       }
     }
   ]

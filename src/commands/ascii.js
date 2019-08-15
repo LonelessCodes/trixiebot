@@ -16,7 +16,8 @@
 
 const asciiPromise = require("asciify-image");
 const filetype = require("file-type");
-const request = require("request");
+const fetch = require("node-fetch");
+const AbortController = require("abort-controller");
 const HelpBuilder = require("../util/commands/HelpBuilder");
 
 const options = {
@@ -45,44 +46,33 @@ module.exports = function install(cr) {
             return;
         }
 
-        await new Promise((resolve, reject) => {
-            const req = request(urls[0], { timeout: 5000, encoding: null }, (err, res, body) => {
-                if (err) return reject(new Error("Couldn't download the image"));
+        const controller = new AbortController();
 
-                const type = filetype(body);
+        await fetch(urls[0], { timeout: 6000, size: 1024 * 1024 * 8, signal: controller.signal })
+            .catch(() => { throw new Error("Couldn't download image"); })
+            .then(res => {
+                if (!res.ok) throw new Error("Image doesn't exist");
 
-                if (!/jpg|png|gif/.test(type.ext)) {
-                    return reject(new Error("The image must be JPG, PNG or GIF"));
-                }
+                const header = res.headers.get("content-type").split("/")[1];
+                if (!header || !/jpg|jpeg|png|gif/.test(header)) throw new Error("The image must be JPG, PNG or GIF");
 
-                asciiPromise(body, options, (err, ascii) => {
-                    if (err) return reject(new Error("Soooooooooooooooooooooooooomething went wrong"));
+                return res.buffer();
+            })
+            .then(body => {
+                const type = filetype(body.slice(0, filetype.minimumBytes));
+                if (!type || !/jpg|png|gif/.test(type.ext)) throw new Error("The image must be JPG, PNG or GIF");
 
-                    resolve("```\n" + ascii + "\n```");
-                });
+                return asciiPromise(body, options)
+                    .catch(() => { throw new Error("Soooooooooooooooooooooooooomething went wrong"); });
+            })
+            .then(ascii => {
+                message.channel.send("```\n" + ascii + "\n```");
+            })
+            .catch(err => {
+                controller.abort();
+                if (err.name === "AbortError" || err.name === "FetchError") return message.channel.send("Couldn't download image");
+                message.channel.send(err.message);
             });
-
-            req.on("error", () => {
-                req.destroy();
-                return reject(new Error("Request failed"));
-            });
-            req.on("response", res => {
-                if (res.statusCode !== 200) {
-                    res.destroy();
-                    return reject(new Error("Request failed"));
-                }
-
-                const header = res.headers["content-type"].split("/")[1];
-                if (!header || !/jpg|jpeg|png|gif/.test(header)) {
-                    res.destroy();
-                    return reject(new Error("The image must be JPG, PNG or GIF"));
-                }
-            });
-        }).then(body =>
-            message.channel.send(body)
-        ).catch(err =>
-            message.channel.send(err.message)
-        );
     });
 
     cr.registerCommand("ascii", ascii_cmd)

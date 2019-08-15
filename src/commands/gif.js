@@ -38,19 +38,18 @@ module.exports = function install(cr) {
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL, true);
 
-    // could be Overload command, but will leave like this
-    gifCommand.registerSubCommand("random", new SimpleCommand(async (message, query) => {
-        let gif;
-        if (query === "") {
-            gif = await giphy.random({
+    gifCommand.registerSubCommand("random", new OverloadCommand)
+        .registerOverload("0", new SimpleCommand(async message => {
+            const gif = await giphy.random({
                 limit: 1,
-                rating: message.channel.nsfw ? "r" : "s",
+                rating: message.channel.nsfw ? "r" : "g",
             });
-            if (!gif.data.image_original_url) {
-                throw new Error("Empty response for global random gif");
-            }
-        } else {
-            gif = await giphy.random({
+            if (!gif.data.image_original_url) return "Empty response for global random gif";
+
+            await message.channel.send(gif.data.image_original_url);
+        }))
+        .registerOverload("1+", new SimpleCommand(async (message, query) => {
+            const gif = await giphy.random({
                 limit: 1,
                 tag: encodeURIComponent(query),
                 rating: message.channel.nsfw ? "r" : "g",
@@ -59,12 +58,9 @@ module.exports = function install(cr) {
                 await message.channel.sendTranslated("No GIFs were found matching this query.");
                 return;
             }
-        }
 
-        const url = gif.data.image_original_url;
-
-        await message.channel.send(url);
-    }))
+            await message.channel.send(gif.data.image_original_url);
+        }))
         .setHelp(new HelpContent()
             .setUsage("<query>", "returns a random gif for the given `query`"));
 

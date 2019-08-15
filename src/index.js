@@ -29,7 +29,7 @@ const LocaleManager = require("./core/managers/LocaleManager");
 const Core = require("./core/Core");
 
 // Indicate a new app lifecycle
-bannerPrinter(info.VERSION, Discord.version);
+bannerPrinter(info.DEV, info.VERSION, Discord.version);
 
 // Catch exceptions
 process.addListener("uncaughtException", error => {
@@ -74,7 +74,7 @@ initialize(client)
     .then(() => log.namespace("app", "Ready uwu.", `bootup_time:${(bootup_timer.end() / nanoTimer.NS_PER_SEC).toFixed(3)}s`))
     .catch(async err => {
         log.error("Failed to log in", err);
-        await exit(1);
+        await exit(1); // 1 - Uncaught Fatal Exception
     });
 
 async function initialize(client) {

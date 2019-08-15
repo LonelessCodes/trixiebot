@@ -17,7 +17,7 @@
 const fs = require("fs");
 const path = require("path");
 
-module.exports = function bannerPrinter(trixie, discord) {
+module.exports = function bannerPrinter(dev, trixie, discord) {
     const txt = fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "text", "banner.txt"), "utf8");
-    console.log(txt, trixie, discord);
+    console.log(txt, trixie, dev ? " dev" : "", discord);
 };

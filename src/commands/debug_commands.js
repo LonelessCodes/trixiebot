@@ -89,7 +89,7 @@ module.exports = function install(cr, client) {
 
             .addField("CPU Usage", (await getCPUUsage() * 100).toFixed(0) + "%", true)
             .addField("CPU Cores", os.cpus().length.toString(), true)
-            .addField("Memory Usage", ((os.totalmem() - os.freemem()) / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB")
+            .addField("Memory Usage", (process.memoryUsage().rss / (1024 * 1024)).toFixed(2) + " / " + (os.totalmem() / (1024 * 1024)).toFixed(2) + " MB")
 
             .addField("Uptime", "Server: " + toHumanTime(Math.floor(os.uptime() * 1000)) + ", Bot: " + toHumanTime(Math.floor(process.uptime() * 1000)))
 

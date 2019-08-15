@@ -808,7 +808,7 @@ class OnlineChannel extends Channel {
             this.message = onlineMessage;
         }
 
-        if (this.message.deletable && !this.message.deleted)
+        if (this.message && this.message.deletable && !this.message.deleted)
             await this.message.delete().catch(() => { /* Do nothing */ });
 
         this.messageId = null;

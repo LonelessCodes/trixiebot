@@ -190,9 +190,9 @@ class BlackJack {
         if (player_s > BlackJack.MAX_HAND) {
             this.result = new Result(Result.BUSTED, 0);
         } else if (dealer_s > BlackJack.MAX_HAND || player_s > dealer_s) {
-            this.result = new Result(Result.YOU_WIN, this.bet * 2);
+            this.result = new Result(Result.YOU_WIN, this.bet);
         } else if (dealer_s === player_s) {
-            this.result = new Result(Result.PUSH, this.bet);
+            this.result = new Result(Result.PUSH, 0);
         } else {
             this.result = new Result(Result.DEALER_WINS, 0);
         }
@@ -211,7 +211,7 @@ class BlackJack {
         const embed = basicEmbed("Blackjack", author);
 
         if (!this.done) {
-            if (await credits.canPurchase(author, this.bet * 2) && this.doubledown_able)
+            if (this.doubledown_able && await credits.canPurchase(author, this.bet * 2))
                 embed.setDescription("Type `hit` to draw another card, `stand` to pass or `double` to double down");
             else
                 embed.setDescription("Type `hit` to draw another card or `stand` to pass");
@@ -281,7 +281,7 @@ async function blackJack(channel, author, bet) {
 }
 
 const MIN = 10;
-const MAX = 1000;
+const MAX = 2000;
 
 module.exports = function install(cr) {
     cr.registerCommand("blackjack", new OverloadCommand)

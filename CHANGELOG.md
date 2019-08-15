@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.12.2"></a>
+## [2.12.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.1...v2.12.2) (2019-08-15)
+
+
+### Bug Fixes
+
+* **alert:** fix a little bug when deleting an online message ([aa9ad09](https://bitbucket.org/Loneless/trixiebot/commits/aa9ad09))
+* **ascii cmd:** fix errors regarding mime type recognition and switched to fetch instead of request module ([77b9f15](https://bitbucket.org/Loneless/trixiebot/commits/77b9f15))
+* **blackjack:** don't give double the bet as a win ([8ebdb43](https://bitbucket.org/Loneless/trixiebot/commits/8ebdb43))
+* **gif cmd:** fixed gif random command in not nsfw channels ([fcd76e7](https://bitbucket.org/Loneless/trixiebot/commits/fcd76e7))
+* **info cmd:** fixed memory usage display ([f30720a](https://bitbucket.org/Loneless/trixiebot/commits/f30720a))
+* **penis cmd:** fixed penis creation ([bbccf67](https://bitbucket.org/Loneless/trixiebot/commits/bbccf67))
+
+
+### Features
+
+* **intl:** add full icu data file to node runtime ([0f85627](https://bitbucket.org/Loneless/trixiebot/commits/0f85627))
+
+
+
 <a name="2.12.1"></a>
 ## [2.12.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.0...v2.12.1) (2019-08-10)
 

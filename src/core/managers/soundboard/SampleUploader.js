@@ -24,7 +24,7 @@ const fs = require("fs-extra");
 const ffmpeg = require("fluent-ffmpeg");
 const ffprobe = promisify(ffmpeg.ffprobe);
 const mime = require("mime");
-const request = require("request");
+const fetch = require("node-fetch");
 const readChunk = require("read-chunk");
 const fileType = require("file-type");
 const { isEnoughDiskSpace } = require("../../../util/files");
@@ -154,13 +154,11 @@ class SampleUploader extends Events {
         const tmp_file_stream = fs.createWriteStream(tmp_file.path);
 
         try {
+            const req = await fetch(attachment.url);
             await new Promise((resolve, reject) => {
-                request(attachment.url, { encoding: null })
-                    .on("error", err => reject(err))
-                    .on("response", response => {
-                        response.pipe(tmp_file_stream);
-                        tmp_file_stream.on("finish", () => tmp_file_stream.close(() => resolve()));
-                    });
+                tmp_file_stream.on("finish", () => tmp_file_stream.close(() => resolve()));
+                req.body.once("error", err => reject(err));
+                req.body.pipe(tmp_file_stream);
             });
         } catch (_) {
             tmp_file.cleanupCallback();

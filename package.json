@@ -41,7 +41,7 @@
     "libsodium-wrappers": "^0.7.5",
     "mime": "^2.4.4",
     "moment": "^2.24.0",
-    "mongodb": "^3.2.7",
+    "mongodb": "^3.3.0",
     "nanoid": "^2.0.3",
     "node-fetch": "^2.6.0",
     "node-gettext": "^2.0.0",
@@ -52,23 +52,21 @@
     "ps-tree": "^1.2.0",
     "random-number-csprng": "^1.0.2",
     "read-chunk": "^3.2.0",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
     "tiny-text": "^1.0.1",
     "tmp": "^0.1.0",
     "twit": "^2.2.11",
-    "twitch": "^3.4.0",
+    "twitch": "^3.4.1",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@types/mongodb": "^3.2.1",
-    "@types/node": "^12.7.1",
+    "@types/mongodb": "^3.2.2",
+    "@types/node": "^12.7.2",
     "@types/node-fetch": "^2.5.0",
     "eslint": "^6.1.0",
     "standard-version": "^4.4.0"
   },
   "engines": {
-    "node": ">= 10.15.3",
+    "node": ">= 10.16.0",
     "npm": ">= 6.9.0"
   },
   "scripts": {

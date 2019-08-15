@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const request = require("request-promise-native");
+const fetch = require("node-fetch");
 const path = require("path");
 const fs = require("fs-extra");
 
@@ -37,6 +37,14 @@ const MemberLog = require("./listeners/MemberLog");
 
 // eslint-disable-next-line no-unused-vars
 const { Client } = require("discord.js");
+
+function fetchPost(url, opts) {
+    if (opts.json) {
+        opts.body = JSON.stringify(opts.json);
+        delete opts.json;
+    }
+    return fetch(url, { method: "POST", ...opts });
+}
 
 class Core {
     /**
@@ -167,15 +175,16 @@ class Core {
         const promises = [];
 
         if (config.has("botlists.divinediscordbots_com"))
-            promises.push(request.post(`https://divinediscordbots.com/bot/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://divinediscordbots.com/bot/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {
+                    "Content-Type": "application/json",
                     Authorization: config.get("botlists.divinediscordbots_com"),
                 },
             }).catch(err => err));
 
         if (config.has("botlists.botsfordiscord_com"))
-            promises.push(request.post(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
+            promises.push(fetchPost(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
@@ -184,7 +193,7 @@ class Core {
             }).catch(err => err));
 
         if (config.has("botlists.discord_bots_gg"))
-            promises.push(request.post(`https://discord.bots.gg/api/v1/bots/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://discord.bots.gg/api/v1/bots/${this.client.user.id}/stats`, {
                 json: { guildCount: server_count },
                 headers: {
                     "Content-Type": "application/json",
@@ -193,7 +202,7 @@ class Core {
             }).catch(err => err));
 
         if (config.has("botlists.botlist_space"))
-            promises.push(request.post(`https://botlist.space/api/bots/${this.client.user.id}`, {
+            promises.push(fetchPost(`https://botlist.space/api/bots/${this.client.user.id}`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",
@@ -202,7 +211,7 @@ class Core {
             }).catch(err => err));
 
         if (config.has("botlists.ls_terminal_ink"))
-            promises.push(request.post(`https://ls.terminal.ink/api/v2/bots/${this.client.user.id}`, {
+            promises.push(fetchPost(`https://ls.terminal.ink/api/v2/bots/${this.client.user.id}`, {
                 json: { bot: { count: server_count } },
                 headers: {
                     "Content-Type": "application/json",
@@ -211,7 +220,7 @@ class Core {
             }).catch(err => err));
 
         if (config.has("botlists.discordbotlist_com"))
-            promises.push(request.post(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
                 json: {
                     guilds: server_count,
                     users: this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0),
@@ -224,7 +233,7 @@ class Core {
             }).catch(err => err));
 
         if (config.has("botlists.discordbots_org"))
-            promises.push(request.post(`https://discordbots.org/api/bots/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://discordbots.org/api/bots/${this.client.user.id}/stats`, {
                 json: { server_count },
                 headers: {
                     "Content-Type": "application/json",

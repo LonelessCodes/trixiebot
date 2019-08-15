@@ -24,7 +24,7 @@ const log = require("../log");
 const config = require("../config");
 const typing = require("../modules/typing");
 
-const request = require("request-promise-native");
+const fetch = require("node-fetch");
 const base_url = "https://cleverbot.io/1.0/";
 
 class CleverbotError extends Error { }
@@ -44,20 +44,20 @@ class Session {
      * @param {string} input
      */
     async ask(input) {
-        const body = await request.post({
-            url: base_url + "ask", form: {
-                user: this.client.user,
-                key: this.client.key,
-                nick: this.nick,
-                text: input,
-            },
-        });
+        const body = new URLSearchParams();
+        body.append("user", this.client.user);
+        body.append("key", this.client.key);
+        body.append("nick", this.nick);
+        body.append("text", input);
 
-        if (JSON.parse(body).status == "success") {
-            return JSON.parse(body).response;
-        } else {
-            throw new CleverbotError(JSON.parse(body).status);
-        }
+        const req = await fetch(base_url + "ask", {
+            method: "POST",
+            body,
+        });
+        const json = await req.json();
+
+        if (json.status == "success") return json.response;
+        else throw new CleverbotError(json.status);
     }
 }
 
@@ -82,26 +82,28 @@ class Cleverbot {
             return new Session(this, nick);
         }
 
-        const body = await request.post({
-            url: base_url + "create",
-            form: {
-                user: this.user,
-                key: this.key,
-                nick: nick,
-            },
+        const params = new URLSearchParams();
+        params.append("user", this.user);
+        params.append("key", this.key);
+        params.append("nick", nick);
+
+        const req = await fetch(base_url + "create", {
+            method: "POST",
+            body: params,
         });
+        const json = await req.json();
 
         /** @type {string} */
         let status;
 
         try {
-            status = JSON.parse(body).status;
+            status = json.status;
         } catch (e) {
             status = "API endpoints unreachable";
         }
 
         if (status == "success") {
-            nick = JSON.parse(body).nick;
+            nick = json.nick;
             this._cache.add(nick);
             return new Session(this, nick);
         } else if (status == "Error: reference name already exists") {

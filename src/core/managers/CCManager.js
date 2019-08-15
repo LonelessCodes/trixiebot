@@ -368,6 +368,10 @@ class CCManager {
         }
     }
 
+    /*
+     * Regular methods
+     */
+
     async get(guild, { command_name, prefix_used, raw_content }) {
         const guildId = guild.id;
         if (!this.trigger_cache.has(guildId)) {
@@ -430,6 +434,10 @@ class CCManager {
 
         return await this.database.find(query).toArray();
     }
+
+    /*
+     * Web stuff
+     */
 
     async getCommandsForWeb(guildId) {
         const rows = await this.database.find({ guildId }).toArray();

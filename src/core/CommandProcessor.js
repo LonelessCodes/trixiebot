@@ -118,12 +118,6 @@ class CommandProcessor {
         const command_name = command_name_raw.toLowerCase();
 
         const executed = await this.DISPATCHER.process(message, command_name, processed_content, prefix, prefix_used, timer);
-
-        // const diff = timer.end();
-        // commandTime.observe(diff);
-
-        // use some stats observing software
-
         if (!executed) return;
 
         stats.bot.get("COMMANDS_EXECUTED").inc(1);

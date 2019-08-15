@@ -6,7 +6,8 @@
             "watch": false,
             "env": {
                 "NODE_ENV": "development"
-            }
+            },
+            "args": "--icu-data-dir=/home/trixie/trixiebot/node_modules/full-icu"
         }
     ]
 }

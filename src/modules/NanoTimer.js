@@ -19,16 +19,16 @@ const NS_PER_MS = 1e6;
 
 class NanoTimer {
     constructor() {
+        /** @type {bigint} */
         this._begin = null;
-        this._diff = null;
     }
     begin() {
-        this._begin = process.hrtime();
+        this._begin = process.hrtime.bigint();
         return this;
     }
     end() {
-        this._diff = process.hrtime(this._begin);
-        return (this._diff[0] * NS_PER_SEC) + this._diff[1];
+        const end = process.hrtime.bigint();
+        return Number(end - this._begin);
     }
 }
 

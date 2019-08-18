@@ -56,7 +56,7 @@ module.exports = function install(cr, client) {
                 "For a list of all commands, go `" + m.prefix + "help`.\n\n" +
                 (INFO.WEBSITE ?
                     "Website " + INFO.WEBSITE + "\n" +
-                    "Web Dashboard " + INFO.WEBSITE + "/dashboard/" + m.guild.id + "\n" :
+                    "Web Dashboard " + INFO.WEBSITE + (m.channel.type === "text" ? "/dashboard/" + m.guild.id : "/dashboard") + "\n" :
                     "") +
                 "Contributing: https://github.com/LonelessCodes/trixiebot")
             .setFooter(`TrixieBot v${INFO.VERSION}`),

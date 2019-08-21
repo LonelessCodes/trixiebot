@@ -1,4 +1,5 @@
-const cpc = require("../../../modules/concurrency/cpc")(process);
+const Comlink = require("comlink");
+const childProcessAdapter = require("../../../modules/concurrency/childProcessAdapter");
 
 const lexer = require("./lexer/lexer");
 const parser = require("./parser");
@@ -47,25 +48,25 @@ async function runCC(commandId, code, cst, message) {
     }
 }
 
-cpc.answer("lint", ({ code }) => {
-    try {
-        compileCC(code);
-        return { errors: [] };
-    } catch (errs) {
-        return { errors: errs };
-    }
-});
+Comlink.expose({
+    lint(code) {
+        try {
+            compileCC(code);
+            return { errors: [] };
+        } catch (errs) {
+            return { errors: errs };
+        }
+    },
+    compile(code) {
+        try {
+            return { cst: compileCC(code), errors: [] };
+        } catch (errs) {
+            return { cst: undefined, errors: errs };
+        }
+    },
+    run({ id, code, cst, message }) {
+        return runCC(id, code, cst, message);
+    },
+}, childProcessAdapter(process));
 
-cpc.answer("compile", payload => {
-    const { code } = payload;
-
-    try {
-        return { cst: compileCC(code), errors: [] };
-    } catch (errs) {
-        return { cst: undefined, errors: errs };
-    }
-});
-
-cpc.answer("run", ({ id, code, cst, message }) => runCC(id, code, cst, message));
-
-cpc.send("ready");
+Comlink.wrap(childProcessAdapter(process)).ready();

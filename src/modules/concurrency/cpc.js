@@ -16,9 +16,9 @@
 
 const { timeout } = require("../../util/promises");
 const uuid = require("uuid");
-const EventEmitter = require("events");
+const events = require("events");
 
-class CPC extends EventEmitter {
+class CPC extends events.EventEmitter {
     constructor(child) {
         super();
 
@@ -51,16 +51,25 @@ class CPC extends EventEmitter {
     }
 
     awaitAnswer(busRequest, payloadRequest, opts = {}) {
-        const p = new Promise(resolve => {
+        const p = new Promise((resolve, reject) => {
             const idRequest = uuid.v1();
 
+            const removeHandlers = () => {
+                this.child.removeListener("exit", exitHandler);
+                this.child.removeListener("message", handler);
+            };
+            const exitHandler = () => {
+                removeHandlers();
+                reject(new Error("Child died while processing"));
+            };
             const handler = ({ bus: busGotten, id: idGotten, payload: payloadGotten }) => {
                 if (idRequest !== idGotten) return;
                 if (busRequest !== busGotten) return;
 
-                this.child.removeListener("message", handler);
+                removeHandlers();
                 resolve(payloadGotten);
             };
+            this.child.on("exit", exitHandler);
             this.child.on("message", handler);
 
             if (this.child.send)

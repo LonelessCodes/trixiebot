@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../../log").namespace("cc methods");
+const log = require("../../../log").namespace("cc methods");
 const nanoTimer = require("../../../modules/NanoTimer");
 const toEmoji = require("emoji-name-map");
 const Discord = require("discord.js");

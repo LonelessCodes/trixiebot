@@ -1,6 +1,4 @@
-const Comlink = require("comlink");
-const childProcessAdapter = require("../../../modules/concurrency/childProcessAdapter");
-const link = Comlink.wrap(childProcessAdapter(process));
+const link = require("../comlink");
 
 const { Permissions: DiscordPermissions } = require("discord.js");
 const c = require("./types");

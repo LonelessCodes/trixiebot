@@ -1,5 +1,6 @@
 const Comlink = require("comlink");
 const childProcessAdapter = require("../../../modules/concurrency/childProcessAdapter");
+const link = require("./comlink");
 
 const lexer = require("./lexer/lexer");
 const parser = require("./parser");
@@ -69,4 +70,4 @@ Comlink.expose({
     },
 }, childProcessAdapter(process));
 
-Comlink.wrap(childProcessAdapter(process)).ready();
+link.ready();

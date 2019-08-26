@@ -38,6 +38,7 @@ function childProcessAdapter(process) {
             listeners.delete(eh);
         },
         start: null,
+        orig: process,
     };
 }
 

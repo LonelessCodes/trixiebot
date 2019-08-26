@@ -303,7 +303,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:lint", async code => {
-            const { errors } = await this.REGISTRY.CC.lint(code);
+            const { errors } = await this.REGISTRY.CC.cpc.awaitAnswer("lint", { code });
             return {
                 success: true,
                 errors,

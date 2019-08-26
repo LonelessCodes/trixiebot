@@ -25,7 +25,6 @@ if (!config.has("database.db"))
 const opts = {
     autoReconnect: true,
     useNewUrlParser: true,
-    useUnifiedTopology: true,
 };
 if (config.has("database.auth")) opts.auth = config.get("database.auth");
 

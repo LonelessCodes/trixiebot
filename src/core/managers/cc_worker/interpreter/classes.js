@@ -15,13 +15,14 @@ async function Emoji(context, id) {
     }
     const opts = id;
 
-    return new c.ObjectLiteral({
+    const emoji = new c.ObjectLiteral({
         animated: new c.BooleanLiteral(opts.animated),
         name: new c.StringLiteral(opts.name),
         id: opts.id ? new c.StringLiteral(opts.id) : new c.NullLiteral,
         identifier: opts.id ? new c.StringLiteral(`${opts.name}:${opts.id}`) : new c.NullLiteral,
         createdAt: opts.createdAt ? new c.TimeLiteral(opts.createdAt) : new c.NullLiteral,
         url: opts.url ? new c.StringLiteral(opts.url) : new c.NullLiteral,
+        roles: opts.roles ? new c.ArrayLiteral(await Promise.all(opts.roles.map(role => Role(context, role)))) : new c.ArrayLiteral([]),
 
         // methods
         toString: new c.NativeFunc("toString", function toString() {
@@ -31,6 +32,7 @@ async function Emoji(context, id) {
             return new c.StringLiteral(`<${opts.animated ? "a" : ""}:${opts.name}:${opts.id}>`);
         }),
     });
+    return emoji;
 }
 
 async function Reaction(context, opts) {
@@ -62,6 +64,17 @@ async function Mentions(context, opts) {
     });
 }
 
+function Attachment(context, opts) {
+    return new c.ObjectLiteral({
+        id: new c.StringLiteral(opts.id),
+        filename: new c.StringLiteral(opts.filename),
+        filesize: new c.NumberLiteral(opts.filesize),
+        height: opts.height ? new c.NumberLiteral(opts.height) : new c.NullLiteral,
+        width: opts.width ? new c.NumberLiteral(opts.width) : new c.NullLiteral,
+        url: new c.StringLiteral(opts.url),
+    });
+}
+
 async function Message(context, id) {
     if (id instanceof c.StringLiteral) {
         id = id.content;
@@ -87,6 +100,7 @@ async function Message(context, id) {
         reactions: new c.ArrayLiteral(await Promise.all(opts.reactions.map(reaction =>
             Reaction(context, { ...reaction, messageId: opts.id })
         ))),
+        attachments: new c.ArrayLiteral(opts.attachments.map(a => Attachment(context, a))),
 
         // methods
         toString: new c.NativeFunc("toString", function toString() {
@@ -194,9 +208,9 @@ async function GuildMember(context, id) {
     }
     const opts = id;
 
-    const perm = new DiscordPermissions(opts.permissions);
+    let perm = new DiscordPermissions(opts.permissions);
 
-    return new c.ObjectLiteral({
+    const member = new c.ObjectLiteral({
         id: new c.StringLiteral(opts.id),
         nickname: new c.StringLiteral(opts.nickname || opts.username),
         highestRole: await Role(context, opts.highestRole),
@@ -222,10 +236,43 @@ async function GuildMember(context, id) {
             }
             return new c.ArrayLiteral(roles);
         }),
+
+        addRole: new c.NativeFunc("addRole", async function addRole(context, ...ids) {
+            ids = ids.map(id => id.content).map(r => typeof r === "object" ? r.id : r).filter(r => typeof r === "string");
+
+            for (let id of ids) {
+                if (!context.settings.allowed_roles.includes(id)) throw context.error(`Role "${id}" is not allowed to be added or removed from users.`);
+            }
+
+            const m = await cpc.awaitAnswer("member.addRole", {
+                guildId: context.guildId, memberId: opts.id, roles: ids,
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't add roles to member. Timed-out"); });
+
+            perm = new DiscordPermissions(m.permissions);
+            return member;
+        }),
+        removeRole: new c.NativeFunc("removeRole", async function removeRole(context, ...ids) {
+            ids = ids.map(id => id.content).map(r => typeof r === "object" ? r.id : r).filter(r => typeof r === "string");
+
+            for (let id of ids) {
+                if (!context.settings.allowed_roles.includes(id)) throw context.error(`Role "${id}" is not allowed to be added or removed from users.`);
+            }
+
+            const m = await cpc.awaitAnswer("member.removeRole", {
+                guildId: context.guildId, memberId: opts.id, roles: ids,
+            }, { timeout: 5000 })
+                .catch(() => { throw context.error("Couldn't remove roles from member. Timed-out"); });
+
+            perm = new DiscordPermissions(m.permissions);
+            return member;
+        }),
+
         hasPermission: new c.NativeFunc("hasPermission", function hasPermission(_, permission) {
             return new c.BooleanLiteral(perm.has(permission.content, true));
         }),
     });
+    return member;
 }
 
 async function Channel(context, id) {

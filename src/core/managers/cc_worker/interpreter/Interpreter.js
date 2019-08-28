@@ -50,16 +50,17 @@ const GLOBALS = require("./globals");
 
 // All our semantics go into the visitor, completly separated from the grammar.
 class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
-    constructor(commandId, guildId) {
+    constructor(commandId, guildId, code, settings) {
         super();
         // This helper will detect any missing or redundant methods on this visitor
         // this.validateVisitor();
 
         this.id = commandId;
         this.guildId = guildId;
+        this.settings = settings;
 
         /** @type {string} */
-        this.text_input = null;
+        this.text_input = code;
 
         this.varsPerStatement = new VariableStack;
 

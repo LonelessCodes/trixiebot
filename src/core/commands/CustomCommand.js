@@ -119,8 +119,9 @@ class CustomCommand extends BaseCommand {
             },
         };
 
-        const { error, embed, content: cont } =
-            await this.manager.run(message, { id: this.id, code: this.code, cst: this.cst, message: msg });
+        const { error, embed, content: cont } = await this.manager.run(message, {
+            id: this.id, code: this.code, cst: this.cst, message: msg, settings: await this.manager.getSettings(guild.id),
+        });
 
         if (error && error.name === "RuntimeError") {
             error.ts = new Date;

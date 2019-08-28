@@ -22,9 +22,7 @@ const path = require("path");
 const uuid = require("uuid/v1");
 const BSON = require("bson");
 const CustomCommand = require("../commands/CustomCommand");
-const Discord = require("discord.js");
-const toEmoji = require("emoji-name-map");
-const { Member, Channel, Emoji, Role, Message } = require("./cc_utils/cc_classes");
+const WorkerMethods = require("./cc_utils/WorkerMethods");
 
 const TYPE = Object.freeze({
     COMMAND: 0,
@@ -116,6 +114,9 @@ class CCManager {
         this.errors_db = database.collection("cc_errors");
         this.errors_db.createIndex({ ts: 1 });
 
+        this.settings_db = database.collection("cc_settings");
+        this.settings_db.createIndex({ guildId: 1 }, { unique: true });
+
         log("Starting worker");
         const timer = nanoTimer();
 
@@ -128,244 +129,10 @@ class CCManager {
             log(`Worker ready. boot_time:${time.toFixed(1)}ms`);
         });
 
-        this.attachListeners();
+        this.worker_methods = new WorkerMethods(this.client, this.database, this.settings_db, this.cpc);
 
         /** @type {Map<string, Trigger[]} */
         this.trigger_cache = new Map;
-        this.message_cache = new Map;
-    }
-
-    attachListeners() {
-        this.cpc.answer("getEmoji", ({ emojiId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-            if (!guild.emojis.has(emojiId)) return;
-            return new Emoji(guild.emojis.get(emojiId));
-        });
-
-        this.cpc.answer("reaction.getMembers", async ({ messageId, reactionId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
-
-            const m = await this.getMessage(guild, messageId);
-            if (!m) return [];
-
-            if (!m.reactions.has(reactionId)) return [];
-            const members = m.reactions.get(reactionId).members.array();
-
-            return members.map(m => new Member(m));
-        });
-
-        this.cpc.answer("getMessage", async ({ messageId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            const m = await this.getMessage(guild, messageId);
-            if (!m) return;
-
-            return new Message(m);
-        });
-
-        this.cpc.answer("message.delete", async ({ messageId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            const m = await this.getMessage(guild, messageId);
-            if (!m) return;
-
-            if (m.author.id !== this.client.user.id ||
-                !m.channel.permissionsFor(guild.me).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES))
-                return;
-
-            await m.delete();
-        });
-
-        this.cpc.answer("message.edit", async ({ messageId, guildId, embed, content }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            const m = await this.getMessage(guild, messageId);
-            if (!m) return;
-
-            if (m.author.id !== this.client.user.id) return;
-
-            let message;
-            if (embed && content) {
-                message = await m.edit(content, { embed: new Discord.RichEmbed(embed) });
-            } else if (embed) {
-                message = await m.edit({ embed: new Discord.RichEmbed(embed) });
-            } else if (content) {
-                message = await m.edit(content);
-            } else message = m;
-
-            this.setMessage(message);
-
-            return new Message(message);
-        });
-
-        this.cpc.answer("message.react", async ({ messageId, guildId, emojis }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            const m = await this.getMessage(guild, messageId);
-            if (!m) return;
-
-            for (let emoji of emojis) {
-                if (guild.emojis.has(emoji)) {
-                    await m.react(guild.emojis.get(emoji)).catch(() => { /* Do nothing */ });
-                } else {
-                    const e = toEmoji.get(emoji);
-                    if (e) await m.react(e).catch(() => { /* Do nothing */ });
-                    else await m.react(emoji).catch(() => { /* Do nothing */ });
-                }
-            }
-        });
-
-        this.cpc.answer("getRole", ({ guildId, roleId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            if (!guild.roles.has(roleId)) return;
-            return new Role(guild.roles.get(roleId));
-        });
-
-        this.cpc.answer("role.getMembers", ({ guildId, roleId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
-
-            if (!guild.roles.has(roleId)) return [];
-            const role = guild.roles.get(roleId);
-            const members = role.members.array();
-
-            return members.map(m => new Member(m));
-        });
-
-        this.cpc.answer("getMember", ({ guildId, memberId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            if (!guild.members.has(memberId)) return;
-            const member = guild.members.get(memberId);
-
-            return new Member(member);
-        });
-
-        this.cpc.answer("member.getRoles", ({ guildId, memberId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
-
-            if (!guild.members.has(memberId)) return [];
-            const member = guild.members.get(memberId);
-            const roles = member.roles.array();
-
-            return roles.map(m => new Role(m));
-        });
-
-        this.cpc.answer("getChannel", ({ guildId, channelId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            if (!guild.channels.has(channelId)) return;
-            const channel = guild.channels.get(channelId);
-
-            return new Channel(channel);
-        });
-
-        this.cpc.answer("channel.createInvite", async ({ guildId, channelId, options }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            if (!guild.channels.has(channelId)) return;
-            const channel = guild.channels.get(channelId);
-
-            if (!channel.permissionsFor(guild.me).has(Discord.Permissions.FLAGS.CREATE_INSTANT_INVITE))
-                return;
-
-            try {
-                const invite = await channel.createInvite(options);
-                if (!invite) return;
-
-                return invite.url;
-            } catch (_) { /* Do nothing */ }
-        });
-
-        this.cpc.answer("channel.send", async ({ guildId, channelId, content, embed }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-
-            if (!guild.channels.has(channelId)) return;
-            const channel = guild.channels.get(channelId);
-
-            let message;
-            if (embed && content) {
-                message = await channel.send(content, { embed: new Discord.RichEmbed(embed) });
-            } else if (embed) {
-                message = await channel.send({ embed: new Discord.RichEmbed(embed) });
-            } else if (content) {
-                message = await channel.send(content);
-            }
-
-            if (message) {
-                this.setMessage(message);
-                return new Message(message);
-            }
-        });
-
-        this.cpc.answer("guild.getMembers", ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
-            const members = guild.members.array();
-
-            return members.map(m => new Member(m));
-        });
-
-        this.cpc.answer("guild.getRoles", ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
-
-            const roles = guild.roles.array();
-
-            return roles.map(m => new Role(m));
-        });
-
-        this.cpc.answer("guild.getChannels", ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
-
-            const channels = guild.channels.array().filter(c => c.type === "text");
-
-            return channels.map(m => new Channel(m));
-        });
-
-        this.cpc.answer("guild.getEmojis", ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
-
-            const emojis = guild.emojis.array();
-
-            return emojis.map(m => new Emoji(m));
-        });
-    }
-
-    setMessage(message) {
-        const guild = message.guild;
-        if (!this.message_cache.has(guild.id)) this.message_cache.set(guild.id, new Map);
-        this.message_cache.get(guild.id).set(message.id, message);
-    }
-
-    async getMessage(guild, messageId) {
-        if (this.message_cache.has(guild.id) && this.message_cache.get(guild.id).has(messageId)) {
-            return this.message_cache.get(guild.id).get(messageId);
-        }
-
-        let channels = guild.channels.filter(c => c.type == "text").array();
-        for (let current of channels) {
-            let target = await current.fetchMessage(messageId);
-            if (target) {
-                this.setMessage(target);
-                return target;
-            }
-        }
     }
 
     /*
@@ -403,7 +170,7 @@ class CCManager {
     }
 
     async run(message, opts) {
-        this.setMessage(message);
+        this.worker_methods.setMessage(message);
 
         let response;
         let error;
@@ -413,7 +180,7 @@ class CCManager {
             error = err;
         }
 
-        this.message_cache.delete(message.guild.id);
+        this.worker_methods.message_cache.delete(message.guild.id);
 
         if (error) throw error;
         return response;
@@ -454,6 +221,22 @@ class CCManager {
             if (bmod > amod) return 1;
             return 0;
         }).map(row => new WebCommand(row, errors.get(row.id)));
+    }
+
+    async getSettings(guildId) {
+        const settings = Object.assign({
+            allowed_roles: [],
+        }, await this.settings_db.findOne({ guildId }));
+
+        return settings;
+    }
+
+    async updateSettings(guildId, settings) {
+        await this.settings_db.updateOne({ guildId }, { $set: { ...settings } }, { upsert: true });
+
+        return Object.assign({
+            allowed_roles: [],
+        }, settings);
     }
 
     async addCommand(guildId, conf = { type: 0, trigger: "", case_sensitive: false, code: "", disabled_channels: [] }) {

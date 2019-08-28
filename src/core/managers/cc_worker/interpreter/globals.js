@@ -11,7 +11,7 @@ const database = require("../../../../modules/db/database")()
     });
 const BSON = require("bson");
 
-const VERSION = new c.StringLiteral("1.1.0");
+const VERSION = new c.StringLiteral("1.2.0");
 
 // Literal Functions
 

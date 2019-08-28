@@ -30,13 +30,12 @@ function compileCC(code) {
     return cst;
 }
 
-async function runCC(commandId, code, cst, message) {
-    const interpreter = new Interpreter(commandId, message.guild.id);
+async function runCC(commandId, code, cst, message, settings) {
+    const interpreter = new Interpreter(commandId, message.guild.id, code, settings);
 
     try {
         // 3. Perform semantics using a CstVisitor.
         // Note that separation of concerns between the syntactic analysis (parsing) and the semantics.
-        interpreter.text_input = code;
         const reply = await interpreter.visit(cst, message);
         if (reply instanceof ObjectLiteral && reply.isEmbed) {
             return { embed: reply.getEmbed() };
@@ -66,6 +65,6 @@ cpc.answer("compile", payload => {
     }
 });
 
-cpc.answer("run", ({ id, code, cst, message }) => runCC(id, code, cst, message));
+cpc.answer("run", ({ id, code, cst, message, settings }) => runCC(id, code, cst, message, settings));
 
 cpc.send("ready");

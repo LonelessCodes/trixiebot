@@ -120,6 +120,14 @@ class WebsiteManager {
                     name: c.name,
                 }));
 
+        const getRoles = guildId =>
+            this.client.guilds.get(guildId).roles.array().filter(r => r.name !== "@everyone").sort((a, b) => b.position - a.position)
+                .map(c => ({
+                    id: c.id,
+                    color: c.color === 0 ? null : c.hexColor,
+                    name: c.name,
+                }));
+
         ipc.answer("commands", async guildId => {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
@@ -199,14 +207,29 @@ class WebsiteManager {
                 return { success: false };
 
             const commands = await this.REGISTRY.CC.getCommandsForWeb(guildId);
+            const settings = await this.REGISTRY.CC.getSettings(guildId);
 
             const config = await this.config.get(guildId);
 
             return {
                 prefix: config.prefix,
                 commands: commands,
+                settings,
                 channels: getChannels(guildId),
+                roles: getRoles(guildId),
                 success: true,
+            };
+        });
+
+        ipc.answer("cc:updateSettings", async ({ guildId, allowed_roles }) => {
+            if (!this.client.guilds.has(guildId))
+                return { success: false };
+
+            const settings = await this.REGISTRY.CC.updateSettings(guildId, { allowed_roles });
+
+            return {
+                success: true,
+                settings,
             };
         });
 

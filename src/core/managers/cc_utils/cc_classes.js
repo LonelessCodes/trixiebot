@@ -14,6 +14,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+class Attachment {
+    constructor(attach) {
+        return {
+            id: attach.id,
+            filename: attach.filename,
+            filesize: attach.filesize,
+            height: attach.height,
+            width: attach.width,
+            url: attach.url,
+        };
+    }
+}
+
 class Message {
     constructor(message) {
         return {
@@ -31,6 +44,7 @@ class Message {
             },
             pinned: message.pinned,
             reactions: Array.from(message.reactions.entries()).map(r => new Reaction({ ...r[1], id: r[0] })),
+            attachments: message.attachments.array().map(a => new Attachment(a)),
         };
     }
 }
@@ -98,6 +112,7 @@ class Emoji {
             createdAt: emoji.createdTimestamp,
             requiresColons: emoji.requiresColons,
             url: emoji.url,
+            roles: emoji.roles.map(r => new Role(r)),
         };
     }
 }

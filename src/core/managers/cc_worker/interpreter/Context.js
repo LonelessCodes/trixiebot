@@ -4,6 +4,7 @@ class Context {
     constructor(interpreter, pos, args = []) {
         this.interpreter = interpreter;
         this.guildId = interpreter.guildId;
+        this.settings = interpreter.settings;
         this.pos = pos;
         this.args = args;
     }

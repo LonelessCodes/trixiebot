@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.13.1"></a>
+## [2.13.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.0...v2.13.1) (2019-08-28)
+
+
+### Bug Fixes
+
+* **cc handlers:** message deletion should work now ([05c0623](https://bitbucket.org/Loneless/trixiebot/commits/05c0623))
+
+
+
 <a name="2.13.0"></a>
 # [2.13.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.2...v2.13.0) (2019-08-28)
 

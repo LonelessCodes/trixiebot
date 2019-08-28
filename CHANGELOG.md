@@ -17,7 +17,6 @@ All notable changes to this project will be documented in this file. See [standa
 ### Features
 
 * **cc:** implement adding and removing roles from users ([217a12f](https://bitbucket.org/Loneless/trixiebot/commits/217a12f))
-* **internal:** switched to comlink for communication between CCManager and CC worker ([a0fe55f](https://bitbucket.org/Loneless/trixiebot/commits/a0fe55f))
 
 
 

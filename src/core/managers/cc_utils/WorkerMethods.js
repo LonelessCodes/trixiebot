@@ -94,11 +94,8 @@ class WorkerMethods {
             const m = await this.getMessage(guild, messageId);
             if (!m) return;
 
-            if (m.author.id !== this.client.user.id ||
-                !m.channel.permissionsFor(guild.me).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES))
-                return;
-
-            await m.delete();
+            if (m.author.id === this.client.user.id || m.channel.permissionsFor(guild.me).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES))
+                await m.delete();
         });
 
         this.cpc.answer("message.edit", async ({ messageId, guildId, embed, content }) => {

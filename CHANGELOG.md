@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.13.0"></a>
+# [2.13.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.2...v2.13.0) (2019-08-28)
+
+
+### Bug Fixes
+
+* some typos ([5184ba2](https://bitbucket.org/Loneless/trixiebot/commits/5184ba2))
+* **bj cmd:** no longer secretly double downable ([e581c60](https://bitbucket.org/Loneless/trixiebot/commits/e581c60))
+* **db:** switch to new server discovery engine ([43889a5](https://bitbucket.org/Loneless/trixiebot/commits/43889a5))
+* **trixie cmd:** fixed !trixie in DMs ([9f7cc70](https://bitbucket.org/Loneless/trixiebot/commits/9f7cc70))
+
+
+### Features
+
+* **cc:** implement adding and removing roles from users ([217a12f](https://bitbucket.org/Loneless/trixiebot/commits/217a12f))
+* **internal:** switched to comlink for communication between CCManager and CC worker ([a0fe55f](https://bitbucket.org/Loneless/trixiebot/commits/a0fe55f))
+
+
+
 <a name="2.12.2"></a>
 ## [2.12.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.1...v2.12.2) (2019-08-15)
 

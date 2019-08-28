@@ -211,7 +211,8 @@ class BlackJack {
         const embed = basicEmbed("Blackjack", author);
 
         if (!this.done) {
-            if (this.doubledown_able && await credits.canPurchase(author, this.bet * 2))
+            this.doubledown_able = this.doubledown_able && await credits.canPurchase(author, this.bet * 2);
+            if (this.doubledown_able)
                 embed.setDescription("Type `hit` to draw another card, `stand` to pass or `double` to double down");
             else
                 embed.setDescription("Type `hit` to draw another card or `stand` to pass");

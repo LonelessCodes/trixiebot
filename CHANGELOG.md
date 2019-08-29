@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.13.2"></a>
+## [2.13.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.1...v2.13.2) (2019-08-29)
+
+
+### Bug Fixes
+
+* **poll cmd:** fixed throwing errors because of unescaped option text ([cc6fe60](https://bitbucket.org/Loneless/trixiebot/commits/cc6fe60))
+
+
+### Features
+
+* **cc runtime:** improve errors and error handling ([615f412](https://bitbucket.org/Loneless/trixiebot/commits/615f412))
+
+
+
 <a name="2.13.1"></a>
 ## [2.13.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.0...v2.13.1) (2019-08-28)
 

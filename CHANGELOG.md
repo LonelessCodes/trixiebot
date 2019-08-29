@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.13.3"></a>
+## [2.13.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.2...v2.13.3) (2019-08-29)
+
+
+### Bug Fixes
+
+* **cc member.addRole:** dont throw an error when user already has role ([be2605c](https://bitbucket.org/Loneless/trixiebot/commits/be2605c))
+
+
+
 <a name="2.13.2"></a>
 ## [2.13.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.1...v2.13.2) (2019-08-29)
 

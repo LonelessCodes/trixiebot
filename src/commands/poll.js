@@ -25,6 +25,10 @@ const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
+function escapeRegExp(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 class Poll {
     // eslint-disable-next-line valid-jsdoc
     /**
@@ -71,7 +75,7 @@ class Poll {
         if (timeLeft > 0) {
             await this.channel.awaitMessages(message => {
                 for (const option of this.options)
-                    if (new RegExp(`^${option}`, "i").test(message.content))
+                    if (new RegExp(`^${escapeRegExp(option)}`, "i").test(message.content))
                         return this.vote(message.member, option);
 
                 return false;

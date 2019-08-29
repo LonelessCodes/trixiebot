@@ -258,7 +258,11 @@ async function GuildMember(context, id) {
             const m = await cpc.awaitAnswer("member.addRole", {
                 guildId: context.guildId, memberId: opts.id, roles: ids,
             }, { timeout: 5000 })
-                .catch(err => { throw context.error(err.name + ": " + err.message); });
+                .catch(err => {
+                    // ignore error for when member already has role
+                    if (err.message.includes("The set already contains this value")) return member;
+                    throw context.error(err.name + ": " + err.message);
+                });
 
             perm = new DiscordPermissions(m.permissions);
             return member;

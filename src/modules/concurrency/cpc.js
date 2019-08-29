@@ -24,8 +24,6 @@ class CPC extends events.EventEmitter {
 
         this.setMaxListeners(0);
 
-        this._listeners = {};
-
         this.child = child;
         this.child.setMaxListeners(0);
 
@@ -38,15 +36,30 @@ class CPC extends events.EventEmitter {
 
     send(bus, payload) {
         if (this.child.send)
-            this.child.send({ bus, payload });
+            this.child.send({ bus, type: CPC.TYPE.RAW, payload });
     }
 
     answer(busWanted, handler) {
         this.child.on("message", async ({ bus: busGotten, id, payload }) => {
             if (busWanted !== busGotten) return;
-            const response = await handler(payload);
-            if (this.child.send)
-                this.child.send({ bus: busGotten, id, payload: response });
+
+            try {
+                const response = await handler(payload);
+                if (this.child.send)
+                    this.child.send({ bus: busGotten, id, type: CPC.TYPE.RAW, payload: response });
+            } catch (err) {
+                let response = err;
+                if (err instanceof Error) {
+                    response = {
+                        isError: true,
+                        name: err.name,
+                        message: err.message,
+                        stack: err.stack,
+                    };
+                }
+                if (this.child.send)
+                    this.child.send({ bus: busGotten, id, type: CPC.TYPE.ERROR, payload: response });
+            }
         });
     }
 
@@ -62,18 +75,28 @@ class CPC extends events.EventEmitter {
                 removeHandlers();
                 reject(new Error("Child died while processing"));
             };
-            const handler = ({ bus: busGotten, id: idGotten, payload: payloadGotten }) => {
+            const handler = ({ bus: busGotten, id: idGotten, type: typeGotten, payload: payloadGotten }) => {
                 if (idRequest !== idGotten) return;
                 if (busRequest !== busGotten) return;
 
                 removeHandlers();
-                resolve(payloadGotten);
+                switch (typeGotten) {
+                    case CPC.TYPE.ERROR: {
+                        if (payloadGotten.isError) {
+                            return reject(Object.assign(new Error(), payloadGotten));
+                        }
+                        return reject(payloadGotten);
+                    }
+                    case CPC.TYPE.RAW: {
+                        return resolve(payloadGotten);
+                    }
+                }
             };
             this.child.on("exit", exitHandler);
             this.child.on("message", handler);
 
             if (this.child.send)
-                this.child.send({ bus: busRequest, id: idRequest, payload: payloadRequest });
+                this.child.send({ bus: busRequest, id: idRequest, type: CPC.TYPE.RAW, payload: payloadRequest });
         });
         if (opts.timeout) {
             return Promise.race([
@@ -91,5 +114,9 @@ class CPC extends events.EventEmitter {
         this.child.removeAllListeners();
     }
 }
+CPC.TYPE = Object.freeze({
+    RAW: 0,
+    ERROR: 1,
+});
 
 module.exports = child => new CPC(child);

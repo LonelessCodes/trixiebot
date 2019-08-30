@@ -292,6 +292,9 @@ StringLiteral.prototype.proto = Object.create(Literal.prototype.proto);
 StringLiteral.prototype.proto.toString = new NativeFunc(function toString() {
     return new StringLiteral(this.content);
 });
+StringLiteral.prototype.proto.size = new NativeFunc(function size() {
+    return new NumberLiteral(this.content.length);
+});
 StringLiteral.prototype.proto.includes = new NativeFunc(function includes(_, includes) {
     return new BooleanLiteral(this.content.includes(includes.content));
 });

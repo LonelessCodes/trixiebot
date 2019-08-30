@@ -307,6 +307,7 @@ class CCInterpreter extends parser.getBaseCstVisitorConstructor() {
         if (func instanceof Func || func instanceof NativeFunc) {
             this.callStack.push(new CallTrace(Position.fromCST(ctx.Arguments)));
             this.callStack.pushFunc(func.funcName);
+            while (val instanceof Member) val = val.value;
             const retrn = assign(await func.call(new Context(this, ctx.Arguments, args.pos), val, args.args));
             this.callStack.pop();
             this.callStack.popFunc();

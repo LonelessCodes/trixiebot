@@ -4,7 +4,8 @@ const lexer = require("./lexer/lexer");
 const parser = require("./parser");
 const Interpreter = require("./interpreter/Interpreter");
 const { ObjectLiteral } = require("./interpreter/types");
-const { ParserError, TokenizerError } = require("./errors");
+const { ParserError, TokenizerError, RuntimeError } = require("./errors");
+const { log } = require("./util");
 
 function parseTokenizerErrors(errors) {
     return errors.map(err => new TokenizerError(err));
@@ -42,6 +43,7 @@ async function runCC(commandId, code, cst, message, settings) {
         }
         return { content: reply ? reply.native : null };
     } catch (error) {
+        if (!(error instanceof RuntimeError)) log.error(error);
         return { error };
     }
 }

@@ -15,7 +15,6 @@
  */
 
 const { findArgs } = require("../../util/string");
-const log = require("../../log");
 const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
 const { Message, RichEmbed } = require("discord.js");
@@ -138,8 +137,6 @@ class CustomCommand extends BaseCommand {
                 name: "Unknown Error",
                 message: "Not an error thrown by the actual TrixieScript runtime, but by the interpreter",
             };
-
-            log.namespace("cc interpreter").error(error);
 
             await this.manager.errors_db.insertOne(err);
             return;

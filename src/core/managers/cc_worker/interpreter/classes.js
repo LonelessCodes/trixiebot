@@ -260,7 +260,7 @@ async function GuildMember(context, id) {
             }, { timeout: 5000 })
                 .catch(err => {
                     // ignore error for when member already has role
-                    if (err.message.includes("The set already contains this value")) return member;
+                    if (err.message.includes("The set already contains this value")) return { permissions: perm.bitfield };
                     throw context.error(err.name + ": " + err.message);
                 });
 

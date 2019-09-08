@@ -61,7 +61,7 @@ module.exports = function install(cr) {
 
                 const stream = request.body;
 
-                const dispatcher = connection.playStream(stream, { passes: 2 });
+                const dispatcher = connection.playStream(stream);
                 dispatcher.once("start", () => {
                     connection.player.streamingData.pausedTime = 0;
                 });

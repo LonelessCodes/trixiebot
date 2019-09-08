@@ -66,8 +66,7 @@ class Sample {
             try {
                 const dispatcher = connection.playOpusStream(
                     fs.createReadStream(this.file)
-                        .pipe(new prism.opus.OggDemuxer()),
-                    { passes: 2 }
+                        .pipe(new prism.opus.OggDemuxer())
                 );
                 dispatcher.once("start", () => {
                     connection.player.streamingData.pausedTime = 0;

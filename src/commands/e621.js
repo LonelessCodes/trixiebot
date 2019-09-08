@@ -108,12 +108,17 @@ async function process(message, msg, type) {
     let result;
     switch (type) {
         case "random":
-            result = await fetchImages({
-                tags: encodeURIComponent(query),
-                sf: "id",
-                sd: "desc",
-                limit: 300,
-            });
+            try {
+                result = await fetchImages({
+                    tags: encodeURIComponent(query),
+                    sf: "id",
+                    sd: "desc",
+                    limit: 300,
+                });
+            } catch (_) {
+                await message.channel.send("❌ There's been an error talking to e621 :'c");
+                return;
+            }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
                 whileBreak--;
@@ -132,12 +137,17 @@ async function process(message, msg, type) {
             }
             break;
         case "latest":
-            result = await fetchImages({
-                tags: encodeURIComponent(query),
-                sf: "id",
-                sd: "desc",
-                limit: amount,
-            });
+            try {
+                result = await fetchImages({
+                    tags: encodeURIComponent(query),
+                    sf: "id",
+                    sd: "desc",
+                    limit: amount,
+                });
+            } catch (_) {
+                await message.channel.send("❌ There's been an error talking to e621 :'c");
+                return;
+            }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
                 whileBreak--;
@@ -158,11 +168,16 @@ async function process(message, msg, type) {
             }
             break;
         case "popular":
-            result = await fetchImages({
-                scope: "popular_by_" + popular_order,
-                tags: encodeURIComponent(query),
-                limit: amount,
-            });
+            try {
+                result = await fetchImages({
+                    scope: "popular_by_" + popular_order,
+                    tags: encodeURIComponent(query),
+                    limit: amount,
+                });
+            } catch (_) {
+                await message.channel.send("❌ There's been an error talking to e621 :'c");
+                return;
+            }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
                 whileBreak--;
@@ -183,10 +198,15 @@ async function process(message, msg, type) {
             }
             break;
         case "top":
-            result = await fetchImages({
-                tags: encodeURIComponent(query),
-                limit: amount,
-            });
+            try {
+                result = await fetchImages({
+                    tags: encodeURIComponent(query),
+                    limit: amount,
+                });
+            } catch (_) {
+                await message.channel.send("❌ There's been an error talking to e621 :'c");
+                return;
+            }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
                 whileBreak--;

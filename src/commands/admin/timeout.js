@@ -18,7 +18,7 @@
 const { userToString } = require("../../util/util");
 const LocaleManager = require("../../core/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../util/time");
-const { splitArgs } = require("../../util/string");
+const { splitArgs, format } = require("../../util/string");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
@@ -233,7 +233,7 @@ module.exports = function install(cr, client, config, db) {
 
             const promises = members.map(member => database.updateOne({ guildId: member.guild.id, memberId: member.id }, { $set: { expiresAt } }, { upsert: true }));
 
-            await message.channel.send(LocaleManager.format(LocaleManager
+            await message.channel.send(format(LocaleManager
                 .locale(await message.channel.locale())
                 .translate("{{users}} is now timeouted for the next {{timeLeft}}")
                 .ifPlural("{{users}} are now timeouted for the next {{timeLeft}}")

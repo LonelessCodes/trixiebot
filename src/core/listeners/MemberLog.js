@@ -19,7 +19,7 @@ const { immediate } = require("../../util/promises");
 const log = require("../../log").namespace("member log");
 const stats = require("../../modules/stats");
 const guild_stats = require("../managers/GuildStatsManager");
-const { format } = require("../managers/LocaleManager");
+const { format } = require("../../util/string");
 
 class MemberLog {
     constructor(client, config) {

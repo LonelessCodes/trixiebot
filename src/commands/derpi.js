@@ -17,6 +17,7 @@
 const config = require("../config");
 const log = require("../log");
 const { splitArgs } = require("../util/string");
+const { findAndRemove } = require("../util/array");
 const fetch = require("node-fetch");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -28,11 +29,6 @@ const CommandScope = require("../util/commands/CommandScope");
 
 //                                                                                               no real gore, but candy gore is allowed
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "(gore AND -candy gore)", "foal abuse"];
-
-function findAndRemove(arr, elem) {
-    const i = arr.indexOf(elem);
-    if (i > -1) arr.splice(i, 1);
-}
 
 function getArtist(tags) {
     const arr = tags.split(/,\s*/g);

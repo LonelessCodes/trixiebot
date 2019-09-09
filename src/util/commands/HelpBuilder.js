@@ -20,19 +20,8 @@ const AliasCommand = require("../../core/commands/AliasCommand");
 const CommandPermission = require("./CommandPermission");
 const Category = require("./Category");
 const { RichEmbed } = require("discord.js");
+const { ucFirst, format } = require("../string");
 const CONST = require("../../const");
-
-function ucFirst(string) {
-    return string.split(" ").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
-}
-
-function format(message, format = {}) {
-    for (const f in format) {
-        // eslint-disable-next-line no-useless-escape
-        message = message.replace(new RegExp(`{{\s*${f}\s*}}`, "g"), format[f]);
-    }
-    return message;
-}
 
 class HelpBuilder extends RichEmbed {
     constructor(message, name, command) {

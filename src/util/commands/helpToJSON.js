@@ -19,14 +19,8 @@ const ScopeCommand = require("../../core/commands/ScopedCommand");
 const AliasCommand = require("../../core/commands/AliasCommand");
 const CommandPermission = require("./CommandPermission");
 const CommandScope = require("./CommandScope");
+const { format } = require("../string");
 
-function format(message, format = {}) {
-    for (const f in format) {
-        // eslint-disable-next-line no-useless-escape
-        message = message.replace(new RegExp(`{{\s*${f}\s*}}`, "g"), format[f]);
-    }
-    return message;
-}
 function createParameter(name, parameter) {
     return `\`${name}\` ${parameter.optional ? "- optional" : ""}- ${parameter.content}`;
 }

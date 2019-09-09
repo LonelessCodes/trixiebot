@@ -16,6 +16,7 @@
 
 const LocaleManager = require("../core/managers/LocaleManager");
 const { parseHumanTime, toHumanTime } = require("../util/time");
+const { escapeRegExp } = require("../util/string");
 const { progressBar } = require("../util/util");
 const CONST = require("../const");
 const Discord = require("discord.js");
@@ -24,10 +25,6 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
-
-function escapeRegExp(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-}
 
 class Poll {
     // eslint-disable-next-line valid-jsdoc

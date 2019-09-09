@@ -108,4 +108,28 @@ module.exports = new class StringUtils {
     resolveStdout(string) {
         return string.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
     }
+
+    /**
+     * @param {string} string
+     * @returns {string}
+     */
+    escapeRegExp(string) {
+        return string.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    }
+
+    /**
+     * Make first letter of each word uppercase
+     * @param {string} string
+     * @returns {string}
+     */
+    ucFirst(string) {
+        return string.split(" ").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
+    }
+
+    format(message, format = {}) {
+        for (const f in format) {
+            message = message.replace(new RegExp(`{{\\s*${module.exports.escapeRegExp(f)}\\s*}}`, "g"), format[f]);
+        }
+        return message;
+    }
 };

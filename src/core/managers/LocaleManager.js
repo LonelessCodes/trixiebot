@@ -17,6 +17,7 @@
 const fs = require("fs-extra");
 const path = require("path");
 const { isPlainObject } = require("../../util/util");
+const { format } = require("../../util/string");
 const { po } = require("gettext-parser");
 const Gettext = require("node-gettext");
 const DocumentMapCache = require("../../modules/db/DocumentMapCache");
@@ -79,7 +80,7 @@ class Cursor {
             str = gt.gettext(this.opts.translate);
         }
 
-        return module.exports.format(str, this.opts.format);
+        return format(str, this.opts.format);
     }
 }
 
@@ -161,15 +162,6 @@ module.exports = class LocaleManager {
         }
     }
 };
-
-// expose the function for formating a string
-function format(message, format = {}) {
-    for (const f in format)
-        message = message.replace(new RegExp(`{{\\s*${f}\\s*}}`, "g"), format[f]);
-
-    return message;
-}
-module.exports.format = format;
 
 function translate(message) {
     return new Cursor({ translate: message });

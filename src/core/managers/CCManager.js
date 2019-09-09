@@ -228,7 +228,9 @@ class CCManager {
             allowed_roles: [],
         }, await this.settings_db.findOne({ guildId }));
 
-        return settings;
+        return {
+            allowed_roles: settings.allowed_roles,
+        };
     }
 
     async updateSettings(guildId, settings) {
@@ -236,7 +238,9 @@ class CCManager {
 
         return Object.assign({
             allowed_roles: [],
-        }, settings);
+        }, {
+            allowed_roles: settings.allowed_roles,
+        });
     }
 
     async addCommand(guildId, conf = { type: 0, trigger: "", case_sensitive: false, code: "", disabled_channels: [] }) {

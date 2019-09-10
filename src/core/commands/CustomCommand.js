@@ -51,8 +51,8 @@ class CustomCommand extends BaseCommand {
         this.case_sensitive = row.case_sensitive;
 
         this.code = row.code;
-        this.raw_cst = row.cst;
-        this._cst = row._cst || null;
+        this.raw_cst = row.cst && row.cst._bsontype === "Binary" && row.cst.length() >= 5 ? row.cst : null;
+        this._cst = row._cst ? Object.freeze(row._cst) : null;
 
         this.last_read = row.last_read;
         this.compile_errors = row.compile_errors;
@@ -66,7 +66,7 @@ class CustomCommand extends BaseCommand {
 
     get cst() {
         if (!this._cst) {
-            this._cst = this.raw_cst ? BSON.deserialize(this.raw_cst.buffer) : null;
+            this._cst = this.raw_cst ? Object.freeze(BSON.deserialize(this.raw_cst.buffer)) : null;
             this.raw_cst = null;
         }
         return this._cst;

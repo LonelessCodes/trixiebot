@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.14.1"></a>
+## [2.14.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.0...v2.14.1) (2019-09-10)
+
+
+### Bug Fixes
+
+* **ipc adapter:** fixed trixieweb being denied a connected when it reconnects ([1de6ec7](https://bitbucket.org/Loneless/trixiebot/commits/1de6ec7))
+
+
+
 <a name="2.14.0"></a>
 # [2.14.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.3...v2.14.0) (2019-09-10)
 

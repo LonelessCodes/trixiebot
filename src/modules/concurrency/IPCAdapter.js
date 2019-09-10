@@ -42,9 +42,10 @@ class IPCAdapter extends events.EventEmitter {
         this.promiseStart = new Promise(resolve => {
             this.server.on("start", () => {
                 this.server.on("connect", socket => {
-                    if (this.sockets.length > 0) {
-                        socket.end();
-                        return;
+                    while (this.sockets.length > 0) {
+                        this.sockets[0].end();
+                        this.sockets.splice(0, 1);
+                        this.emit("exit");
                     }
                     this.sockets.push(socket);
                     resolve();

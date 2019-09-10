@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.14.0"></a>
+# [2.14.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.3...v2.14.0) (2019-09-10)
+
+
+### Bug Fixes
+
+* **audio stuff:** stop sending duplicate audio packets as Discord stopped supporting it ([59cc861](https://bitbucket.org/Loneless/trixiebot/commits/59cc861))
+* **cc errors:** move error logging of unknown errors from master to worker for better debugging ([a578660](https://bitbucket.org/Loneless/trixiebot/commits/a578660))
+* **cc settings:** fixed returned parameters for dashboard ([5d332c0](https://bitbucket.org/Loneless/trixiebot/commits/5d332c0))
+* **CustomCommand:** fixed trying to run empty or invalid custom command ([fe5b6ec](https://bitbucket.org/Loneless/trixiebot/commits/fe5b6ec))
+* **e621 cmd:** give proper error if parsing the response failed or connected was refused ([72238d8](https://bitbucket.org/Loneless/trixiebot/commits/72238d8))
+* **owner cmds:** send message to channel with id if guild with id doesn't exist ([4c17a6c](https://bitbucket.org/Loneless/trixiebot/commits/4c17a6c))
+
+
+### Features
+
+* **cc runtime:** add .size() to String to get length of String ([05687cd](https://bitbucket.org/Loneless/trixiebot/commits/05687cd))
+
+
+
 <a name="2.13.3"></a>
 ## [2.13.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.2...v2.13.3) (2019-08-29)
 

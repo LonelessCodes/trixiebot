@@ -113,6 +113,11 @@ module.exports = function install(cr, client, config, db) {
     cr.registerCommand("send", new SimpleCommand((message, msg) => {
         const s = splitArgs(msg, 2);
         const guild = client.guilds.get(s[0]);
+        if (!guild) {
+            const channel = client.channels.get(s[0]);
+            if (!channel) return;
+            channel.send(s[1]);
+        }
         if (!guild.available) return;
         const defaultChannel = findDefaultChannel(guild);
         defaultChannel.send(s[1]);

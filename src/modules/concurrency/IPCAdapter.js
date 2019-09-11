@@ -53,7 +53,7 @@ class IPCAdapter extends events.EventEmitter {
                 });
 
                 this.server.on("socket.disconnect", (socket, socketId) => {
-                    if (this.sockets.length !== 0) return;
+                    if (this.sockets.length === 0) return;
                     const i = this.sockets.findIndex(s => socketId === s.id);
                     if (i >= 0) {
                         this.sockets.splice(i, 1);

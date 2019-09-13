@@ -1,0 +1,143 @@
+{
+    "errors": {
+        "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...": "Äh... Ich... ähm, ich glaube... es gab da ein Problem...? Es ist aber nicht deine Schuld...",
+        "Yeeeeah, nothing found": "Tja, nichts gefunden"
+    },
+    "deleted": {
+        "Removed all deleted messages successfully": "Alle gelöschten Nachrichten gecleart"
+    },
+    "roles": {
+        "Here's a list of available roles:": "Hier ist eine Liste verfügbarer Rollen:",
+        "Made the role available for everyone! Yay": "Hab die Rolle für jeden verfügbar gemacht! Yay",
+        "Role added! /)": "Rolle geadded!",
+        "This server doesn't have any publicly available roles :/": "In diesem Server gibt es noch keine öffentlichen Rollen :/",
+        "Uh apparently this server doesn't have this role available right now.": "Ähm, also so wie's aussieht ist diese Rolle gerade nicht verfügbar.",
+        "Sorry, you can't add a role to the config that is more powerful than your owns.": "Tschuldigung, aber du kannst keine Rolle der Konfiguration hinzufügen, die höher im Rollenmanager in den Servereinstellungen ist als deine eigene höchte Rolle.",
+        "Made the role available for everyone! It's free real estate": "Rolle ist jetzt für jeden verfügbar! Es ist freier Grundbesitz",
+        "Sorry, you can't remove a role from the config that is more powerful than your owns.": "Du kannst keine Rolle von der Konfiguration entfernen die mächtiger ist als deine eigenen.",
+        "Removed the role from the config. Ouchie wouchie ;~;": "Rolle von der Konfiguration entfernt. Aua",
+        "IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles.": "Also ich weiß ja nicht was gerade DU hier zu suchen hast, Mister. Um das role Kommando zu nutzen musst du Rollen verwalten dürfen.",
+        "You cannot remove roles from other users with Manage Roles permission.": "Du kannst anderen Nutzern die auch Rollen verwalten dürfen nicht ihre Rollen wegnehmen! Bei uns nennt man das Betrug! Ne aber echt, das können sie auch selber machen.",
+        "Role removed.": "Rolle entfernt.",
+        "Can't remove a role without having it first.": "Du kannst dir keine Rolle entnehmen, wenn du sie nichtmal hast :3",
+        "This role doesn't exist so you can't have it.": "Diese Rolle existiert nicht. Nach logischer Schlussfolgerung kannst du sie also nicht haben.",
+        "You don't have permission to remove this role.": "Du hast keine Erlaubnis diese Rolle zu entfernen.",
+        "You cannot add roles to other users with Manage Roles permission.": "Du kannst anderen Nutzern die auch Rollen verwalten dürfen keine Rollen zuteilen! Das können sie auch selber machen.",
+        "You already have this role! Yay?": "Du hast diese Rolle schon! Yay?",
+        "Hmm... I couldn't really find your role.": "Weird... ich konnte diese Rolle nicht finden.",
+        "Other": "Andere"
+    },
+    "help": {
+        "`!trixie` to get this help message.": "`!trixie` um diese Hilfsnachricht zu erhalten."
+    },
+    "timeout": {
+        "{{users}} is now timeouted for the next {{timeLeft}}": {
+            "one": "{{users}} ist jetzt für die nächsten {{timeLeft}} getimeoutet",
+            "other": "{{users}} sind jetzt für die nächsten {{timeLeft}} getimeoutet"
+        },
+        "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}": "{{userMention}} Du wurdest vom schreiben in diesem Server getimeoutet! In {{timeLeft}} kann's wieder weiter geh'n",
+        "IDK what you're doing here. To use the timeout command you must have permissions to manage messages.": "Also ich weiß ja nicht was du hier zu suchen hast. Um das Timeout Kommando zu nutzen musst du mindestens Nachrichten Verwalten können.",
+        "Removed all timeouts successfully.": "Alle Timeouts erfolgreich entfernt.",
+        "Removed timeouts for {{user}} successfully. Get dirty~": "Timeout von {{user}} erfolgreich entfernt. Jetzt kann's weiter geh'n",
+        "You cannot timeout yourself, dummy!": "Du kannst dich nicht selber timeouten, Dummkopf!",
+        "You cannot timeout TrixieBot! I own you.": "Hast du echt gedacht das würde gehen? Tsk tsk stk",
+        "You cannot timeout other moderators or admins. That's just rood": "Du kannst keine anderen Moderatoren oder Admins timeouten. Das ist einfach nur unhöflich",
+        "Timeout length should be at least 10 seconds long and shorter than 3 days :3": "Timeoutlänge sollte mindestens 10 Sekunden kurz und maximal 3 Tage lang sein."
+    },
+    "no": "nö",
+    "Not a file. Sorry :(": "Keine Datei. 'Tschuldigung :(",
+    "Broadcast from creator": "Broadcast vom Entwickler",
+    "permissions": {
+        "No boi, git gud": "Ne, versuch's nett erst",
+        "IDK what you're doing here": "Also ich weiß ja nun gar nicht was du hier zu suchen hast"
+    },
+    "meow": "Miau",
+    "woof": "Wuff",
+    "The chat got mlem'd by {{user}} | Art by n0nnny": "Der Chat wurde gemlemt von {{user}} | Bild von n0nnny",
+    "The chat got blep'd by {{user}} | Art by n0nnny": "Der Chat wurde geblept von {{user}} | Bild von n0nnny",
+    "A round of cider is distributed in the chat!": "Eine Runde Cider wird im Chat verteilt!",
+    "voice": {
+        "You need to join a voice channel first!": "Du musst erst einem Voicechannel beitreten!"
+    },
+    "gif": {
+        "No GIFs were found matching this query.": "Keine GIFs auf die Query gefunden.",
+        "Apparently nothing is trending right now.": "Irgendwie trendet gerade nichts ¯\\_(ツ)_/¯"
+    },
+    "A new member joined a server. first %s = user tag, second %s = rules channel tag": {
+        "Welcome to the server, {{user}}!": "Willkommen in unserem geilen Server, {{user}}!"
+    },
+    "A user left the server": {
+        "*{{user}}* has left the server. Bye bye": "*{{user}}* hat den Server verlassen :'c bye bye"
+    },
+    "poll": {
+        "{{user}} Poll ended!": "{{user}} Umfrage zuende!",
+        "Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed": "Ruhig Brauner. In diesem Channel ist schon eine Umfrage am runnen. Nur eine Umfrage pro Channel ist erlaubt, um Verwirrung vorzubeugen",
+        "`duration` must be formated as in the example.": "`duration` muss so formatiert sein wie im Beispiel:",
+        "`duration` should be at least 1m and max 3d": "`duration` muss mindestens 1m und max 3d sein",
+        "To create a poll you must give at least two options to choose from.": "Um eine Umfrage zu erstellen musst du zwei oder mehr Optionen angeben!",
+        "Poll is starting! {{timeLeft}} left to vote": "Umfrage hat begonnen! {{timeLeft}} noch um abzustimmen.",
+        "You vote by simply posting {{options}} in this channel": "Man wählt, indem man einfach {{options}} in diesen Channel schreibt",
+        "But no one voted :c": "Aber niemand hat gevotet :c",
+        "{{votesCount}} vote": {
+            "one": "{{votesCount}} Vote",
+            "other": "{{votesCount}} Votes"
+        }
+    },
+    "Here's a list of available roles:": "Hier ist eine Liste verfügbarer Rollen:",
+    "Role added! /)": "Rolle geadded!",
+    "call": {
+        "Alright!": "Aber hundert!"
+    },
+    "pong! Wee hee": "pong! Juhuu",
+    "Hugging yourself? How about huggig someone you love!": "Wieder mal am sich-selbst-umarmen? Wie wär's wenn du anderen mal die Liebe zuteil kommen tusts!",
+    "mute": {
+        "IDK what you're doing here. To use the mute command you must have permissions to manage messages.": "Also ich weiß ja nun nicht was du hier machts, ja. Um das mute Command zu benutzen brauchst du Rechte Nachrichten zu verwalten, ja.",
+        "Currently muted are:": "Gerade gemuted sind:",
+        "Nothing yet muted": "Noch nüscht gemuted",
+        "Removed all muted words successfully": "Alle gemuteten Wörter entfernt!",
+        "Removed muted word \"{{word}}\" successfully": "Gemutetes Wort \"{{word}}\" entmuted!!",
+        "Already got this muted": "Wir ham das schon gemuted",
+        "Got it! Blacklisted use of \"{{word}}\"": "Schon verstanden! Du willst also, dass ich \"{{word}}\" mute? Schon erledigt!"
+    },
+    "config": {
+        "no_parameter": "Keine solche Einstellung vorhanden. *schulter zuck*",
+        "wrong_format": "Neuer Wert hat das falsche Format. Sollte {{format}} sein.",
+        "currently": "Aktuell:",
+        "update": "Aktualisieren:",
+        "allowed_types": "Erlaubte Typen:",
+        "success": ":ok_hand: Geändert zu `{{value}}`",
+        "description": "Benutz' das Command `!config <option>` um eine Option anzusehen."
+    },
+    "penis": {
+        "everyone has fucking huge diccs k. You're all beautiful": "JEDER HAT OMG VERDAMMT RIESIGE SCHWÄNZE. Sie sind so schön °˖✧◝(⁰▿⁰)◜✧˖°",
+        "Length:": "Länge:",
+        "Girth:": "Umfang:"
+    },
+    "derpi": {
+        "`amount` cannot be smaller than 1 or greater than 5!": "`amount` kann nicht kleiner als 1 oder größer als 5 sein!",
+        "`query` **must** be given": "`query` **muss* gegeben sein",
+        "`order` must be either `first`, `latest`, `top` or `random`!": "`order` muss entweder `first`, `latest`, `top` oder `random` sein!"
+    },
+    "Invalid input": "Ungültiger Input",
+    "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...": "Tja, dumm gelaufen. Ich hab da nicht so wirklich was gefunden? Tut mir auch leid und so",
+    "alert": {
+        "{{user}} is live on {{service}}!": "{{user}} ist live auf {{service}}!"
+    },
+    "Hehe, nothing here lol. Time to add some.": "Hehe, nichts hier lül. Zeit Alerts hinzuzufügen.",
+    "general": {
+        "lang_name": "Deutsch",
+        "lang_name_en": "German"
+    },
+    "format": {
+        "and": "und",
+        "or": "oder"
+    },
+    "locale": {
+        "not_supported": "Sprache '{{locale}}' wird nicht unterstützt :c Versuch's mal mit {{locales}}",
+        "success": "Sprache des Servers zu {{locale}} geändert.",
+        "success_ch": "Sprache für {{channel}} zu {{locale}} geändert."
+    },
+    "textaction": {
+        "everyone": "alle {{count}} User"
+    }
+}

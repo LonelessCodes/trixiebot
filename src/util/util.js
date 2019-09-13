@@ -65,4 +65,36 @@ module.exports = new class Utils {
         str.fill(b, Math.round(v * length));
         return `${str.join("")} ${(v * 100).toFixed(1)}%`;
     }
+
+    debounce(func, wait, immediate) {
+        let timeout, args, context, timestamp, result;
+
+        const later = () => {
+            const last = +new Date() - timestamp;
+
+            if (last < wait && last > 0) {
+                timeout = setTimeout(later, wait - last);
+            } else {
+                timeout = null;
+                if (!immediate) {
+                    result = func.apply(context, args);
+                    if (!timeout) context = args = null;
+                }
+            }
+        };
+
+        return function debouncer(...args) {
+            // eslint-disable-next-line consistent-this
+            context = this;
+            timestamp = +new Date();
+            const callNow = immediate && !timeout;
+            if (!timeout) timeout = setTimeout(later, wait);
+            if (callNow) {
+                result = func.apply(context, args);
+                context = args = null;
+            }
+
+            return result;
+        };
+    }
 };

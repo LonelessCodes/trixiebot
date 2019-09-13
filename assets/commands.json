@@ -387,7 +387,7 @@
     {
       "name": "locale",
       "help": {
-        "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
+        "description": "Trixie supports multiple different languages, including `[object Object]`, `[object Object]`. Here you can set them in your server",
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional- set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional- set a channel to be a unique locale",
         "category": "Moderation"

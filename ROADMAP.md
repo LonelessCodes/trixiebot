@@ -6,7 +6,6 @@
 * ban, kick und tempban commands. warn/strike commands
 * One module and db collection for all guild-specific configurations
 * Make basic custom commands work
-* New Approach at Localization
 * Custom Commands dashboard disabled channels AND whitelisted channels (maybe by a switch, or two panels side by side)
 
 ## 2019

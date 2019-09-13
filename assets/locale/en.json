@@ -1,0 +1,143 @@
+{
+  "errors": {
+    "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...": "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...",
+    "Yeeeeah, nothing found": "Yeeeeah, nothing found"
+  },
+  "deleted": {
+    "Removed all deleted messages successfully": "Removed all deleted messages successfully"
+  },
+  "roles": {
+    "Here's a list of available roles:": "Here's a list of available roles:",
+    "Made the role available for everyone! Yay": "Made the role available for everyone! Yay",
+    "Role added! /)": "Role added! /)",
+    "This server doesn't have any publicly available roles :/": "This server doesn't have any publicly available roles :/",
+    "Uh apparently this server doesn't have this role available right now.": "Uh apparently this server doesn't have this role available right now.",
+    "Sorry, you can't add a role to the config that is more powerful than your owns.": "Sorry, you can't add a role to the config that is more powerful than your owns.",
+    "Made the role available for everyone! It's free real estate": "Made the role available for everyone! It's free real estate",
+    "Sorry, you can't remove a role from the config that is more powerful than your owns.": "Sorry, you can't remove a role from the config that is more powerful than your owns.",
+    "Removed the role from the config. Ouchie wouchie ;~;": "Removed the role from the config. Ouchie wouchie ;~;",
+    "IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles.": "IDK what you're doing here, Mister. To use the role command you must have permissions to manage roles.",
+    "You cannot remove roles from other users with Manage Roles permission.": "You cannot remove roles from other users with Manage Roles permission.",
+    "Role removed.": "Role removed.",
+    "Can't remove a role without having it first.": "Can't remove a role without having it first.",
+    "This role doesn't exist so you can't have it.": "This role doesn't exist so you can't have it.",
+    "You don't have permission to remove this role.": "You don't have permission to remove this role.",
+    "You cannot add roles to other users with Manage Roles permission.": "You cannot add roles to other users with Manage Roles permission.",
+    "You already have this role! Yay?": "You already have this role! Yay?",
+    "Hmm... I couldn't really find your role.": "Hmm... I couldn't really find your role.",
+    "Other": "Other"
+  },
+  "help": {
+    "`!trixie` to get this help message.": "`!trixie` to get this help message."
+  },
+  "timeout": {
+    "{{users}} is now timeouted for the next {{timeLeft}}": {
+      "one": "{{users}} is now timeouted for the next {{timeLeft}}",
+      "other": "{{users}} are now timeouted for the next {{timeLeft}}"
+    },
+    "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}": "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}",
+    "IDK what you're doing here. To use the timeout command you must have permissions to manage messages.": "IDK what you're doing here. To use the timeout command you must have permissions to manage messages.",
+    "Removed all timeouts successfully.": "Removed all timeouts successfully.",
+    "Removed timeouts for {{user}} successfully. Get dirty~": "Removed timeouts for {{user}} successfully. Get dirty~",
+    "You cannot timeout yourself, dummy!": "You cannot timeout yourself, dummy!",
+    "You cannot timeout TrixieBot! I own you.": "You cannot timeout TrixieBot! I own you.",
+    "You cannot timeout other moderators or admins. That's just rood": "You cannot timeout other moderators or admins. That's just rood",
+    "Timeout length should be at least 10 seconds long and shorter than 3 days :3": "Timeout length should be at least 10 seconds long and shorter than 3 days :3"
+  },
+  "no": "no",
+  "Not a file. Sorry :(": "Not a file. Sorry :(",
+  "Broadcast from creator": "Broadcast from creator",
+  "permissions": {
+    "No boi, git gud": "No boi, git gud",
+    "IDK what you're doing here": "IDK what you're doing here"
+  },
+  "meow": "meow",
+  "woof": "woof",
+  "The chat got mlem'd by {{user}} | Art by n0nnny": "The chat got mlem'd by {{user}} | Art by n0nnny",
+  "The chat got blep'd by {{user}} | Art by n0nnny": "The chat got blep'd by {{user}} | Art by n0nnny",
+  "A round of cider is distributed in the chat!": "A round of cider is distributed in the chat!",
+  "voice": {
+    "You need to join a voice channel first!": "You need to join a voice channel first!"
+  },
+  "gif": {
+    "No GIFs were found matching this query.": "No GIFs were found matching this query.",
+    "Apparently nothing is trending right now.": "Apparently nothing is trending right now."
+  },
+  "A new member joined a server. first %s = user tag, second %s = rules channel tag": {
+    "Welcome to the server, {{user}}!": "Welcome to the server, {{user}}!"
+  },
+  "A user left the server": {
+    "*{{user}}* has left the server. Bye bye": "*{{user}}* has left the server. Bye bye"
+  },
+  "poll": {
+    "{{user}} Poll ended!": "{{user}} Poll ended!",
+    "Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed": "Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed",
+    "`duration` must be formated as in the example.": "`duration` must be formated as in the example.",
+    "`duration` should be at least 1m and max 3d": "`duration` should be at least 1m and max 3d",
+    "To create a poll you must give at least two options to choose from.": "To create a poll you must give at least two options to choose from.",
+    "Poll is starting! {{timeLeft}} left to vote": "Poll is starting! {{timeLeft}} left to vote",
+    "You vote by simply posting {{options}} in this channel": "You vote by simply posting {{options}} in this channel",
+    "But no one voted :c": "But no one voted :c",
+    "{{votesCount}} vote": {
+      "one": "{{votesCount}} vote",
+      "other": "{{votesCount}} votes"
+    }
+  },
+  "Here's a list of available roles:": "Here's a list of available roles:",
+  "Role added! /)": "Role added! /)",
+  "call": {
+    "Alright!": "Alright!"
+  },
+  "pong! Wee hee": "pong! Wee hee",
+  "Hugging yourself? How about huggig someone you love!": "Hugging yourself? How about huggig someone you love!",
+  "mute": {
+    "IDK what you're doing here. To use the mute command you must have permissions to manage messages.": "IDK what you're doing here. To use the mute command you must have permissions to manage messages.",
+    "Currently muted are:": "Currently muted are:",
+    "Nothing yet muted": "Nothing yet muted",
+    "Removed all muted words successfully": "Removed all muted words successfully",
+    "Removed muted word \"{{word}}\" successfully": "Removed muted word \"{{word}}\" successfully",
+    "Already got this muted": "Already got this muted",
+    "Got it! Blacklisted use of \"{{word}}\"": "Got it! Blacklisted use of \"{{word}}\""
+  },
+  "config": {
+    "no_parameter": "No such parameter. *shrugs*",
+    "wrong_format": "New value has a wrong format. Should be {{format}}",
+    "currently": "Currently:",
+    "update": "Update:",
+    "allowed_types": "Allowed Types:",
+    "success": ":ok_hand: Set to `{{value}}`",
+    "description": "Use the command format !config <option> to view more info about an option."
+  },
+  "penis": {
+    "everyone has fucking huge diccs k. You're all beautiful": "everyone has fucking huge diccs k. You're all beautiful",
+    "Length:": "Length:",
+    "Girth:": "Girth:"
+  },
+  "derpi": {
+    "`amount` cannot be smaller than 1 or greater than 5!": "`amount` cannot be smaller than 1 or greater than 5!",
+    "`query` **must** be given": "`query` **must** be given",
+    "`order` must be either `first`, `latest`, `top` or `random`!": "`order` must be either `first`, `latest`, `top` or `random`!"
+  },
+  "Invalid input": "Invalid input",
+  "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...": "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...",
+  "alert": {
+    "{{user}} is live on {{service}}!": "{{user}} is live on {{service}}!"
+  },
+  "Hehe, nothing here lol. Time to add some.": "Hehe, nothing here lol. Time to add some.",
+  "general": {
+    "lang_name": "English",
+    "lang_name_en": "English"
+  },
+  "format": {
+    "and": "and",
+    "or": "or"
+  },
+  "locale": {
+    "not_supported": "Locale '{{locale}}' is not supported :c Try {{locales}}",
+    "success": "Changed locale for the server to {{locale}}",
+    "success_ch": "Changed locale for {{channel}} to {{locale}}"
+  },
+  "textaction": {
+    "everyone": "all {{count}} users"
+  }
+}

@@ -18,6 +18,7 @@ const { userToString, isOwner } = require("../../util/util");
 const getChangelog = require("../../modules/getChangelog");
 const ipc = require("../../modules/concurrency/ipc");
 const guild_stats = require("./GuildStatsManager");
+const LocaleManager = require("./LocaleManager");
 const AliasCommand = require("../commands/AliasCommand");
 const Category = require("../../util/commands/Category");
 
@@ -46,10 +47,11 @@ function cleanContent(str, guild) {
 }
 
 class WebsiteManager {
-    constructor(REGISTRY, client, config, database) {
+    constructor(REGISTRY, client, config, locale, database) {
         this.REGISTRY = REGISTRY;
         this.client = client;
         this.config = config;
+        this.locale = locale;
         this.db = database;
 
         this.initializeIPC();
@@ -383,7 +385,7 @@ class WebsiteManager {
                 return { success: false };
 
             const config = await this.config.get(guildId);
-            const locale = await this.client.locale.get(guildId);
+            const locale = await this.locale.get(guildId);
 
             const channels = [];
             for (const key in locale.channels) {
@@ -422,7 +424,7 @@ class WebsiteManager {
                         id: c.id,
                         name: c.name,
                     })),
-                locales: this.client.locale.locales,
+                locales: LocaleManager.getLocales(),
             };
         });
 
@@ -439,7 +441,7 @@ class WebsiteManager {
                 locale_json.channels[channel.id] = channel.locale;
             }
 
-            await this.client.locale.set(guildId, locale_json);
+            await this.locale.set(guildId, locale_json);
 
             // Config
             await this.config.set(guildId, settings);
@@ -457,8 +459,8 @@ class WebsiteManager {
             }, { $set: { channels: disabledTrue } }, { upsert: true });
 
             // Get values
-            const config = await this.config.get(guildId);
-            locale = await this.client.locale.get(guildId);
+            settings = await this.config.get(guildId);
+            locale = await this.locale.get(guildId);
 
             const channels = [];
             for (const key in locale.channels) {
@@ -474,7 +476,7 @@ class WebsiteManager {
 
             return {
                 success: true,
-                settings: config,
+                settings,
                 locale: {
                     global: locale.global,
                     channels: channels
@@ -494,7 +496,7 @@ class WebsiteManager {
                 return { success: false };
 
             await this.config.set(guildId, this.config.default_config);
-            await this.client.locale.delete(guildId);
+            await this.locale.delete(guildId);
 
             await this.db.collection("disabled_channels").deleteOne({
                 guildId,
@@ -509,7 +511,7 @@ class WebsiteManager {
             });
 
             const config = await this.config.get(guildId);
-            const locale = await this.client.locale.get(guildId);
+            const locale = await this.locale.get(guildId);
 
             const channels = [];
             for (const key in locale.channels) {

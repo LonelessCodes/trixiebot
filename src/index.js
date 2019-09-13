@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const nanoTimer = require("./modules/nanoTimer");
+const nanoTimer = require("./modules/timer");
 const bootup_timer = nanoTimer();
 
 const config = require("./config");
@@ -24,8 +24,6 @@ const bannerPrinter = require("./util/banner/bannerPrinter");
 const info = require("./info");
 const Discord = require("discord.js");
 const database = require("./modules/db/database");
-const ConfigManager = require("./core/managers/ConfigManager");
-const LocaleManager = require("./core/managers/LocaleManager");
 const Core = require("./core/Core");
 
 // Indicate a new app lifecycle
@@ -71,53 +69,17 @@ client.addListener("resume", replayed => djs_log(`Replayed ${replayed} events`))
 
 // Initialize Bot
 initialize(client)
-    .then(() => log.namespace("app", "Ready uwu.", `bootup_time:${(bootup_timer.end() / nanoTimer.NS_PER_SEC).toFixed(3)}s`))
+    .then(() => log.namespace("app", "Ready uwu.", `bootup_time:${(nanoTimer.diff(bootup_timer) / nanoTimer.NS_PER_SEC).toFixed(3)}s`))
     .catch(async err => {
         log.error("Failed to log in", err);
         await exit(1); // 1 - Uncaught Fatal Exception
     });
 
 async function initialize(client) {
+    if (!config.has("discord.token")) throw new Error("No Discord API Token specified in config files");
+
     const db = await database();
     log.namespace("db", "Connected");
-
-    const { Parameter } = ConfigManager;
-    const config_manager = new ConfigManager(client, db, [
-        new Parameter("prefix", "❗ Prefix", config.get("prefix") || "!", String),
-
-        // New Parameter("calling", "📞 Accept calls servers", false, Boolean),
-        new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
-
-        new Parameter([
-            new Parameter("announce.channel", "Channel. 'none' disables announcements", null, Discord.TextChannel, true),
-            new Parameter("announce.bots", "Announce Bots", true, Boolean),
-        ], "🔔 Announce new/leaving/banned users"),
-
-        new Parameter([
-            new Parameter("welcome.enabled", "true/false", false, Boolean),
-            new Parameter("welcome.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
-        ], "👋 Announce new users"),
-
-        new Parameter([
-            new Parameter("leave.enabled", "true/false", false, Boolean),
-            new Parameter("leave.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
-        ], "🚶 Announce leaving users"),
-
-        new Parameter([
-            new Parameter("ban.enabled", "true/false", false, Boolean),
-            new Parameter("ban.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
-        ], "🔨 Announce banned users"),
-    ]);
-
-    const locale = new LocaleManager(client, db, [
-        "en", "de", "hu",
-    ]);
-
-    client.db = db;
-    client.config = config_manager;
-    client.locale = locale;
-
-    if (!config.has("discord.token")) throw new Error("No Discord API Token specified in config files");
 
     await new Promise(resolve => {
         client.once("ready", () => resolve());
@@ -126,7 +88,7 @@ async function initialize(client) {
         client.login(config.get("discord.token"));
     });
 
-    const core = new Core(client, config_manager, db);
+    const core = new Core(client, db);
 
     await core.startMainComponents("commands");
 }

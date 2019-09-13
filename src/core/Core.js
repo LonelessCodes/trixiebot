@@ -22,21 +22,21 @@ const log = require("../log").namespace("core");
 const config = require("../config");
 const { walk } = require("../util/files");
 const helpToJSON = require("../util/commands/helpToJSON");
-const nanoTimer = require("../modules/nanoTimer");
+const nanoTimer = require("../modules/timer");
 const random = require("../modules/random/random");
 const calendar_events = require("../modules/calendar_events");
 const AliasCommand = require("./commands/AliasCommand");
 const CommandScope = require("../util/commands/CommandScope");
-// eslint-disable-next-line no-unused-vars
+const LocaleManager = require("./managers/LocaleManager");
 const ConfigManager = require("./managers/ConfigManager");
+const { Parameter } = ConfigManager;
 
 const CommandProcessor = require("./CommandProcessor");
 const WebsiteManager = require("./managers/WebsiteManager");
 const UpvotesManager = require("./managers/UpvotesManager");
 const MemberLog = require("./listeners/MemberLog");
 
-// eslint-disable-next-line no-unused-vars
-const { Client } = require("discord.js");
+const Discord = require("discord.js");
 
 function fetchPost(url, opts) {
     if (opts.json) {
@@ -48,18 +48,43 @@ function fetchPost(url, opts) {
 
 class Core {
     /**
-     * @param {Client} client
-     * @param {ConfigManager} config
+     * @param {Discord.Client} client
      * @param {Db} db
      */
-    constructor(client, config, db) {
+    constructor(client, db) {
         this.client = client;
-        this.config = config;
-
         this.db = db;
 
-        this.processor = new CommandProcessor(this.client, this.config, this.db);
-        this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.db);
+        this.config = new ConfigManager(this.client, this.db, [
+            new Parameter("prefix", "❗ Prefix", config.get("prefix") || "!", String),
+
+            new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
+
+            new Parameter([
+                new Parameter("announce.channel", "Channel. 'none' disables announcements", null, Discord.TextChannel, true),
+                new Parameter("announce.bots", "Announce Bots", true, Boolean),
+            ], "🔔 Announce new/leaving/banned users"),
+
+            new Parameter([
+                new Parameter("welcome.enabled", "true/false", false, Boolean),
+                new Parameter("welcome.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
+            ], "👋 Announce new users"),
+
+            new Parameter([
+                new Parameter("leave.enabled", "true/false", false, Boolean),
+                new Parameter("leave.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
+            ], "🚶 Announce leaving users"),
+
+            new Parameter([
+                new Parameter("ban.enabled", "true/false", false, Boolean),
+                new Parameter("ban.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
+            ], "🔨 Announce banned users"),
+        ]);
+
+        this.locale = new LocaleManager(this.client, this.db);
+
+        this.processor = new CommandProcessor(this.client, this.config, this.locale, this.db);
+        this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.locale, this.db);
         this.upvotes = new UpvotesManager(this.client, this.db);
 
         this.member_log = new MemberLog(this.client, this.config);
@@ -78,7 +103,7 @@ class Core {
     }
 
     async loadCommands(commands_package) {
-        if (!commands_package) throw new Error("Cannot load commands if not given a path to look at!");
+        if (!commands_package || typeof commands_package !== "string") throw new Error("Cannot load commands if not given a path to look at!");
 
         log("Installing Commands...");
 
@@ -89,10 +114,12 @@ class Core {
 
         await Promise.all(files.map(async file => {
             const install = require(path.resolve("../" + commands_package, file));
-            await install(this.processor.REGISTRY, this.client, this.config, this.db);
+            await install(this.processor.REGISTRY, {
+                client: this.client, config: this.config, locale: this.locale, db: this.db,
+            });
         }));
 
-        const install_time = timer.end() / nanoTimer.NS_PER_SEC;
+        const install_time = nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC;
 
         log("Building commands.json");
 
@@ -124,7 +151,7 @@ class Core {
         await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str, { mode: 0o666 });
         await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str, { mode: 0o666 });
 
-        const build_time = (timer.end() / nanoTimer.NS_PER_SEC) - install_time;
+        const build_time = (nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC) - install_time;
 
         log(`Commands installed. files:${files.length} commands:${this.processor.REGISTRY.commands.size} install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
     }

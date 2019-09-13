@@ -23,8 +23,8 @@ class TextCommand extends BaseCommand {
         this.content = content instanceof Array ? content : [content];
     }
 
-    async run(message) {
-        await message.channel.send(await secureRandom(this.content));
+    async run(context) {
+        await context.send(await secureRandom(this.content));
     }
 }
 

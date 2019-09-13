@@ -21,7 +21,8 @@ const stats = require("../modules/stats");
 const guild_stats = require("./managers/GuildStatsManager");
 const CommandRegistry = require("./CommandRegistry");
 const CommandDispatcher = require("./CommandDispatcher");
-const nanoTimer = require("../modules/nanoTimer");
+const MessageContext = require("./commands/MessageContext");
+const nanoTimer = require("../modules/timer");
 // eslint-disable-next-line no-unused-vars
 const { Message, Permissions } = require("discord.js");
 
@@ -49,13 +50,14 @@ async function onProcessingError(message, err) {
 }
 
 class CommandProcessor {
-    constructor(client, config, database) {
+    constructor(client, config, locale, db) {
         this.client = client;
         this.config = config;
-        this.db = database;
+        this.locale = locale;
+        this.db = db;
 
-        this.REGISTRY = new CommandRegistry(client, database);
-        this.DISPATCHER = new CommandDispatcher(client, database, this.REGISTRY);
+        this.REGISTRY = new CommandRegistry(client, db);
+        this.DISPATCHER = new CommandDispatcher(client, db, this.REGISTRY);
 
         stats.bot.register("COMMANDS_EXECUTED", true);
         stats.bot.register("MESSAGES_TODAY", true);
@@ -68,7 +70,7 @@ class CommandProcessor {
      * @param {Message} message
      */
     async onMessage(message) {
-        const timer = nanoTimer();
+        const received_at = nanoTimer();
 
         try {
             if (message.author.bot || message.author.equals(message.client.user)) return;
@@ -81,13 +83,17 @@ class CommandProcessor {
                 !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES, true))
                 return;
 
-            await this.run(message, timer);
+            await this.run(message, received_at);
         } catch (err) {
             await onProcessingError(message, err);
         }
     }
 
-    async run(message, timer) {
+    /**
+     * @param {Message} message
+     * @param {bigint} received_at
+     */
+    async run(message, received_at) {
         let raw_content = message.content;
 
         // remove prefix
@@ -95,12 +101,12 @@ class CommandProcessor {
         let prefix = "";
         let prefix_used = true;
 
+        let config = null;
         if (message.channel.type === "text") {
-            // eslint-disable-next-line require-atomic-updates
-            message.guild.config = await this.config.get(message.guild.id);
+            config = await this.config.get(message.guild.id);
 
             me = message.guild.me.toString();
-            prefix = message.guild.config.prefix;
+            prefix = config.prefix;
         }
 
         // check prefixes
@@ -112,12 +118,12 @@ class CommandProcessor {
             prefix_used = false;
         }
 
-        message = Object.assign(Object.create(message), message, { prefix, prefix_used });
-
-        const [command_name_raw, processed_content] = splitArgs(raw_content, 2);
+        const [command_name_raw, content] = splitArgs(raw_content, 2);
         const command_name = command_name_raw.toLowerCase();
 
-        const executed = await this.DISPATCHER.process(message, command_name, processed_content, prefix, prefix_used, timer);
+        const ctx = new MessageContext(message, this.locale, config, content, prefix, prefix_used, received_at);
+
+        const executed = await this.DISPATCHER.process(ctx, command_name);
         if (!executed) return;
 
         stats.bot.get("COMMANDS_EXECUTED").inc(1);

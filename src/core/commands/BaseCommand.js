@@ -15,23 +15,24 @@
  */
 
 const { toHumanTime } = require("../../util/time");
-const { Message, Channel, Guild } = require("discord.js");
-const LocaleManager = require("../managers/LocaleManager");
+const { format } = require("../../util/string");
+const { Message, Channel } = require("discord.js");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const CommandScope = require("../../util/commands/CommandScope");
 const RateLimiter = require("../../util/commands/RateLimiter");
 const CalendarRange = require("../../modules/CalendarRange");
 const TimeUnit = require("../../modules/TimeUnit");
 
-// give each Channel and Guild class a locale function, which returns the locale config for this
-// specific namespace, and on a Message class give the whole locale config
-Message.prototype.locale = function locale() { return this.client.locale.get(this.guild ? this.guild.id : ""); };
-Channel.prototype.locale = function locale() { return this.client.locale.get(this.guild ? this.guild.id : "", this.id || ""); };
-Guild.prototype.locale = async function locale() { return (await this.client.locale.get(this.id)).global; };
+const Translation = require("../../modules/i18n/Translation");
+const TranslationPlural = require("../../modules/i18n/TranslationPlural");
 
-Message.prototype.translate = LocaleManager.autoTranslate;
-Channel.prototype.translate = LocaleManager.autoTranslateChannel;
-Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
+// provide a fallback for old .translate() based commands
+// until they are finally also converted
+Message.prototype.translate = format;
+Channel.prototype.translate = format;
+Channel.prototype.sendTranslated = function sendTranslated(a, b, embed) {
+    return this.send(format(a, b), embed);
+};
 
 class BaseCommand {
     /**
@@ -52,18 +53,23 @@ class BaseCommand {
         this.season = new CalendarRange;
     }
 
-    async rateLimit(message) {
-        const id = `${message.channel.type === "text" ? message.guild.id : ""}:${message.channel.id}`;
+    async rateLimit(context) {
+        const id = `${context.channel.type === "text" ? context.guild.id : ""}:${context.channel.id}`;
         if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(id))) return;
-        await this.rateLimitMessage(message);
+        await this.rateLimitMessage(context);
     }
 
-    async rateLimitMessage(message) {
-        const num = `${this.rateLimiter.max} ${this.rateLimiter.max === 1 ? "time" : "times"}`;
-        await message.channel.sendTranslated(
-            `Whoa whoa not so fast! You may only do this ${num} every ${this.rateLimiter.toString()}. ` +
-            `There is still ${toHumanTime(this.rateLimiter.tryAgainIn(message.author.id))} left to wait.`
-        );
+    async rateLimitMessage(context) {
+        await context.send(new TranslationPlural("command.ratelimit", [
+            "Whoa whoa not so fast! You may only do this {{count}} time every {{time_frame}}. " +
+            "There is still {{time_left}} left to wait.",
+            "Whoa whoa not so fast! You may only do this {{count}} times every {{time_frame}}. " +
+            "There is still {{time_left}} left to wait.",
+        ], this.rateLimiter.max, {
+            count: this.rateLimiter.max,
+            time_frame: this.rateLimiter.toString(),
+            time_left: toHumanTime(this.rateLimiter.tryAgainIn(context.author.id)),
+        }));
     }
 
     setRateLimiter(rateLimiter) {
@@ -77,8 +83,8 @@ class BaseCommand {
         return this;
     }
 
-    async noPermission(message) {
-        await message.channel.sendTranslated("IDK what you're doing here. This is restricted area >:c");
+    async noPermission(context) {
+        await context.send(new Translation("command.no_permissions", "IDK what you're doing here. This is restricted area >:c"));
     }
 
     setPermissions(permissions) {
@@ -147,8 +153,8 @@ class BaseCommand {
 
     async beforeProcessCall() { /* Do nothing */ }
 
-    async run(message, command_name, content, pass_through, timer) {
-        return await this.call(message, content, { pass_through, command_name, timer });
+    async run(ctx, command_name, pass_through) {
+        return await this.call(ctx, { pass_through, command_name });
     }
 
     async call() { /* Do nothing */ }

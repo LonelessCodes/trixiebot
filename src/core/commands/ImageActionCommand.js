@@ -24,8 +24,10 @@ const Category = require("../../util/commands/Category");
 const MessageMentions = require("../../util/commands/MessageMentions");
 
 const { Attachment } = require("discord.js");
+const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
+const Translation = require("../../modules/i18n/Translation");
 
-class TextActionCommand extends BaseCommand {
+class ImageActionCommand extends BaseCommand {
     constructor(image, content, noMentionMessage, permissions) {
         super(permissions);
 
@@ -41,20 +43,22 @@ class TextActionCommand extends BaseCommand {
         this.everyone = false;
     }
 
-    async run(message, command_name, content) {
-        const mentions = new MessageMentions(content, message.guild);
+    async run(context) {
+        const mentions = new MessageMentions(context.content, context.guild);
         const mention = mentions.members.first();
         if (!mention && !mentions.everyone) {
-            await message.channel.sendTranslated(this.noMentionMessage);
+            await context.send(this.noMentionMessage);
             return;
         }
 
         const phrase = await secureRandom(this.texts);
-        const user = mentions.everyone ? `all ${message.guild.members.size} users` : userToString(mention);
+        const user = mentions.everyone ?
+            new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.members.size }) :
+            userToString(mention);
 
         const attachment = new Attachment(this.image);
 
-        await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), user), attachment);
+        await context.send(new TranslationFormatter(phrase, { user }), attachment);
     }
 
     setAllowEveryone(v) {
@@ -63,4 +67,4 @@ class TextActionCommand extends BaseCommand {
     }
 }
 
-module.exports = TextActionCommand;
+module.exports = ImageActionCommand;

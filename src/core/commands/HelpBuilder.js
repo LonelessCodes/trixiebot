@@ -19,11 +19,18 @@ const ScopeCommand = require("../../modules/class/ScopedCommand");
 const AliasCommand = require("../../modules/class/AliasCommand");
 const CommandPermission = require("./CommandPermission");
 const Category = require("../../util/commands/Category");
+// eslint-disable-next-line no-unused-vars
+const MessageContext = require("./MessageContext");
 const { ucFirst, format } = require("../../util/string");
 const { RichEmbed } = require("discord.js");
 const CONST = require("../../const");
 
 class HelpBuilder extends RichEmbed {
+    /**
+     * @param {MessageContext} message
+     * @param {string} name
+     * @param {string} command
+     */
     constructor(message, name, command) {
         super();
 

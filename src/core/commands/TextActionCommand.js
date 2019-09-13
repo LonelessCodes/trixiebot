@@ -21,6 +21,9 @@ const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 const MessageMentions = require("../../util/commands/MessageMentions");
 
+const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
+const Translation = require("../../modules/i18n/Translation");
+
 class TextActionCommand extends BaseCommand {
     constructor(description, content, noMentionMessage, permissions) {
         super(permissions);
@@ -35,20 +38,20 @@ class TextActionCommand extends BaseCommand {
         this.everyone = false;
     }
 
-    async run(message, command_name, content) {
-        const mentions = new MessageMentions(content, message.guild);
+    async run(context) {
+        const mentions = new MessageMentions(context.content, context.guild);
         const mention = mentions.members.first();
         if (!mention && !mentions.everyone) {
-            await message.channel.sendTranslated(this.noMentionMessage);
+            await context.send(this.noMentionMessage);
             return;
         }
 
         const phrase = await secureRandom(this.texts);
 
         if (mentions.everyone) {
-            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
+            await context.send(new TranslationFormatter(phrase, { user: new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.members.size }) }));
         } else {
-            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), userToString(mention)));
+            await context.send(new TranslationFormatter(phrase, { user: userToString(mention) }));
         }
     }
 

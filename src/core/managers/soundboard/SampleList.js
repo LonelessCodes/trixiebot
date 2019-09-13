@@ -26,6 +26,7 @@ class SampleList extends Events {
     /**
      * @param {User} user
      * @param {Guild} guild
+     * @param {string} prefix
      * @param {Object} samples
      * @param {number} samples.total
      * @param {PredefinedSample[]} samples.predefined
@@ -36,12 +37,13 @@ class SampleList extends Events {
      * @param {number} max_slots.user
      * @param {number} timeout
      */
-    constructor(user, guild, samples, max_slots = { guild: 0, user: 0 }, timeout = 60000 * 2) {
+    constructor(user, guild, prefix, samples, max_slots = { guild: 0, user: 0 }, timeout = 60000 * 2) {
         super();
 
         this.user = user;
         this.guild = guild;
         this.member = this.guild.member(this.user);
+        this.prefix = prefix;
         this.samples = samples;
         this.max_slots = {
             guild: max_slots.guild,
@@ -94,7 +96,7 @@ class SampleList extends Events {
 
         const embed = basicEmbed("Available Samples", this.user);
 
-        const prefix = this.guild.config.prefix;
+        const prefix = this.prefix;
         embed.setDescription(
             "Play a sample with `" + prefix + "sb <sample name>`. " +
             "View more info about a sample by typing `" + prefix + "sb info u <sample name>` for user samples and `" +

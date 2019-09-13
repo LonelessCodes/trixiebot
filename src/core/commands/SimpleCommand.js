@@ -19,14 +19,12 @@ const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
 const CommandPermission = require("../../util/commands/CommandPermission");
 // eslint-disable-next-line no-unused-vars
-const { Message } = require("discord.js");
-// eslint-disable-next-line no-unused-vars
-const { NanoTimer } = require("../../modules/NanoTimer");
+const MessageContext = require("./MessageContext");
 
 class SimpleCommand extends BaseCommand {
     // eslint-disable-next-line valid-jsdoc
     /**
-     * @param {(message: Message, content: string, add: { pass_through: any, command_name: string, timer: NanoTimer }) => *} func
+     * @param {(message: MessageContext, add: { pass_through: any, command_name: string }) => *} func
      * @param {CommandPermission} permissions
      */
     constructor(func = async () => { /* Do nothing */ }, permissions) {
@@ -35,11 +33,11 @@ class SimpleCommand extends BaseCommand {
         this.func = func;
     }
 
-    async run(message, command_name, content, pass_through, timer) {
-        const result = await this.func(message, content, { pass_through, command_name, timer });
+    async run(context, command_name, pass_through) {
+        const result = await this.func(context, { pass_through, command_name });
         if (!result) return;
 
-        await message.channel.send(result);
+        await context.send(result);
     }
 }
 

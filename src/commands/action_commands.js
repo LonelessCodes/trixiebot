@@ -56,7 +56,7 @@ module.exports = function install(cr) {
         "{{user}}ԅ( ˘ω˘ ԅ)",
         "{{user}}ԅ(≖‿≖ ;ԅ)",
         "{{user}}ԅ(‹o›Д‹o›ԅ)",
-    ], "Aww, *kisses*"))
+    ], "{{user}}ԅ(‾⌣‾ԅ)"))
         .setAllowEveryone(true);
 
     cr.registerCommand("point", new TextActionCommand("Point at someone", [

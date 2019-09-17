@@ -39,7 +39,7 @@ class TextActionCommand extends BaseCommand {
         const mentions = new MessageMentions(content, message.guild);
         const mention = mentions.members.first();
         if (!mention && !mentions.everyone) {
-            await message.channel.sendTranslated(this.noMentionMessage);
+            await message.channel.sendTranslated(this.noMentionMessage.replace(new RegExp("{{user}}", "g"), userToString(message.member)));
             return;
         }
 

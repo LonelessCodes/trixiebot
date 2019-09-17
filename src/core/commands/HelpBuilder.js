@@ -124,7 +124,7 @@ class HelpBuilder extends RichEmbed {
     }
 
     createParameter(name, parameter) {
-        return `\`${name}\` ${parameter.optional ? "- optional" : ""}- ${parameter.content}`;
+        return `\`${name}\` ${parameter.optional ? "- optional " : ""}- ${parameter.content}`;
     }
 }
 

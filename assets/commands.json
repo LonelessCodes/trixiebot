@@ -14,7 +14,7 @@
       "help": {
         "description": "Make Trixie announce streamers when they go live.\nSupported are Picarto, Piczel, Twitch and Smashcast.",
         "permissions": "Manage Channels",
-        "usage": "\n`!alert <page url> <?channel>` - Subscribe Trixie to a streaming channel! *(alias `!alert add`)*\n`page url` - copy the url of the stream page and paste it in here\n`channel` - optional- the channel to post the alert to later. If omitted will be this channel\n\n`!alert list` - list all active streaming alerts\n\n`!alert remove <page url>` - unsubscribe Trixie from a Picarto channel\n\n`!alert compact` - toggle compact online announcements\n\n`!alert cleanup` - toggle cleaning up online announcements",
+        "usage": "\n`!alert <page url> <?channel>` - Subscribe Trixie to a streaming channel! *(alias `!alert add`)*\n`page url` - copy the url of the stream page and paste it in here\n`channel` - optional - the channel to post the alert to later. If omitted will be this channel\n\n`!alert list` - list all active streaming alerts\n\n`!alert remove <page url>` - unsubscribe Trixie from a Picarto channel\n\n`!alert compact` - toggle compact online announcements\n\n`!alert cleanup` - toggle cleaning up online announcements",
         "category": "Utility"
       }
     },
@@ -22,7 +22,7 @@
       "name": "ascii",
       "help": {
         "description": "Generates ascii art from an image",
-        "usage": "\n`!ascii <?url>`\n`url` - optional- Url to an image. Or add an attachment to your message",
+        "usage": "\n`!ascii <?url>`\n`url` - optional - Url to an image. Or add an attachment to your message",
         "category": "Misc"
       }
     },
@@ -31,7 +31,7 @@
       "help": {
         "description": "Autoban allows admins to make sure to keep specific users out of the server, even if they create a new account.\n\nGlob is an easy to understand text pattern matching solution. Check https://en.wikipedia.org/wiki/Glob_(programming)#Syntax for the info.\nPatterns use the RegEx specification. Infos on RegEx can be found here: https://regexr.com/. A good sandbox for RegEx tooling is https://regex101.com/",
         "permissions": "Ban Members",
-        "usage": "\n`!autoban <? userID|username#0000|username>` - view the autoban patterns of this server *(alias `!autoban list`)*\n`userID|username#0000|username` - optional- If given, add an autoban configuration\n\n`!autoban id <userID>` - add an autoban config banning the user with this specific, unique userID\n\n`!autoban name <username#0000|username>` - add an autoban config banning the user with this user tag (username#0000) or, if passed a username only, this username (case insensitive)\n\n`!autoban glob <glob>` - add an autoban config banning users matching this glob pattern (always case insensitive)\n\n`!autoban regexp <regexp>` - add an autoban config banning users matching this RegEx pattern (always with i and u flags) *(alias `!autoban regex`)*\n\n**Remove configs:**\n`!autoban remove <?thing>` - remove an autoban again. If no args given, returns a numbered list of autobans to choose from",
+        "usage": "\n`!autoban <? userID|username#0000|username>` - view the autoban patterns of this server *(alias `!autoban list`)*\n`userID|username#0000|username` - optional - If given, add an autoban configuration\n\n`!autoban id <userID>` - add an autoban config banning the user with this specific, unique userID\n\n`!autoban name <username#0000|username>` - add an autoban config banning the user with this user tag (username#0000) or, if passed a username only, this username (case insensitive)\n\n`!autoban glob <glob>` - add an autoban config banning users matching this glob pattern (always case insensitive)\n\n`!autoban regexp <regexp>` - add an autoban config banning users matching this RegEx pattern (always with i and u flags) *(alias `!autoban regex`)*\n\n**Remove configs:**\n`!autoban remove <?thing>` - remove an autoban again. If no args given, returns a numbered list of autobans to choose from",
         "category": "Moderation"
       }
     },
@@ -39,7 +39,7 @@
       "name": "bank",
       "help": {
         "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
-        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional- Sets the singular of the currency name\n`plural` - optional- Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional - Sets the singular of the currency name\n`plural` - optional - Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
         "category": "Currency"
       }
     },
@@ -142,7 +142,7 @@
       "name": "config",
       "help": {
         "permissions": "Administrator or Manage Server",
-        "usage": "\n`!config <?parameter> <?value>` - view the Trixie's config in this server *(alias `!cfg`, `!opts`)*\n`parameter` - optional- view only this parameter's config\n`value` - optional- set a parameter in Trixie's config. \"default\" for default config",
+        "usage": "\n`!config <?parameter> <?value>` - view the Trixie's config in this server *(alias `!cfg`, `!opts`)*\n`parameter` - optional - view only this parameter's config\n`value` - optional - set a parameter in Trixie's config. \"default\" for default config",
         "category": "Moderation"
       }
     },
@@ -175,7 +175,7 @@
       "name": "derpi",
       "help": {
         "description": "Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
-        "usage": "\n`!derpi` *(alias `!db`)*\n\n`!derpi random <?amount> <query>` *(alias `!derpi`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)\n\n`!derpi top <?amount> <query>`\n\n`!derpi latest <?amount> <query>`\n\n`!derpi first <?amount> <query>`",
+        "usage": "\n`!derpi` *(alias `!db`)*\n\n`!derpi random <?amount> <query>` *(alias `!derpi`)*\n`amount` - optional - number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)\n\n`!derpi top <?amount> <query>`\n\n`!derpi latest <?amount> <query>`\n\n`!derpi first <?amount> <query>`",
         "category": "Image"
       }
     },
@@ -200,7 +200,7 @@
       "name": "dolan",
       "help": {
         "description": "Translate something into dolan duck-ish",
-        "rateLimiter": "2 times in 1 hours",
+        "rateLimiter": "2 times in 1 hour",
         "usage": "\n`!dolan <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -217,7 +217,7 @@
       "name": "e621",
       "help": {
         "description": "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines.",
-        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional- number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional- Popular by 'day', 'week' or 'month'. Default: 'week'",
+        "usage": "\n`!e621`\n\n`!e621 random <?amount> <query>` *(alias `!e621`)*\n`amount` - optional - number ranging from 1 to 5 for how many results to return\n`query` - a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)\n\n`!e621 latest <?amount> <query>`\n\n`!e621 top <?amount> <query>`\n\n`!e621 popular <?timerange> <?amount>`\n`timerange` - optional - Popular by 'day', 'week' or 'month'. Default: 'week'",
         "category": "Image"
       }
     },
@@ -290,7 +290,7 @@
       "name": "help",
       "help": {
         "description": "Haha, very funny",
-        "usage": "\n`!help <?command>` *(alias `!h`)*\n`command` - optional- The name of the command you want help for. Whole command list if omitted",
+        "usage": "\n`!help <?command>` *(alias `!h`)*\n`command` - optional - The name of the command you want help for. Whole command list if omitted",
         "category": "Info"
       }
     },
@@ -389,7 +389,7 @@
       "help": {
         "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
         "permissions": "Administrator or Manage Server",
-        "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional- set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional- set a channel to be a unique locale",
+        "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional - set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional - set a channel to be a unique locale",
         "category": "Moderation"
       }
     },
@@ -455,7 +455,7 @@
       "help": {
         "explicit": true,
         "description": "Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.",
-        "usage": "\n`!penis <?mention>` *(alias `!cock`, `!dick`)*\n`mention` - optional- User who's penis you wish to ~~pleasure~~ measure\n\n`!penis leaderboard` - Shows where you are in the penis size ranking",
+        "usage": "\n`!penis <?mention>` *(alias `!cock`, `!dick`)*\n`mention` - optional - User who's penis you wish to ~~pleasure~~ measure\n\n`!penis leaderboard` - Shows where you are in the penis size ranking",
         "category": "Action"
       }
     },
@@ -471,7 +471,7 @@
       "name": "pirate",
       "help": {
         "description": "Translate something into pirate-ish",
-        "rateLimiter": "2 times in 1 hours",
+        "rateLimiter": "2 times in 1 hour",
         "usage": "\n`!pirate <text>`\n`text` - The text to translate",
         "category": "Text"
       }
@@ -505,7 +505,7 @@
       "help": {
         "description": "Alias for `{{prefix}}config prefix <?value>`",
         "permissions": "Administrator or Manage Server",
-        "usage": "\n`!prefix <?prefix>` - view Trixie's prefix in this server\n`prefix` - optional- set the prefix in Trixie's config. \"default\" for default prefix `(!)`",
+        "usage": "\n`!prefix <?prefix>` - view Trixie's prefix in this server\n`prefix` - optional - set the prefix in Trixie's config. \"default\" for default prefix `(!)`",
         "category": "Moderation"
       }
     },
@@ -521,7 +521,7 @@
       "name": "role",
       "help": {
         "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",
-        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional- this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\n**Admin Area:**\n`!role config` - Configure roles that everyone can add\n\n`!role config add <role> <?category>` - Add a role to the public configuration\n\n`!role config remove <role>` - Remove a role from the public configuration\n`role` - The \"quoted\" role name of the role you want to remove\n`category` - optional- The \"quoted\" name of the category you want to add the role to. Not given will be \"Other\"",
+        "usage": "\n`!role <role> <?user mention 1> <?user mention 2> ...` - to add roles *(alias `!rank`, `!role add`)*\n`role` - The role you would like to have added\n`user mention` - optional - this is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role remove <role> <?user mention 1> <?user mention 2> ...` - to remove\n`role` - The role you would like to have removed\n`user mention` - This is irrelevant to you, if you don't have rights to manage roles yourself\n\n`!role available` - Show all public roles that you can add to yourself.\n\n**Admin Area:**\n`!role config` - Configure roles that everyone can add\n\n`!role config add <role> <?category>` - Add a role to the public configuration\n\n`!role config remove <role>` - Remove a role from the public configuration\n`role` - The \"quoted\" role name of the role you want to remove\n`category` - optional - The \"quoted\" name of the category you want to add the role to. Not given will be \"Other\"",
         "category": "Utility"
       }
     },
@@ -529,7 +529,7 @@
       "name": "sb",
       "help": {
         "description": "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.",
-        "usage": "\n`!sb <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!soundboard`)*\n`sound name` - optional- sound name to play. If omitted, shows list of all available soundclips\n`id` - optional- sound clip id to play instead of sound name\n\n**Manage Your Soundboards:**\n`!sb upload <?scope> <sound name>` - Upload a sound clip to Trixie. Attach the audio file to the message when sending *(alias `!sb u`)*\n`scope` - optional- `user` or `server`\n`sound name` - Name of the new sound clip\n\n`!sb import <?scope> <id>` - Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `!sb info <sound name>` *(alias `!sb i`)*\n`id` - The unique ID of a soundclip\n\n`!sb delete <?scope> <sound name>` - Delete a soundclip from your or your server's soundboard. *(alias `!sb d`)*\n`sound name` - The name of the soundclip to delete\n\n`!sb info <?scope> <sound name|id>` - View info about a sound clip and get it's unique ID, for people to be able to play it as well\n`sound name` - The name of the sound clip to view more info about\n`id` - The id of the sound clip to view more info about instead of sound name\n\n**Buy New Slots:**\n`!sb buyslot <?scope>` - Buy additional soundboard slots with Trixie's currency *(alias `!sb b`)*\n\n",
+        "usage": "\n`!sb <?sound name|id>` - Play a soundie of the one's available for you in this server *(alias `!soundboard`)*\n`sound name` - optional - sound name to play. If omitted, shows list of all available soundclips\n`id` - optional - sound clip id to play instead of sound name\n\n**Manage Your Soundboards:**\n`!sb upload <?scope> <sound name>` - Upload a sound clip to Trixie. Attach the audio file to the message when sending *(alias `!sb u`)*\n`scope` - optional - `user` or `server`\n`sound name` - Name of the new sound clip\n\n`!sb import <?scope> <id>` - Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `!sb info <sound name>` *(alias `!sb i`)*\n`id` - The unique ID of a soundclip\n\n`!sb delete <?scope> <sound name>` - Delete a soundclip from your or your server's soundboard. *(alias `!sb d`)*\n`sound name` - The name of the soundclip to delete\n\n`!sb info <?scope> <sound name|id>` - View info about a sound clip and get it's unique ID, for people to be able to play it as well\n`sound name` - The name of the sound clip to view more info about\n`id` - The id of the sound clip to view more info about instead of sound name\n\n**Buy New Slots:**\n`!sb buyslot <?scope>` - Buy additional soundboard slots with Trixie's currency *(alias `!sb b`)*\n\n",
         "category": "Audio"
       }
     },
@@ -657,7 +657,7 @@
       "name": "trump",
       "help": {
         "description": "What would Trump say?\nGets a random Trump quote",
-        "usage": "\n`!trump <?@mention>`\n`@mention` - optional- If mentioned a user, command will return a personalized quote",
+        "usage": "\n`!trump <?@mention>`\n`@mention` - optional - If mentioned a user, command will return a personalized quote",
         "category": "Misc"
       }
     },
@@ -696,7 +696,7 @@
       "name": "userstats",
       "help": {
         "description": "Get some stats about how active someone is on the server",
-        "usage": "\n`!userstats <?@user>`\n`@user` - optional- The member c:",
+        "usage": "\n`!userstats <?@user>`\n`@user` - optional - The member c:",
         "category": "Info"
       }
     },
@@ -728,7 +728,7 @@
       "name": "whois",
       "help": {
         "description": "Receive information about a user or about yourself",
-        "usage": "\n`!whois <@user>`\n`@user` - optional- If given, return info about that user, otherwise return info about yourself",
+        "usage": "\n`!whois <@user>`\n`@user` - optional - If given, return info about that user, otherwise return info about yourself",
         "category": "Info"
       }
     },
@@ -736,7 +736,7 @@
       "name": "yoda",
       "help": {
         "description": "Translate something into yoda-ish",
-        "rateLimiter": "2 times in 1 hours",
+        "rateLimiter": "2 times in 1 hour",
         "usage": "\n`!yoda <text>`\n`text` - The text to translate",
         "category": "Text"
       }

@@ -22,7 +22,7 @@ const CommandScope = require("./CommandScope");
 const { format } = require("../string");
 
 function createParameter(name, parameter) {
-    return `\`${name}\` ${parameter.optional ? "- optional" : ""}- ${parameter.content}`;
+    return `\`${name}\` ${parameter.optional ? "- optional " : ""}- ${parameter.content}`;
 }
 
 function helpToJSON(config, name, command) {

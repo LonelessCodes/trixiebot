@@ -32,8 +32,10 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+
 module.exports = function install(cr) {
-    const ascii_cmd = new SimpleCommand(async (message, content, { command_name }) => {
+    const ascii_cmd = new SimpleCommand(async ({ message, content, ctx }, { command_name }) => {
         const urls = [];
         const match = content.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
         urls.push(...(match || []));
@@ -42,36 +44,35 @@ module.exports = function install(cr) {
         }
 
         if (urls.length === 0) {
-            await HelpBuilder.sendHelp(message, command_name, ascii_cmd);
+            await HelpBuilder.sendHelp(ctx, command_name, ascii_cmd);
             return;
         }
 
         const controller = new AbortController();
 
-        await fetch(urls[0], { timeout: 6000, size: 1024 * 1024 * 8, signal: controller.signal })
-            .catch(() => { throw new Error("Couldn't download image"); })
+        return await fetch(urls[0], { timeout: 6000, size: 1024 * 1024 * 8, signal: controller.signal })
+            .catch(() => { throw new Translation("ascii.failed_dl", "Couldn't download image"); })
             .then(res => {
-                if (!res.ok) throw new Error("Image doesn't exist");
+                if (!res.ok) throw new Translation("ascii.doesnt_exist", "Image doesn't exist");
 
                 const header = res.headers.get("content-type").split("/")[1];
-                if (!header || !/jpg|jpeg|png|gif/.test(header)) throw new Error("The image must be JPG, PNG or GIF");
+                if (!header || !/jpg|jpeg|png|gif/.test(header)) throw new Translation("ascii.invalid_type", "The image must be JPG, PNG or GIF");
 
                 return res.buffer();
             })
             .then(body => {
                 const type = filetype(body.slice(0, filetype.minimumBytes));
-                if (!type || !/jpg|png|gif/.test(type.ext)) throw new Error("The image must be JPG, PNG or GIF");
+                if (!type || !/jpg|png|gif/.test(type.ext)) throw new Translation("ascii.invalid_type", "The image must be JPG, PNG or GIF");
 
                 return asciiPromise(body, options)
-                    .catch(() => { throw new Error("Soooooooooooooooooooooooooomething went wrong"); });
+                    .catch(() => { throw new Translation("ascii.error", "Soooooooooooooooooooooooooomething went wrong"); });
             })
-            .then(ascii => {
-                message.channel.send("```\n" + ascii + "\n```");
-            })
+            .then(ascii => "```\n" + ascii + "\n```")
             .catch(err => {
                 controller.abort();
-                if (err.name === "AbortError" || err.name === "FetchError") return message.channel.send("Couldn't download image");
-                message.channel.send(err.message);
+                if (err.name === "AbortError" || err.name === "FetchError") return new Translation("ascii.failed_dl", "Couldn't download image");
+                if (err instanceof Translation) return err;
+                return err.message;
             });
     });
 

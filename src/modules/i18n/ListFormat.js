@@ -23,7 +23,7 @@ class ListFormat extends Resolvable {
      * @param {"and" | "or"} [opts.type]
      * @param {"long" | "short"} [opts.style]
      */
-    constructor(arr, opts = {}) {
+    constructor(arr = [], opts = {}) {
         super();
         this.arr = arr;
 

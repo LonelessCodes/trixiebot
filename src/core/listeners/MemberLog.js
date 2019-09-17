@@ -21,10 +21,13 @@ const stats = require("../../modules/stats");
 const guild_stats = require("../managers/GuildStatsManager");
 const { format } = require("../../util/string");
 
+const Translation = require("../../modules/i18n/Translation");
+
 class MemberLog {
-    constructor(client, config) {
+    constructor(client, config, locale) {
         this.client = client;
         this.config = config;
+        this.locale = locale;
 
         this.TOTAL_SERVERS = stats.bot.register("TOTAL_SERVERS");
         this.LARGE_SERVERS = stats.bot.register("LARGE_SERVERS");
@@ -62,7 +65,7 @@ class MemberLog {
         const channel = findDefaultChannel(guild);
         if (!channel) return;
 
-        await channel.sendTranslated(
+        await channel.send(
             "Hi! I'm new here. Let me introduce myself:\n" +
             "I'm TrixieBot, a bot which offers a variety of great features, " +
             "many of which to satisfy the needs of My Little Pony fans and server admins.\n" +
@@ -94,8 +97,7 @@ class MemberLog {
         if (!channel) return;
 
         const str = format(guild_config.welcome.text ||
-            ("**" + await channel.translate("New member joined our Guild, guys!") + "**\n" +
-                await channel.translate("Hey, {{user}} welcome to the server!")), {
+            await this.locale.translate(channel, new Translation("memberlog.join", "Welcome to the server, {{user}}!")), {
             user: member.toString(),
         });
 
@@ -117,8 +119,7 @@ class MemberLog {
         if (!channel) return;
 
         const str = format(guild_config.leave.text ||
-            ("**" + await channel.translate("A soldier has left us") + "**\n" +
-                await channel.translate("{{user}} left the server. Bye bye")), {
+            await this.locale.translate(channel, new Translation("memberlog.leave", "*{{user}}* has left the server. Bye bye")), {
             user: userToString(member),
         });
 
@@ -138,7 +139,7 @@ class MemberLog {
         if (!channel) return;
 
         const str = format(guild_config.ban.text ||
-            "{{user}} has been banned from the server. Don't let the door hit your ass on the way out!", {
+            await this.locale.translate(channel, new Translation("memberlog.ban", "{{user}} has been banned from the server. Don't let the door hit your ass on the way out!")), {
             user: userToString(user),
         });
 

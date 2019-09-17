@@ -24,7 +24,10 @@ const { TextChannel, User } = require("discord.js");
 
 const random = require("../modules/random/random");
 const credits = require("../core/managers/CreditsManager");
-const { basicEmbed } = require("../util/util");
+const { basicTEmbed } = require("../util/util");
+
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
 
 class Card {
     /**
@@ -124,9 +127,13 @@ class Player {
 
     render() {
         const score = this.score;
-        let str = this.cards.map(card => card.render()).join(" - ") + "\nValue: " + score;
-        if (score > BlackJack.MAX_HAND) str += " - BUSTED";
-        return str;
+        const value = new TranslationMerge(new Translation("bj.value", "Value:"), score);
+        if (score > BlackJack.MAX_HAND) value.push("-", new Translation("bj.busted", "BUSTED"));
+
+        return new TranslationMerge(
+            this.cards.map(card => card.render()).join(" - "),
+            value
+        ).setSeperator("\n");
     }
 }
 
@@ -138,7 +145,10 @@ class Dealer extends Player {
     render(visible = false) {
         if (visible) return super.render();
 
-        return this.cards[0].render() + " - " + this.cards.slice(1).map(() => "XX").join(" - ") + "\nValue: --";
+        return new TranslationMerge(
+            this.cards[0].render() + " - " + this.cards.slice(1).map(() => "XX").join(" - "),
+            new TranslationMerge(new Translation("bj.value", "Value:"), "--")
+        ).setSeperator("\n");
     }
 }
 
@@ -208,28 +218,32 @@ class BlackJack {
     }
 
     async render(guild, author) {
-        const embed = basicEmbed("Blackjack", author);
+        const embed = basicTEmbed("Blackjack", author);
 
         if (!this.done) {
             this.doubledown_able = this.doubledown_able && await credits.canPurchase(author, this.bet * 2);
             if (this.doubledown_able)
-                embed.setDescription("Type `hit` to draw another card, `stand` to pass or `double` to double down");
+                embed.setDescription(new Translation("bj.hit_stand_double", "Type `hit` to draw another card, `stand` to pass or `double` to double down"));
             else
-                embed.setDescription("Type `hit` to draw another card or `stand` to pass");
+                embed.setDescription(new Translation("bj.hit_stand", "Type `hit` to draw another card or `stand` to pass"));
 
-            embed.addField("Your hand", this.player.render(), true);
-            embed.addField("Dealer hand", this.dealer.render(false), true);
+            embed.addField(new Translation("bj.your_hand", "Your hand"), this.player.render(), true);
+            embed.addField(new Translation("bj.dealer_hand", "Dealer hand"), this.dealer.render(false), true);
         } else {
             let status;
             switch (this.result.status) {
-                case Result.BUSTED: status = "**BUSTED!** You lost " + credits.getBalanceString(this.bet, await credits.getName(guild)); break;
-                case Result.DEALER_WINS: status = "**Dealer wins!** You lost " + credits.getBalanceString(this.bet, await credits.getName(guild)); break;
-                case Result.PUSH: status = "**PUSH!**"; break;
-                case Result.YOU_WIN: status = "**YOU WON** " + credits.getBalanceString(this.result.win, await credits.getName(guild)); break;
+                case Result.BUSTED:
+                    status = new Translation("bj.result.busted", "**BUSTED!** You lost {{money}}", { money: credits.getBalanceString(this.bet, await credits.getName(guild)) }); break;
+                case Result.DEALER_WINS:
+                    status = new Translation("bj.result.dealer", "**Dealer wins!** You lost {{money}}", { money: credits.getBalanceString(this.bet, await credits.getName(guild)) }); break;
+                case Result.PUSH:
+                    status = new Translation("bj.result.push", "**PUSH!**"); break;
+                case Result.YOU_WIN:
+                    status = new Translation("bj.result.win", "**YOU WON** {{money}}", { money: credits.getBalanceString(this.result.win, await credits.getName(guild)) }); break;
             }
             embed.setDescription(status);
-            embed.addField("Your hand", this.player.render(), true);
-            embed.addField("Dealer hand", this.dealer.render(true), true);
+            embed.addField(new Translation("bj.your_hand", "Your hand"), this.player.render(), true);
+            embed.addField(new Translation("bj.dealer_hand", "Dealer hand"), this.dealer.render(true), true);
         }
 
         return embed;
@@ -244,16 +258,11 @@ class BlackJack {
 }
 BlackJack.MAX_HAND = 21;
 
-/**
- * @param {TextChannel} channel
- * @param {User} author
- * @param {number} bet
- */
-async function blackJack(channel, author, bet) {
+async function blackJack({ channel, author, ctx }, bet) {
     const game = new BlackJack(bet);
 
     while (!game.done) {
-        const msg = await channel.send(await game.render(channel.guild, author));
+        const msg = await ctx.send(await game.render(channel.guild, author));
 
         const options = game.doubledown_able ? /hit|stand|double/i : /hit|stand/i;
         const msgs = await channel.awaitMessages(m => m.author.equals(author) && options.test(m.content), { maxMatches: 1, time: 30000 });
@@ -286,16 +295,18 @@ const MAX = 2000;
 
 module.exports = function install(cr) {
     cr.registerCommand("blackjack", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content, ctx }) => {
             const bet = parseInt(content);
-            if (Number.isNaN(bet)) return "Invalid bet! Plz put a number wumber uwu";
+            if (Number.isNaN(bet)) return new Translation("bj.invalid_bet", "Invalid bet! Plz put a number wumber uwu");
 
-            if (bet < MIN) return "Minimum bet should be " + credits.getBalanceString(MIN, await credits.getName(message.guild));
-            if (bet > MAX) return "Maximum bet should be " + credits.getBalanceString(MAX, await credits.getName(message.guild));
+            if (bet < MIN) return new Translation("casino.minimum", "Minimum bet should be {{bet}}", { bet: credits.getBalanceString(MIN, await credits.getName(message.guild)) });
+            if (bet > MAX) return new Translation("casino.maximum", "Maximum bet should be {{bet}}", { bet: credits.getBalanceString(MAX, await credits.getName(message.guild)) });
 
-            if (!(await credits.canPurchase(message.author, bet))) return "You don't have enough " + (await credits.getName(message.guild)).plural + " to gamble :c";
+            if (!(await credits.canPurchase(message.author, bet))) return new Translation(
+                "casino.not_enough", "You don't have enough {{name}} to gamble :c", { name: (await credits.getName(message.guild)).plural }
+            );
 
-            return await blackJack(message.channel, message.author, bet);
+            return await blackJack(ctx, bet);
         }))
         .setHelp(new HelpContent()
             .setUsage("<bet>", "Play a round of blackjack")

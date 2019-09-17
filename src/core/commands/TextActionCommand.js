@@ -19,7 +19,6 @@ const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../../modules/random/secureRandom");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
-const MessageMentions = require("../../util/commands/MessageMentions");
 
 const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
 const Translation = require("../../modules/i18n/Translation");
@@ -39,16 +38,15 @@ class TextActionCommand extends BaseCommand {
     }
 
     async run(context) {
-        const mentions = new MessageMentions(context.content, context.guild);
-        const mention = mentions.members.first();
-        if (!mention && !mentions.everyone) {
-            await context.send(this.noMentionMessage);
+        const mention = context.mentions.members.first();
+        if (!mention && !context.mentions.everyone) {
+            await context.send(new TranslationFormatter(this.noMentionMessage, { user: userToString(context.member) }));
             return;
         }
 
         const phrase = await secureRandom(this.texts);
 
-        if (mentions.everyone) {
+        if (context.mentions.everyone) {
             await context.send(new TranslationFormatter(phrase, { user: new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.members.size }) }));
         } else {
             await context.send(new TranslationFormatter(phrase, { user: userToString(mention) }));

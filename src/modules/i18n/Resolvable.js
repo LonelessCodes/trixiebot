@@ -34,6 +34,7 @@ Resolvable.resolve = function resolve(item, arg) {
     if (typeof item === "number") return String(item);
     if (typeof item === "string") return item;
     if (typeof item.resolve === "function") return item.resolve(arg);
+    throw new TypeError("Item is not defined or not number, string or Resolvable");
 };
 
 module.exports = Resolvable;

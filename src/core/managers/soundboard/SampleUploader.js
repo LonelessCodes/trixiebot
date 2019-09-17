@@ -36,6 +36,9 @@ const SampleID = require("./SampleID");
 // eslint-disable-next-line no-unused-vars
 const { Sample, UserSample, GuildSample, PredefinedSample } = require("./Sample");
 
+const Translation = require("../../../modules/i18n/Translation");
+const ListFormat = require("../../../modules/i18n/ListFormat");
+
 tmp.setGracefulCleanup();
 
 class Type {
@@ -75,11 +78,7 @@ class SampleUploader extends Events {
         } else if (user == null) {
             this.scope = "predefined";
         }
-        this.status = "Checking data...";
-    }
-
-    _emitError(message) {
-        this.emit("error", message);
+        this.status = new Translation("sb.checking", "Checking data...");
     }
 
     _setStatus(status) {
@@ -93,56 +92,58 @@ class SampleUploader extends Events {
      */
     async upload(attachment, name) {
         if (!(await isEnoughDiskSpace())) {
-            return this._emitError("Trixie cannot accept any more uploads, as I'm running out of disk space");
+            throw new Translation("sb.error.out_of_space", "Trixie cannot accept any more uploads, as I'm running out of disk space");
         }
 
         if (!attachment) {
-            return this._emitError("Attach a sound file to this command to add it.");
+            throw new Translation("sb.error.file_missing", "Attach a sound file to this command to add it.");
         }
 
         if (!name || name === "") {
-            return this._emitError("Pass the name for the soundclip as an argument to this command!");
+            throw new Translation("sb.error.name_missing", "Pass the name for the soundclip as an argument to this command!");
         }
 
         if (name.length < 2 || name.length > 24) {
-            return this._emitError("The name for the soundclip should be between (incl) 2 and 24 characters!");
+            throw new Translation("sb.error.name_out_range", "The name for the soundclip should be between (incl) 2 and 24 characters!");
         }
 
         // eslint-disable-next-line no-useless-escape
         if (!/^[a-zA-Z0-9 .,_\-]*$/.test(name)) {
-            return this._emitError("Please only use common characters A-Z, 0-9, .,_- in sound sample names ;c;");
+            throw new Translation("sb.error.invalid_name", "Please only use common characters A-Z, 0-9, .,_- in sound sample names ;c;");
         }
 
         switch (this.scope) {
             case "user":
                 if (await this.manager.getSampleUser(this.user, name)) {
-                    return this._emitError("You already have a soundclip with that name in your soundboard");
+                    throw new Translation("sb.error.user_clip_exists", "You already have a soundclip with that name in your soundboard");
                 }
                 break;
             case "guild":
                 if (await this.manager.getSampleGuild(this.guild, name)) {
-                    return this._emitError("You already have a soundclip with that name in this server's soundboard");
+                    throw new Translation("sb.error.guild_clip_exists", "You already have a soundclip with that name in this server's soundboard");
                 }
                 break;
             case "predefined":
                 if (await this.manager.getPredefinedSample(name)) {
-                    return this._emitError("There is already a predefined soundclip with this name");
+                    throw new Translation("sb.error.pre_clip_exists", "There is already a predefined soundclip with this name");
                 }
                 break;
         }
 
         const extname = path.extname(attachment.filename);
         if (!SampleUploader.isSupportedExt(extname)) {
-            return this._emitError(
-                `${extname} files are not supported at this time. Try uploading ${SampleUploader.getSupportedFileTypes()} files.`
+            throw new Translation(
+                "sb.error.unsupported",
+                "{{extname}} files are not supported at this time. Try uploading {{supported}} files.",
+                { extname, supported: SampleUploader.getSupportedFileTypes() }
             );
         }
 
         if (attachment.filesize > 1000 * 1000 * 4) {
-            return this._emitError("The file is too big! Please try to keep it below 4 MB. Even WAV can do that");
+            throw new Translation("sb.error.too_big", "The file is too big! Please try to keep it below 4 MB. Even WAV can do that");
         }
 
-        this._setStatus("Downloading file...");
+        this._setStatus(new Translation("sb.downloading", "Downloading file..."));
 
         const tmp_file = await new Promise((res, rej) => tmp.file({
             prefix: "sample_download_", tries: 3, postfix: path.extname(attachment.filename),
@@ -156,16 +157,16 @@ class SampleUploader extends Events {
         try {
             const req = await fetch(attachment.url);
             await new Promise((resolve, reject) => {
+                if (!req.ok) return reject(new Error("Resource not accessible"));
                 tmp_file_stream.on("finish", () => tmp_file_stream.close(() => resolve()));
-                req.body.once("error", err => reject(err));
-                req.body.pipe(tmp_file_stream);
+                req.body.once("error", err => reject(err)).pipe(tmp_file_stream);
             });
         } catch (_) {
             tmp_file.cleanupCallback();
-            this._emitError("Error downloading the file from Discord's servers");
+            throw new Translation("sb.error.downloading", "Error downloading the file from Discord's servers");
         }
 
-        this._setStatus("Checking file data...");
+        this._setStatus(new Translation("sb.checking", "Checking file data..."));
 
         try {
             const fingerprint = await readChunk(tmp_file.path, 0, fileType.minimumBytes);
@@ -173,9 +174,10 @@ class SampleUploader extends Events {
 
             if (!SampleUploader.isSupportedExt(type.ext)) {
                 tmp_file.cleanupCallback();
-                return this._emitError(
-                    `${type.mime} files are not supported at this time. ` +
-                    `Try uploading ${SampleUploader.getSupportedFileTypes()} files.`
+                throw new Translation(
+                    "sb.error.unsupported",
+                    "{{extname}} files are not supported at this time. Try uploading {{supported}} files.",
+                    { extname: type.mime, supported: SampleUploader.getSupportedFileTypes() }
                 );
             }
         } catch (err) {
@@ -191,14 +193,14 @@ class SampleUploader extends Events {
 
             if (duration * 1000 > SampleUploader.MAX_DURATION) {
                 tmp_file.cleanupCallback();
-                return this._emitError(`The soundclip cannot be longer than ${toHumanTime(SampleUploader.MAX_DURATION)}`);
+                throw new Translation("sb.error.too_long", "The soundclip cannot be longer than {{time}}", { time: toHumanTime(SampleUploader.MAX_DURATION) });
             }
         } catch (err) {
             tmp_file.cleanupCallback();
             throw err;
         }
 
-        this._setStatus("Converting and optimizing sound file...");
+        this._setStatus(new Translation("sb.converting", "Converting and optimizing sound file..."));
 
         /** @type {Sample} */
         let sample = null;
@@ -298,7 +300,7 @@ class SampleUploader extends Events {
             throw err;
         }
 
-        this._setStatus("Checking converted file for errors...");
+        this._setStatus(new Translation("sb.checking_errors", "Checking converted file for errors..."));
 
         // try {
         //     await ffprobe(sample.file);
@@ -309,7 +311,7 @@ class SampleUploader extends Events {
         //     return;
         // }
 
-        this._setStatus("Saving to database and finishing up...");
+        this._setStatus(new Translation("sb.saving", "Saving to database and finishing up..."));
 
         switch (this.scope) {
             case "user":
@@ -352,7 +354,7 @@ class SampleUploader extends Events {
                 break;
         }
 
-        this.emit("success", sample);
+        return sample;
     }
 
     static isSupportedExt(extname) {
@@ -361,7 +363,7 @@ class SampleUploader extends Events {
 
     static getSupportedFileTypes() {
         const arr = SampleUploader.SUPPORTED_FILES.filter(t => t.ext && t.mime).map(t => t.ext);
-        return arr.slice(0, -1).join(", ") + " or " + arr[arr.length - 1];
+        return new ListFormat(arr);
     }
 }
 SampleUploader.MAX_DURATION = 30000;

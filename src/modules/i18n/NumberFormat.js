@@ -28,8 +28,7 @@ class NumberFormat extends Resolvable {
     }
 
     resolve(i18n) {
-        const formatter = new Intl.NumberFormat([i18n.locale, "en"], this.opts);
-        return formatter.format(this.num);
+        return this.num.toLocaleString([i18n.locale, "en"], this.opts);
     }
 }
 

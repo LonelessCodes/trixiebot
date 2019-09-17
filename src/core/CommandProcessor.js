@@ -21,35 +21,24 @@ const stats = require("../modules/stats");
 const guild_stats = require("./managers/GuildStatsManager");
 const CommandRegistry = require("./CommandRegistry");
 const CommandDispatcher = require("./CommandDispatcher");
-const MessageContext = require("./commands/MessageContext");
-const nanoTimer = require("../modules/timer");
 // eslint-disable-next-line no-unused-vars
-const { Message, Permissions } = require("discord.js");
+const ConfigManager = require("./managers/ConfigManager");
+// eslint-disable-next-line no-unused-vars
+const LocaleManager = require("./managers/LocaleManager");
+const MessageContext = require("./commands/MessageContext");
+const timer = require("../modules/timer");
+const Discord = require("discord.js");
 
-/**
- * @param {Message} message
- * @param {Error} err
- * @returns {void}
- */
-async function onProcessingError(message, err) {
-    log.error(
-        "ProcessingError {\n" +
-        "  content:     " + JSON.stringify(message.content) + "\n" +
-        "  channelType: " + message.channel.type + "\n" +
-        (message.channel.type === "text" ? "  guildId:     " + message.guild.id + "\n" : "") +
-        "  channelId:   " + message.channel.id + "\n" +
-        "  userId:      " + message.author.id + "\n" +
-        "  error:      ", err, "}"
-    );
-
-    try {
-        const err_message = "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...";
-        if (INFO.DEV) await message.channel.sendTranslated(err_message + `\n\`${err.name}: ${err.message}\``);
-        else await message.channel.sendTranslated(err_message);
-    } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
-}
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
 
 class CommandProcessor {
+    /**
+     * @param {Discord.Client} client
+     * @param {ConfigManager} config
+     * @param {LocaleManager} locale
+     * @param {*} db
+     */
     constructor(client, config, locale, db) {
         this.client = client;
         this.config = config;
@@ -67,10 +56,40 @@ class CommandProcessor {
     }
 
     /**
-     * @param {Message} message
+     * @param {Discord.Message} message
+     * @param {Error} err
+     * @returns {Promise<void>}
+     */
+    async onProcessingError(message, err) {
+        log.error([
+            "ProcessingError {",
+            "  content:     " + JSON.stringify(message.content),
+            "  channelType: " + message.channel.type,
+            message.channel.type === "text" && "  guildId:     " + message.guild.id,
+            "  channelId:   " + message.channel.id,
+            "  userId:      " + message.author.id,
+            "  error:      ",
+        ].filter(s => !!s).join("\n"), err, "}");
+
+        const err_message = new Translation(
+            "general.error",
+            "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though..."
+        );
+
+        try {
+            if (INFO.DEV) {
+                await this.locale.send(message.channel, new TranslationMerge(err_message, `\n\`${err.name}: ${err.message}\``));
+            } else {
+                await this.locale.send(message.channel, err_message);
+            }
+        } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
+    }
+
+    /**
+     * @param {Discord.Message} message
      */
     async onMessage(message) {
-        const received_at = nanoTimer();
+        const received_at = timer();
 
         try {
             if (message.author.bot || message.author.equals(message.client.user)) return;
@@ -80,17 +99,17 @@ class CommandProcessor {
                 guild_stats.get("messages").add(new Date, message.guild.id, message.channel.id, message.author.id);
 
             if (message.channel.type === "text" &&
-                !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES, true))
+                !message.channel.permissionsFor(message.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES, true))
                 return;
 
             await this.run(message, received_at);
         } catch (err) {
-            await onProcessingError(message, err);
+            await this.onProcessingError(message, err);
         }
     }
 
     /**
-     * @param {Message} message
+     * @param {Discord.Message} message
      * @param {bigint} received_at
      */
     async run(message, received_at) {
@@ -128,8 +147,9 @@ class CommandProcessor {
 
         stats.bot.get("COMMANDS_EXECUTED").inc(1);
 
-        if (message.channel.type === "text")
+        if (message.channel.type === "text") {
             await guild_stats.get("commands").add(new Date, message.guild.id, message.channel.id, message.author.id, command_name);
+        }
     }
 }
 

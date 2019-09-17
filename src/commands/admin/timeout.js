@@ -16,9 +16,8 @@
 
 /* eslint-disable require-atomic-updates */
 const { userToString } = require("../../util/util");
-const LocaleManager = require("../../core/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../util/time");
-const { splitArgs, format } = require("../../util/string");
+const { splitArgs } = require("../../util/string");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
@@ -32,7 +31,14 @@ const MessageMentions = require("../../util/commands/MessageMentions");
 /** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
 const timeout_notices = {};
 
-module.exports = function install(cr, client, config, db) {
+const Translation = require("../../modules/i18n/Translation");
+const TranslationPlural = require("../../modules/i18n/TranslationPlural");
+const ListFormat = require("../../modules/i18n/ListFormat");
+
+// eslint-disable-next-line no-warning-comments
+// TODO: proper redo of the timeout commands and system
+
+module.exports = function install(cr, { db }) {
     const database = db.collection("timeout");
     database.createIndex("expiresAt", { expireAfterSeconds: 0 });
     const database_messages = db.collection("timeout_messages");
@@ -41,7 +47,7 @@ module.exports = function install(cr, client, config, db) {
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
     const timeoutCommand = cr.registerCommand("timeout", new class extends TreeCommand {
-        async beforeProcessCall(message) {
+        async beforeProcessCall({ message, ctx }) {
             if (!timeout_notices[message.channel.id])
                 timeout_notices[message.channel.id] = {};
 
@@ -54,10 +60,14 @@ module.exports = function install(cr, client, config, db) {
 
                     const expiresIn = toHumanTime(timeleft);
 
-                    const timeoutNotice = await message.channel.translate("{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}", {
-                        userMention: message.member.toString(),
-                        timeLeft: `__**${expiresIn}**__`,
-                    });
+                    const timeoutNotice = new Translation(
+                        "timeout.timeouted",
+                        "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}",
+                        {
+                            userMention: message.member.toString(),
+                            timeLeft: `__**${expiresIn}**__`,
+                        }
+                    );
 
                     if (timeout_notices[message.channel.id].time &&
                         (timeout_notices[message.channel.id].last ||
@@ -65,11 +75,11 @@ module.exports = function install(cr, client, config, db) {
                         timeout_notices[message.channel.id].time = new Date;
                         timeout_notices[message.channel.id].message.delete();
                         timeout_notices[message.channel.id].message =
-                            await message.channel.send(timeoutNotice);
+                            await ctx.send(timeoutNotice);
                         return;
                     }
 
-                    const notice = await message.channel.send(timeoutNotice);
+                    const notice = await ctx.send(timeoutNotice);
 
                     await database_messages.insertOne({
                         guildId: message.guild.id,
@@ -104,8 +114,12 @@ module.exports = function install(cr, client, config, db) {
         .setPermissions(permission)
         .setIgnore(false);
 
-    timeoutCommand.registerSubCommand("remove", new SimpleCommand(async (message, content) => {
-        const members = new MessageMentions(content, message.guild).members.array();
+    timeoutCommand.registerSubCommand("remove", new SimpleCommand(async ({ message, mentions, ctx }) => {
+        const members = mentions.members.array();
+
+        if (members.length === 0) {
+            return new Translation("timeouts.found_no_mentions", "Found none of the mentioned users here");
+        }
 
         for (const member of members) {
             await database_messages.updateMany({
@@ -120,9 +134,9 @@ module.exports = function install(cr, client, config, db) {
 
         const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
 
-        await message.channel.sendTranslated("Removed timeouts for {{user}} successfully. Get dirty~", {
-            users: members.map(member => userToString(member)).join(" "),
-        });
+        await ctx.send(new Translation("timeout.remove_success", "Removed timeouts for {{user}} successfully. Get dirty~", {
+            users: new ListFormat(members.map(member => userToString(member))),
+        }));
 
         await Promise.all(promises);
     }))
@@ -146,7 +160,7 @@ module.exports = function install(cr, client, config, db) {
 
         await database.deleteMany({ guildId: message.guild.id });
 
-        await message.channel.sendTranslated("Removed all timeouts successfully");
+        return new Translation("timeout.remove_all_success", "Removed all timeouts successfully");
     }))
         .setHelp(new HelpContent().setUsage("", "remove all timeouts"));
 
@@ -181,31 +195,29 @@ module.exports = function install(cr, client, config, db) {
             .setUsage("", "list all timeouts present at the moment"));
 
     timeoutCommand.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, msg) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content: msg, ctx }) => {
             const args = splitArgs(msg, 2);
             if (args.length < 2) {
-                await message.channel.sendTranslated("At least two arguments are required: duration and @user");
-                return;
+                return new Translation("timeout.at_least", "At least two arguments are required: duration and @user");
             }
 
             let members = new MessageMentions(args[1], message.guild).members;
 
             if (members.has(message.member.id)) {
-                await message.channel.sendTranslated("You cannot timeout yourself, dummy!");
-                return;
+                return new Translation("timeout.not_yourself", "You cannot timeout yourself, dummy!");
             }
 
             if (members.has(message.client.user.id)) {
-                await message.channel.sendTranslated("You cannot timeout TrixieBot! I own you.");
-                return;
+                return new Translation("timeout.not_trixie", "You cannot timeout TrixieBot! I own you.");
             }
 
             members = members.array();
 
             for (const member of members) {
                 if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {
-                    await message.channel.sendTranslated("You cannot timeout other moderators or admins. That's just rood");
-                    return;
+                    return new Translation(
+                        "timeout.not_other_moderators", "You cannot timeout other moderators or admins. That's just rood"
+                    );
                 }
             }
 
@@ -213,8 +225,9 @@ module.exports = function install(cr, client, config, db) {
 
             const ms = parseHumanTime(timestr);
             if (ms < 10000 || ms > 1000 * 3600 * 24 * 3) {
-                await message.channel.sendTranslated("Timeout length should be at least 10 seconds long and shorter than 3 days");
-                return;
+                return new Translation(
+                    "timeout.out_range", "Timeout length should be at least 10 seconds long and shorter than 3 days"
+                );
             }
 
             const expiresAt = new Date(Date.now() + ms);
@@ -231,16 +244,19 @@ module.exports = function install(cr, client, config, db) {
                 });
             }
 
-            const promises = members.map(member => database.updateOne({ guildId: member.guild.id, memberId: member.id }, { $set: { expiresAt } }, { upsert: true }));
+            const promises = members.map(member =>
+                database.updateOne({ guildId: member.guild.id, memberId: member.id }, { $set: { expiresAt } }, { upsert: true })
+            );
 
-            await message.channel.send(format(LocaleManager
-                .locale(await message.channel.locale())
-                .translate("{{users}} is now timeouted for the next {{timeLeft}}")
-                .ifPlural("{{users}} are now timeouted for the next {{timeLeft}}")
-                .fetch(members.size), {
-                users: members.map(member => userToString(member)).join(" "),
-                timeLeft: timestr,
-            }));
+            await ctx.send(new TranslationPlural(
+                "timeout.success",
+                ["{{users}} is now timeouted for the next {{timeLeft}}", "{{users}} are now timeouted for the next {{timeLeft}}"],
+                members.size,
+                {
+                    users: new ListFormat(members.map(member => userToString(member))),
+                    timeLeft: timestr,
+                }
+            ));
 
             await Promise.all(promises);
         }));

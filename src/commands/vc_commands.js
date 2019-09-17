@@ -22,17 +22,17 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-module.exports = function install(cr) {
-    cr.registerCommand("leavevc", new SimpleCommand(async message => {
-        const audio = AudioManager.getGuild(message.guild);
+const Translation = require("../modules/i18n/Translation");
 
+module.exports = function install(cr) {
+    cr.registerCommand("leavevc", new SimpleCommand(async ({ message, audio }) => {
         try {
             await audio.destroy();
             await message.react("👍");
         } catch (err) {
             await message.react("❌");
             log.namespace("leave", err);
-            message.channel.sendTranslated("Some error happened and caused some whoopsies");
+            return new Translation("audio.error", "Some error happened and caused some whoopsies");
         }
     }))
         .setHelp(new HelpContent()
@@ -42,16 +42,14 @@ module.exports = function install(cr) {
     cr.registerAlias("leavevc", "leave");
     cr.registerAlias("leavevc", "begone");
 
-    cr.registerCommand("stopvc", new SimpleCommand(async message => {
-        const audio = AudioManager.getGuild(message.guild);
-
+    cr.registerCommand("stopvc", new SimpleCommand(async ({ message, audio }) => {
         try {
             audio.stop();
             await message.react("👍");
         } catch (err) {
             await message.react("❌");
             log.namespace("stop", err);
-            message.channel.sendTranslated("Some error happened and caused some whoopsies");
+            return new Translation("audio.error", "Some error happened and caused some whoopsies");
         }
     }))
         .setHelp(new HelpContent()
@@ -60,20 +58,17 @@ module.exports = function install(cr) {
 
     cr.registerAlias("stopvc", "stop");
 
-    cr.registerCommand("joinvc", new SimpleCommand(async message => {
-        const audio = AudioManager.getGuild(message.guild);
-
+    cr.registerCommand("joinvc", new SimpleCommand(async ({ message, audio }) => {
         try {
             await audio.connect(message.member);
             await message.react("👍");
         } catch (err) {
             await message.react("❌");
             if (err instanceof ConnectError) {
-                message.channel.sendTranslated(err.message);
-                return;
+                return err.message;
             }
             log.namespace("join", err);
-            message.channel.sendTranslated("Some error happened and caused some whoopsies");
+            return new Translation("audio.error", "Some error happened and caused some whoopsies");
         }
     }))
         .setHelp(new HelpContent()

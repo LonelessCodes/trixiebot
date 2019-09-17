@@ -17,6 +17,8 @@
 const config = require("../config");
 const CONST = require("../const");
 const Discord = require("discord.js");
+const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
 
 if (!config.has("owner_id")) throw new Error("No owner_id specified in the config");
 const ownerId = config.get("owner_id");
@@ -54,6 +56,16 @@ module.exports = new class Utils {
         return new Discord.RichEmbed()
             .setColor(color)
             .setAuthor(`${module.exports.userToString(user, true)} | ${title}`, user.avatarURL);
+    }
+
+    basicTEmbed(title, user, color = CONST.COLOR.PRIMARY) {
+        if (user instanceof Discord.Guild) return new TranslationEmbed()
+            .setColor(color)
+            .setAuthor(new TranslationMerge(user.name, "|", title), user.iconURL);
+        if (user instanceof Discord.GuildMember) user = user.user;
+        return new TranslationEmbed()
+            .setColor(color)
+            .setAuthor(new TranslationMerge(module.exports.userToString(user, true), "|", title), user.avatarURL);
     }
 
     progressBar(v, length, a, b) {

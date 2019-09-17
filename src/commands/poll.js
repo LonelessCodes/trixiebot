@@ -26,6 +26,8 @@ const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
+// Soon to be deprecating the poll command and replace it with a simpler one
+
 class Poll {
     // eslint-disable-next-line valid-jsdoc
     /**
@@ -90,7 +92,7 @@ class Poll {
         if (total === 0) {
             const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setDescription(await this.channel.translate("But no one voted :c"));
-            await this.channel.sendTranslated("{{user}} Poll ended!", {
+            await this.channel.send("{{user}} Poll ended!", {
                 user: this.creator.toString(),
             }, { embed });
             return;
@@ -112,7 +114,7 @@ class Poll {
             .format({ votesCount: total })
             .fetch(total));
 
-        await this.channel.sendTranslated("{{user}} Poll ended!", {
+        await this.channel.send("{{user}} Poll ended!", {
             user: this.creator.toString(),
         }, { embed });
     }
@@ -150,7 +152,7 @@ Poll.add = function add(poll) {
     if (poll instanceof Poll) Poll.polls.push(poll);
 };
 
-module.exports = async function install(cr, client, config, db) {
+module.exports = async function install(cr, { client, db }) {
     const database = db.collection("poll");
 
     const polls = await database.find({}).toArray();
@@ -193,9 +195,9 @@ module.exports = async function install(cr, client, config, db) {
     }
 
     cr.registerCommand("poll", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             if (await database.findOne({ guildId: message.guild.id, channelId: message.channel.id })) {
-                await message.channel.sendTranslated("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
+                await message.channel.send("Hey hey hey. There's already a poll running in this channel. Only one poll in a channel at a time allowed");
                 return;
             }
 

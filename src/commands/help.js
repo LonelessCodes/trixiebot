@@ -37,9 +37,9 @@ function sortCommands(commands) {
         .join(", ");
 }
 
-module.exports = function install(cr, client, config, database) {
+module.exports = function install(cr, { client, db: database }) {
     cr.registerCommand("help", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content, ctx }) => {
             let query = content.toLowerCase();
             let path = [];
             /** @type {Map<string, BaseCommand>} */
@@ -61,7 +61,7 @@ module.exports = function install(cr, client, config, database) {
                     path.push(name);
 
                     if (query === "") {
-                        await HelpBuilder.sendHelp(message, path.join(" "), command);
+                        await HelpBuilder.sendHelp(ctx, path.join(" "), command);
                         return;
                     }
 
@@ -75,11 +75,9 @@ module.exports = function install(cr, client, config, database) {
                 if (!found) return;
             }
         }))
-        .registerOverload("0", new SimpleCommand(async message => {
+        .registerOverload("0", new SimpleCommand(async ({ message, prefix }) => {
             const is_guild = message.channel.type === "text";
             const is_dm = message.channel.type === "dm";
-
-            const prefix = is_guild ? message.prefix : "";
 
             const disabledCommands = is_guild ? await database.collection("disabled_commands").find({
                 guildId: message.guild.id,

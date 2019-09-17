@@ -21,6 +21,8 @@ const MessageMentions = require("../../util/commands/MessageMentions");
 const AudioManager = require("../managers/AudioManager");
 // eslint-disable-next-line no-unused-vars
 const LocaleManager = require("../managers/LocaleManager");
+// eslint-disable-next-line no-unused-vars
+const Resolvable = require("../../modules/i18n/Resolvable");
 
 class MessageContext {
     /**
@@ -76,12 +78,26 @@ class MessageContext {
         return this._mentions;
     }
 
+    /**
+     * @param {TextChannel} [ch]
+     * @returns {Promise<{ global: string, channels: Object<string, string>} | string>}
+     */
     locale(ch) {
         if (!ch) {
             return this._locale.get(this.guild.id);
         } else {
             return this._locale.get(ch.guild.id, ch.id);
         }
+    }
+
+    /**
+     * @param {TextChannel|Resolvable} ch
+     * @param {Resolvable} [resolvable]
+     * @returns {Promise<string>}
+     */
+    translate(ch, resolvable) {
+        if (ch instanceof TextChannel) return this._locale.translate(ch, resolvable);
+        else return this._locale.translate(this.channel, ch);
     }
 
     edit(msg, content, options) {

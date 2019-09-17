@@ -23,23 +23,20 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
-module.exports = function install(cr, client, config, db) {
+const Translation = require("../../modules/i18n/Translation");
+const TranslationMerge = require("../../modules/i18n/TranslationMerge");
+
+module.exports = function install(cr, { db }) {
     const database = db.collection("mute");
 
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
     const muteWordCommand = cr.registerCommand("muteword", new class extends TreeCommand {
-        async noPermission(message) {
-            await message.channel.sendTranslated("IDK what you're doing here. To use the mute command you must have permissions to manage messages.");
-        }
-
         /**
          * TODO: CACHE DATABASE STUFF
          */
 
-        async beforeProcessCall(message, content) {
-            if (message.channel.type !== "text") return [];
-
+        async beforeProcessCall({ message, content }) {
             const muted_words = (await database.find({ guildId: message.guild.id }).toArray()).map(doc => doc.word);
 
             if (muted_words.length > 0 && !permission.test(message.member)) {
@@ -64,12 +61,12 @@ module.exports = function install(cr, client, config, db) {
         .setIgnore(false);
 
     const removeCommand = new OverloadCommand()
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const word = content.trim().toLowerCase();
 
             await database.deleteOne({ guildId: message.guild.id, word });
 
-            await message.channel.sendTranslated("Removed muted word \"{{word}}\" successfully", { word });
+            return new Translation("mute.removed", "Removed muted word \"{{word}}\" successfully", { word });
         }))
         .setHelp(new HelpContent()
             .setUsage("<phrase>")
@@ -81,38 +78,33 @@ module.exports = function install(cr, client, config, db) {
     muteWordCommand.registerSubCommand("clear", new SimpleCommand(async message => {
         await database.deleteMany({ guildId: message.guild.id });
 
-        await message.channel.sendTranslated("Removed all muted words successfully");
+        return new Translation("mute.cleared_all", "Removed all muted words successfully");
     }))
         .setHelp(new HelpContent().setUsage("", "Remove all muted words"));
 
-    muteWordCommand.registerSubCommand("list", new SimpleCommand(async (message, content, { pass_through: muted_words }) => {
-        let str = "";
+    muteWordCommand.registerSubCommand("list", new SimpleCommand((message, { pass_through: muted_words }) => {
         if (muted_words.length > 0) {
-            str = await message.channel.translate("Currently muted are:") + "\n";
-            str += "`" + muted_words.join("`, `") + "`";
+            return new TranslationMerge(new Translation("mute.currently", "Currently muted are:"), "\n", "`" + muted_words.join("`, `") + "`");
         } else {
-            str = await message.channel.translate("Nothing yet muted");
+            return new Translation("mute.nothing_muted", "Nothing yet muted");
         }
-
-        return str;
     }))
         .setHelp(new HelpContent().setUsage("", "list all muted words and phrases"));
 
     muteWordCommand.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, content, { pass_through: muted_words }) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }, { pass_through: muted_words }) => {
             /**
              * @type {string}
              */
             const word = content.trim().toLowerCase();
 
             if (muted_words.includes(word)) {
-                await message.channel.sendTranslated("Already got this muted");
-                return;
+                return new Translation("mute.exists", "Already got this muted");
             }
 
             await database.insertOne({ guildId: message.guild.id, word });
 
-            await message.channel.sendTranslated("Got it! Blacklisted use of \"{{word}}\"", { word });
+            return new Translation("mute.success", "Got it! Blacklisted use of \"{{word}}\"", { word });
         }));
 
     muteWordCommand.registerSubCommandAlias("*", "add");

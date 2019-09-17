@@ -32,6 +32,7 @@ const DocumentMapCache = require("../modules/db/DocumentMapCache");
 // eslint-disable-next-line no-unused-vars
 const MessageContext = require("./commands/MessageContext");
 
+const Translation = require("../modules/i18n/Translation");
 const TranslationPlural = require("../modules/i18n/TranslationPlural");
 
 /**
@@ -82,7 +83,7 @@ class CommandDispatcher {
             "There is still {{time_left}} left to wait.",
         ], this.global_ratelimit.max, {
             count: this.global_ratelimit.max,
-            time_frame: this.global_ratelimit.toString(),
+            time_frame: this.global_ratelimit.timeUnit.toString(),
             time_left: toHumanTime(this.global_ratelimit.tryAgainIn(context.author.id)),
         }));
     }
@@ -119,8 +120,8 @@ class CommandDispatcher {
         if (!context.member) return false;
 
         if (await this.blacklisted_users.has(context.author.id)) {
-            await context.channel.send("You have been blacklisted from using all of Trixie's functions. " +
-                "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere.");
+            await context.send(new Translation("general.blacklisted", "You have been blacklisted from using all of Trixie's functions. " +
+                "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere."));
             return false;
         }
 
@@ -182,8 +183,8 @@ class CommandDispatcher {
 
         if (command && command.ignore && !isOwnerCommand) {
             if (!keyword && await this.blacklisted_users.has(context.author.id)) {
-                await context.channel.send("You have been blacklisted from using all of Trixie's functions. " +
-                    "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere.");
+                await context.send(new Translation("general.blacklisted", "You have been blacklisted from using all of Trixie's functions. " +
+                    "If you wish to get more details on why, don't hesitate to join the support server and ask, but be sincere."));
                 return false;
             }
 
@@ -245,8 +246,8 @@ class CommandDispatcher {
             promises.set(cmd.id, cmd.beforeProcessCall(context));
         }
 
-        if (!command) return;
-        if (!context.prefix_used && !keyword) return;
+        if (!command) return false;
+        if (!context.prefix_used && !keyword) return false;
 
         if (is_guild) {
             // eslint-disable-next-line require-atomic-updates
@@ -264,17 +265,17 @@ class CommandDispatcher {
 
         if (!command.permissions.test(context.member || context.author)) {
             await command.noPermission(context);
-            return;
+            return false;
         }
 
         if (this.global_ratelimit && !this.global_ratelimit.testAndAdd(context.author.id)) {
             await this.rateLimit(context, command_name);
-            return;
+            return false;
         }
 
         if (command.rateLimiter && !command.rateLimiter.testAndAdd(context.author.id)) {
             await command.rateLimit(context);
-            return;
+            return false;
         }
 
         // good to send help when using `command help` and `help command`

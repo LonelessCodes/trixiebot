@@ -21,36 +21,31 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
-const MessageMentions = require("../util/commands/MessageMentions");
 
 module.exports = function install(cr) {
-    cr.registerCommand("trump", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("trump", new SimpleCommand(async ({ message, ctx }) => {
         if (message.channel.type === "text") {
-            const mentions = new MessageMentions(content, message.guild);
+            const mentions = ctx.mentions;
             if (mentions.members.size > 0) {
                 const member = mentions.members.first();
 
-                /** @type {} */
                 const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" + encodeURIComponent(userToString(member)));
                 const magic = await request.json();
                 if (!magic) {
                     throw new Error("API fucked up");
                 }
 
-                await message.channel.send(magic.message);
-
-                return;
+                return magic.message;
             }
         }
 
-        /** @type {} */
         const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/random");
         const magic = await request.json();
         if (!magic) {
             throw new Error("API fucked up");
         }
 
-        await message.channel.send(magic.message);
+        return magic.message;
     }))
         .setHelp(new HelpContent()
             .setDescription("What would Trump say?\nGets a random Trump quote")

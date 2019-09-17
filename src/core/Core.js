@@ -38,6 +38,8 @@ const MemberLog = require("./listeners/MemberLog");
 
 const Discord = require("discord.js");
 
+const Translation = require("../modules/i18n/Translation");
+
 function fetchPost(url, opts) {
     if (opts.json) {
         opts.body = JSON.stringify(opts.json);
@@ -56,29 +58,29 @@ class Core {
         this.db = db;
 
         this.config = new ConfigManager(this.client, this.db, [
-            new Parameter("prefix", "❗ Prefix", config.get("prefix") || "!", String),
+            new Parameter("prefix", new Translation("config.prefix", "❗ Prefix"), config.get("prefix") || "!", String),
 
-            new Parameter("uom", "📐 Measurement preference", "cm", ["cm", "in"]),
+            new Parameter("uom", new Translation("config.uom", "📐 Measurement preference"), "cm", ["cm", "in"]),
 
             new Parameter([
-                new Parameter("announce.channel", "Channel. 'none' disables announcements", null, Discord.TextChannel, true),
-                new Parameter("announce.bots", "Announce Bots", true, Boolean),
-            ], "🔔 Announce new/leaving/banned users"),
+                new Parameter("announce.channel", new Translation("config.announce_ch", "Channel. 'none' disables announcements"), null, Discord.TextChannel, true),
+                new Parameter("announce.bots", new Translation("config.announce_bot", "Announce Bots"), true, Boolean),
+            ], new Translation("config.announce", "🔔 Announce new/leaving/banned users")),
 
             new Parameter([
                 new Parameter("welcome.enabled", "true/false", false, Boolean),
-                new Parameter("welcome.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
-            ], "👋 Announce new users"),
+                new Parameter("welcome.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
+            ], new Translation("config.welcome", "👋 Announce new users")),
 
             new Parameter([
                 new Parameter("leave.enabled", "true/false", false, Boolean),
-                new Parameter("leave.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
-            ], "🚶 Announce leaving users"),
+                new Parameter("leave.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
+            ], new Translation("config.leave", "🚶 Announce leaving users")),
 
             new Parameter([
                 new Parameter("ban.enabled", "true/false", false, Boolean),
-                new Parameter("ban.text", "Custom Text ('{{user}}' as user, empty = default)", null, String, true),
-            ], "🔨 Announce banned users"),
+                new Parameter("ban.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
+            ], new Translation("config.ban", "🔨 Announce banned users")),
         ]);
 
         this.locale = new LocaleManager(this.client, this.db);
@@ -87,7 +89,7 @@ class Core {
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.locale, this.db);
         this.upvotes = new UpvotesManager(this.client, this.db);
 
-        this.member_log = new MemberLog(this.client, this.config);
+        this.member_log = new MemberLog(this.client, this.config, this.locale);
     }
 
     async startMainComponents(commands_package) {

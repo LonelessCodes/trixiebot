@@ -37,7 +37,9 @@ class SimpleCommand extends BaseCommand {
         const result = await this.func(context, { pass_through, command_name });
         if (!result) return;
 
-        await context.send(result);
+        // allow returning a [content, opts] like array
+        if (Array.isArray(result)) await context.send(...result);
+        else await context.send(result);
     }
 }
 

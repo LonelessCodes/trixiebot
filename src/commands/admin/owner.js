@@ -39,12 +39,14 @@ const extnames = {
 };
 
 // eslint-disable-next-line no-unused-vars
-module.exports = function install(cr, client, config, db) {
+module.exports = function install(cr, { client, config, locale, db }) {
     cr.registerCommand("file", new class extends BaseCommand {
-        async noPermission(message) { await message.channel.sendTranslated("no"); }
+        async noPermission(context) {
+            await context.send("no");
+        }
 
-        async call(message, msg) {
-            const file = path.resolve(path.join(process.cwd(), msg));
+        async call({ message, content }) {
+            const file = path.resolve(path.join(process.cwd(), content));
             if (!(await fs.exists(file))) {
                 await message.channel.send("Doesn't exist");
                 return;
@@ -62,7 +64,7 @@ module.exports = function install(cr, client, config, db) {
                 return;
             }
 
-            const language = extnames[path.extname(msg)] || "";
+            const language = extnames[path.extname(content)] || "";
             const highWaterMark = 2000 - (2 * 4) - language.length;
 
             let tmp = await fs.readFile(file, { encoding: "utf8" });
@@ -74,13 +76,13 @@ module.exports = function install(cr, client, config, db) {
                 await message.channel.send(`\`\`\`${result}\`\`\``);
             }
 
-            log(`Sent file contents of ${msg}`);
+            log(`Sent file contents of ${content}`);
         }
     }).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.registerCommand("exec", new SimpleCommand(async (message, msg) => {
-        const content = await promisify(exec)(msg);
-        let escaped = resolveStdout("Out:\n" + content.stdout + "\nErr:\n" + content.stderr);
+    cr.registerCommand("exec", new SimpleCommand(async ({ message, content }) => {
+        const { stdout, stderr } = await promisify(exec)(content);
+        let escaped = resolveStdout("Out:\n" + stdout + "\nErr:\n" + stderr);
 
         while (escaped.length > 0) {
             let lastIndex = escaped.substring(0, 2000 - (2 * 3)).lastIndexOf("\n");
@@ -89,34 +91,35 @@ module.exports = function install(cr, client, config, db) {
             await message.channel.send(`\`\`\`${result}\`\`\``);
         }
 
-        log(`Sent stdout for command ${msg}`);
+        log(`Sent stdout for command ${content}`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.registerCommand("eval", new SimpleCommand(async (message, msg) => {
-        const content = await eval(`(async () => {${msg}})()`);
-        await message.channel.send("```\n" + content + "\n```");
-        log(`Evaluated ${msg} and sent result`);
+    cr.registerCommand("eval", new SimpleCommand(async ({ message, content }) => {
+        const result = await eval(`(async () => {${content}})()`);
+        await message.channel.send("```\n" + result + "\n```");
+        log(`Evaluated ${content} and sent result`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.registerCommand("broadcast", new SimpleCommand((message, msg) => {
+    cr.registerCommand("broadcast", new SimpleCommand(({ content }) => {
         client.guilds.forEach(guild => {
             if (!guild.available) return;
             const defaultChannel = findDefaultChannel(guild);
             if (!defaultChannel) return;
             defaultChannel.send("Broadcast from creator", {
-                embed: new Discord.RichEmbed().setDescription(msg),
+                embed: new Discord.RichEmbed().setDescription(content),
             }).catch(() => { /* Do nothing */ });
         });
-        log(`Broadcasted message ${msg}`);
+        log(`Broadcasted message ${content}`);
     })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.registerCommand("send", new SimpleCommand((message, msg) => {
-        const s = splitArgs(msg, 2);
+    cr.registerCommand("send", new SimpleCommand(({ content }) => {
+        const s = splitArgs(content, 2);
         const guild = client.guilds.get(s[0]);
         if (!guild) {
             const channel = client.channels.get(s[0]);
             if (!channel) return;
             channel.send(s[1]);
+            return;
         }
         if (!guild.available) return;
         const defaultChannel = findDefaultChannel(guild);
@@ -127,16 +130,12 @@ module.exports = function install(cr, client, config, db) {
         const url = await ipc.awaitAnswer("admin:mongoarchive");
 
         await message.channel.send(`Get your archive here: ${url}`);
-    }))
-        .setCategory(Category.OWNER)
-        .setScope(CommandScope.FLAGS.DM);
+    })).setCategory(Category.OWNER).setScope(CommandScope.FLAGS.DM);
 
     cr.registerCommand("reboot", new SimpleCommand(async message => {
         await message.channel.send("Gracefully rebooting...");
 
         await client.destroy();
         process.exit();
-    }))
-        .setCategory(Category.OWNER)
-        .setScope(CommandScope.ALL);
+    })).setCategory(Category.OWNER).setScope(CommandScope.ALL);
 };

@@ -24,15 +24,13 @@ const CalendarRange = require("../../modules/CalendarRange");
 const TimeUnit = require("../../modules/TimeUnit");
 
 const Translation = require("../../modules/i18n/Translation");
+const TranslationMerge = require("../../modules/i18n/TranslationMerge");
 const TranslationPlural = require("../../modules/i18n/TranslationPlural");
 
 // provide a fallback for old .translate() based commands
 // until they are finally also converted
 Message.prototype.translate = format;
 Channel.prototype.translate = format;
-Channel.prototype.sendTranslated = function sendTranslated(a, b, embed) {
-    return this.send(format(a, b), embed);
-};
 
 class BaseCommand {
     /**
@@ -46,30 +44,44 @@ class BaseCommand {
         this.ignore = true;
         this.list = true;
         this._category = null;
-        this._help = null;
+        this.help = null;
         this.aliases = [];
         this.explicit = false;
         this.scope = new CommandScope(CommandScope.DEFAULT).freeze();
         this.season = new CalendarRange;
     }
 
-    async rateLimit(context) {
-        const id = `${context.channel.type === "text" ? context.guild.id : ""}:${context.channel.id}`;
-        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(id))) return;
-        await this.rateLimitMessage(context);
+    get category() {
+        return this._category;
     }
 
-    async rateLimitMessage(context) {
-        await context.send(new TranslationPlural("command.ratelimit", [
-            "Whoa whoa not so fast! You may only do this {{count}} time every {{time_frame}}. " +
-            "There is still {{time_left}} left to wait.",
-            "Whoa whoa not so fast! You may only do this {{count}} times every {{time_frame}}. " +
-            "There is still {{time_left}} left to wait.",
-        ], this.rateLimiter.max, {
-            count: this.rateLimiter.max,
-            time_frame: this.rateLimiter.toString(),
-            time_left: toHumanTime(this.rateLimiter.tryAgainIn(context.author.id)),
-        }));
+    async rateLimit(context) {
+        const id = `${context.channel.type === "text" ? context.guild.id : ""}:${context.channel.id}`;
+        if (
+            !this.rateLimiter ||
+            (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(id))
+        ) return;
+
+        await context.send(new TranslationPlural(
+            "command.ratelimit",
+            [
+                "Whoa whoa not so fast! You may only do this {{count}} time every {{time_frame}}. There is still {{time_left}} left to wait.",
+                "Whoa whoa not so fast! You may only do this {{count}} times every {{time_frame}}. There is still {{time_left}} left to wait.",
+            ],
+            this.rateLimiter.max,
+            {
+                count: this.rateLimiter.max,
+                time_frame: this.rateLimiter.toString(),
+                time_left: toHumanTime(this.rateLimiter.tryAgainIn(context.author.id)),
+            }
+        ));
+    }
+
+    async noPermission(context) {
+        await context.send(new TranslationMerge(new Translation(
+            "command.no_permissions",
+            "IDK what you're doing here. This is restricted area >:c Required Permissions:"
+        ), this.permissions.toString()));
     }
 
     setRateLimiter(rateLimiter) {
@@ -81,10 +93,6 @@ class BaseCommand {
             this.rateLimiter = null;
         }
         return this;
-    }
-
-    async noPermission(context) {
-        await context.send(new Translation("command.no_permissions", "IDK what you're doing here. This is restricted area >:c"));
     }
 
     setPermissions(permissions) {
@@ -108,12 +116,8 @@ class BaseCommand {
         return this;
     }
 
-    get category() {
-        return this._category;
-    }
-
     setHelp(v) {
-        this._help = v;
+        this.help = v;
         return this;
     }
 
@@ -132,23 +136,19 @@ class BaseCommand {
         return this;
     }
 
+    setSeason(range) {
+        this.season = range || new CalendarRange;
+        return this;
+    }
+
     hasScope(channel) {
         if (!this.scope.has(CommandScope.FLAGS.GUILD) && channel.type === "text") return false;
         if (!this.scope.has(CommandScope.FLAGS.DM) && channel.type === "dm") return false;
         return true;
     }
 
-    setSeason(range) {
-        this.season = range || new CalendarRange;
-        return this;
-    }
-
     isInSeason() {
         return this.season.isToday();
-    }
-
-    get help() {
-        return this._help;
     }
 
     async beforeProcessCall() { /* Do nothing */ }

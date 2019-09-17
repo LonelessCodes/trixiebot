@@ -21,9 +21,12 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-const MessageMentions = require("../util/commands/MessageMentions");
 const guild_stats = require("../core/managers/GuildStatsManager");
-const { basicEmbed } = require("../util/util");
+const { basicTEmbed } = require("../util/util");
+
+const Translation = require("../modules/i18n/Translation");
+const TranslationPlural = require("../modules/i18n/TranslationPlural");
+const ListFormat = require("../modules/i18n/ListFormat");
 
 function sort(data) {
     return data.map(entry => {
@@ -51,8 +54,6 @@ function findFirstIndex(arr, cb) {
  * @returns {string}
  */
 function getString(start, end, [commands = [], messages = [], users = []]) {
-    let str = "";
-
     start = start.getTime();
     if (end) end = end.getTime();
 
@@ -69,17 +70,20 @@ function getString(start, end, [commands = [], messages = [], users = []]) {
         if (users && users.length) users = users.slice(0, findFirstIndex(users, findIndexEnd));
     }
 
-    str += `${messages.reduce((sum, entry) => sum + entry.value, 0)} Messages`;
+    const list = new ListFormat();
 
-    const commands_total = commands.reduce((sum, entry) => sum + entry.value, 0);
-    if (commands_total) str += ` and ${commands_total} Commands`;
+    const msgs_total = messages.reduce((sum, entry) => sum + entry.value, 0);
+    list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], msgs_total, { count: msgs_total }));
+
+    const cmds_total = commands.reduce((sum, entry) => sum + entry.value, 0);
+    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], cmds_total, { count: cmds_total }));
 
     const joined_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.added, 0);
     const left_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.removed, 0);
 
-    if (joined_users > 0 || left_users > 0) str += ` and +${joined_users}/-${left_users} Users`;
+    if (joined_users > 0 || left_users > 0) list.push(new Translation("stats.users", "{{count}} Users", { count: `+${joined_users}/-${left_users}` }));
 
-    return str;
+    return list;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -90,8 +94,6 @@ function getString(start, end, [commands = [], messages = [], users = []]) {
  * @returns {string}
  */
 function getAverageString(start, divider, [commands = [], messages = [], users = []]) {
-    let str = "";
-
     start = start.getTime();
 
     const findIndex = entry => entry.ts > start;
@@ -100,17 +102,20 @@ function getAverageString(start, divider, [commands = [], messages = [], users =
     if (messages.length) messages = messages.slice(findFirstIndex(messages, findIndex));
     if (users.length) users = users.slice(findFirstIndex(users, findIndex));
 
-    str += `${(messages.reduce((sum, entry) => sum + entry.value, 0) / divider).toFixed(2)} Messages`;
+    const list = new ListFormat();
 
-    const commands_total = commands.reduce((sum, entry) => sum + entry.value, 0) / divider;
-    str += ` and ${commands_total.toFixed(2)} Commands`;
+    const msgs_total = messages.reduce((sum, entry) => sum + entry.value, 0) / divider;
+    list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], msgs_total, { count: msgs_total.toFixed(2) }));
+
+    const cmds_total = commands.reduce((sum, entry) => sum + entry.value, 0) / divider;
+    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], cmds_total, { count: cmds_total.toFixed(2) }));
 
     const joined_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.added, 0);
     const left_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.removed, 0);
 
-    if (joined_users > 0 || left_users > 0) str += ` and +${(joined_users / divider).toFixed(2)}/-${(left_users / divider).toFixed(2)} Users`;
+    if (joined_users > 0 || left_users > 0) list.push(new Translation("stats.users", "{{count}} Users", { count: `+${(joined_users / divider).toFixed(2)}/-${(left_users / divider).toFixed(2)}` }));
 
-    return str;
+    return list;
 }
 
 function generateTimeFrames() {
@@ -148,14 +153,14 @@ module.exports = function install(cr) {
             guild_stats.get("users").getLastItemBefore(quartal, guildId),
         ]);
 
-        const embed = basicEmbed(await message.channel.translate("Statistics"), message.guild);
+        const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), message.guild);
 
-        embed.addField("Today", getString(today, null, results), true);
-        embed.addField("Yesterday", getString(yesterday, today, results), true);
+        embed.addField(new Translation("stats.today", "Today"), getString(today, null, results), true);
+        embed.addField(new Translation("stats.yesterday", "Yesterday"), getString(yesterday, today, results), true);
 
-        embed.addField("Average (7 days)", getAverageString(week, 7, results));
-        embed.addField("Average (30 days)", getAverageString(month, 30, results));
-        if (results[3] && results[3].ts.getTime() < quartal.getTime()) embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
+        embed.addField(new Translation("stats.avg_7d", "Average (7 days)"), getAverageString(week, 7, results));
+        embed.addField(new Translation("stats.avg_30d", "Average (30 days)"), getAverageString(month, 30, results));
+        if (results[3] && results[3].ts.getTime() < quartal.getTime()) embed.addField(new Translation("stats.avg_90d", "Average (90 days)"), getAverageString(quartal, 90, results));
 
         return { embed };
     }))
@@ -163,8 +168,7 @@ module.exports = function install(cr) {
             .setDescription("Get some stats about the alive-ness of this server"))
         .setCategory(Category.INFO);
 
-    cr.registerCommand("userstats", new SimpleCommand(async (message, content) => {
-        const mentions = new MessageMentions(content, message.guild);
+    cr.registerCommand("userstats", new SimpleCommand(async ({ message, mentions }) => {
         const member = mentions.members.first() || message.member;
         const user = member.user;
 
@@ -177,14 +181,14 @@ module.exports = function install(cr) {
             guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort),
         ]);
 
-        const embed = basicEmbed(await message.channel.translate("Statistics"), member);
+        const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), member);
 
-        embed.addField("Today", getString(today, null, results), true);
-        embed.addField("Yesterday", getString(yesterday, today, results), true);
+        embed.addField(new Translation("stats.today", "Today"), getString(today, null, results), true);
+        embed.addField(new Translation("stats.yesterday", "Yesterday"), getString(yesterday, today, results), true);
 
-        embed.addField("Average (7 days)", getAverageString(week, 7, results));
-        embed.addField("Average (30 days)", getAverageString(month, 30, results));
-        embed.addField("Average (90 days)", getAverageString(quartal, 90, results));
+        embed.addField(new Translation("stats.avg_7d", "Average (7 days)"), getAverageString(week, 7, results));
+        embed.addField(new Translation("stats.avg_30d", "Average (30 days)"), getAverageString(month, 30, results));
+        embed.addField(new Translation("stats.avg_90d", "Average (90 days)"), getAverageString(quartal, 90, results));
 
         return { embed };
     }))

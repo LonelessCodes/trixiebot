@@ -21,6 +21,12 @@ class TranslationMerge extends Resolvable {
         super();
         /** @type {(Resolvable|string|number)[]} */
         this.arr = arr;
+        this.sep = " ";
+    }
+
+    setSeperator(sep = " ") {
+        this.sep = sep;
+        return this;
     }
 
     push(...items) {
@@ -28,7 +34,7 @@ class TranslationMerge extends Resolvable {
     }
 
     resolve(i18n) {
-        return this.arr.map(trans => Resolvable.resolve(trans, i18n)).join(" ");
+        return this.arr.filter(i => i !== null && i !== undefined).map(trans => Resolvable.resolve(trans, i18n)).join(this.sep);
     }
 }
 

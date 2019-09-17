@@ -18,7 +18,7 @@ const Resolvable = require("./Resolvable");
 const { escapeRegExp } = require("../../util/string");
 
 module.exports = {
-    formatter(i18n, msg, args) {
+    formatter(i18n, msg, args = {}) {
         for (const f in args) {
             msg = msg.replace(new RegExp(`{{\\s*${escapeRegExp(f)}\\s*}}`, "g"), Resolvable.resolve(args[f], i18n));
         }

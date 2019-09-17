@@ -33,7 +33,8 @@ const PluralsForLocale = {};
 
 function postProcess(msg, args, count = 1) {
     // test for parsable interval string
-    if ((/\|/).test(msg)) {
+    // (?<!\\) negative lookbehind to allow escaping the pipe
+    if ((/(?<!\\)\|/).test(msg)) {
         msg = parsePluralInterval(msg, count);
     }
 
@@ -53,7 +54,7 @@ function postProcess(msg, args, count = 1) {
  */
 function parsePluralInterval(phrase, count) {
     let returnPhrase = phrase;
-    const phrases = phrase.split(/\|/);
+    const phrases = phrase.split(/(?<!\\)\|/);
 
     // some() breaks on 1st true
     phrases.some(p => {
@@ -265,11 +266,12 @@ class I18n extends events.EventEmitter {
 
         let msg = this.localeAccessor(locale, id);
         if (!msg && default_config && this.update_files) {
-            this.localeMutator(locale, id, default_msg);
+            this.localeMutator(this.default_locale, id, default_msg);
             this.write(locale);
         }
 
         msg = msg || default_msg || id;
+        if (msg === "") msg = default_msg;
 
         return msg;
     }

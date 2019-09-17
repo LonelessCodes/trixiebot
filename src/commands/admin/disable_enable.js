@@ -20,7 +20,11 @@ const TreeCommand = require("../../core/commands/TreeCommand");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 
-module.exports = function install(cr, client, config, database) {
+const Translation = require("../../modules/i18n/Translation");
+const TranslationPlural = require("../../modules/i18n/TranslationPlural");
+const ListFormat = require("../../modules/i18n/ListFormat");
+
+module.exports = function install(cr, { database }) {
     /**
      * DISABLE
      */
@@ -30,11 +34,10 @@ module.exports = function install(cr, client, config, database) {
 
     disableCmd.registerDefaultCommand(new HelpCommand);
 
-    disableCmd.registerSubCommand("channel", new SimpleCommand(async message => {
+    disableCmd.registerSubCommand("channel", new SimpleCommand(async ({ message }) => {
         const channels = message.mentions.channels;
         if (channels.size < 1) {
-            await message.channel.send("Uhm, I guess... but you gotta give me a channel or more to disable");
-            return;
+            return new Translation("disable.no_ch", "Uhm, I guess... but you gotta give me a channel or more to disable");
         }
 
         await database.collection("disabled_channels").updateOne({
@@ -43,17 +46,19 @@ module.exports = function install(cr, client, config, database) {
             $addToSet: { channels: [...channels.array().map(c => c.id)] },
         }, { upsert: true });
 
-        await message.channel.send(`Channels ${channels.map(c => c.toString()).join(", ")} will no longer listen to commands`);
+        return new TranslationPlural("disable.success_ch", [
+            "Channel {{channels}} will no longer listen to commands",
+            "Channels {{channels}} will no longer listen to commands",
+        ], channels.size, { channels: new ListFormat(channels.map(c => c.toString())) });
     })).setHelp(new HelpContent()
         .setDescription("Disable Trixie from listening to a channel")
         .setUsage("<#channel>")
         .addParameter("#channel", "A channel or multiple channels"));
 
-    disableCmd.registerSubCommand("command", new SimpleCommand(async (message, content) => {
+    disableCmd.registerSubCommand("command", new SimpleCommand(async ({ message, content }) => {
         const commandsRaw = content.toLowerCase().split(/\s+/g);
         if (commandsRaw.length < 1) {
-            await message.channel.send("Uhm, I guess... but you gotta give me a command or more to enable");
-            return;
+            return new Translation("disable.no_cmd", "Uhm, I guess... but you gotta give me a command or more to disable");
         }
 
         const commands = [];
@@ -69,7 +74,10 @@ module.exports = function install(cr, client, config, database) {
             $addToSet: { commands: [...commands] },
         }, { upsert: true });
 
-        await message.channel.send(`Commands ${commands.join(", ")} will no longer listen`);
+        return new TranslationPlural("disable.success_cmd", [
+            "Command {{commands}} will no longer listen",
+            "Commands {{commands}} will no longer listen",
+        ], commands.length, { commands: new ListFormat(commands) });
     })).setHelp(new HelpContent()
         .setDescription("Disable a command")
         .setUsage("<command name>")
@@ -82,11 +90,10 @@ module.exports = function install(cr, client, config, database) {
         .setHelp(new HelpContent("If you have disabled channels or commands for Trixie, you can enable them here again."))
         .setCategory(Category.MODERATION);
 
-    enableCmd.registerSubCommand("channel", new SimpleCommand(async message => {
+    enableCmd.registerSubCommand("channel", new SimpleCommand(async ({ message }) => {
         const channels = message.mentions.channels;
         if (channels.size < 1) {
-            await message.channel.send("Uhm, I guess... but you gotta give me a channel or more to enable");
-            return;
+            return new Translation("enable.no_ch", "Uhm, I guess... but you gotta give me a channel or more to enable");
         }
 
         await database.collection("disabled_channels").updateOne({
@@ -95,17 +102,19 @@ module.exports = function install(cr, client, config, database) {
             $pull: { channels: [...channels.array().map(c => c.id)] },
         });
 
-        await message.channel.send(`Channels ${channels.map(c => c.toString()).join(", ")} will listen to commands again`);
+        return new TranslationPlural("enable.success_ch", [
+            "Channel {{channels}} will listen to commands again",
+            "Channels {{channels}} will listen to commands again",
+        ], channels.size, { channels: new ListFormat(channels.map(c => c.toString())) });
     })).setHelp(new HelpContent()
         .setDescription("Enable Trixie from listening to a channel again")
         .setUsage("<#channel>")
         .addParameter("#channel", "A channel or multiple channels"));
 
-    enableCmd.registerSubCommand("command", new SimpleCommand(async (message, content) => {
+    enableCmd.registerSubCommand("command", new SimpleCommand(async ({ message, content }) => {
         const commandsRaw = content.toLowerCase().split(/\s+/g);
         if (commandsRaw.length < 1) {
-            await message.channel.send("Uhm, I guess... but you gotta give me a command or more to enable");
-            return;
+            return new Translation("enable.no_cmd", "Uhm, I guess... but you gotta give me a command or more to enable");
         }
 
         const commands = [];
@@ -121,10 +130,10 @@ module.exports = function install(cr, client, config, database) {
             $pull: { commands: [...commands] },
         });
 
-        await message.channel.send(
-            (dontExist.length > 0 ? `Commands ${dontExist.join(", ")} don't exist, but ` : "Commands ") +
-            `${commands.join(", ")} will no longer listen to commands`
-        );
+        return new TranslationPlural("enable.success_cmd", [
+            "Command {{commands}} will listen again",
+            "Commands {{commands}} will listen again",
+        ], commands.length, { commands: new ListFormat(commands) });
     })).setHelp(new HelpContent()
         .setDescription("Enable a command again")
         .setUsage("<command name>")

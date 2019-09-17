@@ -20,6 +20,9 @@ const secureRandom = require("../../modules/random/secureRandom");
 // eslint-disable-next-line no-unused-vars
 const { GuildMember, User, Guild } = require("discord.js");
 
+const TranslationMerge = require("../../modules/i18n/TranslationMerge");
+const NumberFormat = require("../../modules/i18n/NumberFormat");
+
 class CreditsManager {
     constructor() {
         this.accounts = database().then(db => db.collection("credits_accounts"));
@@ -302,6 +305,18 @@ class CreditsManager {
     getBalanceString(balance = 0, names, middl) {
         if (balance === 1 || !names.plural) return `${balance.toLocaleString("en")} ${middl ? middl + " " : ""}${names.singular}`;
         else return `${balance.toLocaleString("en")} ${middl ? middl + " " : ""}${names.plural}`;
+    }
+
+    /**
+     * Convert a balance to a univeral translation resolvable
+     * @param {number} balance
+     * @param {{ singular: string, plural: string }} names
+     * @param {string} middl
+     * @returns {TranslationMerge}
+     */
+    getBalanceTrans(balance = 0, names, middl) {
+        if (balance === 1 || !names.plural) return new TranslationMerge(new NumberFormat(balance), middl, names.singular);
+        else return new TranslationMerge(new NumberFormat(balance), middl, names.plural);
     }
 }
 

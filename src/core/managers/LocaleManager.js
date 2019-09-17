@@ -139,13 +139,15 @@ class LocaleManager {
         if (options instanceof RichEmbed || options instanceof TranslationEmbed) options = { embed: options };
         options.reply = reply;
 
+        let translator;
+
         if (options.embed && options.embed instanceof TranslationEmbed) {
             // eslint-disable-next-line require-atomic-updates
-            options.embed = options.embed.resolve(await this.translator(ch));
+            options.embed = options.embed.resolve(translator || (translator = await this.translator(ch)));
         }
 
         if (content && typeof content !== "string" && typeof content.resolve === "function") {
-            content = Resolvable.resolve(content, await this.translator(ch));
+            content = Resolvable.resolve(content, translator || (translator = await this.translator(ch)));
         }
 
         if (content && content !== "") return [content, options];
@@ -158,7 +160,18 @@ class LocaleManager {
      * @param {Object} [options]
      */
     async edit(msg, content, options) {
-        return await msg.edit(...await this._transformMsg(msg.channel, content, options));
+        const new_msg = await msg.edit(...await this._transformMsg(msg.channel, content, options));
+        return this._addEdit(new_msg);
+    }
+
+    _addEdit(msg) {
+        const oldEdit = msg.edit.bind(msg);
+        return Object.assign(msg, {
+            edit: async (content, options) => {
+                await oldEdit(...await this._transformMsg(msg.channel, content, options));
+                return msg;
+            },
+        });
     }
 
     /**
@@ -167,7 +180,10 @@ class LocaleManager {
      * @param {Object} [options]
      */
     async send(ch, content, options) {
-        return await ch.send(...await this._transformMsg(ch, content, options));
+        const msg = await ch.send(...await this._transformMsg(ch, content, options));
+        // Change the interface of the returned Message object to support editing with
+        // Translation objects
+        return this._addEdit(msg);
     }
 }
 LocaleManager.i18n = i18n;

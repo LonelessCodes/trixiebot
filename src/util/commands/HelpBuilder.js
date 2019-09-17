@@ -125,11 +125,11 @@ class HelpBuilder extends RichEmbed {
     }
 
     createParameter(name, parameter) {
-        return `\`${name}\` ${parameter.optional ? "- optional" : ""}- ${parameter.content}`;
+        return `\`${name}\` ${parameter.optional ? "- optional " : ""}- ${parameter.content}`;
     }
 }
 
-HelpBuilder.sendHelp = function sendHelp(message, name, command) {
+HelpBuilder.sendHelp = async function sendHelp(message, name, command) {
     if (command instanceof AliasCommand) {
         command = command.command;
     }
@@ -137,7 +137,7 @@ HelpBuilder.sendHelp = function sendHelp(message, name, command) {
     if (!command.help) return;
 
     const embed = new HelpBuilder(message, name, command);
-    return message.channel.send({ embed });
+    return await message.channel.send({ embed });
 };
 
 module.exports = HelpBuilder;

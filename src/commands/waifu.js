@@ -266,7 +266,7 @@ module.exports = function install(cr, client, config, db) {
 
             await timeout(1500);
 
-            if (random > 95) {
+            if (random > 92) {
                 await database.updateOne({
                     guildId: message.guild.id,
                     waifuId: waifuUser.user.id,
@@ -343,7 +343,7 @@ because bees don...`);
 
             await timeout(1500);
 
-            if (random > 95) {
+            if (random > 92) {
                 await database.deleteOne({
                     guildId: message.guild.id,
                     waifuId: message.author.id,

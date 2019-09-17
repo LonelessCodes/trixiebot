@@ -127,7 +127,7 @@ class RateLimiter {
 
     toString() {
         if (this.max > 1) {
-            return this.timeUnit.toString(`${this.max} times in ${this.timeNum}`);
+            return this.max + " times in " + this.timeUnit.toString(this.timeNum);
         } else {
             return this.timeUnit.toString(this.timeNum);
         }

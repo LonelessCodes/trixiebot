@@ -54,14 +54,14 @@ class BaseCommand {
 
     async rateLimit(message) {
         const id = `${message.channel.type === "text" ? message.guild.id : ""}:${message.channel.id}`;
-        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(id))) return;
-        await this.rateLimitMessage(message);
-    }
+        if (
+            !this.rateLimiter ||
+            (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(id))
+        ) return;
 
-    async rateLimitMessage(message) {
         const num = `${this.rateLimiter.max} ${this.rateLimiter.max === 1 ? "time" : "times"}`;
         await message.channel.sendTranslated(
-            `Whoa whoa not so fast! You may only do this ${num} every ${this.rateLimiter.toString()}. ` +
+            `Whoa whoa not so fast! You may only do this ${num} every ${this.rateLimiter.timeUnit.toString()}. ` +
             `There is still ${toHumanTime(this.rateLimiter.tryAgainIn(message.author.id))} left to wait.`
         );
     }

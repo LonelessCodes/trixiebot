@@ -86,6 +86,11 @@ class MessageMentions {
                     const member = guild.members.find(member =>
                         member.displayName.toLowerCase().startsWith(displayNameLowercase));
                     if (member) this.users.set(member.user.id, member.user);
+                    else {
+                        const member = guild.members.find(member =>
+                            member.user.username.toLowerCase().startsWith(displayNameLowercase));
+                        if (member) this.users.set(member.user.id, member.user);
+                    }
                 }
             }
         }

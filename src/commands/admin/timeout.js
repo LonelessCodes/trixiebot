@@ -153,10 +153,12 @@ module.exports = function install(cr, client, config, db) {
     timeoutCommand.registerSubCommand("list", new SimpleCommand(async message => {
         let longestName = 0;
         let longestString = 0;
-        const docs = (await database.find({ guildId: message.guild.id }).toArray()).map(doc => {
-            doc.member = message.guild.members.has(doc.memberId) ?
-                message.guild.members.get(doc.memberId) :
-                null;
+
+        const timeouts = await database.find({ guildId: message.guild.id }).toArray();
+        const docs = await Promise.all(timeouts.map(async doc => {
+            doc.member = await message.guild.fetchMember(doc.memberId);
+            return doc;
+        })).then(arr => arr.filter(doc => !!doc.member).map(doc => {
             if (longestName < userToString(doc.member).length) {
                 longestName = userToString(doc.member).length;
             }
@@ -165,7 +167,8 @@ module.exports = function install(cr, client, config, db) {
                 longestString = doc.string.length;
             }
             return doc;
-        }).filter(doc => !!doc.member);
+        }));
+
         let str = "```";
         for (const doc of docs) {
             str += "\n";

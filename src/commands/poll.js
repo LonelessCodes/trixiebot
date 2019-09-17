@@ -167,7 +167,7 @@ module.exports = async function install(cr, client, config, db) {
             continue;
         }
 
-        const creator = guild.members.get(poll.creatorId) || {
+        const creator = await guild.fetchMember(poll.creatorId) || {
             id: poll.creatorId,
             toString() { return `<@${poll.creatorId}>`; },
         };
@@ -176,9 +176,9 @@ module.exports = async function install(cr, client, config, db) {
 
         const votes = poll.votes;
 
-        const users = new Discord.Collection(poll.users.map(userId =>
-            [userId, guild.members.get(userId)]
-        ));
+        const users = new Discord.Collection(await Promise.all(poll.users.map(async userId =>
+            [userId, await guild.fetchMember(userId)]
+        )));
 
         const poll_object = new Poll(
             database,

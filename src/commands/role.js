@@ -32,6 +32,8 @@ function findRoleInServer(guild, role) {
 }
 
 async function rolesMessage(guild, channel, db) {
+    await guild.fetchMembers();
+
     const roles = await db.find({
         guildId: guild.id,
     }).toArray();

@@ -38,11 +38,11 @@ async function getData(message, content, database, databaseSlots) {
 
     const all_waifus = await database.find({ guildId: message.guild.id }).toArray();
     for (const row of all_waifus) {
-        if (!message.guild.members.has(row.ownerId)) {
+        if (!await message.guild.fetchMember(row.ownerId)) {
             await database.deleteMany({ guildId: message.guild.id, ownerId: row.ownerId });
         }
 
-        if (!message.guild.members.has(row.waifuId)) {
+        if (!await message.guild.fetchMember(row.waifuId)) {
             await database.deleteOne({ guildId: message.guild.id, waifuId: row.waifuId });
         }
     }
@@ -126,7 +126,7 @@ module.exports = function install(cr, client, config, db) {
                 waifuId: mentioned_member.user.id,
             });
             if (owner) {
-                const owner_member = message.guild.members.get(owner.ownerId);
+                const owner_member = await message.guild.fetchMember(owner.ownerId);
                 if (owner_member) {
                     await message.channel.send(`Oh nu. ${owner_member.toString()} already claimed this beautiful user!`);
                     return;
@@ -232,7 +232,7 @@ module.exports = function install(cr, client, config, db) {
                 const w = await database.findOne({ waifuId: mentioned_member.user.id, guildId: message.guild.id });
 
                 if (w) {
-                    const owner_member = message.guild.members.get(w.ownerId);
+                    const owner_member = await message.guild.fetchMember(w.ownerId);
                     if (owner_member) {
                         waifu = w;
                     } else {
@@ -251,8 +251,8 @@ module.exports = function install(cr, client, config, db) {
                 return;
             }
 
-            const ownerUser = message.guild.members.get(waifu.ownerId);
-            const waifuUser = message.guild.members.get(waifu.waifuId);
+            const ownerUser = await message.guild.fetchMember(waifu.ownerId);
+            const waifuUser = await message.guild.fetchMember(waifu.waifuId);
 
             const m1 = await message.channel.send(`${userToString(ownerUser)}'s waifu ${userToString(waifuUser)} just seemed to have appeared nearby. You are quietly approaching them...`);
             await timeout(1000);
@@ -329,7 +329,7 @@ because bees don...`);
                 this.cooldown_user.splice(this.cooldown_user.indexOf(message.author.id), 1);
             }, 5 * 60 * 1000);
 
-            const ownerUser = message.guild.members.get(owner_of_me.ownerId);
+            const ownerUser = await message.guild.fetchMember(owner_of_me.ownerId);
 
             const m1 = await message.channel.send(`You are out for walkies with your owner, ${userToString(ownerUser)}. You are following them and their orders, preparing for the perfect escape...`);
             await timeout(1000);
@@ -411,7 +411,7 @@ because bees don...`);
                 return;
             }
 
-            const other_owner = message.guild.members.get(trade_waifu.ownerId);
+            const other_owner = await message.guild.fetchMember(trade_waifu.ownerId);
             if (!trade_waifu || !other_owner) {
                 await message.channel.send(`${userToString(my_waifu)} can't be traded, because they don't belong to anyone!`);
                 return;
@@ -535,7 +535,7 @@ because bees don...`);
             } else {
                 let str = "";
                 for (const waifu of owner_waifus) {
-                    const member = message.guild.members.get(waifu.waifuId);
+                    const member = await message.guild.fetchMember(waifu.waifuId);
                     if (!member) continue;
                     str += userToString(member) + "\n";
                 }
@@ -543,9 +543,8 @@ because bees don...`);
             }
 
             if (owner_of_me) {
-                const owner = message.guild.members.get(owner_of_me.ownerId);
-                if (owner)
-                    embed.addField("Owned by", userToString(owner));
+                const owner = await message.guild.fetchMember(owner_of_me.ownerId);
+                if (owner) embed.addField("Owned by", userToString(owner));
             }
 
             embed.setFooter(`Total Waifus: ${owner_waifus.length} - Available Slots: ${slots - owner_waifus.length}`);

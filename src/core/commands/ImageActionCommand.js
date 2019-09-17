@@ -50,7 +50,7 @@ class TextActionCommand extends BaseCommand {
         }
 
         const phrase = await secureRandom(this.texts);
-        const user = mentions.everyone ? `all ${message.guild.members.size} users` : userToString(mention);
+        const user = mentions.everyone ? `all ${message.guild.memberCount} users` : userToString(mention);
 
         const attachment = new Attachment(this.image);
 

@@ -85,12 +85,13 @@ module.exports = function install(cr, client, config, db) {
         const uom = message.guild.config.uom;
         const r = uom === "cm" ? 2.54 : 1;
 
+        await message.guild.fetchMembers();
         const penises = await database.find({ $or: message.guild.members.array().map(member => ({ userId: member.user.id })) }).toArray();
         const sorted = penises.sort((a, b) => b.length - a.length);
 
         const items = [];
         for (let penis of sorted) {
-            const member = message.guild.members.find(member => member.user.id === penis.userId);
+            const member = await message.guild.fetchMember(penis.userId);
             if (!member) continue;
             items.push(
                 `**8${new Array(Math.round(penis.length)).fill("=").join("")}D   ${member.user.tag}**\n` +

@@ -46,7 +46,7 @@ class TextActionCommand extends BaseCommand {
         const phrase = await secureRandom(this.texts);
 
         if (mentions.everyone) {
-            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.members.size} users`));
+            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.memberCount} users`));
         } else {
             await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), userToString(mention)));
         }

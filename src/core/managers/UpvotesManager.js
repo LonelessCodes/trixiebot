@@ -181,22 +181,6 @@ class UpvotesManager extends EventEmitter {
                 });
                 return this._returnResponse(res, 200, "Webhook successfully received");
             }
-
-            case UpvotesManager.test: {
-                const config_path = "webhook.secrets." + UpvotesManager.test;
-                if (!config.has(config_path)) return;
-
-                const secret = req.headers["authorization"];
-                if (secret !== config.get(config_path)) return this._returnResponse(res, 400);
-
-                this.emit("vote", {
-                    id: data.user,
-                    type: data.type,
-                    site: UpvotesManager.test,
-                    timestamp: Date.now(),
-                });
-                return this._returnResponse(res, 200, "Webhook successfully received");
-            }
         }
         return this._returnResponse(res, 404);
     }
@@ -211,6 +195,5 @@ UpvotesManager.discordbotlist = "discordbotlist.com";
 UpvotesManager.discordbots = "discordbots.org";
 UpvotesManager.botlistspace = "botlist.space";
 UpvotesManager.botsfordiscord = "botsfordiscord.com";
-UpvotesManager.test = "test";
 
 module.exports = UpvotesManager;

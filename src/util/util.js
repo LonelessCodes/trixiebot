@@ -29,7 +29,7 @@ module.exports = new class Utils {
     findDefaultChannel(guild) {
         return guild.channels.find(c => new RegExp("general", "g").test(c.name) && c.type === "text") ||
             guild.channels
-                .filter(c => c.type === "text" && c.send && {}.toString.call(c.send) === "[object Function]")
+                .filter(c => c.type === "text" && c.send && typeof c.send === "function")
                 .sort((a, b) => a.position - b.position)
                 .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
     }

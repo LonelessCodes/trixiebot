@@ -23,7 +23,7 @@ module.exports = function random(...args) {
         } else if (Array.isArray(args[0])) {
             return args[0].length <= 1 ? args[0][0] : args[0][Math.floor(Math.random() * args[0].length)];
         } else {
-            throw new Error("First argument should be number or Array");
+            throw new TypeError("First argument should be number or Array");
         }
     } else if (args.length === 2) {
         return args[0] === args[1] ||

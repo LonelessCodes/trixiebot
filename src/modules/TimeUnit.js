@@ -14,11 +14,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const TranslationPlural = require("./i18n/TranslationPlural");
+
 class TimeUnit {
-    constructor(millis, singular, plural) {
+    /**
+     * @param {number} millis
+     * @param {TranslationPlural} phrase
+     */
+    constructor(millis, phrase) {
         this._millis = millis;
-        this.singular = singular;
-        this.plural = plural;
+        this.translation = phrase;
     }
 
     toMillis(number) {
@@ -31,18 +36,26 @@ class TimeUnit {
 
     toString(number) {
         if (number) {
-            return number === 1 ? `${number} ${this.singular}` : `${number} ${this.plural}`;
+            return number === 1 ? `${number} ${this.translation.phrase[0]}` : `${number} ${this.translation.phrase[1]}`;
         } else {
-            return this.singular;
+            return this.translation.phrase[0];
+        }
+    }
+
+    toTranslation(number) {
+        if (number) {
+            return this.translation.clone(number);
+        } else {
+            return this.translation.phrase[0];
         }
     }
 }
 
-TimeUnit.MILLISECOND = new TimeUnit(1, "millisecond", "milliseconds");
-TimeUnit.SECOND = new TimeUnit(1000, "second", "seconds");
-TimeUnit.MINUTE = new TimeUnit(60000, "minute", "minutes");
-TimeUnit.HOUR = new TimeUnit(3600000, "hour", "hours");
-TimeUnit.DAY = new TimeUnit(3600000 * 24, "day", "days");
-TimeUnit.WEEK = new TimeUnit(3600000 * 24 * 7, "week", "weeks");
+TimeUnit.MILLISECOND = new TimeUnit(1, new TranslationPlural("time.millis", ["millisecond", "milliseconds"]));
+TimeUnit.SECOND = new TimeUnit(1000, new TranslationPlural("time.secs", ["second", "seconds"]));
+TimeUnit.MINUTE = new TimeUnit(60000, new TranslationPlural("time.mins", ["minute", "minutes"]));
+TimeUnit.HOUR = new TimeUnit(3600000, new TranslationPlural("time.hrs", ["hour", "hours"]));
+TimeUnit.DAY = new TimeUnit(3600000 * 24, new TranslationPlural("time.dys", ["day", "days"]));
+TimeUnit.WEEK = new TimeUnit(3600000 * 24 * 7, new TranslationPlural("time.wks", ["week", "weeks"]));
 
 module.exports = TimeUnit;

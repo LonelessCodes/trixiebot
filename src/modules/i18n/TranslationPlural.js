@@ -26,6 +26,19 @@ class TranslationPlural extends Resolvable {
         this.args = args;
     }
 
+    /**
+     * @param {number} [num]
+     * @returns {TranslationPlural}
+     */
+    clone(num) {
+        return new TranslationPlural(
+            this.id,
+            Array.isArray(this.phrase) ? this.phrase.slice() : Object.assign({}, this.phrase),
+            typeof num === "number" ? num : this.count,
+            this.args
+        );
+    }
+
     resolve(i18n) {
         return formatter(i18n, i18n.translateN(this.id, this.phrase, this.count), this.args);
     }

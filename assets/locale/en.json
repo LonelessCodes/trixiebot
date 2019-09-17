@@ -339,5 +339,32 @@
     "no_waifus": "No waifus to see here, just dust :(\nYou can get waifus by claiming someone! Use `{{prefix}}waifu claim` to get started.",
     "owned_by": "Owned by",
     "footer": "Total Waifus: {{waifus}} - Available Slots: {{slots}}"
+  },
+  "time": {
+    "millis": {
+      "one": "millisecond",
+      "other": "milliseconds"
+    },
+    "secs": {
+      "one": "second",
+      "other": "seconds"
+    },
+    "mins": {
+      "one": "minute",
+      "other": "minutes"
+    },
+    "hrs": {
+      "one": "hour",
+      "other": "hours"
+    },
+    "dys": {
+      "one": "day",
+      "other": "days"
+    },
+    "wks": {
+      "one": "week",
+      "other": "weeks"
+    },
+    "x_times_in": "{{x}} times in {{timeframe}}"
   }
 }

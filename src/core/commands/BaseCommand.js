@@ -71,7 +71,7 @@ class BaseCommand {
             this.rateLimiter.max,
             {
                 count: this.rateLimiter.max,
-                time_frame: this.rateLimiter.toString(),
+                time_frame: this.rateLimiter.timeUnit.toTranslation(),
                 time_left: toHumanTime(this.rateLimiter.tryAgainIn(context.author.id)),
             }
         ));

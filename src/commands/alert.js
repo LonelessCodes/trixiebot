@@ -715,7 +715,7 @@ class Manager extends EventEmitter {
     }
 
     async isCompact(guild) {
-        return !!(await this.db_config.findOne({ guildId: guild.id, compact: true }));
+        return !!await this.db_config.findOne({ guildId: guild.id, compact: true });
     }
 
     async setCompact(guild) {
@@ -727,7 +727,7 @@ class Manager extends EventEmitter {
     }
 
     async isCleanup(guild) {
-        return !(await this.db_config.findOne({ guildId: guild.id, cleanup: false }));
+        return !await this.db_config.findOne({ guildId: guild.id, cleanup: false });
     }
 
     async setCleanup(guild) {

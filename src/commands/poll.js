@@ -52,10 +52,10 @@ class Poll {
 
     async init() {
         // insert into database
-        if (!(await this.db.findOne({
+        if (!await this.db.findOne({
             guildId: this.guild.id,
             channelId: this.channel.id,
-        }))) {
+        })) {
             // all the way up in the message handler we checked if DB includes
             // this channel already.So now we can go the efficient insert way
             await this.db.insertOne({

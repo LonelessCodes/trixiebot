@@ -92,7 +92,7 @@ class SampleUploader extends Events {
      * @param {string} name
      */
     async upload(attachment, name) {
-        if (!(await isEnoughDiskSpace())) {
+        if (!await isEnoughDiskSpace()) {
             return this._emitError("Trixie cannot accept any more uploads, as I'm running out of disk space");
         }
 

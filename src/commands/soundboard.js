@@ -387,7 +387,7 @@ module.exports = function install(cr) {
 
         const name = await credits.getName(message.guild);
 
-        if (!(await credits.canPurchase(user, cost))) {
+        if (!await credits.canPurchase(user, cost)) {
             message.channel.send(`:atm: You don't have enough ${name.plural || name.singular} to buy more slots! You need **${credits.getBalanceString(cost, name)}**.`);
             return;
         }
@@ -402,7 +402,7 @@ module.exports = function install(cr) {
                 if (/^buy$/i.test(m.content)) {
                     cooldown.testAndAdd(isUser ? user.id : guild.id);
 
-                    if (!(await credits.canPurchase(user, cost))) {
+                    if (!await credits.canPurchase(user, cost)) {
                         message.channel.send(":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
                         return;
                     }

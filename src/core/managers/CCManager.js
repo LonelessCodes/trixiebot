@@ -157,13 +157,13 @@ class CCManager {
         const triggers = this.trigger_cache.get(guildId);
         // first check against commands
         for (let trigger of triggers.filter(t => t.type === TYPE.COMMAND)) {
-            if (!(await trigger.test(command_name, prefix_used, raw_content))) continue;
+            if (!await trigger.test(command_name, prefix_used, raw_content)) continue;
 
             return await trigger.getCommand();
         }
         // then check against anything else
         for (let trigger of triggers.filter(t => t.type !== TYPE.COMMAND)) {
-            if (!(await trigger.test(command_name, prefix_used, raw_content))) continue;
+            if (!await trigger.test(command_name, prefix_used, raw_content)) continue;
 
             return await trigger.getCommand();
         }

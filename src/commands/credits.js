@@ -155,7 +155,7 @@ module.exports = function install(cr) {
             return;
         }
 
-        if (!(await credits.canPurchase(me, amount))) {
+        if (!await credits.canPurchase(me, amount)) {
             await message.channel.send(":atm: You do not have enough money on your account to pay " + userToString(other_user) + " this much");
             return;
         }

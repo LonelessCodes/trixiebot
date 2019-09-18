@@ -46,8 +46,8 @@ module.exports = function install(cr, client) {
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("trixie", new SimpleCommand(m => ({
-        embed: new Discord.RichEmbed()
+    cr.registerCommand("trixie", new SimpleCommand(m =>
+        new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setAuthor("TrixieBot", client.user.avatarURL, INFO.WEBSITE)
             .setDescription("**Trixie is an all-in-one Discord Bot for pony lovers**\n\n" +
@@ -59,8 +59,8 @@ module.exports = function install(cr, client) {
                     "Web Dashboard " + INFO.WEBSITE + (m.channel.type === "text" ? "/dashboard/" + m.guild.id : "/dashboard") + "\n" :
                     "") +
                 "Contributing: https://github.com/LonelessCodes/trixiebot")
-            .setFooter(`TrixieBot v${INFO.VERSION}`),
-    })))
+            .setFooter(`TrixieBot v${INFO.VERSION}`)
+    ))
         .setHelp(new HelpContent().setDescription("First command to call."))
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);

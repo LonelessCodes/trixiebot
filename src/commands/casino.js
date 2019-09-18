@@ -293,7 +293,7 @@ module.exports = function install(cr) {
             if (bet < MIN) return "Minimum bet should be " + credits.getBalanceString(MIN, await credits.getName(message.guild));
             if (bet > MAX) return "Maximum bet should be " + credits.getBalanceString(MAX, await credits.getName(message.guild));
 
-            if (!(await credits.canPurchase(message.author, bet))) return "You don't have enough " + (await credits.getName(message.guild)).plural + " to gamble :c";
+            if (!await credits.canPurchase(message.author, bet)) return "You don't have enough " + (await credits.getName(message.guild)).plural + " to gamble :c";
 
             return await blackJack(message.channel, message.author, bet);
         }))

@@ -254,7 +254,7 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
-            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
+            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
                 return { success: false };
 
             try {
@@ -274,7 +274,7 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
-            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
+            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
                 return { success: false };
 
             try {
@@ -291,7 +291,7 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { success: false };
 
-            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
+            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
                 return { success: false };
 
             try {
@@ -308,7 +308,7 @@ class WebsiteManager {
             if (!this.client.guilds.has(guildId))
                 return { errors: [], success: false };
 
-            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId)))
+            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
                 return { errors: [], success: false };
 
             try {

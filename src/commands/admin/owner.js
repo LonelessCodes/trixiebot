@@ -45,7 +45,7 @@ module.exports = function install(cr, client, config, db) {
 
         async call(message, msg) {
             const file = path.resolve(path.join(process.cwd(), msg));
-            if (!(await fs.exists(file))) {
+            if (!await fs.exists(file)) {
                 await message.channel.send("Doesn't exist");
                 return;
             }

@@ -19,7 +19,7 @@ const path = require("path");
 
 module.exports = async function getChangelog() {
     const p = path.join(__dirname, "..", "..", "CHANGELOG.md");
-    if (!(await fs.exists(p))) return [];
+    if (!await fs.exists(p)) return [];
 
     const file = await fs.readFile(p, "utf8");
 

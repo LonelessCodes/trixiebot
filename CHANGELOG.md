@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.14.2"></a>
+## [2.14.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.1...v2.14.2) (2019-09-18)
+
+
+### Bug Fixes
+
+* **BaseCommand:** fix default rate limiter message ([f8a825a](https://bitbucket.org/Loneless/trixiebot/commits/f8a825a))
+* **help generation:** add missing space after "optional" identifier ([099f4ea](https://bitbucket.org/Loneless/trixiebot/commits/099f4ea))
+* **IPC Adapter:** fixed little typo ([6aa1cd0](https://bitbucket.org/Loneless/trixiebot/commits/6aa1cd0))
+* **member fetching:** fixed fetching members instead of getting them only from cache ([f31743a](https://bitbucket.org/Loneless/trixiebot/commits/f31743a))
+* **README:** fix scrolling of footer license notice on Github ([35ebaf7](https://bitbucket.org/Loneless/trixiebot/commits/35ebaf7))
+* **touch cmd:** fixed wrong no-mention message ([683e4d1](https://bitbucket.org/Loneless/trixiebot/commits/683e4d1))
+* **waifu cmd:** re-adjust steal and escape chances ([5b93fbe](https://bitbucket.org/Loneless/trixiebot/commits/5b93fbe))
+
+
+### Features
+
+* **mentions parser:** at last also search through usernames to find a fit ([b72870a](https://bitbucket.org/Loneless/trixiebot/commits/b72870a))
+
+
+
 <a name="2.14.1"></a>
 ## [2.14.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.0...v2.14.1) (2019-09-10)
 

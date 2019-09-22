@@ -41,8 +41,8 @@ const LineTerminator = createToken({
 });
 
 // Comments
-const SingleLineComment = createToken({ name: "SingleLineComment", pattern: /\/\/[^\r\n]*/, group: Lexer.SKIPPED });
-const MultiLineComment = createToken({ name: "MultiLineComment", pattern: /\/\*(?:[\s\S]*?)\*\//, group: Lexer.SKIPPED });
+const SingleLineComment = createToken({ name: "SingleLineComment", pattern: /\/\/[^\r\n]*/, group: Lexer.SKIPPED, start_chars_hint: ["/"] });
+const MultiLineComment = createToken({ name: "MultiLineComment", pattern: /\/\*(?:[\s\S]*?)\*\//, group: Lexer.SKIPPED, start_chars_hint: ["/"], line_breaks: true });
 
 // An identifier name. This is anything, a variable or a reserved keyword
 const IdentifierName = createToken({ name: "IdentifierName", pattern: Lexer.NA });
@@ -148,27 +148,30 @@ const NumbericLiteral = createToken({ name: "NumbericLiteral", pattern: Lexer.NA
 
 const DecimalLiteral = createToken({
     categories: NumbericLiteral, name: "DecimalLiteral", pattern: /(?:[0-9]+(?:\.[0-9]+)?)(?:e[+-]?[0-9]+)?\b/i,
+    start_chars_hint: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
 });
 const HexLiteral = createToken({
-    categories: NumbericLiteral, name: "HexLiteral", pattern: /0x([0-9a-f]+)\b/i,
+    categories: NumbericLiteral, name: "HexLiteral", pattern: /0x([0-9a-f]+)\b/i, start_chars_hint: ["0"],
 });
 const OctalLiteral = createToken({
-    categories: NumbericLiteral, name: "OctalLiteral", pattern: /0o([0-7]+)\b/i,
+    categories: NumbericLiteral, name: "OctalLiteral", pattern: /0o([0-7]+)\b/i, start_chars_hint: ["0"],
 });
 const BinaryLiteral = createToken({
-    categories: NumbericLiteral, name: "BinaryLiteral", pattern: /0b([01]+)\b/i,
+    categories: NumbericLiteral, name: "BinaryLiteral", pattern: /0b([01]+)\b/i, start_chars_hint: ["0"],
 });
 
 const StringLiteral = createToken({
     categories: Literal,
     name: "StringLiteral",
     pattern: /(?:"([^"\n]*)")|(?:'([^'\n]*)')/,
+    start_chars_hint: ["\"", "'"],
 });
 
 const RegExpLiteral = createToken({
     categories: Literal,
     name: "RegExpLiteral",
     pattern: regex_regex,
+    start_chars_hint: "/",
 });
 
 const Identifier = createToken({ name: "Identifier", pattern: /([A-Za-z_$][A-Za-z0-9_$]*)/, categories: IdentifierName });

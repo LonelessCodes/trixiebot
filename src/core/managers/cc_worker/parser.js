@@ -1,3 +1,4 @@
+const INFO = require("../../../info");
 const { Parser, EOF, tokenMatcher, tokenName, tokenLabel } = require("chevrotain");
 const { ALL_TOKENS, tokens: t } = require("./lexer/tokens");
 
@@ -133,9 +134,8 @@ function hasTokenLabel(obj) {
 
 const parser = new CCParser(ALL_TOKENS, {
     outputCst: true,
-    ignoredIssues: {
-        Statement: { OR: true },
-    },
+    skipValidations: !INFO.DEV,
+    traceInitPerf: INFO.DEV,
     errorMessageProvider: {
         buildMismatchTokenMessage({ actual, expected }) {
             const hasLabel = hasTokenLabel(expected);
@@ -458,9 +458,8 @@ $.RULE("AssignmentExpression", () => {
 });
 
 $.RULE("Statement", () => {
-    $.OR(
-        $.c2 ||
-        ($.c2 = [
+    $.OR({
+        DEF: $.c2 || ($.c2 = [
             { ALT: () => $.SUBRULE($.BlockStatement, $statement) },
             { ALT: () => $.SUBRULE($.EmptyStatement, $empty) },
             { ALT: () => $.SUBRULE($.ExpressionStatement, $statement) },
@@ -472,8 +471,9 @@ $.RULE("Statement", () => {
             { ALT: () => $.SUBRULE($.ReturnStatement, $statement) },
             { ALT: () => $.SUBRULE($.SleepStatement, $statement) },
             { ALT: () => $.SUBRULE($.ReplyStatement, $statement) },
-        ])
-    );
+        ]),
+        IGNORE_AMBIGUITIES: true,
+    });
 });
 
 $.RULE("BlockStatement", () => {

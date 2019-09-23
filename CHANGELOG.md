@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.15.0"></a>
+# [2.15.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.2...v2.15.0) (2019-09-23)
+
+
+### Features
+
+* **status:** loop over server count, website link and status text ([1a5ddff](https://bitbucket.org/Loneless/trixiebot/commits/1a5ddff))
+* implemented an error cases manager ([c7b1ecd](https://bitbucket.org/Loneless/trixiebot/commits/c7b1ecd))
+
+
+
 <a name="2.14.2"></a>
 ## [2.14.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.1...v2.14.2) (2019-09-18)
 

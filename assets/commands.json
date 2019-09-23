@@ -518,6 +518,13 @@
       }
     },
     {
+      "name": "reporterror",
+      "help": {
+        "usage": "\n`!reporterror <error case id>` - Report a processing error",
+        "category": "Info"
+      }
+    },
+    {
       "name": "role",
       "help": {
         "description": "A whole easy to use role manager. Configure roles everyone can add themselves.",

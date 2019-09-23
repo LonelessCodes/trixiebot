@@ -19,40 +19,20 @@ const INFO = require("../info");
 const { splitArgs } = require("../util/string");
 const stats = require("../modules/stats");
 const guild_stats = require("./managers/GuildStatsManager");
+const ErrorCaseManager = require("./managers/ErrorCaseManager");
 const CommandRegistry = require("./CommandRegistry");
 const CommandDispatcher = require("./CommandDispatcher");
 const nanoTimer = require("../modules/nanoTimer");
 // eslint-disable-next-line no-unused-vars
 const { Message, Permissions } = require("discord.js");
 
-/**
- * @param {Message} message
- * @param {Error} err
- * @returns {void}
- */
-async function onProcessingError(message, err) {
-    log.error(
-        "ProcessingError {\n" +
-        "  content:     " + JSON.stringify(message.content) + "\n" +
-        "  channelType: " + message.channel.type + "\n" +
-        (message.channel.type === "text" ? "  guildId:     " + message.guild.id + "\n" : "") +
-        "  channelId:   " + message.channel.id + "\n" +
-        "  userId:      " + message.author.id + "\n" +
-        "  error:      ", err, "}"
-    );
-
-    try {
-        const err_message = "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...";
-        if (INFO.DEV) await message.channel.sendTranslated(err_message + `\n\`${err.name}: ${err.message}\``);
-        else await message.channel.sendTranslated(err_message);
-    } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
-}
-
 class CommandProcessor {
     constructor(client, config, database) {
         this.client = client;
         this.config = config;
         this.db = database;
+
+        this.error_cases = new ErrorCaseManager(this.client, this.db);
 
         this.REGISTRY = new CommandRegistry(client, database);
         this.DISPATCHER = new CommandDispatcher(client, database, this.REGISTRY);
@@ -83,8 +63,34 @@ class CommandProcessor {
 
             await this.run(message, timer);
         } catch (err) {
-            await onProcessingError(message, err);
+            await this.onProcessingError(message, err);
         }
+    }
+
+    /**
+     * @param {Message} message
+     * @param {Error} err
+     * @returns {void}
+     */
+    async onProcessingError(message, err) {
+        const caseId = await this.error_cases.collectInfo(message, err);
+
+        log.error(
+            "ProcessingError {\n" +
+            "  caseID:      " + caseId + "\n" +
+            "  content:     " + JSON.stringify(message.content) + "\n" +
+            "  channelType: " + message.channel.type + "\n" +
+            (message.channel.type === "text" ? "  guildId:     " + message.guild.id + "\n" : "") +
+            "  channelId:   " + message.channel.id + "\n" +
+            "  userId:      " + message.author.id + "\n" +
+            "  error:      ", err, "}"
+        );
+
+        try {
+            const err_message = "Uh... I think... I might've run into a problem there...?\nIf you believe this is unintended behaviour, report the error with `" + (message.prefix || "!") + "reporterror " + caseId + "`";
+            if (INFO.DEV) await message.channel.sendTranslated(err_message + `\n\`${err.name}: ${err.message}\``);
+            else await message.channel.sendTranslated(err_message);
+        } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
     }
 
     async run(message, timer) {

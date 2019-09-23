@@ -89,7 +89,7 @@ class Core {
 
         await Promise.all(files.map(async file => {
             const install = require(path.resolve("../" + commands_package, file));
-            await install(this.processor.REGISTRY, this.client, this.config, this.db);
+            await install(this.processor.REGISTRY, this.client, this.config, this.db, this.processor.error_cases);
         }));
 
         const install_time = timer.end() / nanoTimer.NS_PER_SEC;

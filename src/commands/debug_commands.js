@@ -68,11 +68,14 @@ function getCPUInfo() {
 }
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
+const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-module.exports = function install(cr, client) {
+const Paginator = require("../util/commands/Paginator");
+
+module.exports = function install(cr, client, _, __, error_cases) {
     cr.registerCommand("info", new SimpleCommand(async () => {
         const guilds = client.guilds;
         const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
@@ -159,5 +162,54 @@ module.exports = function install(cr, client) {
     }))
         .setHelp(new HelpContent().setDescription("Gets the changes made to TrixieBot in the latest versions"))
         .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
+
+    // ERROR CASES
+
+    cr.registerCommand("reporterror", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (_, caseId) => {
+            await error_cases.reportError(caseId);
+            return ":ok_hand: The error will go under review soon!";
+        }))
+        .setHelp(new HelpContent()
+            .setUsage("<error case id>", "Report a processing error"))
+        .setCategory(Category.INFO)
+        .setScope(CommandScope.ALL);
+
+    cr.registerCommand("viewerrors", new SimpleCommand(async message => {
+        const errs = await error_cases.getErrors();
+
+        const items = [];
+
+        for (let err of errs) {
+            items.push(
+                "```\n" +
+                `${(/** @type {Date} */err.ts.toString().slice(4, 24))}   ${err._id}\n` +
+                "Message Id             User Id\n" +
+                `${err.message_id}     ${err.user_id}\n` +
+                "Channel Id             Guild Id\n" +
+                `${err.channel_id}     ${err.guild_id}\n` +
+                "Guild Large?           Channel Type\n" +
+                `${err.guild_large}                  ${err.channel_type}\n` +
+                "Memory Usage           Uptime\n" +
+                `${(err.memory_usage.rss / 1024 / 1024).toFixed(3)} MB             ${err.uptime / 1000} s\n` +
+                "Content\n" +
+                `${err.content.replace("`", "´")}\n` +
+                `${err.err.stack}\n` +
+                "```"
+            );
+        }
+
+        new Paginator("Error Cases", "", 1, items, message.author).display(message.channel);
+    }))
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.ALL);
+
+    cr.registerCommand("approveerror", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async (_, caseId) => {
+            await error_cases.acknowledgeError(caseId);
+            return ":ok_hand:";
+        }))
+        .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 };

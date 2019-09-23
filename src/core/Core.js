@@ -142,21 +142,21 @@ class Core {
 
         const updateStatus = async () => {
             clearTimeout(timeout_ref);
-            timeout_ref = setTimeout(updateStatus, 8 * 60000);
+            timeout_ref = setTimeout(updateStatus, 3 * 60000);
 
             this.client.user.setStatus("online");
 
             // Server count
 
-            this.client.user.setActivity(`${this.client.guilds.size.toLocaleString("en")} servers`, { type: "WATCHING" });
+            this.client.user.setActivity(`!trixie | ${this.client.guilds.size.toLocaleString("en")} servers`, { type: "WATCHING" });
 
-            await timeout(2 * 60000);
+            await timeout(60000);
 
             // Website
 
-            this.client.user.setActivity("trixie.loneless.art", { type: "STREAMING" });
+            this.client.user.setActivity("!trixie | trixie.loneless.art", { type: "PLAYING" });
 
-            await timeout(2 * 60000);
+            await timeout(60000);
 
             // Status text
 

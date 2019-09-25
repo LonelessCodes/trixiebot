@@ -237,11 +237,11 @@ module.exports = function install(cr, client, config, db) {
                         waifu = w;
                     } else {
                         await database.deleteMany({ guildId: message.guild.id, ownerId: w.ownerId });
-                        await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displyaName}\` to call them your own!`);
+                        await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displayName}\` to call them your own!`);
                         return;
                     }
                 } else {
-                    await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displyaName}\` to call them your own!`);
+                    await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displayName}\` to call them your own!`);
                     return;
                 }
             }

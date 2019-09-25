@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.15.3"></a>
+## [2.15.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.2...v2.15.3) (2019-09-25)
+
+
+### Bug Fixes
+
+* **fetch member:** fixed typos made. sryyyy ([aff3948](https://bitbucket.org/Loneless/trixiebot/commits/aff3948))
+
+
+
 <a name="2.15.2"></a>
 ## [2.15.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.1...v2.15.2) (2019-09-25)
 

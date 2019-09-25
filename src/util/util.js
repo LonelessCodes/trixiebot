@@ -65,4 +65,18 @@ module.exports = new class Utils {
         str.fill(b, Math.round(v * length));
         return `${str.join("")} ${(v * 100).toFixed(1)}%`;
     }
+
+    /**
+     * @param {Discord.Guild} guild
+     * @param {Discord.UserResolvable} user
+     * @param {boolean} cache
+     * @returns {?Discord.GuildMember}
+     */
+    fetchMember(guild, user, cache = true) {
+        try {
+            return guild.fetchMember(user, cache);
+        } catch (_) {
+            return null;
+        }
+    }
 };

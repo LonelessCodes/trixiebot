@@ -17,7 +17,7 @@
 const LocaleManager = require("../core/managers/LocaleManager");
 const { parseHumanTime, toHumanTime } = require("../util/time");
 const { escapeRegExp } = require("../util/string");
-const { progressBar } = require("../util/util");
+const { progressBar, fetchMember } = require("../util/util");
 const CONST = require("../const");
 const Discord = require("discord.js");
 
@@ -167,7 +167,7 @@ module.exports = async function install(cr, client, config, db) {
             continue;
         }
 
-        const creator = await guild.fetchMember(poll.creatorId) || {
+        const creator = await fetchMember(guild, poll.creatorId) || {
             id: poll.creatorId,
             toString() { return `<@${poll.creatorId}>`; },
         };
@@ -177,7 +177,7 @@ module.exports = async function install(cr, client, config, db) {
         const votes = poll.votes;
 
         const users = new Discord.Collection(await Promise.all(poll.users.map(async userId =>
-            [userId, await guild.fetchMember(userId)]
+            [userId, await fetchMember(guild, userId)]
         )));
 
         const poll_object = new Poll(

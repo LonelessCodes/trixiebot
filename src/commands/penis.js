@@ -91,7 +91,7 @@ module.exports = function install(cr, client, config, db) {
 
         const items = [];
         for (let penis of sorted) {
-            const member = await message.guild.fetchMember(penis.userId);
+            const member = message.guild.members.get(penis.userId);
             if (!member) continue;
             items.push(
                 `**8${new Array(Math.round(penis.length)).fill("=").join("")}D   ${member.user.tag}**\n` +

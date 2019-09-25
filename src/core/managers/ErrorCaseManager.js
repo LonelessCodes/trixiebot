@@ -38,6 +38,9 @@ class ErrorCaseManager {
             stack: err.stack,
         };
 
+        const guild_id = message.guild && message.guild.id;
+        const guild_large = message.guild ? message.guild.large : false;
+
         const doc = {
             _id: "#" + await getNextSequence(this.db, "error_cases"),
             ts: new Date,
@@ -45,8 +48,8 @@ class ErrorCaseManager {
             err: err_clean,
             message_id: message.id,
             content: message.content,
-            guild_id: message.guild.id,
-            guild_large: message.guild.large,
+            guild_id,
+            guild_large,
             channel_type: message.channel.type,
             channel_id: message.channel.id,
             user_id: message.author.id,

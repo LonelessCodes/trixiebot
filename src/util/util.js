@@ -70,11 +70,11 @@ module.exports = new class Utils {
      * @param {Discord.Guild} guild
      * @param {Discord.UserResolvable} user
      * @param {boolean} cache
-     * @returns {?Discord.GuildMember}
+     * @returns {Promise<Discord.GuildMember>}
      */
-    fetchMember(guild, user, cache = true) {
+    async fetchMember(guild, user, cache = true) {
         try {
-            return guild.fetchMember(user, cache);
+            return await guild.fetchMember(user, cache);
         } catch (_) {
             return null;
         }

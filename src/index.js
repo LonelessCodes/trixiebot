@@ -49,7 +49,12 @@ process.addListener("warning", warning => {
  * ==== START BOT ====
  */
 
-const client = new Discord.Client({ autoReconnect: true }).setMaxListeners(Infinity);
+const client = new Discord.Client({
+    autoReconnect: true,
+    messageCacheMaxSize: 200,
+    messageCacheLifetime: 60 * 10,
+    messageSweepInterval: 60 * 10,
+});
 
 // Attach listeners
 client.addListener("warn", warn => djs_log.warn(warn));

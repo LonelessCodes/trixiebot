@@ -621,6 +621,13 @@
       }
     },
     {
+      "name": "subscribe",
+      "help": {
+        "usage": "\n`!subscribe` - Subscribe to Trixie's newsletter to receive infos about updates and deprecations.",
+        "category": "Info"
+      }
+    },
+    {
       "name": "tableflip",
       "help": {
         "description": "(╯°□°）╯︵ Tableflip",
@@ -689,6 +696,13 @@
       "help": {
         "permissions": "Manage Messages",
         "usage": "\n`!unmute <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted"
+      }
+    },
+    {
+      "name": "unsubscribe",
+      "help": {
+        "usage": "\n`!unsubscribe` - Unsubscribe from Trixie's newsletter.",
+        "category": "Info"
       }
     },
     {

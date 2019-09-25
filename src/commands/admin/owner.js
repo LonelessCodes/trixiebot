@@ -14,7 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../../log").namespace("owner cmd");
 const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
@@ -23,7 +22,6 @@ const { findDefaultChannel } = require("../../util/util");
 const { resolveStdout } = require("../../util/string");
 const { splitArgs } = require("../../util/string");
 const ipc = require("../../modules/concurrency/ipc");
-const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const BaseCommand = require("../../core/commands/BaseCommand");
@@ -73,10 +71,10 @@ module.exports = function install(cr, client, config, db) {
                 tmp = tmp.substring(lastIndex + 1);
                 await message.channel.send(`\`\`\`${result}\`\`\``);
             }
-
-            log(`Sent file contents of ${msg}`);
         }
-    }).setIgnore(false).setCategory(Category.OWNER);
+    })
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.ALL);
 
     cr.registerCommand("exec", new SimpleCommand(async (message, msg) => {
         const content = await promisify(exec)(msg);
@@ -88,45 +86,40 @@ module.exports = function install(cr, client, config, db) {
             escaped = escaped.substring(lastIndex + 1);
             await message.channel.send(`\`\`\`${result}\`\`\``);
         }
-
-        log(`Sent stdout for command ${msg}`);
-    })).setIgnore(false).setCategory(Category.OWNER);
+    }))
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.ALL);
 
     cr.registerCommand("eval", new SimpleCommand(async (message, msg) => {
         const content = await eval(`(async () => {${msg}})()`);
-        await message.channel.send("```\n" + content + "\n```");
-        log(`Evaluated ${msg} and sent result`);
-    })).setIgnore(false).setCategory(Category.OWNER);
+        return "```\n" + content + "\n```";
+    }))
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.ALL);
 
-    cr.registerCommand("broadcast", new SimpleCommand((message, msg) => {
-        client.guilds.forEach(guild => {
-            if (!guild.available) return;
-            const defaultChannel = findDefaultChannel(guild);
-            if (!defaultChannel) return;
-            defaultChannel.send("Broadcast from creator", {
-                embed: new Discord.RichEmbed().setDescription(msg),
-            }).catch(() => { /* Do nothing */ });
-        });
-        log(`Broadcasted message ${msg}`);
-    })).setIgnore(false).setCategory(Category.OWNER);
-
-    cr.registerCommand("send", new SimpleCommand((message, msg) => {
+    cr.registerCommand("send", new SimpleCommand(async (message, msg) => {
         const s = splitArgs(msg, 2);
         const guild = client.guilds.get(s[0]);
         if (!guild) {
             const channel = client.channels.get(s[0]);
-            if (!channel) return;
-            channel.send(s[1]);
+            if (!channel) return "Channel doesn't exist";
+            await channel.send(s[1]);
+        } else {
+            if (!guild.available) return "Guild not available";
+            const defaultChannel = findDefaultChannel(guild);
+            if (!defaultChannel) return "No default channel found";
+            await defaultChannel.send(s[1]);
         }
-        if (!guild.available) return;
-        const defaultChannel = findDefaultChannel(guild);
-        defaultChannel.send(s[1]);
-    })).setIgnore(false).setCategory(Category.OWNER);
 
-    cr.registerCommand("backup", new SimpleCommand(async message => {
+        return "Successfully delivered!";
+    }))
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.ALL);
+
+    cr.registerCommand("backup", new SimpleCommand(async () => {
         const url = await ipc.awaitAnswer("admin:mongoarchive");
 
-        await message.channel.send(`Get your archive here: ${url}`);
+        return `Get your archive here: ${url}`;
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.FLAGS.DM);

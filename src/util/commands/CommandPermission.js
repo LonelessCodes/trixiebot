@@ -44,7 +44,7 @@ class CommandPermission {
     test(member) {
         for (const permission of this.permissions) {
             if (member instanceof User) return false;
-            if (!member.hasPermission(permission, false, true, true)) return false;
+            if (!member.hasPermission(permission)) return false;
         }
         return true;
     }

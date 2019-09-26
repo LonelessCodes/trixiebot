@@ -52,6 +52,14 @@
       }
     },
     {
+      "name": "birthday",
+      "help": {
+        "description": "Automatically give birthday boiz in your server a specific role.",
+        "usage": "\n`!birthday <YYYY-MM-DD>` - Set your birthday\n`YYYY-MM-DD` - optional - Your b-day in Year-Month-Day format\n\n`!birthday reset` - Reset your birthday. Trixie will no longer know it.\n\n`!birthday month <month>` - List all birthdays in this month in the server\n`month` - The month as a number. 1 for January, 2 for February, and so on.\n\n**Admin Area:**\n`!birthday config` - Configure the automatic birthday role thing in your server\n\n`!birthday config role <role name>` - Set the birthday boy role\n`role name` - The birthday role name\n\n`!birthday config toggle` - Toggle the birthday announcer on or off",
+        "category": "Fun"
+      }
+    },
+    {
       "name": "bite",
       "help": {
         "description": "Ouchie! Bite someone",

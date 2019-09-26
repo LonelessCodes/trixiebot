@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.16.0"></a>
+# [2.16.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.3...v2.16.0) (2019-09-26)
+
+
+### Bug Fixes
+
+* **announcements:** MemberAdd, MemberRemove and BanAdd work again!!! ([e5cdccc](https://bitbucket.org/Loneless/trixiebot/commits/e5cdccc))
+* **birthday cmd:** update hourly to at least show good will ([d5299e5](https://bitbucket.org/Loneless/trixiebot/commits/d5299e5))
+* **error cases:** fixed error catching in DM channels ([987d193](https://bitbucket.org/Loneless/trixiebot/commits/987d193))
+* **waifu steal cmd:** fixed "@ undefined" bug if waifu hasn't yet been claimed ([cbee0cf](https://bitbucket.org/Loneless/trixiebot/commits/cbee0cf))
+
+
+### Features
+
+* add birthday command ([1c030c5](https://bitbucket.org/Loneless/trixiebot/commits/1c030c5))
+* added Newsletter functionality (subscribe, unsubscribe cmds) ([410a9f7](https://bitbucket.org/Loneless/trixiebot/commits/410a9f7))
+
+
+
 <a name="2.15.3"></a>
 ## [2.15.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.2...v2.15.3) (2019-09-25)
 

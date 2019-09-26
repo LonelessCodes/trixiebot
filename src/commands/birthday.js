@@ -80,7 +80,10 @@ module.exports = async function install(cr, client, config, db) {
         }
     };
 
-    new CronJob("0 0 0 * * *", tick).start();
+    // eslint-disable-next-line no-warning-comments
+    // TODO: allow instant updating
+    // Run every hour instead of every day to update new entries at least hourly
+    new CronJob("0 0 * * * *", tick).start();
     await tick();
 
     const birthdayCmd = cr.registerCommand("birthday", new TreeCommand)

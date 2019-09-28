@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.16.1"></a>
+## [2.16.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.0...v2.16.1) (2019-09-28)
+
+
+
 <a name="2.16.0"></a>
 # [2.16.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.3...v2.16.0) (2019-09-26)
 

@@ -84,6 +84,8 @@ class CommandDispatcher {
         /** @type {[RegExp|string, BaseCommand]} */
         const keyword = this.REGISTRY.getKeyword(message.content);
         if (keyword) return await this.processCommand(message, command_name, content, prefix_used, keyword[1], timer, keyword[0]);
+
+        await this.processCommand(message, command_name, content, prefix_used, null, timer, null);
     }
 
     /**
@@ -155,8 +157,8 @@ class CommandDispatcher {
             command = command.command;
         }
 
-        if (!command.hasScope(message.channel)) return;
-        if (!command.isInSeason()) return;
+        if (command && !command.hasScope(message.channel)) return;
+        if (command && !command.isInSeason()) return;
 
         // is the case of cases, Owner should be able to use Owner commands everywhere, regardless of timeouts and other problems
         const isOwnerCommand = command && command.category && command.category === Category.OWNER && isOwner(message.author);

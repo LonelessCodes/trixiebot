@@ -48,7 +48,6 @@ module.exports = function install(cr, client, config, db) {
                     if (msg.indexOf(word) === -1) continue;
 
                     await message.delete().catch(() => { /* Do nothing */ });
-                    return;
                 }
             }
 
@@ -99,7 +98,7 @@ module.exports = function install(cr, client, config, db) {
         .setHelp(new HelpContent().setUsage("", "list all muted words and phrases"));
 
     muteWordCommand.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, content, { pass_through: muted_words }) => {
+        .registerOverload("1+", new SimpleCommand(async (message, content, { pass_through: muted_words = [] }) => {
             /**
              * @type {string}
              */

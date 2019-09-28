@@ -46,7 +46,7 @@
     "node-fetch": "^2.6.0",
     "node-gettext": "^2.0.0",
     "node-ipc": "^9.1.1",
-    "node-opus": "^0.2.9",
+    "node-opus": "^0.3.2",
     "ogg": "^1.2.6",
     "prism-media": "^1.1.0",
     "ps-tree": "^1.2.0",

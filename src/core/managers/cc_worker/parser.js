@@ -135,7 +135,6 @@ function hasTokenLabel(obj) {
 const parser = new CCParser(ALL_TOKENS, {
     outputCst: true,
     skipValidations: !INFO.DEV,
-    traceInitPerf: INFO.DEV,
     errorMessageProvider: {
         buildMismatchTokenMessage({ actual, expected }) {
             const hasLabel = hasTokenLabel(expected);

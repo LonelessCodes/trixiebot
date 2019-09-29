@@ -26,6 +26,8 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+
 module.exports = function install(cr) {
     if (!config.has("giphy.key")) return log.namespace("config", "Found no API token for Giphy - Disabled gif command");
 
@@ -44,57 +46,51 @@ module.exports = function install(cr) {
                 limit: 1,
                 rating: message.channel.nsfw ? "r" : "g",
             });
-            if (!gif.data.image_original_url) return "Empty response for global random gif";
+            if (!gif.data.image_original_url) return new Translation("gif.empty", "Empty response for global random gif");
 
-            await message.channel.send(gif.data.image_original_url);
+            return gif.data.image_original_url;
         }))
-        .registerOverload("1+", new SimpleCommand(async (message, query) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const gif = await giphy.random({
                 limit: 1,
-                tag: encodeURIComponent(query),
+                tag: encodeURIComponent(content),
                 rating: message.channel.nsfw ? "r" : "g",
             });
             if (!gif.data.image_original_url) {
-                await message.channel.sendTranslated("No GIFs were found matching this query.");
-                return;
+                return new Translation("gif.empty_response", "No GIFs were found matching this query.");
             }
 
-            await message.channel.send(gif.data.image_original_url);
+            return gif.data.image_original_url;
         }))
         .setHelp(new HelpContent()
             .setUsage("<query>", "returns a random gif for the given `query`"));
 
-    gifCommand.registerSubCommand("trending", new SimpleCommand(async message => {
+    gifCommand.registerSubCommand("trending", new SimpleCommand(async () => {
         const gif = await giphy.trending({
             limit: 100,
         });
         if (gif.data.length === 0) {
-            await message.channel.sendTranslated("Apparently nothing is trending right now.");
-            return;
+            return new Translation("gif.nothing_trending", "Apparently nothing is trending right now.");
         }
 
-        const url = (await randomItem(gif.data)).images.fixed_height.url;
-
-        return url;
+        const item = await randomItem(gif.data);
+        return item.images.fixed_height.url;
     }))
         .setHelp(new HelpContent()
             .setUsage("", "returns a random trending gif"));
 
     gifCommand.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, query) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const gif = await giphy.search({
-                q: encodeURIComponent(query),
+                q: encodeURIComponent(content),
                 limit: 1,
                 rating: message.channel.nsfw ? "r" : "g",
             });
             if (!gif.data || gif.data.length === 0) {
-                await message.channel.sendTranslated("No GIFs were found matching this query.");
-                return;
+                return new Translation("gif.empty_response", "No GIFs were found matching this query.");
             }
 
-            const url = gif.data[0].images.fixed_height.url;
-
-            await message.channel.send(url);
+            return gif.data[0].images.fixed_height.url;
         }));
 
     gifCommand.registerSubCommandAlias("*", "top");

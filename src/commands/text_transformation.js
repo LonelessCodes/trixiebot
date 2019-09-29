@@ -17,26 +17,21 @@
 const tinytext = require("tiny-text");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
+const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
-const MessageMentions = require("../util/commands/MessageMentions");
 const CommandScope = require("../util/commands/CommandScope");
 
 module.exports = function install(cr) {
-    cr.registerCommand("smol", new SimpleCommand(async (message, content) => {
-        const is_guild = message.channel.type === "text";
-        const mention = is_guild ? new MessageMentions(content, message.guild).members.first() : undefined;
-        if (!mention) {
-            const text = content.replace(/[^\S\x0a\x0d]+/g, " ");
-            if (text === "") {
-                await message.channel.send(`Usage: \`${message.prefix}smol <string${is_guild ? "|user" : ""}>\``);
-                return;
+    cr.registerCommand("smol", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(({ message, content, ctx }) => {
+            const mention = message.channel.type === "text" && ctx.mentions.members.first();
+            if (!mention) {
+                const text = content.replace(/[^\S\x0a\x0d]+/g, " ");
+                return tinytext(text);
             }
-            await message.channel.send(tinytext(text));
-            return;
-        }
-        await message.channel.send(tinytext(mention.displayName));
-    }))
+            return tinytext(mention.displayName);
+        }))
         .setHelp(new HelpContent()
             .setDescription("Make teeeeny tiny text")
             .setUsage("<string|user>")

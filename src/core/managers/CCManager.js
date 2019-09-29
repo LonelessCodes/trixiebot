@@ -16,13 +16,15 @@
 
 const cpc = require("../../modules/concurrency/cpc");
 const respawn = require("../../modules/concurrency/respawn");
-const nanoTimer = require("../../modules/nanoTimer");
+const nanoTimer = require("../../modules/timer");
 const log = require("../../log").namespace("cc manager");
 const path = require("path");
 const uuid = require("uuid/v1");
 const BSON = require("bson");
 const CustomCommand = require("../commands/CustomCommand");
 const WorkerMethods = require("./cc_utils/WorkerMethods");
+// eslint-disable-next-line no-unused-vars
+const MessageContext = require("../commands/MessageContext");
 
 const TYPE = Object.freeze({
     COMMAND: 0,
@@ -125,7 +127,7 @@ class CCManager {
         this.fork = respawn([file], { cwd: dir, fork: true, env: process.env }).restart();
         this.cpc = cpc(this.fork);
         this.cpc.addListener("ready", () => {
-            const time = timer.end() / nanoTimer.NS_PER_MS;
+            const time = nanoTimer.diff(timer) / nanoTimer.NS_PER_MS;
             log(`Worker ready. boot_time:${time.toFixed(1)}ms`);
         });
 
@@ -169,8 +171,12 @@ class CCManager {
         }
     }
 
-    async run(message, opts) {
-        this.worker_methods.setMessage(message);
+    /**
+     * @param {MessageContext} context
+     * @param {Object} opts
+     */
+    async run(context, opts) {
+        this.worker_methods.setMessage(context.message);
 
         let response;
         let error;
@@ -180,7 +186,7 @@ class CCManager {
             error = err;
         }
 
-        this.worker_methods.message_cache.delete(message.guild.id);
+        this.worker_methods.message_cache.delete(context.guild.id);
 
         if (error) throw error;
         return response;

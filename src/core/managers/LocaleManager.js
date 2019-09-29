@@ -14,78 +14,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs-extra");
 const path = require("path");
 const { isPlainObject } = require("../../util/util");
-const { format } = require("../../util/string");
-const { po } = require("gettext-parser");
-const Gettext = require("node-gettext");
+// eslint-disable-next-line no-unused-vars
+const { TextChannel, Attachment, RichEmbed, Message } = require("discord.js");
+const I18n = require("../../modules/i18n/I18n");
 const DocumentMapCache = require("../../modules/db/DocumentMapCache");
+const Resolvable = require("../../modules/i18n/Resolvable");
+const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
 
-const gt = new Gettext;
+const i18n = new I18n({
+    auto_reload: true,
+    default_locale: "en",
+    directory: path.join(__dirname, "..", "..", "..", "assets", "locale"),
+    update_files: true,
+});
 
-const translationsDir = path.join(__dirname, "..", "..", "..", "assets", "locale");
-const locales = ["en", "de", "hu"];
-const domain = "messages";
-
-for (const locale of locales) {
-    const filename = `${locale}.po`;
-    const translationsFilePath = path.join(translationsDir, filename);
-    const translationsContent = fs.readFileSync(translationsFilePath, "utf8")
-        // we do this because I don't want to make a translation to be dependent of the context
-        .split("\n")
-        .filter(line => {
-            if (line.startsWith("msgctxt")) return false;
-            return true;
-        })
-        .join("\n");
-
-    const parsedTranslations = po.parse(translationsContent, "utf8");
-    gt.addTranslations(locale, domain, parsedTranslations);
-}
-
-gt.setTextDomain(domain);
-
-class Cursor {
-    constructor(opts = {}) {
-        this.opts = opts;
-    }
-
-    translate(message) {
-        this.opts.translate = message;
-        return this;
-    }
-
-    ifPlural(message) {
-        this.opts.plural = message;
-        return this;
-    }
-
-    format(opts = {}) {
-        this.opts.format = opts;
-        return this;
-    }
-
-    locale(locale = "en") {
-        this.opts.locale = locale;
-        return this;
-    }
-
-    fetch(num) {
-        let str = "";
-        if (this.opts.locale) gt.setLocale(this.opts.locale);
-        if (num && this.opts.plural) {
-            str = gt.ngettext(this.opts.translate, this.opts.plural, num);
-        } else {
-            str = gt.gettext(this.opts.translate);
-        }
-
-        return format(str, this.opts.format);
-    }
-}
-
-module.exports = class LocaleManager {
-    constructor(client, db, locales) {
+class LocaleManager {
+    constructor(client, db) {
         this.client = client;
         this.db = db.collection("locale");
         this._cache = new DocumentMapCache(this.db, "guildId", {
@@ -93,7 +39,6 @@ module.exports = class LocaleManager {
                 removedFrom: { expireAfterSeconds: 7 * 24 * 3600, sparse: true },
             },
         });
-        this.locales = locales;
 
         this.addListeners();
     }
@@ -136,7 +81,7 @@ module.exports = class LocaleManager {
                 locale = channelId;
                 channelId = null;
             }
-            if (!["global", "default", ...this.locales].includes(locale)) {
+            if (!["default", ...i18n.getLocales()].includes(locale)) {
                 throw new Error("Not a known locale");
             }
             let config = await this.get(guildId);
@@ -161,33 +106,107 @@ module.exports = class LocaleManager {
             }
         }
     }
-};
 
-function translate(message) {
-    return new Cursor({ translate: message });
+    async translator(ch) {
+        let locale = "en";
+        if (ch instanceof TextChannel) locale = await this.get(ch.guild.id, ch.id);
+        return i18n.getTranslator(locale);
+    }
+
+    async translate(ch, resolvable) {
+        return Resolvable.resolve(resolvable, await this.translator(ch));
+    }
+
+    // Dispatching stuff
+
+    /**
+     * @param {TextChannel|DMChannel} ch
+     * @param {string|Object} content
+     * @param {Object} [options]
+     */
+    async _transformMsg(ch, content, options) {
+        if (!options &&
+            !(content instanceof Resolvable && !(content instanceof TranslationEmbed)) && typeof content === "object" &&
+            !(content instanceof Array)) {
+            options = content;
+            content = "";
+        } else if (!options) {
+            options = {};
+        }
+
+        const { reply } = options;
+        if (options instanceof Attachment) options = { files: [options.file] };
+        if (options instanceof RichEmbed || options instanceof TranslationEmbed) options = { embed: options };
+        options.reply = reply;
+
+        let translator;
+
+        if (options.embed && options.embed instanceof TranslationEmbed) {
+            // eslint-disable-next-line require-atomic-updates
+            options.embed = options.embed.resolve(translator || (translator = await this.translator(ch)));
+        }
+
+        if (content && typeof content !== "string" && typeof content.resolve === "function") {
+            content = Resolvable.resolve(content, translator || (translator = await this.translator(ch)));
+        }
+
+        if (content && content !== "") return [content, options];
+        else return [options];
+    }
+
+    /**
+     * @param {Message} msg
+     * @param {string|Object} content
+     * @param {Object} [options]
+     */
+    async edit(msg, content, options) {
+        const new_msg = await msg.edit(...await this._transformMsg(msg.channel, content, options));
+        return this._addEdit(new_msg);
+    }
+
+    _addEdit(msg) {
+        const oldEdit = msg.edit.bind(msg);
+        return Object.assign(msg, {
+            edit: async (content, options) => {
+                await oldEdit(...await this._transformMsg(msg.channel, content, options));
+                return msg;
+            },
+        });
+    }
+
+    /**
+     * @param {TextChannel} ch
+     * @param {string|Object} content
+     * @param {Object} [options]
+     */
+    async send(ch, content, options) {
+        const msg = await ch.send(...await this._transformMsg(ch, content, options));
+        // Change the interface of the returned Message object to support editing with
+        // Translation objects
+        return this._addEdit(msg);
+    }
 }
-module.exports.translate = translate;
+LocaleManager.i18n = i18n;
 
-module.exports.locales = locales;
-module.exports.setLocale = gt.setLocale.bind(gt);
-module.exports.locale = function locale(code) {
-    return new Cursor({ locale: code });
+LocaleManager.getLocaleInfo = locale => ({
+    code: locale,
+    name: i18n.translate(locale, "general.lang_name"),
+    name_en: i18n.translate(locale, "general.lang_name_en"),
+});
+LocaleManager.getLocales = () => i18n.getLocales().map(locale => LocaleManager.getLocaleInfo(locale));
+
+// eslint-disable-next-line valid-jsdoc
+/** @type {(str: string) => string} */
+LocaleManager.findFit = str => {
+    const locales = LocaleManager.getLocales();
+
+    // check locale codes
+    for (let { code } of locales) if (code.toLowerCase() === str.toLowerCase()) return code;
+    for (let { code } of locales) if (code.split(/-/g)[0].toLowerCase() === str.split(/-/g)[0].toLowerCase()) return code;
+
+    // check language names
+    for (let { name, code } of locales) if (name.toLowerCase() === str.toLowerCase()) return code;
+    for (let { name_en, code } of locales) if (name_en.toLowerCase() === str.toLowerCase()) return code;
 };
 
-module.exports.autoTranslate = async function autoTranslate(channel, str, format) {
-    return translate(str)
-        .locale(await channel.locale())
-        .format(format)
-        .fetch() || str;
-};
-
-module.exports.autoTranslateChannel = async function autoTranslateChannel(str, format) {
-    return translate(str)
-        .locale(await this.locale())
-        .format(format)
-        .fetch() || str;
-};
-
-module.exports.sendTranslated = async function sendTranslated(str, format, embed) {
-    return await this.send(await module.exports.autoTranslateChannel.apply(this, [str, format]), embed);
-};
+module.exports = LocaleManager;

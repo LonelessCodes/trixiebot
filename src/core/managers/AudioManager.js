@@ -17,6 +17,9 @@
 // eslint-disable-next-line no-unused-vars
 const { Guild, GuildMember, Collection, VoiceChannel, VoiceConnection } = require("discord.js");
 const EventEmitter = require("events");
+const Translation = require("../../modules/i18n/Translation");
+// eslint-disable-next-line no-unused-vars
+const Resolvable = require("../../modules/i18n/Resolvable");
 
 /**
  * @param {VoiceConnection} connection
@@ -30,7 +33,14 @@ async function disconnect(connection) {
     }
 }
 
-class ConnectError extends Error { }
+class ConnectError {
+    /**
+     * @param {Resolvable|string} message
+     */
+    constructor(message) {
+        this.message = message;
+    }
+}
 
 class VCGuild extends EventEmitter {
     /**
@@ -67,13 +77,13 @@ class VCGuild extends EventEmitter {
      */
     async connect(member) {
         if (!this.vc) {
-            if (!member.voiceChannel) throw new ConnectError("You need to join a voice channel first!");
+            if (!member.voiceChannel) throw new ConnectError(new Translation("audio.join_ch", "You need to join a voice channel first!"));
 
             const vc = member.voiceChannel;
 
-            if (vc.full) throw new ConnectError("The voice channel you're in is full!");
-            if (!vc.joinable) throw new ConnectError("Trixie doesn't have permissions to join the vc you're in");
-            if (!vc.speakable) throw new ConnectError("Trixie doesn't have permissions to speak in the vc you're in");
+            if (vc.full) throw new ConnectError(new Translation("audio.ch_full", "The voice channel you're in is full!"));
+            if (!vc.joinable) throw new ConnectError(new Translation("audio.no_perms_join", "Trixie doesn't have permissions to join the vc you're in"));
+            if (!vc.speakable) throw new ConnectError(new Translation("audio.no_perms_speak", "Trixie doesn't have permissions to speak in the vc you're in"));
 
             this.vc = vc;
         }

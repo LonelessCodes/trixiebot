@@ -1,0 +1,43 @@
+{
+    "no": "nö",
+    "config": {
+        "no_parameter": "Keine solche Einstellung vorhanden. *schulter zuck*",
+        "wrong_format": "Neuer Wert hat das falsche Format. Sollte {{format}} sein.",
+        "currently": "Aktuell:",
+        "update": "Aktualisieren:",
+        "allowed_types": "Erlaubte Typen:",
+        "success": ":ok_hand: Geändert zu `{{value}}`",
+        "description": "Benutz' das Command `!config <option>` um eine Option anzusehen.",
+        "prefix": "❗ Prefix",
+        "uom": "📐 Maß-Vorliebe",
+        "announce": "🔔 Verkünde neue/gehende/gebannte User",
+        "announce_ch": "Kanal. 'none' deaktiviert Verkündungen",
+        "announce_bot": "Verkünde Bots",
+        "welcome": "👋 Verkünde neue User",
+        "leave": "🚶 Verkünde gehende User",
+        "ban": "🔨 Verkünde gebannte User",
+        "text": "Benutzerdefinierter Text ('{{user}}' als User, 'empty' = Standard)"
+    },
+    "general": {
+        "lang_name": "Deutsch",
+        "lang_name_en": "German",
+        "error": "Äh... Ich... ähm, ich glaube... es gab da ein Problem...? Es ist aber nicht deine Schuld..."
+    },
+    "format": {
+        "and": "und",
+        "or": "oder"
+    },
+    "locale": {
+        "not_supported": "Sprache '{{locale}}' wird nicht unterstützt :c Versuch's mal mit {{locales}}",
+        "success": "Sprache des Servers zu {{locale}} geändert.",
+        "success_ch": "Sprache für {{channel}} zu {{locale}} geändert."
+    },
+    "penis": {
+        "length": "Länge:",
+        "girth": "Umfang:",
+        "top_penises": "Beste Penisse dieses Servers"
+    },
+    "textaction": {
+        "everyone": "alle {{count}} User"
+    }
+}

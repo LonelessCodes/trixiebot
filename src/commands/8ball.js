@@ -16,7 +16,6 @@
 
 const CONST = require("../const");
 const RandomChance = require("../modules/random/RandomChance");
-const Discord = require("discord.js");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
@@ -24,93 +23,97 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
+
 const replies = new RandomChance();
 replies.add({
-    text: "It is certain",
+    text: new Translation("8ball.pos0", "It is certain"),
     type: 1,
 }, 2);
 replies.add({
-    text: "Yes – definitely",
+    text: new Translation("8ball.pos1", "Yes – definitely"),
     type: 1,
 }, 2);
 replies.add({
-    text: "Without a doubt",
+    text: new Translation("8ball.pos2", "Without a doubt"),
     type: 1,
 }, 2);
 replies.add({
-    text: "Outlook good",
+    text: new Translation("8ball.pos3", "Outlook good"),
     type: 1,
 }, 2);
 replies.add({
-    text: "Ye",
+    text: new Translation("8ball.pos4", "Ye"),
     type: 1,
 }, 2);
 replies.add({
-    text: "You may rely on it",
+    text: new Translation("8ball.pos5", "You may rely on it"),
     type: 1,
 }, 2);
 replies.add({
-    text: "As I see it, yes",
+    text: new Translation("8ball.pos6", "As I see it, yes"),
     type: 1,
 }, 2);
 replies.add({
-    text: "Most likely",
+    text: new Translation("8ball.pos7", "Most likely"),
     type: 1,
 }, 2);
 replies.add({
-    text: "Signs point to yes",
+    text: new Translation("8ball.pos8", "Signs point to yes"),
     type: 1,
 }, 2);
 replies.add({
-    text: "It is decidedly so",
+    text: new Translation("8ball.pos9", "It is decidedly so"),
     type: 1,
 }, 2);
 
 replies.add({
-    text: "Very doubtful",
+    text: new Translation("8ball.neg0", "Very doubtful"),
     type: -1,
 }, 4);
 replies.add({
-    text: "My sources say no",
+    text: new Translation("8ball.neg1", "My sources say no"),
     type: -1,
 }, 4);
 replies.add({
-    text: "Outlook not so good",
+    text: new Translation("8ball.neg2", "Outlook not so good"),
     type: -1,
 }, 4);
 replies.add({
-    text: "Don't count on it",
+    text: new Translation("8ball.neg3", "Don't count on it"),
     type: -1,
 }, 4);
 replies.add({
-    text: "No",
+    text: new Translation("8ball.neg4", "No"),
     type: -1,
 }, 4);
 
 replies.add({
-    text: "Cannot predict now",
+    text: new Translation("8ball.ntr0", "Cannot predict now"),
     type: 0,
 }, 1);
 replies.add({
-    text: "Better not tell you now",
+    text: new Translation("8ball.ntr1", "Better not tell you now"),
     type: 0,
 }, 1);
 replies.add({
-    text: "Concentrate and ask again",
+    text: new Translation("8ball.ntr2", "Concentrate and ask again"),
     type: 0,
 }, 1);
 replies.add({
-    text: "Reply hazy, try again",
+    text: new Translation("8ball.ntr3", "Reply hazy, try again"),
     type: 0,
 }, 1);
 replies.add({
-    text: "Ask again later",
+    text: new Translation("8ball.ntr4", "Ask again later"),
     type: 0,
 }, 1);
 
 module.exports = function install(cr) {
     cr.registerCommand("8ball", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async message => {
+        .registerOverload("1+", new SimpleCommand(async () => {
             /** @type {{ text: string; type: number; }} */
             const reply = await replies.random();
 
@@ -127,11 +130,9 @@ module.exports = function install(cr) {
                     break;
             }
 
-            const embed = new Discord.RichEmbed()
+            return new TranslationEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
-                .setTitle(`${reply.text} ${emoji}`);
-
-            await message.channel.send({ embed });
+                .setTitle(new TranslationMerge(reply.text, emoji));
         }))
         .setHelp(new HelpContent()
             .setDescription("An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy")
@@ -140,4 +141,5 @@ module.exports = function install(cr) {
         .setCategory(Category.MISC)
         .setScope(CommandScope.ALL);
     cr.registerAlias("8ball", "tellme");
+    cr.registerAlias("8ball", "8");
 };

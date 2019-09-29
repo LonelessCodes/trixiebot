@@ -20,13 +20,12 @@ const Discord = require("discord.js");
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
-const MessageMentions = require("../util/commands/MessageMentions");
 
 const { userToString } = require("../util/util");
 
 module.exports = function install(cr) {
-    cr.registerCommand("whois", new SimpleCommand((message, content) => {
-        const member = new MessageMentions(content, message.guild).members.first() || message.member;
+    cr.registerCommand("whois", new SimpleCommand(({ message, mentions }) => {
+        const member = mentions.members.first() || message.member;
 
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
 

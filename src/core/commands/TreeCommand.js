@@ -25,8 +25,8 @@ class TreeCommand extends BaseCommand {
         this.sub_commands = new Map;
     }
 
-    async run(message, command_name, content, pass_through, timer) {
-        const args = splitArgs(content, 2);
+    async run(context, command_name, pass_through) {
+        const args = splitArgs(context.content, 2);
 
         if (this.sub_commands.size === 0) {
             throw new Error("No SubCommands registered");
@@ -39,20 +39,20 @@ class TreeCommand extends BaseCommand {
             is_default = true;
         }
         if (!command)
-            return; // Use SimpleTreeCommand then?
+            return;
 
-        if (!command.permissions.test(message.member || message.author)) {
-            await command.noPermission(message);
+        if (!command.permissions.test(context.member || context.author)) {
+            await command.noPermission(context);
             return;
         }
-        if (command.rateLimiter && !command.rateLimiter.testAndAdd(message.author.id)) {
-            await command.rateLimit(message);
+        if (command.rateLimiter && !command.rateLimiter.testAndAdd(context.author.id)) {
+            await command.rateLimit(context);
             return;
         }
 
         command_name += (is_default ? "" : " " + args[0]);
-        content = is_default ? content : args[1];
-        await command.run(message, command_name, content, pass_through, timer);
+        context.content = is_default ? context.content : args[1];
+        await command.run(context, command_name, pass_through);
     }
 
     registerSubCommand(id, command) {

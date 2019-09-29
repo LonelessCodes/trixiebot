@@ -24,7 +24,9 @@ const Category = require("../../util/commands/Category");
 
 const Paginator = require("../../util/commands/Paginator");
 
-module.exports = function install(cr, client, config, db) {
+const Translation = require("../../modules/i18n/Translation");
+
+module.exports = function install(cr, { client, db }) {
     const database = db.collection("deleted_messages");
     database.createIndex("deletedAt", { expireAfterSeconds: 7 * 24 * 3600 });
     database.createIndex("editedAt", { expireAfterSeconds: 3 * 24 * 3600 });
@@ -90,11 +92,7 @@ module.exports = function install(cr, client, config, db) {
 
     // Registering down here
 
-    const deletedCommand = cr.registerCommand("deleted", new class extends TreeCommand {
-        async noPermission(message) {
-            await message.channel.sendTranslated("No boi, git gud");
-        }
-    })
+    const deletedCommand = cr.registerCommand("deleted", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie can collect deleted for up to 7 days, so you always know what's going on in your server behind your back.\nCommand enabled by default. Soon option to turn it off")
             .setUsage("", "List all deleted messages from the last 7 days"))
@@ -104,34 +102,33 @@ module.exports = function install(cr, client, config, db) {
     deletedCommand.registerSubCommand("clear", new SimpleCommand(async message => {
         await database.deleteMany({ guildId: message.guild.id });
 
-        await message.channel.sendTranslated("Removed all deleted messages successfully");
+        return new Translation("deleted.clear_success", "Removed all deleted messages successfully");
     }))
         .setHelp(new HelpContent()
             .setUsage("", "Clears list of deleted messages"));
 
-    deletedCommand.registerDefaultCommand(new SimpleCommand(async message => {
+    deletedCommand.registerDefaultCommand(new SimpleCommand(async context => {
         const messages = await database.find({
-            guildId: message.guild.id,
-        }).toArray();
+            guildId: context.guild.id,
+        }).toArray().then(m => m.filter(m => "deletedAt" in m));
 
         if (messages.length === 0) {
-            await message.channel.sendTranslated("Yeeeeah, nothing found");
-            return;
+            return new Translation("deleted.empty", "Yeeeeah, nothing found");
         }
 
         const page_limit = 10;
 
         const items = [];
-        for (const deleted_message of messages.filter(m => "deletedAt" in m).sort((a, b) => b.deletedAt - a.deletedAt)) {
+        for (const deleted_message of messages.sort((a, b) => b.deletedAt - a.deletedAt)) {
             let str = "";
-            const channel = message.guild.channels.get(deleted_message.channelId);
+            const channel = context.guild.channels.get(deleted_message.channelId);
             if (channel) str += `# **${channel.name}**`;
             else str += "# **deleted channel**";
 
             const timestamp = deleted_message.deletedAt.toLocaleString().slice(0, -3);
             str += ` | ${timestamp} | `;
 
-            const member = message.client.users.get(deleted_message.userId);
+            const member = client.users.get(deleted_message.userId);
             if (member) str += `${userToString(member)}: `;
             else str += `**${deleted_message.name}**: `;
 
@@ -141,9 +138,11 @@ module.exports = function install(cr, client, config, db) {
         }
 
         new Paginator(
-            "Deleted Messages",
-            `Messages deleted or edited by users: **${items.length}**\n`,
-            page_limit, items, message.author, { guild: message.guild }
-        ).display(message.channel);
+            await context.translate(new Translation("deleted.title", "Deleted Messages")),
+            await context.translate(new Translation(
+                "deleted.description", "Messages deleted or edited by users: **{{count}}**\n", { count: items.length }
+            )),
+            page_limit, items, context.author, { guild: context.guild }
+        ).display(context.channel);
     }));
 };

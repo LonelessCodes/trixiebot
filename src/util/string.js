@@ -20,9 +20,9 @@ const PATTERNS = Object.freeze({
 
 module.exports = new class StringUtils {
     /**
-     * @param {string} raw Original array
+     * @param {string[]} raw Original array
      * @param {number} expectedSize Size of the new array
-     * @returns {string}
+     * @returns {string[]}
      */
     normalizeArray(raw, expectedSize) {
         /**

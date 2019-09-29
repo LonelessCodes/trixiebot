@@ -23,6 +23,9 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
+
 async function randomCat(reconnectTries = 0) {
     let file;
     try {
@@ -67,16 +70,16 @@ async function randomBird() {
 }
 
 module.exports = function install(cr) {
-    cr.registerCommand("cat", new SimpleCommand(async message =>
-        await message.channel.translate("meow") + " " + catFace() + " " + await randomCat()
+    cr.registerCommand("cat", new SimpleCommand(async () =>
+        new TranslationMerge(new Translation("animal.cat", "meow"), catFace(), await randomCat())
     ))
         .setHelp(new HelpContent().setDescription("Random cat image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("cat", "kitty");
 
-    cr.registerCommand("dog", new SimpleCommand(async message =>
-        await message.channel.translate("woof") + " " + dogFace() + " " + await randomDog()
+    cr.registerCommand("dog", new SimpleCommand(async () =>
+        new TranslationMerge(new Translation("animal.dog", "woof"), dogFace(), await randomDog())
     ))
         .setHelp(new HelpContent().setDescription("Random dog image :3"))
         .setCategory(Category.IMAGE)
@@ -86,8 +89,8 @@ module.exports = function install(cr) {
     cr.registerAlias("dog", "bork");
     cr.registerAlias("dog", "pup");
 
-    cr.registerCommand("fox", new SimpleCommand(async message =>
-        await message.channel.translate("yip") + " 🦊 " + await randomFox()
+    cr.registerCommand("fox", new SimpleCommand(async () =>
+        new TranslationMerge(new Translation("animal.fox", "yip"), "🦊", await randomFox())
     ))
         .setHelp(new HelpContent().setDescription("Random fox image :3"))
         .setCategory(Category.IMAGE)
@@ -96,16 +99,16 @@ module.exports = function install(cr) {
     cr.registerAlias("fox", "foxi");
     cr.registerAlias("fox", "weff");
 
-    cr.registerCommand("shibe", new SimpleCommand(async message =>
-        await message.channel.translate("weff") + " " + dogFace() + " " + await randomShibe()
+    cr.registerCommand("shibe", new SimpleCommand(async () =>
+        new TranslationMerge(new Translation("animal.shibe", "weff"), dogFace(), await randomShibe())
     ))
         .setHelp(new HelpContent().setDescription("Random SHIBE image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("shibe", "shiba");
 
-    cr.registerCommand("bird", new SimpleCommand(async message =>
-        await message.channel.translate("peep") + " ovo " + await randomBird()
+    cr.registerCommand("bird", new SimpleCommand(async () =>
+        new TranslationMerge(new Translation("animal.bird", "peep"), "ovo", await randomBird())
     ))
         .setHelp(new HelpContent().setDescription("Random Birb image ovo"))
         .setCategory(Category.IMAGE)

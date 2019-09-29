@@ -23,11 +23,11 @@ const CommandScope = require("../util/commands/CommandScope");
 
 const Discord = require("discord.js");
 
-module.exports = function install(cr, client, config, db) {
+module.exports = function install(cr, { db }) {
     const database = db.collection("newsletter");
 
-    cr.registerCommand("subscribe", new SimpleCommand(async message => {
-        const userId = message.author.id;
+    cr.registerCommand("subscribe", new SimpleCommand(async context => {
+        const userId = context.author.id;
 
         if (await database.findOne({ userId })) {
             return "Damn, you are already subscribed! • c •'";
@@ -35,14 +35,14 @@ module.exports = function install(cr, client, config, db) {
 
         await database.insertOne({ userId });
 
-        return ":sparkles: Subscribed to my newsletter! You'll get important updates right in your DM's! Unsubscribe at any time through `" + message.prefix + "unsubscribe`";
+        return ":sparkles: Subscribed to my newsletter! You'll get important updates right in your DM's! Unsubscribe at any time through `" + context.prefix + "unsubscribe`";
     }))
         .setHelp(new HelpContent().setUsage("", "Subscribe to Trixie's newsletter to receive infos about updates and deprecations."))
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("unsubscribe", new SimpleCommand(async message => {
-        const userId = message.author.id;
+    cr.registerCommand("unsubscribe", new SimpleCommand(async context => {
+        const userId = context.author.id;
 
         await database.deleteOne({ userId });
 
@@ -52,13 +52,13 @@ module.exports = function install(cr, client, config, db) {
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("newsletter", new SimpleCommand(async (message, msg) => {
+    cr.registerCommand("newsletter", new SimpleCommand(async ({ message, content }) => {
         const subscribed = await database.find({}).toArray();
 
         const embed = new Discord.RichEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setAuthor(`TrixieBot Newsletter | ${new Date().toLocaleDateString("en")}`, message.client.user.avatarURL)
-            .setDescription(msg)
+            .setDescription(content)
             .setFooter("Unsubscribe from this newsletter via 'unsubscribe'");
 
         for (let { userId } of subscribed) {

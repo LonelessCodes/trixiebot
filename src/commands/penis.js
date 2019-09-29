@@ -20,11 +20,26 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
-const MessageMentions = require("../util/commands/MessageMentions");
 
 const Paginator = require("../util/commands/Paginator");
 
-module.exports = function install(cr, client, config, db) {
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
+
+function graph(uom, r, length, girth) {
+    return new TranslationMerge(
+        new Translation("penis.length", "Length:"),
+        `**${(length * r).toFixed(1)} ${uom}**  `,
+        new Translation("penis.girth", "Girth:"),
+        `**${(girth * r).toFixed(1)} ${uom}**`
+    );
+}
+
+function pp(length) {
+    return `8${new Array(Math.round(length)).fill("=").join("")}D`;
+}
+
+module.exports = function install(cr, { client, db }) {
     const database = db.collection("penis");
 
     const penisCommand = cr.registerCommand("penis", new TreeCommand)
@@ -39,24 +54,23 @@ module.exports = function install(cr, client, config, db) {
      * SUB COMMANDS
      */
 
-    penisCommand.registerDefaultCommand(new SimpleCommand(async (message, content) => {
-        const uom = message.guild.config.uom;
+    penisCommand.registerDefaultCommand(new SimpleCommand(async ({ message, config, mentions }) => {
+        const uom = config.uom;
         const r = uom === "cm" ? 2.54 : 1;
-
-        const mentions = new MessageMentions(content, message.guild);
 
         const member = mentions.members.first() || message.member;
 
         if (mentions.everyone) {
-            await message.channel.sendTranslated("everyone has fucking huge diccs k. You're all beautiful");
-            return;
+            return new Translation("penis.everyone", "everyone has fucking huge diccs k. You're all beautiful");
         }
 
         if (member.user.id === client.user.id) {
             const length = 20;
             const girth = 18;
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D ( ͡° ͜ʖ ͡°)\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
-            return;
+            return new TranslationMerge(
+                pp(length) + " ( ͡° ͜ʖ ͡°)",
+                graph(uom, r, length, girth)
+            ).setSeperator("\n");
         }
 
         const doc = await database.findOne({ userId: member.user.id });
@@ -73,16 +87,22 @@ module.exports = function install(cr, client, config, db) {
                 length,
             });
 
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
+            return new TranslationMerge(
+                pp(length),
+                graph(uom, r, length, girth)
+            ).setSeperator("\n");
         } else {
             const { length, girth } = doc;
 
-            await message.channel.send(`8${new Array(Math.round(length)).fill("=").join("")}D\n${await message.channel.translate("Length:")} **${(length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(girth * r).toFixed(1)} ${uom}**`);
+            return new TranslationMerge(
+                pp(length),
+                graph(uom, r, length, girth)
+            ).setSeperator("\n");
         }
     }));
 
-    penisCommand.registerSubCommand("leaderboard", new SimpleCommand(async message => {
-        const uom = message.guild.config.uom;
+    penisCommand.registerSubCommand("leaderboard", new SimpleCommand(async ({ message, config, ctx }) => {
+        const uom = config.uom;
         const r = uom === "cm" ? 2.54 : 1;
 
         await message.guild.fetchMembers();
@@ -94,12 +114,18 @@ module.exports = function install(cr, client, config, db) {
             const member = message.guild.members.get(penis.userId);
             if (!member) continue;
             items.push(
-                `**8${new Array(Math.round(penis.length)).fill("=").join("")}D   ${member.user.tag}**\n` +
-                `${await message.channel.translate("Length:")} **${(penis.length * r).toFixed(1)} ${uom}**   ${await message.channel.translate("Girth:")} **${(penis.girth * r).toFixed(1)} ${uom}**`
+                await ctx.translate(new TranslationMerge(
+                    "**" + pp(penis.length) + `   ${member.user.tag}**`,
+                    graph(uom, r, penis.length, penis.girth)
+                ).setSeperator("\n"))
             );
         }
 
-        new Paginator("Penis Leaderboard", "The top penises in this server", 20, items, message.author, { number_items: true, guild: message.guild }).display(message.channel);
+        new Paginator(
+            "Penis Leaderboard",
+            await ctx.translate(new Translation("penis.top_penises", "The top penises in this server")),
+            20, items, message.author, { number_items: true, guild: message.guild }
+        ).display(message.channel);
     }))
         .setHelp(new HelpContent()
             .setUsage("", "Shows where you are in the penis size ranking"));

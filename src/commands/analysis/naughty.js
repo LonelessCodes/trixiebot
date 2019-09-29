@@ -38,7 +38,7 @@ for (let word of bad_words_array) {
 
 const regexp = new RegExp(`\\b(${bad_words_array.join("|")})\\b`, "gi");
 
-module.exports = function install(cr, client, config, db) {
+module.exports = function install(cr, { db }) {
     const queue = new Queue;
 
     const database = db.collection("santaslist");

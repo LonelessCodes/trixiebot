@@ -20,6 +20,8 @@ const { Db } = require("mongodb");
 // eslint-disable-next-line no-unused-vars
 const { Client, TextChannel } = require("discord.js");
 const DocumentMapCache = require("../../modules/db/DocumentMapCache");
+// eslint-disable-next-line no-unused-vars
+const Resolvable = require("../../modules/i18n/Resolvable");
 
 function index(obj, is, value) {
     if (typeof is == "string")
@@ -36,6 +38,13 @@ function index(obj, is, value) {
 }
 
 class Parameter {
+    /**
+     * @param {string} name
+     * @param {Resolvable|string} humanName
+     * @param {*} defaultValue
+     * @param {*} type
+     * @param {boolean} allowEmpty
+     */
     constructor(name, humanName, defaultValue, type, allowEmpty) {
         this.name = name;
         this.humanName = humanName;

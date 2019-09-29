@@ -27,8 +27,8 @@ class OverloadCommand extends BaseCommand {
         this._linked_to = this;
     }
 
-    async run(message, command_name, content, pass_through, timer) {
-        const args = content.split(/\s+/).filter(s => s !== "");
+    async run(context, command_name, pass_through) {
+        const args = context.content.split(/\s+/).filter(s => s !== "");
 
         if (this.overloads.size === 0) {
             throw new Error("No Overloads registered");
@@ -36,21 +36,21 @@ class OverloadCommand extends BaseCommand {
 
         const command = this.getCmd(args);
         if (!command) {
-            await HelpBuilder.sendHelp(message, command_name, this._linked_to || this);
+            await HelpBuilder.sendHelp(context, command_name, this._linked_to || this);
             // maybe send a shorter version of the help
             return;
         }
 
-        if (!command.permissions.test(message.member || message.author)) {
-            await command.noPermission(message);
+        if (!command.permissions.test(context.member || context.author)) {
+            await command.noPermission(context);
             return;
         }
-        if (command.rateLimiter && !command.rateLimiter.testAndAdd(message.author.id)) {
-            await command.rateLimit(message);
+        if (command.rateLimiter && !command.rateLimiter.testAndAdd(context.author.id)) {
+            await command.rateLimit(context);
             return;
         }
 
-        await command.run(message, command_name, content, pass_through, timer);
+        await command.run(context, command_name, pass_through);
     }
 
     /**

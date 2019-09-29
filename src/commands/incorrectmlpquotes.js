@@ -40,10 +40,9 @@ module.exports = function install(cr) {
         .then(() => log.namespace("mlpquote cmd")("Quotes loaded:", quotes.length))
         .catch(() => { /* Do nothing */ });
 
-    cr.registerCommand("mlpquote", new SimpleCommand(async message => {
+    cr.registerCommand("mlpquote", new SimpleCommand(async () => {
         if (quotes.length === 0) {
-            await message.channel.send("Quotes not yet done loading :c come back in a few seconds to minutes");
-            return;
+            return "Quotes not yet done loading :c come back in a few seconds to minutes";
         }
 
         return await secureRandom(quotes);

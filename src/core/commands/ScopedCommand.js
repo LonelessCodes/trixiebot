@@ -25,24 +25,24 @@ class ScopedCommand extends BaseCommand {
         this.scopes = [];
     }
 
-    async run(message, command_name, content, pass_through, timer) {
+    async run(context, command_name, pass_through) {
         if (this.scopes.length === 0) {
             throw new Error("No Scopes registered");
         }
 
-        const command = this.getCmd(message.channel);
+        const command = this.getCmd(context.channel);
         if (!command) return;
 
-        if (!command.permissions.test(message.member || message.author)) {
-            await command.noPermission(message);
+        if (!command.permissions.test(context.member || context.author)) {
+            await command.noPermission(context);
             return;
         }
-        if (command.rateLimiter && !command.rateLimiter.testAndAdd(message.author.id)) {
-            await command.rateLimit(message);
+        if (command.rateLimiter && !command.rateLimiter.testAndAdd(context.author.id)) {
+            await command.rateLimit(context);
             return;
         }
 
-        await command.run(message, command_name, content, pass_through, timer);
+        await command.run(context, command_name, pass_through);
     }
 
     getCmd(channel) {

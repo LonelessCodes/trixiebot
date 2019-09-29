@@ -25,14 +25,16 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+// Keep English, because results are always returned in English, since they are
+// fetched from the English MLP Wikia
+
 module.exports = function install(cr) {
     cr.registerCommand("mlp", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, query) => {
-            const searchRequest = await fetch(`http://mlp.wikia.com/api/v1/Search/List?query=${encodeURIComponent(query)}&format=json&limit=1`);
+        .registerOverload("1+", new SimpleCommand(async ({ content }) => {
+            const searchRequest = await fetch(`http://mlp.wikia.com/api/v1/Search/List?query=${encodeURIComponent(content)}&format=json&limit=1`);
             const searchJson = await searchRequest.json();
             if (!searchJson.items || !searchJson.items[0]) {
-                await message.channel.send("*shrug* nothing here apparently");
-                return;
+                return "*shrug* nothing here apparently";
             }
 
             const item = searchJson.items[0];
@@ -101,7 +103,7 @@ module.exports = function install(cr) {
                 .setColor(CONST.COLOR.PRIMARY)
                 .setTitle(title)
                 .setDescription(abstract.abstract
-                    .replace(new RegExp(query, "gi"), substring => `**${substring}**`)
+                    .replace(new RegExp(content, "gi"), substring => `**${substring}**`)
                     .replace(/ *\[[\w ]+\] */gi, "")) // get rid of reference squared brackets
                 .setURL(pageURL)
                 .setFooter(`type: ${abstract.type} | ${abstract.comments} ${abstract.comments === 1 ? "comment" : "comments"} | Quality of the result: ${item.quality}%`);

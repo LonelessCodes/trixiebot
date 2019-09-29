@@ -21,7 +21,7 @@ const { timeout } = require("../util/promises");
 const getChangelog = require("../modules/getChangelog");
 const INFO = require("../info");
 const CONST = require("../const");
-const nanoTimer = require("../modules/nanoTimer");
+const nanoTimer = require("../modules/timer");
 const Discord = require("discord.js");
 
 async function getCPUUsage() {
@@ -75,7 +75,7 @@ const CommandScope = require("../util/commands/CommandScope");
 
 const Paginator = require("../util/commands/Paginator");
 
-module.exports = function install(cr, client, _, __, error_cases) {
+module.exports = function install(cr, { client, error_cases }) {
     cr.registerCommand("info", new SimpleCommand(async () => {
         const guilds = client.guilds;
         const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
@@ -112,19 +112,21 @@ module.exports = function install(cr, client, _, __, error_cases) {
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("ping", new SimpleCommand(async (message, _, { timer }) => {
-        const internal_ping = timer.end() / nanoTimer.NS_PER_MS;
+    cr.registerCommand("ping", new SimpleCommand(async ({ message, received_at }) => {
+        const internal_ping = nanoTimer.diff(received_at) / nanoTimer.NS_PER_MS;
 
-        const pongText = await message.channel.translate("pong! Wee hee");
+        const pongText = "pong! Wee hee";
         const m = await message.channel.send(pongText);
 
         const ping = m.createdTimestamp - message.createdTimestamp;
-        await m.edit(pongText + "\n" +
+        await m.edit(
+            pongText + "\n" +
             "```" +
             `⏱ Real Latency:     ${ping}ms\n` +
             `⏱ Internal Latency: ${internal_ping.toFixed(1)}ms\n` +
             `💓 API Latency:      ${Math.round(client.ping)}ms\n` +
-            "```");
+            "```"
+        );
     }))
         .setHelp(new HelpContent().setDescription("Ping-Pong-Ping-Pong-Ping-WEE HEEEEE."))
         .setCategory(Category.INFO)

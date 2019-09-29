@@ -21,6 +21,7 @@ const fs = require("fs-extra");
 const log = require("../log").namespace("core");
 const config = require("../config");
 const { walk } = require("../util/files");
+const { timeout } = require("../util/promises");
 const helpToJSON = require("../util/commands/helpToJSON");
 const nanoTimer = require("../modules/nanoTimer");
 const random = require("../modules/random/random");
@@ -89,7 +90,7 @@ class Core {
 
         await Promise.all(files.map(async file => {
             const install = require(path.resolve("../" + commands_package, file));
-            await install(this.processor.REGISTRY, this.client, this.config, this.db);
+            await install(this.processor.REGISTRY, this.client, this.config, this.db, this.processor.error_cases);
         }));
 
         const install_time = timer.end() / nanoTimer.NS_PER_SEC;
@@ -134,14 +135,30 @@ class Core {
     }
 
     async setStatus() {
-        let timeout = null;
+        let timeout_ref = null;
 
         const statuses = await fs.readFile(path.join(__dirname, "../../assets/text/statuses.txt"), "utf8")
             .then(txt => txt.split("\n").filter(s => s !== ""));
 
-        const updateStatus = () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(updateStatus, 20 * 60000);
+        const updateStatus = async () => {
+            clearTimeout(timeout_ref);
+            timeout_ref = setTimeout(updateStatus, 3 * 60000);
+
+            this.client.user.setStatus("online");
+
+            // Server count
+
+            this.client.user.setActivity(`!trixie | ${this.client.guilds.size.toLocaleString("en")} servers`, { type: "WATCHING" });
+
+            await timeout(60000);
+
+            // Website
+
+            this.client.user.setActivity("!trixie | trixie.loneless.art", { type: "PLAYING" });
+
+            await timeout(60000);
+
+            // Status text
 
             let status = null;
             for (let event of calendar_events) {
@@ -153,7 +170,6 @@ class Core {
 
             status = status || random(statuses);
 
-            this.client.user.setStatus("online");
             this.client.user.setActivity(`!trixie | ${status}`, { type: "PLAYING" });
         };
 

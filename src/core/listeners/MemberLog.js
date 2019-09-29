@@ -45,6 +45,10 @@ class MemberLog {
     attachListeners() {
         this.client.on("guildCreate", this.guildCreate.bind(this));
         this.client.on("guildDelete", this.guildDelete.bind(this));
+
+        this.client.on("guildMemberAdd", this.guildMemberAdd.bind(this));
+        this.client.on("guildMemberRemove", this.guildMemberRemove.bind(this));
+        this.client.on("guildBanAdd", this.guildBanAdd.bind(this));
     }
 
     async updateGuildStatistics() {

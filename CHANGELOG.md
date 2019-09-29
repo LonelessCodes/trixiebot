@@ -2,6 +2,92 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.16.1"></a>
+## [2.16.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.0...v2.16.1) (2019-09-28)
+
+
+
+<a name="2.16.0"></a>
+# [2.16.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.3...v2.16.0) (2019-09-26)
+
+
+### Bug Fixes
+
+* **announcements:** MemberAdd, MemberRemove and BanAdd work again!!! ([e5cdccc](https://bitbucket.org/Loneless/trixiebot/commits/e5cdccc))
+* **birthday cmd:** update hourly to at least show good will ([d5299e5](https://bitbucket.org/Loneless/trixiebot/commits/d5299e5))
+* **error cases:** fixed error catching in DM channels ([987d193](https://bitbucket.org/Loneless/trixiebot/commits/987d193))
+* **waifu steal cmd:** fixed "@ undefined" bug if waifu hasn't yet been claimed ([cbee0cf](https://bitbucket.org/Loneless/trixiebot/commits/cbee0cf))
+
+
+### Features
+
+* add birthday command ([1c030c5](https://bitbucket.org/Loneless/trixiebot/commits/1c030c5))
+* added Newsletter functionality (subscribe, unsubscribe cmds) ([410a9f7](https://bitbucket.org/Loneless/trixiebot/commits/410a9f7))
+
+
+
+<a name="2.15.3"></a>
+## [2.15.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.2...v2.15.3) (2019-09-25)
+
+
+### Bug Fixes
+
+* **fetch member:** fixed typos made. sryyyy ([aff3948](https://bitbucket.org/Loneless/trixiebot/commits/aff3948))
+
+
+
+<a name="2.15.2"></a>
+## [2.15.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.1...v2.15.2) (2019-09-25)
+
+
+### Bug Fixes
+
+* **fetch member:** fixed wrong usages of Guild.fetchMember(). ([abd34be](https://bitbucket.org/Loneless/trixiebot/commits/abd34be))
+
+
+
+<a name="2.15.1"></a>
+## [2.15.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.0...v2.15.1) (2019-09-23)
+
+
+### Bug Fixes
+
+* **status:** made status loop more consistently ([db85773](https://bitbucket.org/Loneless/trixiebot/commits/db85773))
+
+
+
+<a name="2.15.0"></a>
+# [2.15.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.2...v2.15.0) (2019-09-23)
+
+
+### Features
+
+* **status:** loop over server count, website link and status text ([1a5ddff](https://bitbucket.org/Loneless/trixiebot/commits/1a5ddff))
+* implemented an error cases manager ([c7b1ecd](https://bitbucket.org/Loneless/trixiebot/commits/c7b1ecd))
+
+
+
+<a name="2.14.2"></a>
+## [2.14.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.1...v2.14.2) (2019-09-18)
+
+
+### Bug Fixes
+
+* **BaseCommand:** fix default rate limiter message ([f8a825a](https://bitbucket.org/Loneless/trixiebot/commits/f8a825a))
+* **help generation:** add missing space after "optional" identifier ([099f4ea](https://bitbucket.org/Loneless/trixiebot/commits/099f4ea))
+* **IPC Adapter:** fixed little typo ([6aa1cd0](https://bitbucket.org/Loneless/trixiebot/commits/6aa1cd0))
+* **member fetching:** fixed fetching members instead of getting them only from cache ([f31743a](https://bitbucket.org/Loneless/trixiebot/commits/f31743a))
+* **README:** fix scrolling of footer license notice on Github ([35ebaf7](https://bitbucket.org/Loneless/trixiebot/commits/35ebaf7))
+* **touch cmd:** fixed wrong no-mention message ([683e4d1](https://bitbucket.org/Loneless/trixiebot/commits/683e4d1))
+* **waifu cmd:** re-adjust steal and escape chances ([5b93fbe](https://bitbucket.org/Loneless/trixiebot/commits/5b93fbe))
+
+
+### Features
+
+* **mentions parser:** at last also search through usernames to find a fit ([b72870a](https://bitbucket.org/Loneless/trixiebot/commits/b72870a))
+
+
+
 <a name="2.14.1"></a>
 ## [2.14.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.0...v2.14.1) (2019-09-10)
 

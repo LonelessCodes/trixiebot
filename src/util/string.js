@@ -132,4 +132,11 @@ module.exports = new class StringUtils {
         }
         return message;
     }
+
+    pad(value, width, fill = "0") {
+        value = String(value);
+        fill = String(fill);
+
+        return value.length >= width ? value : new Array(width - value.length + 1).join(fill) + value;
+    }
 };

@@ -15,7 +15,7 @@
  */
 
 /* eslint-disable require-atomic-updates */
-const { userToString } = require("../../util/util");
+const { userToString, fetchMember } = require("../../util/util");
 const LocaleManager = require("../../core/managers/LocaleManager");
 const { toHumanTime, parseHumanTime } = require("../../util/time");
 const { splitArgs, format } = require("../../util/string");
@@ -156,7 +156,7 @@ module.exports = function install(cr, client, config, db) {
 
         const timeouts = await database.find({ guildId: message.guild.id }).toArray();
         const docs = await Promise.all(timeouts.map(async doc => {
-            doc.member = await message.guild.fetchMember(doc.memberId);
+            doc.member = await fetchMember(message.guild, doc.memberId);
             return doc;
         })).then(arr => arr.filter(doc => !!doc.member).map(doc => {
             if (longestName < userToString(doc.member).length) {

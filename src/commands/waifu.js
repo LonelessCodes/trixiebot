@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { userToString } = require("../util/util");
+const { userToString, fetchMember } = require("../util/util");
 const { timeout } = require("../util/promises");
 const { splitArgs } = require("../util/string");
 const { toHumanTime } = require("../util/time");
@@ -38,11 +38,11 @@ async function getData(message, content, database, databaseSlots) {
 
     const all_waifus = await database.find({ guildId: message.guild.id }).toArray();
     for (const row of all_waifus) {
-        if (!await message.guild.fetchMember(row.ownerId)) {
+        if (!await fetchMember(message.guild, row.ownerId)) {
             await database.deleteMany({ guildId: message.guild.id, ownerId: row.ownerId });
         }
 
-        if (!await message.guild.fetchMember(row.waifuId)) {
+        if (!await fetchMember(message.guild, row.waifuId)) {
             await database.deleteOne({ guildId: message.guild.id, waifuId: row.waifuId });
         }
     }
@@ -126,7 +126,7 @@ module.exports = function install(cr, client, config, db) {
                 waifuId: mentioned_member.user.id,
             });
             if (owner) {
-                const owner_member = await message.guild.fetchMember(owner.ownerId);
+                const owner_member = await fetchMember(message.guild, owner.ownerId);
                 if (owner_member) {
                     await message.channel.send(`Oh nu. ${owner_member.toString()} already claimed this beautiful user!`);
                     return;
@@ -232,16 +232,16 @@ module.exports = function install(cr, client, config, db) {
                 const w = await database.findOne({ waifuId: mentioned_member.user.id, guildId: message.guild.id });
 
                 if (w) {
-                    const owner_member = await message.guild.fetchMember(w.ownerId);
+                    const owner_member = await fetchMember(message.guild, w.ownerId);
                     if (owner_member) {
                         waifu = w;
                     } else {
                         await database.deleteMany({ guildId: message.guild.id, ownerId: w.ownerId });
-                        await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displyaName}\` to call them your own!`);
+                        await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displayName}\` to call them your own!`);
                         return;
                     }
                 } else {
-                    await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displyaName}\` to call them your own!`);
+                    await message.channel.send(`This waifu has not been claimed yet. User \`${message.prefix}waifu claim @ ${mentioned_member.displayName}\` to call them your own!`);
                     return;
                 }
             }
@@ -251,8 +251,8 @@ module.exports = function install(cr, client, config, db) {
                 return;
             }
 
-            const ownerUser = await message.guild.fetchMember(waifu.ownerId);
-            const waifuUser = await message.guild.fetchMember(waifu.waifuId);
+            const ownerUser = await fetchMember(message.guild, waifu.ownerId);
+            const waifuUser = await fetchMember(message.guild, waifu.waifuId);
 
             const m1 = await message.channel.send(`${userToString(ownerUser)}'s waifu ${userToString(waifuUser)} just seemed to have appeared nearby. You are quietly approaching them...`);
             await timeout(1000);
@@ -329,7 +329,7 @@ because bees don...`);
                 this.cooldown_user.splice(this.cooldown_user.indexOf(message.author.id), 1);
             }, 5 * 60 * 1000);
 
-            const ownerUser = await message.guild.fetchMember(owner_of_me.ownerId);
+            const ownerUser = await fetchMember(message.guild, owner_of_me.ownerId);
 
             const m1 = await message.channel.send(`You are out for walkies with your owner, ${userToString(ownerUser)}. You are following them and their orders, preparing for the perfect escape...`);
             await timeout(1000);
@@ -411,7 +411,7 @@ because bees don...`);
                 return;
             }
 
-            const other_owner = await message.guild.fetchMember(trade_waifu.ownerId);
+            const other_owner = await fetchMember(message.guild, trade_waifu.ownerId);
             if (!trade_waifu || !other_owner) {
                 await message.channel.send(`${userToString(my_waifu)} can't be traded, because they don't belong to anyone!`);
                 return;
@@ -535,7 +535,7 @@ because bees don...`);
             } else {
                 let str = "";
                 for (const waifu of owner_waifus) {
-                    const member = await message.guild.fetchMember(waifu.waifuId);
+                    const member = await fetchMember(message.guild, waifu.waifuId);
                     if (!member) continue;
                     str += userToString(member) + "\n";
                 }
@@ -543,7 +543,7 @@ because bees don...`);
             }
 
             if (owner_of_me) {
-                const owner = await message.guild.fetchMember(owner_of_me.ownerId);
+                const owner = await fetchMember(message.guild, owner_of_me.ownerId);
                 if (owner) embed.addField("Owned by", userToString(owner));
             }
 

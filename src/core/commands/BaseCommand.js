@@ -34,18 +34,16 @@ Channel.prototype.translate = LocaleManager.autoTranslateChannel;
 Channel.prototype.sendTranslated = LocaleManager.sendTranslated;
 
 class BaseCommand {
-    /**
-     * @param {CommandPermission} permissions
-     */
-    constructor(permissions) {
+    constructor() {
         this.id = Symbol("command id");
 
-        this.setRateLimiter(null);
-        this.setPermissions(permissions || CommandPermission.USER);
+        this._rateLimitMessageRateLimiter = null;
+        this.rateLimiter = null;
+        this.permissions = CommandPermission.USER;
         this.ignore = true;
         this.list = true;
         this._category = null;
-        this._help = null;
+        this.help = null;
         this.aliases = [];
         this.explicit = false;
         this.scope = new CommandScope(CommandScope.DEFAULT).freeze();
@@ -107,7 +105,7 @@ class BaseCommand {
     }
 
     setHelp(v) {
-        this._help = v;
+        this.help = v;
         return this;
     }
 
@@ -127,9 +125,7 @@ class BaseCommand {
     }
 
     hasScope(channel) {
-        if (!this.scope.has(CommandScope.FLAGS.GUILD) && channel.type === "text") return false;
-        if (!this.scope.has(CommandScope.FLAGS.DM) && channel.type === "dm") return false;
-        return true;
+        return CommandScope.hasScope(this.scope, channel);
     }
 
     setSeason(range) {
@@ -139,10 +135,6 @@ class BaseCommand {
 
     isInSeason() {
         return this.season.isToday();
-    }
-
-    get help() {
-        return this._help;
     }
 
     async beforeProcessCall() { /* Do nothing */ }

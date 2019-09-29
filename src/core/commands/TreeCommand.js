@@ -19,8 +19,8 @@ const AliasCommand = require("./AliasCommand");
 const { splitArgs } = require("../../util/string");
 
 class TreeCommand extends BaseCommand {
-    constructor(permissions) {
-        super(permissions);
+    constructor() {
+        super();
 
         this.sub_commands = new Map;
     }

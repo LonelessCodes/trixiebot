@@ -17,8 +17,6 @@
 const BaseCommand = require("./BaseCommand");
 
 // eslint-disable-next-line no-unused-vars
-const CommandPermission = require("../../util/commands/CommandPermission");
-// eslint-disable-next-line no-unused-vars
 const { Message } = require("discord.js");
 // eslint-disable-next-line no-unused-vars
 const { NanoTimer } = require("../../modules/NanoTimer");
@@ -27,10 +25,9 @@ class SimpleCommand extends BaseCommand {
     // eslint-disable-next-line valid-jsdoc
     /**
      * @param {(message: Message, content: string, add: { pass_through: any, command_name: string, timer: NanoTimer }) => *} func
-     * @param {CommandPermission} permissions
      */
-    constructor(func = async () => { /* Do nothing */ }, permissions) {
-        super(permissions);
+    constructor(func = async () => { /* Do nothing */ }) {
+        super();
 
         this.func = func;
     }

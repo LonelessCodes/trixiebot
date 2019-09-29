@@ -18,8 +18,8 @@ const BaseCommand = require("./BaseCommand");
 const HelpBuilder = require("../../util/commands/HelpBuilder");
 
 class HelpCommand extends BaseCommand {
-    constructor(permissions) {
-        super(permissions);
+    constructor() {
+        super();
 
         this._linked_to = this;
     }

@@ -26,8 +26,8 @@ const MessageMentions = require("../../util/commands/MessageMentions");
 const { Attachment } = require("discord.js");
 
 class TextActionCommand extends BaseCommand {
-    constructor(image, content, noMentionMessage, permissions) {
-        super(permissions);
+    constructor(image, content, noMentionMessage) {
+        super();
 
         this.setRateLimiter(new RateLimiter(TimeUnit.SECOND, 10));
         this.setHelp(new HelpContent()

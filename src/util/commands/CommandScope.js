@@ -16,7 +16,18 @@
 
 const Bitfield = require("../../modules/Bitfield");
 
-class CommandScope extends Bitfield { }
+class CommandScope extends Bitfield {
+    /**
+     * @param {CommandScope} scope
+     * @param {*} channel
+     * @returns {boolean}
+     */
+    static hasScope(scope, channel) {
+        if (!scope.has(CommandScope.FLAGS.GUILD) && channel.type === "text") return false;
+        if (!scope.has(CommandScope.FLAGS.DM) && channel.type === "dm") return false;
+        return true;
+    }
+}
 
 CommandScope.FLAGS = {
     GUILD: 1 << 0,

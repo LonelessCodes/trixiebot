@@ -19,7 +19,7 @@ const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
 const { RichEmbed } = require("discord.js");
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("./MessageContext");
+const MessageContext = require("../../util/commands/MessageContext");
 const BSON = require("bson");
 
 const { Message: CCMessage } = require("../managers/cc_utils/cc_classes");

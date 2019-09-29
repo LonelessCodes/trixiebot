@@ -26,7 +26,7 @@ const CommandDispatcher = require("./CommandDispatcher");
 const ConfigManager = require("./managers/ConfigManager");
 // eslint-disable-next-line no-unused-vars
 const LocaleManager = require("./managers/LocaleManager");
-const MessageContext = require("./commands/MessageContext");
+const MessageContext = require("../util/commands/MessageContext");
 const timer = require("../modules/timer");
 const Discord = require("discord.js");
 

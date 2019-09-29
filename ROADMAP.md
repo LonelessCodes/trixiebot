@@ -2,7 +2,6 @@
 
 ## TrixieBot v3 Milestone
 
-* New i18n infrastructure
 * Expand l10n functionality to include timezone and time-format (h12, h24) configs
 * New config system that can store all guild specific configurations, incl. !config configurations and locale configs
 * Allow use of more basic custom commands, allow custom command aliases, disabled channels AND whitelisted channels and multiple possible replies (randomly selected) custom commands (both basic and TrixieScript)

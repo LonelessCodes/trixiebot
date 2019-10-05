@@ -30,7 +30,7 @@ const RateLimiter = require("../util/commands/RateLimiter");
 const TimeUnit = require("../modules/TimeUnit");
 const DocumentMapCache = require("../modules/db/DocumentMapCache");
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("./commands/MessageContext");
+const MessageContext = require("../util/commands/MessageContext");
 
 const Translation = require("../modules/i18n/Translation");
 const TranslationPlural = require("../modules/i18n/TranslationPlural");

@@ -24,7 +24,7 @@ const BSON = require("bson");
 const CustomCommand = require("../commands/CustomCommand");
 const WorkerMethods = require("./cc_utils/WorkerMethods");
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("../commands/MessageContext");
+const MessageContext = require("../../util/commands/MessageContext");
 
 const TYPE = Object.freeze({
     COMMAND: 0,

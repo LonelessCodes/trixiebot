@@ -19,7 +19,7 @@ const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
 const CommandPermission = require("../../util/commands/CommandPermission");
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("./MessageContext");
+const MessageContext = require("../../util/commands/MessageContext");
 
 class SimpleCommand extends BaseCommand {
     // eslint-disable-next-line valid-jsdoc

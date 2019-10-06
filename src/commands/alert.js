@@ -94,12 +94,22 @@ class StreamProcessor extends EventEmitter {
     addChannel(config) {
         return new Channel(this.manager, this, config.channel, config);
     }
+
+    /**
+     * @param {Config|Channel} config
+     */
     removeChannel(config) {
-        const oldChannel = this.online.findIndex(oldChannel =>
-            oldChannel.channel.guild.id === config.channel.guild.id &&
-            oldChannel.userId === config.userId);
-        if (oldChannel >= 0)
-            this.online.splice(oldChannel, 1);
+        if (config.channel) {
+            const oldChannel = this.online.findIndex(oldChannel =>
+                oldChannel.channel.guild.id === config.channel.guild.id &&
+                oldChannel.userId === config.userId);
+            if (oldChannel >= 0)
+                this.online.splice(oldChannel, 1);
+        } else if (config._id) {
+            const oldChannel = this.online.findIndex(oldChannel => oldChannel._id === config._id);
+            if (oldChannel >= 0)
+                this.online.splice(oldChannel, 1);
+        }
     }
 }
 

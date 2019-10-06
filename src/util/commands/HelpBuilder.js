@@ -79,7 +79,7 @@ class HelpBuilder extends RichEmbed {
                 let aliases = [...command.aliases.map(v => {
                     if (v !== "*") return parentName ? parentName + " " + v : v;
                     else return parentName;
-                })];
+                }).filter(a => !!a)];
 
                 if (command instanceof TreeCommand && command.sub_commands.has("*")) {
                     aliases = [...aliases, ...command.sub_commands.get("*").aliases.map(v => name + " " + v)];

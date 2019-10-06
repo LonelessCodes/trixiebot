@@ -172,7 +172,13 @@ class BlackJack {
     }
 
     hit() {
-        this.doubledown_able = false;
+        if (this.doubledown_able) {
+            // Another option open to the player is doubling their bet when
+            // the original two cards dealt total 9, 10, or 11.
+            const score = this.player.score;
+            this.doubledown_able = score >= 9 && score <= 11;
+            this.doubledown_able = false;
+        }
 
         this.player.pullCards(this.deck, 1);
 

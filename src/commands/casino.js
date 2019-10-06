@@ -126,6 +126,7 @@ class Player {
         const score = this.score;
         let str = this.cards.map(card => card.render()).join(" - ") + "\nValue: " + score;
         if (score > BlackJack.MAX_HAND) str += " - BUSTED";
+        else if (score === 21 && this.cards.length === 2) str += " - BLACKJACK";
         return str;
     }
 }
@@ -187,14 +188,22 @@ class BlackJack {
         const player_s = this.player.score;
         const dealer_s = this.dealer.score;
 
-        if (player_s > BlackJack.MAX_HAND) {
+        if (player_s > BlackJack.MAX_HAND) { // Player is higher than 21
             this.result = new Result(Result.BUSTED, 0);
-        } else if (dealer_s > BlackJack.MAX_HAND || player_s > dealer_s) {
-            this.result = new Result(Result.YOU_WIN, this.bet);
-        } else if (dealer_s === player_s) {
+        } else if (player_s > dealer_s) { // player is <= 21 but higher than dealer
+            if (player_s === BlackJack.MAX_HAND && this.player.cards.length === 2) { // Player has a natural
+                this.result = new Result(Result.YOU_WIN, Math.floor(this.bet * 1.5)); // "the dealer immediately pays that player one and a half times the amount of their bet"
+            } else {
+                this.result = new Result(Result.YOU_WIN, this.bet);
+            }
+        } else if (player_s < dealer_s) { // player is <= 21 and but dealer is higher
+            if (dealer_s > BlackJack.MAX_HAND) { // dealer is higher than 21
+                this.result = new Result(Result.YOU_WIN, this.bet);
+            } else { // dealer is <= 21 but higher than player
+                this.result = new Result(Result.DEALER_WINS, 0);
+            }
+        } else { // player and dealer is equal
             this.result = new Result(Result.PUSH, 0);
-        } else {
-            this.result = new Result(Result.DEALER_WINS, 0);
         }
 
         return this.result;

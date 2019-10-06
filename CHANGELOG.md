@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.16.2"></a>
+## [2.16.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.1...v2.16.2) (2019-10-06)
+
+
+### Bug Fixes
+
+* **alert:** hopefully fixed problem with Error on missing Config#channel in StreamProcessor#removeChannel() ([7f4d183](https://bitbucket.org/Loneless/trixiebot/commits/7f4d183))
+* **birthday cmd:** fixed error if member if not found instead of returning null ([19136b9](https://bitbucket.org/Loneless/trixiebot/commits/19136b9))
+* **bj:** fix doubling to follow actual rules (only on original hand and score 9, 10, 11) ([4c6ee22](https://bitbucket.org/Loneless/trixiebot/commits/4c6ee22))
+* **derpi cmd:** fixed checking for empty query ([134c32a](https://bitbucket.org/Loneless/trixiebot/commits/134c32a))
+
+
+### Features
+
+* **bj:** implement Naturals (A + Q/K/J hand) rule ([139ea68](https://bitbucket.org/Loneless/trixiebot/commits/139ea68))
+
+
+
 <a name="2.16.1"></a>
 ## [2.16.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.0...v2.16.1) (2019-09-28)
 

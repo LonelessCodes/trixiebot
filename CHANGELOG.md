@@ -24,6 +24,11 @@ All notable changes to this project will be documented in this file. See [standa
 ## [2.16.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.0...v2.16.1) (2019-09-28)
 
 
+### Bug Fixes
+
+* fixed not firing beforeProcessCall() if no command is found
+
+
 
 <a name="2.16.0"></a>
 # [2.16.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.3...v2.16.0) (2019-09-26)

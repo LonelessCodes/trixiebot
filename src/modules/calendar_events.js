@@ -18,8 +18,8 @@ const CalendarRange = require("./CalendarRange");
 const CalendarStatus = require("./CalendarStatus");
 
 module.exports = [
-    // 0-24 Oct. 30th
-    new CalendarStatus(new CalendarRange("0 0 0  30 9  *", "0 0 0 31 9  *"), "Happy Halloween!"),
+    // 0-24 Oct. 31th
+    new CalendarStatus(new CalendarRange("0 0 0  31 9  *", "0 0 0 1 10  *"), "Happy Halloween!"),
     // 0:00 25th - 24:00 26th Dec
     new CalendarStatus(new CalendarRange("0 0 0  25 11 *", "0 0 0 27 11 *"), "Merry Christmas!"),
     // 18:00 - 24:00 31st Dec

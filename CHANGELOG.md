@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.16.3"></a>
+## [2.16.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.2...v2.16.3) (2019-10-31)
+
+
+### Bug Fixes
+
+* **status:** fixed halloween status time range ([0225578](https://bitbucket.org/Loneless/trixiebot/commits/0225578))
+* fixed CHANGELOG.md missing entry ([a350f58](https://bitbucket.org/Loneless/trixiebot/commits/a350f58))
+* **HelpBuilder:** fixed undefined alias if parentName is undefined ([254e297](https://bitbucket.org/Loneless/trixiebot/commits/254e297))
+
+
+
 <a name="2.16.2"></a>
 ## [2.16.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.1...v2.16.2) (2019-10-06)
 

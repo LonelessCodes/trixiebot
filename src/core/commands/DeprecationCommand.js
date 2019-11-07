@@ -14,11 +14,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Translation = require("../modules/i18n/Translation");
-const DeprecationCommand = require("../core/commands/DeprecationCommand");
+// eslint-disable-next-line no-unused-vars
+const Resolvable = require("../../modules/i18n/Resolvable");
+const BaseCommand = require("./BaseCommand");
 
-module.exports = function install(cr) {
-    cr.registerCommand("poll", new DeprecationCommand(
-        new Translation("poll.deprecation", "The poll command has been deprecated as it is no longer maintainable and planned to be replaced")
-    ));
-};
+class DeprecationCommand extends BaseCommand {
+    /**
+     * @param {string|Resolvable} desc
+     */
+    constructor(desc) {
+        super();
+
+        this.desc = desc;
+    }
+
+    async run(context) {
+        await context.send(this.desc);
+    }
+}
+
+module.exports = DeprecationCommand;

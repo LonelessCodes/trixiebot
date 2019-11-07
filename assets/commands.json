@@ -493,14 +493,6 @@
       }
     },
     {
-      "name": "poll",
-      "help": {
-        "description": "Create a poll that users can vote on",
-        "usage": "\n`!poll <duration> <option 1>, <option 2>, ..., <option n>`\n`duration` - Duration of the poll. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`option` - a comma seperated list of options to vote for",
-        "category": "Misc"
-      }
-    },
-    {
       "name": "prefix",
       "help": {
         "description": "Alias for `{{prefix}}config prefix <?value>`",

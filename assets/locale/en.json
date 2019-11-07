@@ -366,5 +366,8 @@
       "other": "weeks"
     },
     "x_times_in": "{{x}} times in {{timeframe}}"
+  },
+  "poll": {
+    "deprecation": "The poll command has been deprecated as it is no longer maintainable and planned to be replaced"
   }
 }

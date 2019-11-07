@@ -18,8 +18,8 @@ const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../../modules/random/secureRandom");
 
 class TextCommand extends BaseCommand {
-    constructor(content, permissions) {
-        super(permissions);
+    constructor(content) {
+        super();
         this.content = content instanceof Array ? content : [content];
     }
 

@@ -18,8 +18,8 @@ const BaseCommand = require("./BaseCommand");
 const HelpBuilder = require("../../util/commands/HelpBuilder");
 
 class OverloadCommand extends BaseCommand {
-    constructor(permissions) {
-        super(permissions);
+    constructor() {
+        super();
 
         /** @type {Map<string, BaseCommand>} */
         this.overloads = new Map;

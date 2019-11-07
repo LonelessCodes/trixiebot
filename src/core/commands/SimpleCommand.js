@@ -17,18 +17,15 @@
 const BaseCommand = require("./BaseCommand");
 
 // eslint-disable-next-line no-unused-vars
-const CommandPermission = require("../../util/commands/CommandPermission");
-// eslint-disable-next-line no-unused-vars
 const MessageContext = require("../../util/commands/MessageContext");
 
 class SimpleCommand extends BaseCommand {
     // eslint-disable-next-line valid-jsdoc
     /**
      * @param {(message: MessageContext, add: { pass_through: any, command_name: string }) => *} func
-     * @param {CommandPermission} permissions
      */
-    constructor(func = async () => { /* Do nothing */ }, permissions) {
-        super(permissions);
+    constructor(func = async () => { /* Do nothing */ }) {
+        super();
 
         this.func = func;
     }

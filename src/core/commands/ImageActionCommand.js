@@ -28,8 +28,8 @@ const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
 const Translation = require("../../modules/i18n/Translation");
 
 class ImageActionCommand extends BaseCommand {
-    constructor(image, content, noMentionMessage, permissions) {
-        super(permissions);
+    constructor(image, content, noMentionMessage) {
+        super();
 
         this.setRateLimiter(new RateLimiter(TimeUnit.SECOND, 10));
         this.setHelp(new HelpContent()

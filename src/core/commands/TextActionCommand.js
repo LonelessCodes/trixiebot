@@ -24,8 +24,8 @@ const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
 const Translation = require("../../modules/i18n/Translation");
 
 class TextActionCommand extends BaseCommand {
-    constructor(description, content, noMentionMessage, permissions) {
-        super(permissions);
+    constructor(description, content, noMentionMessage) {
+        super();
 
         this.setHelp(new HelpContent()
             .setDescription(description)

@@ -18,8 +18,8 @@ const BaseCommand = require("./BaseCommand");
 const CommandScope = require("../../util/commands/CommandScope");
 
 class ScopedCommand extends BaseCommand {
-    constructor(permissions) {
-        super(permissions);
+    constructor() {
+        super();
 
         /** @type {BaseCommand[]} */
         this.scopes = [];

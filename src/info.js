@@ -28,4 +28,5 @@ module.exports = Object.freeze({
     VERSION: packageFile.version,
     DEV: dev,
     FILES_BASE: path.resolve(path.join(__dirname, "..", "..", config.get("user_files_dir"))),
+    ROOT: path.resolve(path.join(__dirname, "..")),
 });

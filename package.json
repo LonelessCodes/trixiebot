@@ -78,7 +78,7 @@
     "releaseminor": "standard-version --release-as minor",
     "releasepatch": "standard-version --release-as patch"
   },
-  "license": "MIT",
+  "license": "GPLv3",
   "keywords": [
     "discord",
     "bot",

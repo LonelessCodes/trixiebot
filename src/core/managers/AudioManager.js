@@ -25,8 +25,9 @@ async function disconnect(connection) {
     await connection.disconnect();
     if (connection.client.voiceConnections.get(connection.channel.guild.id)) {
         await connection.client.voiceConnections.get(connection.channel.guild.id).disconnect();
-        await connection.client.voiceConnections.get(connection.channel.guild.id)._destroy();
-        await connection.client.voiceConnections.remove(connection.client.voiceConnections.get(connection.channel.guild.id));
+        if (connection.client.voiceConnections.get(connection.channel.guild.id))
+            await connection.client.voiceConnections.get(connection.channel.guild.id)._destroy();
+        await connection.client.voiceConnections.delete(connection.channel.guild.id);
     }
 }
 
@@ -139,6 +140,7 @@ class VCGuild extends EventEmitter {
             if (oldMember.voiceChannel.id !== this.vc.id) return;
         }
 
+        // TODO: Error: Cannot read property 'members' of undefined
         if (this.vc.members.filter(m => !m.user.bot).size > 0) return;
 
         this.leave();

@@ -73,10 +73,6 @@ module.exports = new class Utils {
      * @returns {Promise<Discord.GuildMember>}
      */
     async fetchMember(guild, user, cache = true) {
-        try {
-            return await guild.fetchMember(user, cache);
-        } catch (_) {
-            return null;
-        }
+        return await guild.fetchMember(user, cache).catch(() => null);
     }
 };

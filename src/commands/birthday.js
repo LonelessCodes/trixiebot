@@ -172,7 +172,7 @@ module.exports = async function install(cr, client, config, db) {
             const users = await database.find({ month }).toArray();
             const members = [];
             for (let user of users) {
-                const member = await fetchMember(message.guild, user.userId);
+                const member = await fetchMember(message.guild, user.userId).catch(() => null);
                 if (!member) continue;
                 members.push(`${pad(month + 1, 2)}/${pad(user.date, 2)} - ${userToString(member)}`);
             }

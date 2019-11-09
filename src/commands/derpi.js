@@ -115,6 +115,7 @@ async function process(key, message, msg, type) {
                 perpage: amount,
                 key,
             });
+            if (!result.search) break;
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 results.push({
@@ -132,6 +133,7 @@ async function process(key, message, msg, type) {
                 perpage: amount,
                 key,
             });
+            if (!result.search) break;
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 results.push({
@@ -149,6 +151,7 @@ async function process(key, message, msg, type) {
                 perpage: amount,
                 key,
             });
+            if (!result.search) break;
             for (let i = 0; i < Math.min(amount, result.search.length); i++) {
                 const image = result.search[i];
                 results.push({
@@ -163,6 +166,7 @@ async function process(key, message, msg, type) {
                 q: query,
                 key,
             });
+            if (!result.total) break;
             for (let i = 0; i < Math.min(amount, result.total); i++) {
                 const promise = fetchDerpi({
                     q: query,

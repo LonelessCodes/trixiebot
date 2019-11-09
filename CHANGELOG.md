@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.16.4"></a>
+## [2.16.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.3...v2.16.4) (2019-11-09)
+
+
+### Bug Fixes
+
+* **AudioManager disconnect:** dirty way of fixing '._destroy is not a function' ([0ed2668](https://bitbucket.org/Loneless/trixiebot/commits/0ed2668))
+* **birthday month:** fix response on 0 birthdays ([a9a04d0](https://bitbucket.org/Loneless/trixiebot/commits/a9a04d0))
+* **birthday month:** work around a really strange error ([04b7a43](https://bitbucket.org/Loneless/trixiebot/commits/04b7a43))
+* **derpi:** should probably throw a proper error, but fixed api result not having a search property ([cf79e25](https://bitbucket.org/Loneless/trixiebot/commits/cf79e25))
+* **waifu trade:** return help when no content is given instead of throwing error "mentions.members of null" ([0bb0409](https://bitbucket.org/Loneless/trixiebot/commits/0bb0409))
+
+
+### Features
+
+* **logger:** improved on the logger a bit. Now uses native stdio and util.format ([e06b1fe](https://bitbucket.org/Loneless/trixiebot/commits/e06b1fe))
+
+
+
 <a name="2.16.3"></a>
 ## [2.16.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.2...v2.16.3) (2019-10-31)
 

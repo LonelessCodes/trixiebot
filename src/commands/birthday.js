@@ -177,6 +177,8 @@ module.exports = async function install(cr, client, config, db) {
                 members.push(`${pad(month + 1, 2)}/${pad(user.date, 2)} - ${userToString(member)}`);
             }
 
+            if (members.length === 0) return "No one got their birthday in this month :c";
+
             new Paginator(
                 "Birthdays",
                 `All birthdays in month ${pad(month + 1, 2)}`,

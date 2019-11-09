@@ -25,6 +25,7 @@ const CONST = require("../const");
 const Discord = require("discord.js");
 
 const BaseCommand = require("../core/commands/BaseCommand");
+const OverloadCommand = require("../core/commands/OverloadCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
@@ -366,95 +367,96 @@ because bees don...`);
     }).setHelp(new HelpContent()
         .setUsage("", "Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes"));
 
-    waifuCommand.registerSubCommand("trade", new class extends BaseCommand {
-        async call(message, content) {
-            const {
-                mentions,
-                owner_waifus,
-            } = await getData(message, content, database, databaseSlots);
+    waifuCommand.registerSubCommand("trade", new OverloadCommand)
+        .registerOverload("1+", new class extends BaseCommand {
+            async call(message, content) {
+                const {
+                    mentions,
+                    owner_waifus,
+                } = await getData(message, content, database, databaseSlots);
 
-            if (mentions.members.size !== 2) {
-                await message.channel.send("Specify waifu you want to trade, and the waifu you want to have.");
-                return;
+                if (mentions.members.size !== 2) {
+                    await message.channel.send("Specify waifu you want to trade, and the waifu you want to have.");
+                    return;
+                }
+
+                const matched = mentions.members;
+
+                let my_waifu = matched.first();
+                let other_waifu = matched.last();
+                let tmp_waifu = null;
+
+                if (!owner_waifus.some(w => w.waifuId === my_waifu.user.id) && owner_waifus.some(w => w.waifuId === other_waifu.user.id)) {
+                    tmp_waifu = my_waifu;
+                    my_waifu = other_waifu;
+                    other_waifu = tmp_waifu;
+                }
+
+                if (message.author.id === my_waifu.user.id ||
+                    message.author.id === other_waifu.user.id) {
+                    await message.channel.send("hahahahahahahahahahahaha that's cute, but no");
+                    return;
+                }
+
+                const waifu = owner_waifus.find(w => w.waifuId === my_waifu.user.id);
+                if (!waifu) {
+                    await message.channel.send(`${userToString(my_waifu)} or ${userToString(other_waifu)} can't be traded, because they both don't belong to you! Trade one waifu you own with one you don't!`);
+                    return;
+                }
+
+                const trade_waifu = await database.findOne({
+                    waifuId: other_waifu.user.id,
+                    guildId: message.guild.id,
+                });
+                if (trade_waifu.ownerId === message.author.id) {
+                    await message.channel.send(`${userToString(other_waifu)} belongs to you. But second @mention should be someone else's waifu.`);
+                    return;
+                }
+
+                const other_owner = await fetchMember(message.guild, trade_waifu.ownerId);
+                if (!trade_waifu || !other_owner) {
+                    await message.channel.send(`${userToString(my_waifu)} can't be traded, because they don't belong to anyone!`);
+                    return;
+                }
+
+                await message.channel.send(`${userToString(other_owner)}, do you agree to trade your ${userToString(other_waifu)} with ${userToString(my_waifu)}? \`yes\`, \`no\`?`);
+
+                const messages = await message.channel.awaitMessages(message => {
+                    if (message.author.id !== other_owner.user.id) return false;
+                    if (!/^(yes|no)\b/i.test(message.content)) return false;
+                    return true;
+                }, {
+                    maxMatches: 1,
+                    time: 4 * 60 * 1000,
+                });
+
+                if (messages.size === 0) {
+                    await message.channel.send("Timeout :v guess they don't wanna");
+                    return;
+                }
+
+                const resultContent = messages.first().content;
+
+                if (/^(no+|no+pe)\b/i.test(resultContent)) {
+                    await message.channel.send(`N'aww :c poor ${userToString(message.member)}`);
+                    return;
+                }
+
+                await database.updateOne({ waifuId: my_waifu.user.id, guildId: message.guild.id }, { $set: { ownerId: other_owner.user.id } });
+                await database.updateOne({ waifuId: other_waifu.user.id, guildId: message.guild.id }, { $set: { ownerId: message.author.id } });
+
+                await message.channel.send({
+                    embed: new Discord.RichEmbed()
+                        .setColor(CONST.COLOR.PRIMARY)
+                        .setTitle("Trading")
+                        .setDescription(`${userToString(my_waifu)}** :arrow_right: ${userToString(other_owner)}**` +
+                            `**${userToString(message.member)}** :arrow_left: **${userToString(other_waifu)}**`),
+                });
             }
-
-            const matched = mentions.members;
-
-            let my_waifu = matched.first();
-            let other_waifu = matched.last();
-            let tmp_waifu = null;
-
-            if (!owner_waifus.some(w => w.waifuId === my_waifu.user.id) && owner_waifus.some(w => w.waifuId === other_waifu.user.id)) {
-                tmp_waifu = my_waifu;
-                my_waifu = other_waifu;
-                other_waifu = tmp_waifu;
-            }
-
-            if (message.author.id === my_waifu.user.id ||
-                message.author.id === other_waifu.user.id) {
-                await message.channel.send("hahahahahahahahahahahaha that's cute, but no");
-                return;
-            }
-
-            const waifu = owner_waifus.find(w => w.waifuId === my_waifu.user.id);
-            if (!waifu) {
-                await message.channel.send(`${userToString(my_waifu)} or ${userToString(other_waifu)} can't be traded, because they both don't belong to you! Trade one waifu you own with one you don't!`);
-                return;
-            }
-
-            const trade_waifu = await database.findOne({
-                waifuId: other_waifu.user.id,
-                guildId: message.guild.id,
-            });
-            if (trade_waifu.ownerId === message.author.id) {
-                await message.channel.send(`${userToString(other_waifu)} belongs to you. But second @mention should be someone else's waifu.`);
-                return;
-            }
-
-            const other_owner = await fetchMember(message.guild, trade_waifu.ownerId);
-            if (!trade_waifu || !other_owner) {
-                await message.channel.send(`${userToString(my_waifu)} can't be traded, because they don't belong to anyone!`);
-                return;
-            }
-
-            await message.channel.send(`${userToString(other_owner)}, do you agree to trade your ${userToString(other_waifu)} with ${userToString(my_waifu)}? \`yes\`, \`no\`?`);
-
-            const messages = await message.channel.awaitMessages(message => {
-                if (message.author.id !== other_owner.user.id) return false;
-                if (!/^(yes|no)\b/i.test(message.content)) return false;
-                return true;
-            }, {
-                maxMatches: 1,
-                time: 4 * 60 * 1000,
-            });
-
-            if (messages.size === 0) {
-                await message.channel.send("Timeout :v guess they don't wanna");
-                return;
-            }
-
-            const resultContent = messages.first().content;
-
-            if (/^(no+|no+pe)\b/i.test(resultContent)) {
-                await message.channel.send(`N'aww :c poor ${userToString(message.member)}`);
-                return;
-            }
-
-            await database.updateOne({ waifuId: my_waifu.user.id, guildId: message.guild.id }, { $set: { ownerId: other_owner.user.id } });
-            await database.updateOne({ waifuId: other_waifu.user.id, guildId: message.guild.id }, { $set: { ownerId: message.author.id } });
-
-            await message.channel.send({
-                embed: new Discord.RichEmbed()
-                    .setColor(CONST.COLOR.PRIMARY)
-                    .setTitle("Trading")
-                    .setDescription(`${userToString(my_waifu)}** :arrow_right: ${userToString(other_owner)}**` +
-                        `**${userToString(message.member)}** :arrow_left: **${userToString(other_waifu)}**`),
-            });
-        }
-    }).setHelp(new HelpContent()
-        .setUsage("<@your waifu> <@other waifu>", "Trade `your waifu` with `other waifu`")
-        .addParameter("@your waifu", "Must be one of your waifus. This one will be traded")
-        .addParameter("@other waifu", "Must be someone's waifu. This is the one you want to get"));
+        }).setHelp(new HelpContent()
+            .setUsage("<@your waifu> <@other waifu>", "Trade `your waifu` with `other waifu`")
+            .addParameter("@your waifu", "Must be one of your waifus. This one will be traded")
+            .addParameter("@other waifu", "Must be someone's waifu. This is the one you want to get"));
 
     /** @type {number[]} */
     const prices = new Array(MAX_SLOTS).fill(0);

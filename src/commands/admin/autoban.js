@@ -42,16 +42,16 @@ const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
 
 const ID_PATTERN = /^[0-9]+$/;
 
-async function byID(database, context, id) {
+async function byID(database, message, id) {
     if (!ID_PATTERN.test(id)) {
         return new Translation(
             "autoban.not_valid_id",
             "`{{id}}` is not a valid user ID. User IDs contain only digits. U dumbo",
-            { id }
+            { id },
         );
     }
 
-    await database.insertOne({ guildId: context.guild.id, action: "ban", type: "id", content: id });
+    await database.insertOne({ guildId: message.guild.id, action: "ban", type: "id", content: id });
 
     return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
         .setDescription(new Translation("autoban.added_id", ":police_car: Added `{{id}}` as an ID", { id }));
@@ -59,49 +59,49 @@ async function byID(database, context, id) {
 
 const TAG_PATTERN = /^([^@#:]{2,32})#([0-9]{4})$/;
 
-async function byName(database, context, name) {
+async function byName(database, message, name) {
     const match = name.match(TAG_PATTERN);
     if (!match) {
-        await database.insertOne({ guildId: context.guild.id, action: "ban", type: "name", content: name });
+        await database.insertOne({ guildId: message.guild.id, action: "ban", type: "name", content: name });
 
         return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
             .setDescription(new Translation("autoban.added_name", ":police_car: Added `{{name}}`", { name }));
     }
 
-    const user = context.client.users.find(user => user.username === match[1] && user.discriminator === match[2]);
+    const user = message.client.users.find(user => user.username === match[1] && user.discriminator === match[2]);
     if (!user) {
-        await database.insertOne({ guildId: context.guild.id, action: "ban", type: "tag", content: name });
+        await database.insertOne({ guildId: message.guild.id, action: "ban", type: "tag", content: name });
 
         return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
             .setDescription(new Translation("autoban.added_name", ":police_car: Added `{{name}}`", { name }));
     }
 
     const id = user.id;
-    await database.insertOne({ guildId: context.guild.id, action: "ban", type: "id", content: id });
+    await database.insertOne({ guildId: message.guild.id, action: "ban", type: "id", content: id });
 
     return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
         .setDescription(new Translation(
             "autoban.added_as_id",
             ":police_car: Found `{{name}}`'s user ID. Added `{{id}}` as an ID",
-            { name, id }
+            { name, id },
         ));
 }
 
-async function byGlob(database, context, pattern) {
-    await database.insertOne({ guildId: context.guild.id, action: "ban", type: "glob", content: pattern });
+async function byGlob(database, message, pattern) {
+    await database.insertOne({ guildId: message.guild.id, action: "ban", type: "glob", content: pattern });
 
     return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
         .setDescription(new Translation(
-            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern }
+            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern },
         ));
 }
 
-async function byRegex(database, context, regex) {
-    await database.insertOne({ guildId: context.guild.id, action: "ban", type: "regex", content: regex });
+async function byRegex(database, message, regex) {
+    await database.insertOne({ guildId: message.guild.id, action: "ban", type: "regex", content: regex });
 
     return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
         .setDescription(new Translation(
-            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern: regex }
+            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern: regex },
         ));
 }
 
@@ -162,7 +162,7 @@ module.exports = function install(cr, { client, db }) {
                     .setDescription(new Translation(
                         "autoban.no_configs",
                         "No autoban configs yet. Add some by using `{{prefix}}autoban <userID\\|username#0000\\|glob>`",
-                        { prefix: context.prefix }
+                        { prefix: context.prefix },
                     ));
             }
 
@@ -174,35 +174,35 @@ module.exports = function install(cr, { client, db }) {
                 "Autobans",
                 await context.translate(new Translation("autoban.all_configs", "All the configured autobans for this server")),
                 20, items, context.author,
-                { guild: context.guild }
+                { guild: context.guild },
             ).display(context.channel);
         }))
-        .registerOverload("1+", new SimpleCommand(({ content, ctx }) => {
-            if (ID_PATTERN.test(content)) return byID(database, ctx, content);
-            else return byName(database, ctx, content);
+        .registerOverload("1+", new SimpleCommand(({ content, message }) => {
+            if (ID_PATTERN.test(content)) return byID(database, message, content);
+            else return byName(database, message, content);
         }));
 
-    autobanCmd.registerSubCommand("id", new SimpleCommand(({ ctx, content }) => {
+    autobanCmd.registerSubCommand("id", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        return byID(database, ctx, content.trim());
+        return byID(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<userID>", "add an autoban config banning the user with this specific, unique userID"));
 
-    autobanCmd.registerSubCommand("name", new SimpleCommand(({ ctx, content }) => {
+    autobanCmd.registerSubCommand("name", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        return byName(database, ctx, content.trim());
+        return byName(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<username#0000|username>", "add an autoban config banning the user with this user tag (username#0000) or, if passed a username only, this username (case insensitive)"));
 
-    autobanCmd.registerSubCommand("glob", new SimpleCommand(({ ctx, content }) => {
+    autobanCmd.registerSubCommand("glob", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        return byGlob(database, ctx, content.trim());
+        return byGlob(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<glob>", "add an autoban config banning users matching this glob pattern (always case insensitive)"));
 
-    autobanCmd.registerSubCommand("regexp", new SimpleCommand(({ ctx, content }) => {
+    autobanCmd.registerSubCommand("regexp", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        return byRegex(database, ctx, content.trim());
+        return byRegex(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<regexp>", "add an autoban config banning users matching this RegEx pattern (always with i and u flags)"));
 
@@ -220,7 +220,7 @@ module.exports = function install(cr, { client, db }) {
                     .setDescription(new Translation(
                         "autoban.no_configs",
                         "No autoban configs yet. Add some by using `{{prefix}}autoban <userID|username#0000|glob>`",
-                        { prefix: context.prefix }
+                        { prefix: context.prefix },
                     ));
             }
 
@@ -229,10 +229,10 @@ module.exports = function install(cr, { client, db }) {
             const paginator = new Paginator(
                 "Removable Autobans",
                 await context.translate(
-                    new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove.")
+                    new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove."),
                 ),
                 20, items, context.author,
-                { number_items: true, guild: context.guild }
+                { number_items: true, guild: context.guild },
             ).display(context.channel);
 
             const msgs = await context.channel.awaitMessages(m => m.author.id === context.author.id && /[0-9]+/.test(m.content), { maxMatches: 1, time: 60000 });
@@ -249,7 +249,7 @@ module.exports = function install(cr, { client, db }) {
                         .setDescription(new Translation(
                             "autoban.deleted",
                             "Deleted `{{id}}` :rotating_light:",
-                            { id: row.content }
+                            { id: row.content },
                         ));
 
                     await context.send({ embed });
@@ -258,8 +258,8 @@ module.exports = function install(cr, { client, db }) {
 
             await paginator.end();
         }))
-        .registerOverload("1+", new SimpleCommand(async ({ ctx, content }) => {
-            const deleted = await database.deleteOne({ guildId: ctx.guild.id, content: content });
+        .registerOverload("1+", new SimpleCommand(async ({ guild, content }) => {
+            const deleted = await database.deleteOne({ guildId: guild.id, content: content });
 
             if (deleted.result.n === 0) {
                 return new TranslationEmbed().setColor(CONST.COLOR.ERROR)
@@ -270,7 +270,7 @@ module.exports = function install(cr, { client, db }) {
                 .setDescription(new Translation(
                     "autoban.deleted",
                     "Deleted `{{id}}` :rotating_light:",
-                    { id: content }
+                    { id: content },
                 ));
         }));
 

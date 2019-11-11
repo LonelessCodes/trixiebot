@@ -16,7 +16,15 @@
         "welcome": "👋 Verkünde neue User",
         "leave": "🚶 Verkünde gehende User",
         "ban": "🔨 Verkünde gebannte User",
-        "text": "Benutzerdefinierter Text ('{{user}}' als User, 'empty' = Standard)"
+        "text": "Benutzerdefinierter Text ('{{user}}' als User, 'empty' = Standard)",
+        "type": {
+            "text": "Text",
+            "num": "Nummer",
+            "bool": "`true` oder `false`",
+            "ch": "\\#Channel",
+            "role": "Rollenname",
+            "none": "none"
+        }
     },
     "general": {
         "lang_name": "Deutsch",
@@ -34,7 +42,8 @@
     "locale": {
         "not_supported": "Sprache '{{locale}}' wird nicht unterstützt :c Versuch's mal mit {{locales}}",
         "success": "Sprache des Servers zu {{locale}} geändert.",
-        "success_ch": "Sprache für {{channel}} zu {{locale}} geändert."
+        "success_ch": "Sprache für {{channel}} zu {{locale}} geändert.",
+        "title": "Serversprachen"
     },
     "penis": {
         "length": "Länge:",
@@ -165,7 +174,11 @@
         "all_configs": "Alle Autobans für diesen Server",
         "remove_configs": "Schreib die Nummer des Autobans, dass du gelöscht haben möchtest.",
         "deleted": "`{{id}}` gelöscht :rotating_light:",
-        "no_parameter": "Kein solches Pattern konfiguriert"
+        "no_parameter": "Kein solches Pattern konfiguriert",
+        "title": "Autobans",
+        "remove": {
+            "title": "Entfernbare Autobans"
+        }
     },
     "stats": {
         "statistics": "Statistiken",
@@ -376,5 +389,13 @@
     "birthday": {
         "birthday": "Geburtstage",
         "title": "Alle Geburtstage in Monat {{month}}"
+    },
+    "action": {
+        "hug": {
+            "self": "Eigenumarmung? Umarme doch jemanden den du lieb hast!"
+        },
+        "pat": {
+            "self": "Aww, gönn dir ein Pat <3"
+        }
     }
 }

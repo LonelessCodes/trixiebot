@@ -52,7 +52,15 @@
     "welcome": "👋 Announce new users",
     "leave": "🚶 Announce leaving users",
     "ban": "🔨 Announce banned users",
-    "text": "Custom Text ('{{user}}' as user, empty = default)"
+    "text": "Custom Text ('{{user}}' as user, empty = default)",
+    "type": {
+      "text": "Text",
+      "num": "Number",
+      "bool": "true or false",
+      "ch": "\\#Channel",
+      "role": "Role Name",
+      "none": "none"
+    }
   },
   "penis": {
     "everyone": "everyone has fucking huge diccs k. You're all beautiful",
@@ -106,7 +114,8 @@
   "locale": {
     "not_supported": "Locale '{{locale}}' is not supported :c Try {{locales}}",
     "success": "Changed locale for the server to {{locale}}",
-    "success_ch": "Changed locale for {{channel}} to {{locale}}"
+    "success_ch": "Changed locale for {{channel}} to {{locale}}",
+    "title": "Server Locales"
   },
   "textaction": {
     "everyone": "all {{count}} users"
@@ -165,7 +174,11 @@
     "all_configs": "All the configured autobans for this server",
     "remove_configs": "Type the number of the autoban you would like to remove.",
     "deleted": "Deleted `{{id}}` :rotating_light:",
-    "no_parameter": "No such pattern configured"
+    "no_parameter": "No such pattern configured",
+    "title": "Autobans",
+    "remove": {
+      "title": "Removable Autobans"
+    }
   },
   "stats": {
     "statistics": "Statistics",
@@ -376,5 +389,13 @@
   "birthday": {
     "birthday": "Birthdays",
     "title": "All birthdays in month {{month}}"
+  },
+  "action": {
+    "hug": {
+      "self": "Hugging yourself? How about huggig someone you love!"
+    },
+    "pat": {
+      "self": "Aww, take a pat <3"
+    }
   }
 }

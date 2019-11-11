@@ -26,6 +26,7 @@ She offers a variety of great features, many of which to satisfy the needs of My
 * 100% customizable (disable / enable everything)
 * Utility and fun stuff
 * Constantly worked on
+* Supports multiple languages
 * and much more...
 
 ---

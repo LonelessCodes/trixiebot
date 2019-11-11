@@ -107,7 +107,8 @@ class MessageContext {
      * @returns {Promise<I18nLocale>}
      */
     translator(ch) {
-        return this._locale.translator(ch || this.channel);
+        if (ch instanceof TextChannel) return this._locale.translator(ch);
+        return this._locale.translator(this.channel);
     }
 
     edit(msg, content, options) {

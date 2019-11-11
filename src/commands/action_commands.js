@@ -15,6 +15,7 @@
  */
 
 const TextActionCommand = require("../core/commands/TextActionCommand");
+const Translation = require("../modules/i18n/Translation");
 
 const hugs = [
     "(っ´▽｀)っ{{user}}",
@@ -30,11 +31,13 @@ const hugs = [
 ];
 
 module.exports = function install(cr) {
-    cr.registerCommand("hug", new TextActionCommand("Hug someone!!!", hugs, "Hugging yourself? How about huggig someone you love!"))
-        .setAllowEveryone(true);
+    cr.registerCommand("hug", new TextActionCommand(
+        "Hug someone!!!", hugs,
+        new Translation("action.hug.self", "Hugging yourself? How about huggig someone you love!")
+    )).setAllowEveryone(true);
     cr.registerAlias("hug", "hugs");
 
-    cr.registerCommand("pat", new TextActionCommand("*patpat*", "*patpats {{user}}*", "Aww, take a pat <3"))
+    cr.registerCommand("pat", new TextActionCommand("*patpat*", "*patpats {{user}}*", new Translation("action.pat.self", "Aww, take a pat <3")))
         .setAllowEveryone(true);
 
     cr.registerCommand("kiss", new TextActionCommand("Kiss someone -3-", [
@@ -46,7 +49,7 @@ module.exports = function install(cr) {
         "(〃ﾟ3ﾟ〃){{user}}",
         "～(^з^)-♡{{user}}",
         "*kisses {{user}}*",
-    ], "Aww, *kisses*"))
+    ], new Translation("action.kiss.self", "Aww, *kisses*")))
         .setAllowEveryone(true);
 
     cr.registerCommand("touch", new TextActionCommand("Touch someone o.o\"", [
@@ -71,8 +74,11 @@ module.exports = function install(cr) {
         "☞๏็ັཪ๏็๎☞ {{user}}",
         "( ━☞´◔‿ゝ◔`)━☞ {{user}}",
         "(☞三☞ ఠ ਉ ఠ))☞三☞ {{user}}",
-    ], ">:3 *points at u*"))
+    ], new Translation("action.point.self", ">:3 *points at u*")))
         .setAllowEveryone(true);
+
+    // eslint-disable-next-line no-warning-comments
+    // TODO: improve these down here
 
     cr.registerCommand("poke", new TextActionCommand("Poke poke", "*pokes {{user}}*", "Aww, *pokes you* :eyes:"))
         .setAllowEveryone(true);

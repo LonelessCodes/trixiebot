@@ -18,14 +18,14 @@ const BaseCommand = require("./BaseCommand");
 const HelpBuilder = require("../../util/commands/HelpBuilder");
 
 class HelpCommand extends BaseCommand {
-    constructor(permissions) {
-        super(permissions);
+    constructor() {
+        super();
 
         this._linked_to = this;
     }
 
-    async run(message, command_name) {
-        await HelpBuilder.sendHelp(message, command_name, this._linked_to || this);
+    async run(context, command_name) {
+        await HelpBuilder.sendHelp(context, command_name, this._linked_to || this);
     }
 
     linkTo(command) {

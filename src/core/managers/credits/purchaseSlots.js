@@ -15,41 +15,53 @@
  */
 
 const credits = require("../CreditsManager");
+const Translation = require("../../../modules/i18n/Translation");
+const TranslationMerge = require("../../../modules/i18n/TranslationMerge");
 
-async function purchaseSlots(message, activeList, cooldown, user, cost, success, handler = async () => { /* Do nothing */ }) {
-    const name = await credits.getName(message.guild);
+async function purchaseSlots(context, activeList, cooldown, cost, success, handler = async () => { /* Do nothing */ }) {
+    const name = await credits.getName(context.guild);
 
-    if (!await credits.canPurchase(user, cost)) {
-        message.channel.send(`:atm: You don't have enough ${name.plural} to buy more slots! You need **${credits.getBalanceString(cost, name)}**.`);
-        return;
+    if (!await credits.canPurchase(context.author, cost)) {
+        return new Translation("bank.not_enough", ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**.", {
+            name: name.plural || name.singular, money: credits.getBalanceString(cost, name),
+        });
     }
 
-    await message.channel.send(`:atm: The new slot will cost you **${credits.getBalanceString(cost, name)}**. Type either \`buy\` or \`cancel\``);
+    await context.send(new Translation("bank.action", ":atm: The new slot will cost you **{{money}}**. Type either `buy` or `cancel`", {
+        money: credits.getBalanceString(cost, name),
+    }));
 
-    activeList.add(user.id);
+    activeList.add(context.author.id);
 
     const opts = { maxMatches: 1, time: 60000, errors: ["time"] };
-    await message.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === message.author.id, opts)
-        .then(async messages => {
-            const m = messages.first();
-            if (/^buy$/i.test(m.content)) {
-                cooldown.testAndAdd(user.id);
 
-                if (!await credits.canPurchase(user, cost)) {
-                    message.channel.send(":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
-                    return;
-                }
+    try {
+        const messages = await context.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === context.author.id, opts);
 
-                const new_balance = await handler(cost);
+        const m = messages.first();
+        if (/^buy$/i.test(m.content)) {
+            cooldown.testAndAdd(context.author.id);
 
-                message.channel.send(":atm: " + success + " (:yen: new account balance: **" + credits.getBalanceString(new_balance, name) + "**)");
-                return;
+            if (!await credits.canPurchase(context.author, cost)) {
+                activeList.delete(context.author.id);
+                return new Translation("bank.unexpected_drop", ":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
             }
 
-            message.channel.send("Then not");
-        })
-        .catch(() => message.channel.send("Time's up. Try again"))
-        .then(() => activeList.delete(user.id));
+            const new_balance = await handler(cost);
+
+            activeList.delete(context.author.id);
+            return new TranslationMerge(
+                success || new Translation("bank.payment_success", ":atm: 'Aight! There you go."),
+                new Translation("bank.payment_new_balance", "(:yen: new account balance: **{{money}}**)", { money: credits.getBalanceString(new_balance, name) })
+            );
+        }
+
+        activeList.delete(context.author.id);
+        return new Translation("bank.payment_abort", "Then not");
+    } catch (_) {
+        activeList.delete(context.author.id);
+        return new Translation("bank.payment_timeout", "Time's up. Try again");
+    }
 }
 
 module.exports = purchaseSlots;

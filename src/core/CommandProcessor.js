@@ -22,20 +22,34 @@ const guild_stats = require("./managers/GuildStatsManager");
 const ErrorCaseManager = require("./managers/ErrorCaseManager");
 const CommandRegistry = require("./CommandRegistry");
 const CommandDispatcher = require("./CommandDispatcher");
-const nanoTimer = require("../modules/nanoTimer");
 // eslint-disable-next-line no-unused-vars
-const { Message, Permissions } = require("discord.js");
+const ConfigManager = require("./managers/ConfigManager");
+// eslint-disable-next-line no-unused-vars
+const LocaleManager = require("./managers/LocaleManager");
+const MessageContext = require("../util/commands/MessageContext");
+const timer = require("../modules/timer");
+const Discord = require("discord.js");
+
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
 
 class CommandProcessor {
-    constructor(client, config, database) {
+    /**
+     * @param {Discord.Client} client
+     * @param {ConfigManager} config
+     * @param {LocaleManager} locale
+     * @param {*} db
+     */
+    constructor(client, config, locale, db) {
         this.client = client;
         this.config = config;
-        this.db = database;
+        this.locale = locale;
+        this.db = db;
 
         this.error_cases = new ErrorCaseManager(this.client, this.db);
 
-        this.REGISTRY = new CommandRegistry(client, database);
-        this.DISPATCHER = new CommandDispatcher(client, database, this.REGISTRY);
+        this.REGISTRY = new CommandRegistry(client, this.db);
+        this.DISPATCHER = new CommandDispatcher(client, this.db, this.REGISTRY);
 
         stats.bot.register("COMMANDS_EXECUTED", true);
         stats.bot.register("MESSAGES_TODAY", true);
@@ -45,10 +59,44 @@ class CommandProcessor {
     }
 
     /**
-     * @param {Message} message
+     * @param {Discord.Message} message
+     * @param {Error} err
+     * @returns {Promise<void>}
+     */
+    async onProcessingError(message, err) {
+        const caseId = await this.error_cases.collectInfo(message, err);
+
+        log.error([
+            "ProcessingError {",
+            "  caseID:      " + caseId,
+            "  content:     " + JSON.stringify(message.content),
+            "  channelType: " + message.channel.type,
+            message.channel.type === "text" && "  guildId:     " + message.guild.id,
+            "  channelId:   " + message.channel.id,
+            "  userId:      " + message.author.id,
+            "  error:      ",
+        ].filter(s => !!s).join("\n"), err, "}");
+
+        const err_message = new Translation(
+            "general.error",
+            "Uh... I think... I might've run into a problem there...?\nIf you believe this is unintended behaviour, report the error with `{{prefix}}reporterror {{caseId}}`",
+            { prefix: message.prefix || "!", caseId }
+        );
+
+        try {
+            if (INFO.DEV) {
+                await this.locale.send(message.channel, new TranslationMerge(err_message, `\n\`${err.name}: ${err.message}\``));
+            } else {
+                await this.locale.send(message.channel, err_message);
+            }
+        } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
+    }
+
+    /**
+     * @param {Discord.Message} message
      */
     async onMessage(message) {
-        const timer = nanoTimer();
+        const received_at = timer();
 
         try {
             if (message.author.bot || message.author.equals(message.client.user)) return;
@@ -58,42 +106,20 @@ class CommandProcessor {
                 guild_stats.get("messages").add(new Date, message.guild.id, message.channel.id, message.author.id);
 
             if (message.channel.type === "text" &&
-                !message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.SEND_MESSAGES, true))
+                !message.channel.permissionsFor(message.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES, true))
                 return;
 
-            await this.run(message, timer);
+            await this.run(message, received_at);
         } catch (err) {
             await this.onProcessingError(message, err);
         }
     }
 
     /**
-     * @param {Message} message
-     * @param {Error} err
-     * @returns {void}
+     * @param {Discord.Message} message
+     * @param {bigint} received_at
      */
-    async onProcessingError(message, err) {
-        const caseId = await this.error_cases.collectInfo(message, err);
-
-        log.error(
-            "ProcessingError {\n" +
-            "  caseID:      " + caseId + "\n" +
-            "  content:     " + JSON.stringify(message.content) + "\n" +
-            "  channelType: " + message.channel.type + "\n" +
-            (message.channel.type === "text" ? "  guildId:     " + message.guild.id + "\n" : "") +
-            "  channelId:   " + message.channel.id + "\n" +
-            "  userId:      " + message.author.id + "\n" +
-            "  error:      ", err, "}"
-        );
-
-        try {
-            const err_message = "Uh... I think... I might've run into a problem there...?\nIf you believe this is unintended behaviour, report the error with `" + (message.prefix || "!") + "reporterror " + caseId + "`";
-            if (INFO.DEV) await message.channel.sendTranslated(err_message + `\n\`${err.name}: ${err.message}\``);
-            else await message.channel.sendTranslated(err_message);
-        } catch (_) { _; } // doesn't have permissions to send. Uninteresting to us
-    }
-
-    async run(message, timer) {
+    async run(message, received_at) {
         let raw_content = message.content;
 
         // remove prefix
@@ -101,12 +127,12 @@ class CommandProcessor {
         let prefix = "";
         let prefix_used = true;
 
+        let config = null;
         if (message.channel.type === "text") {
-            // eslint-disable-next-line require-atomic-updates
-            message.guild.config = await this.config.get(message.guild.id);
+            config = await this.config.get(message.guild.id);
 
             me = message.guild.me.toString();
-            prefix = message.guild.config.prefix;
+            prefix = config.prefix;
         }
 
         // check prefixes
@@ -118,18 +144,19 @@ class CommandProcessor {
             prefix_used = false;
         }
 
-        message = Object.assign(Object.create(message), message, { prefix, prefix_used });
-
-        const [command_name_raw, processed_content] = splitArgs(raw_content, 2);
+        const [command_name_raw, content] = splitArgs(raw_content, 2);
         const command_name = command_name_raw.toLowerCase();
 
-        const executed = await this.DISPATCHER.process(message, command_name, processed_content, prefix, prefix_used, timer);
+        const ctx = new MessageContext(message, this.locale, config, content, prefix, prefix_used, received_at);
+
+        const executed = await this.DISPATCHER.process(ctx, command_name);
         if (!executed) return;
 
         stats.bot.get("COMMANDS_EXECUTED").inc(1);
 
-        if (message.channel.type === "text")
+        if (message.channel.type === "text") {
             await guild_stats.get("commands").add(new Date, message.guild.id, message.channel.id, message.author.id, command_name);
+        }
     }
 }
 

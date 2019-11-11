@@ -15,17 +15,18 @@
  */
 
 const { basicEmbed } = require("../../../util/util");
-const Events = require("events");
+const events = require("events");
 const AudioManager = require("../AudioManager");
 // eslint-disable-next-line no-unused-vars
 const { PredefinedSample, UserSample, GuildSample } = require("./Sample");
 // eslint-disable-next-line no-unused-vars
 const { User, Guild, TextChannel, Message, MessageReaction, Permissions } = require("discord.js");
 
-class SampleList extends Events {
+class SampleList extends events.EventEmitter {
     /**
      * @param {User} user
      * @param {Guild} guild
+     * @param {string} prefix
      * @param {Object} samples
      * @param {number} samples.total
      * @param {PredefinedSample[]} samples.predefined
@@ -36,12 +37,13 @@ class SampleList extends Events {
      * @param {number} max_slots.user
      * @param {number} timeout
      */
-    constructor(user, guild, samples, max_slots = { guild: 0, user: 0 }, timeout = 60000 * 2) {
+    constructor(user, guild, prefix, samples, max_slots = { guild: 0, user: 0 }, timeout = 60000 * 2) {
         super();
 
         this.user = user;
         this.guild = guild;
         this.member = this.guild.member(this.user);
+        this.prefix = prefix;
         this.samples = samples;
         this.max_slots = {
             guild: max_slots.guild,
@@ -94,7 +96,7 @@ class SampleList extends Events {
 
         const embed = basicEmbed("Available Samples", this.user);
 
-        const prefix = this.guild.config.prefix;
+        const prefix = this.prefix;
         embed.setDescription(
             "Play a sample with `" + prefix + "sb <sample name>`. " +
             "View more info about a sample by typing `" + prefix + "sb info u <sample name>` for user samples and `" +

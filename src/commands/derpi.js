@@ -27,6 +27,9 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
+
 //                                                                                               no real gore, but candy gore is allowed
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "(gore AND -candy gore)", "foal abuse"];
 
@@ -65,8 +68,7 @@ async function process(key, message, msg, type) {
         const numParse = parseInt(args[0]);
         if (typeof numParse === "number" && !Number.isNaN(numParse)) {
             if (numParse < 1 || numParse > 5) {
-                message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
-                return;
+                return new Translation("derpi.amount_out_range", "`amount` cannot be smaller than 1 or greater than 5!");
             }
             amount = numParse;
         } else throw new Error("NaN Error"); // go catch
@@ -80,8 +82,7 @@ async function process(key, message, msg, type) {
     const tags = args[1].toLowerCase().trim().split(/,\s*/g);
 
     if (tags.length === 0 || (tags.length === 1 && tags[0] === "")) {
-        await message.channel.sendTranslated("`query` **must** be given");
-        return;
+        return new Translation("derpi.query_missing", "`query` **must** be given");
     }
 
     // filter nsfw tags in sfw channel
@@ -95,8 +96,8 @@ async function process(key, message, msg, type) {
     const length_before = tags.length;
     for (const tag of filter_tags) findAndRemove(tags, tag);
 
-    let warning = "";
-    if (length_before > tags.length) warning = "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly\n";
+    let warning = null;
+    if (length_before > tags.length) warning = new Translation("derpi.warning", "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly");
     tags.push(...filter_tags.map(tag => "-" + tag));
 
     // join to a query string
@@ -191,9 +192,8 @@ async function process(key, message, msg, type) {
     }
 
     if (results.length === 0) {
-        if (warning === "") await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-        else await message.channel.sendTranslated(warning);
-        return;
+        if (!warning) return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+        return warning;
     }
 
     /*
@@ -209,15 +209,16 @@ async function process(key, message, msg, type) {
     (from Derpibooru API License)
     */
 
-    const output = warning + results.map(result => {
-        let str = "";
-        if (result.artist) str += `**${result.artist}** `;
-        str += `*<https://derpibooru.org/${result.id}>* `;
-        str += `https:${result.image_url}`;
-        return str;
-    }).join("\n");
-
-    await message.channel.send(output);
+    return new TranslationMerge(
+        warning,
+        results.map(result => {
+            let str = "";
+            if (result.artist) str += `**${result.artist}** `;
+            str += `*<https://derpibooru.org/${result.id}>* `;
+            str += `https:${result.image_url}`;
+            return str;
+        }).join("\n")
+    ).separator("\n");
 }
 
 module.exports = function install(cr) {
@@ -236,24 +237,24 @@ module.exports = function install(cr) {
      */
 
     derpiCommand.registerSubCommand("random", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "random")))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "random")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>")
             .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
             .addParameter("query", "a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)"));
 
     derpiCommand.registerSubCommand("top", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "top")))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "top")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
 
     derpiCommand.registerSubCommand("latest", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "latest")))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "latest")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
 
     derpiCommand.registerSubCommand("first", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand((message, msg) => process(key, message, msg, "first")))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "first")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
 

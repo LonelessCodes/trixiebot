@@ -23,9 +23,13 @@ const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 const RateLimiter = require("../../util/commands/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
-const MessageMentions = require("../../util/commands/MessageMentions");
 
-module.exports = function install(cr, client, config, db) {
+const Translation = require("../../modules/i18n/Translation");
+
+// Maybe remove translations again because fucks can be any random
+// language when people of other languages add phrases
+
+module.exports = function install(cr, { db }) {
     const added_recently = [];
 
     const database = db.collection("fuck");
@@ -48,30 +52,25 @@ module.exports = function install(cr, client, config, db) {
             .addParameter("text", "the text the bot is supposed to say. It must contain `${name}` in the place the username should be set. E.g.: `{{prefix}}fuck add rides ${name}'s skin bus into tuna town`"))
         .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 3))
 
-        .registerOverload("1+", new SimpleCommand(async (message, text) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             if (added_recently.filter(id => message.author.id === id).length > 5) {
-                await message.channel.send("Cool down, bro. I can't let you add so much at once! Come back in an hour or so.");
-                return;
+                return new Translation("fuck.too_much", "Cool down, bro. I can't let you add so much at once! Come back in an hour or so.");
             }
-            if (text.length <= 10 || text.length > 256) {
-                await message.channel.send("Text must be longer than 10 and shorter than 256 characters.");
-                return;
+            if (content.length <= 10 || content.length > 256) {
+                return new Translation("fuck.out_of_range", "Text must be longer than 10 and shorter than 256 characters.");
             }
-            if (/<[@#]!?(1|\d{17,19})>/g.test(text)) {
-                await message.channel.send("You may not add texts with mentioned roles, channels or users. That's just bull");
-                return;
+            if (/<[@#]!?(1|\d{17,19})>/g.test(content)) {
+                return new Translation("fuck.no_mentions", "You may not add texts with mentioned roles, channels or users. That's just bull");
             }
-            if (!/\$\{name\}/g.test(text)) {
-                await message.channel.send("You must add `${name}` in the place the username should be set.");
-                return;
+            if (!/\$\{name\}/g.test(content)) {
+                return new Translation("fuck.name_missing", "You must add `${name}` in the place the username should be set.");
             }
-            if (await database.findOne({ lowercase: text.toLowerCase() })) {
-                await message.channel.send("This phrase already exists!");
-                return;
+            if (await database.findOne({ lowercase: content.toLowerCase() })) {
+                return new Translation("fuck.exists", "This phrase already exists!");
             }
             await database.insertOne({
-                text,
-                lowercase: text.toLowerCase(),
+                text: content,
+                lowercase: content.toLowerCase(),
                 author: message.author.tag,
                 authorId: message.author.id,
             });
@@ -80,15 +79,19 @@ module.exports = function install(cr, client, config, db) {
                 added_recently.splice(added_recently.indexOf(message.author.id));
             }, 1000 * 60 * 60); // 60 minutes
 
-            await message.channel.send("Added!");
+            return new Translation("fuck.success", "Added!");
         }));
 
-    fuckCommand.registerDefaultCommand(new SimpleCommand(async (message, content) => {
-        const mention = new MessageMentions(content, message.guild).members.first() || message.member;
+    fuckCommand.registerDefaultCommand(new SimpleCommand(async ({ message, prefix, mentions }) => {
+        const mention = mentions.members.first() || message.member;
 
         const phrases = await database.find({ verified: true }).toArray(); // return only text and author
         if (phrases.length === 0) {
-            return `I'm sorry, but... I don't have any fucks to give. Add fucks using \`${message.prefix}fuck add\``;
+            return new Translation(
+                "fuck.no_fucks",
+                "I'm sorry, but... I don't have any fucks to give. Add fucks using `{{prefix}}fuck add`",
+                { prefix }
+            );
         }
 
         const phrase = await randomItem(phrases);

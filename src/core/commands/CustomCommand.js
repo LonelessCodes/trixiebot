@@ -17,7 +17,9 @@
 const { findArgs } = require("../../util/string");
 const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
-const { Message, RichEmbed } = require("discord.js");
+const { RichEmbed } = require("discord.js");
+// eslint-disable-next-line no-unused-vars
+const MessageContext = require("../../util/commands/MessageContext");
 const BSON = require("bson");
 
 const { Message: CCMessage } = require("../managers/cc_utils/cc_classes");
@@ -94,20 +96,19 @@ class CustomCommand extends BaseCommand {
     }
 
     /**
-     * @param {Message} message
+     * @param {MessageContext} context
      * @param {string} command_name
-     * @param {string} content
      */
-    async run(message, command_name, content) {
+    async run(context, command_name) {
         if (!this.cst) return;
 
-        const guild = message.guild;
+        const guild = context.guild;
 
         const msg = {
             command_name: this.type === 0 ? command_name : null,
-            msg: new CCMessage(message),
-            args: this.type !== 0 ? [] : findArgs(content),
-            content,
+            msg: new CCMessage(context.message),
+            args: this.type !== 0 ? [] : findArgs(context.content),
+            content: context.content,
             guild: {
                 id: guild.id,
                 name: guild.name,
@@ -118,7 +119,7 @@ class CustomCommand extends BaseCommand {
             },
         };
 
-        const { error, embed, content: cont } = await this.manager.run(message, {
+        const { error, embed, content: cont } = await this.manager.run(context, {
             id: this.id, code: this.code, cst: this.cst, message: msg, settings: await this.manager.getSettings(guild.id),
         });
 
@@ -143,7 +144,7 @@ class CustomCommand extends BaseCommand {
         }
 
         if (embed || cont) {
-            await message.channel.send(embed ? new RichEmbed(embed) : cont.toString());
+            await context.channel.send(embed ? new RichEmbed(embed) : cont.toString());
         }
     }
 }

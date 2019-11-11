@@ -19,11 +19,13 @@ const BaseCommand = require("./BaseCommand");
 const secureRandom = require("../../modules/random/secureRandom");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
-const MessageMentions = require("../../util/commands/MessageMentions");
+
+const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
+const Translation = require("../../modules/i18n/Translation");
 
 class TextActionCommand extends BaseCommand {
-    constructor(description, content, noMentionMessage, permissions) {
-        super(permissions);
+    constructor(description, content, noMentionMessage) {
+        super();
 
         this.setHelp(new HelpContent()
             .setDescription(description)
@@ -35,20 +37,19 @@ class TextActionCommand extends BaseCommand {
         this.everyone = false;
     }
 
-    async run(message, command_name, content) {
-        const mentions = new MessageMentions(content, message.guild);
-        const mention = mentions.members.first();
-        if (!mention && !mentions.everyone) {
-            await message.channel.sendTranslated(this.noMentionMessage.replace(new RegExp("{{user}}", "g"), userToString(message.member)));
+    async run(context) {
+        const mention = context.mentions.members.first();
+        if (!mention && !context.mentions.everyone) {
+            await context.send(new TranslationFormatter(this.noMentionMessage, { user: userToString(context.member) }));
             return;
         }
 
         const phrase = await secureRandom(this.texts);
 
-        if (mentions.everyone) {
-            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), `all ${message.guild.memberCount} users`));
+        if (context.mentions.everyone) {
+            await context.send(new TranslationFormatter(phrase, { user: new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount }) }));
         } else {
-            await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), userToString(mention)));
+            await context.send(new TranslationFormatter(phrase, { user: userToString(mention) }));
         }
     }
 

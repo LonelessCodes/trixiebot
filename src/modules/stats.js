@@ -75,9 +75,7 @@ class BotStats extends EventEmitter {
         this.broadcastStats();
     }
 
-    async broadcastStats() {
-        await ipc.promiseStart;
-
+    broadcastStats() {
         ipc.answer("getBotStats", () => {
             const json = this.toJSON();
             json.UPTIME = Math.floor(process.uptime() / 60);
@@ -145,9 +143,7 @@ class WebStats extends EventEmitter {
         this.awaitStats();
     }
 
-    async awaitStats() {
-        if (!ipc.started) await ipc.promiseStart;
-
+    awaitStats() {
         ipc.awaitAnswer("getWebStats").then(({ stats }) => {
             for (const name in stats) {
                 if (!this.has(name)) continue;

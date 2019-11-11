@@ -2,19 +2,26 @@
 
 ## Things I really really want
 
+* Expand l10n functionality to include timezone and time-format (h12, h24) configs
 * Mod Log (in a channel and on web)
 * ban, kick und tempban commands. warn/strike commands
-* One module and db collection for all guild-specific configurations
 * Make basic custom commands work
-* New Approach at Localization
-* Custom Commands dashboard disabled channels AND whitelisted channels (maybe by a switch, or two panels side by side)
+* create packages for code used by both trixiebot and trixieweb
+* Finish Documentation of TrixieScript
+* Allow use of more basic custom commands, allow custom command aliases, disabled channels AND whitelisted channels and multiple possible replies (randomly selected) custom commands (both basic and TrixieScript)
 
 ## 2019
 
 * Cache more Database stuff that's possibly impacting performance or makes too many calls that could impact performance 
-* XP System (global and locale seperated, but connected somehow)
 * Purchasable roles
 * Marketplace (incl. purchasable roles)
 * CC fix Logical Expression logic
 * repair toString on arrays
 * suspiciousness levels and alerts for users
+* New config system that can store all guild specific configurations, incl. !config configurations and locale configs
+* User Profiles
+    * XP System
+    * Reputation System (Reputation level shown in profile, @Loneless 🍩 or 🍩 as reaction to +1)
+    * Badges (default badges by Trixie and custom badges that a server can create, incl. automatic assignment on specific custom events)
+* Add Database abstraction that makes it easier to keep track of all database tables and operations
+    * then allow users to export their data 

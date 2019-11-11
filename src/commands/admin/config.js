@@ -24,16 +24,21 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
+const Translation = require("../../modules/i18n/Translation");
+const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
+const TranslationMerge = require("../../modules/i18n/TranslationMerge");
+const ListFormat = require("../../modules/i18n/ListFormat");
+
 const types_human = new Map([
-    [String, "Text"],
-    [Number, "Number"],
-    [Boolean, "true or false"],
-    [Discord.TextChannel, "\\#Channel"],
-    [Discord.Role, "Role Name"],
-    [Discord.GuildMember, "\\@User"],
+    [String, new Translation("config.type.text", "Text")],
+    [Number, new Translation("config.type.num", "Number")],
+    [Boolean, new Translation("config.type.bool", "true or false")],
+    [Discord.TextChannel, new Translation("config.type.ch", "\\#Channel")],
+    [Discord.Role, new Translation("config.type.role", "Role Name")],
+    [Discord.GuildMember, new Translation("config.type.user", "\\@User")],
 ]);
 
-module.exports = function install(cr, client, config) {
+module.exports = function install(cr, { config }) {
     cr.registerCommand("config", new OverloadCommand)
         .setHelp(new HelpContent()
             .setUsage("<?parameter> <?value>", "view the Trixie's config in this server")
@@ -42,37 +47,36 @@ module.exports = function install(cr, client, config) {
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN)
 
-        .registerOverload("0", new SimpleCommand(async message => {
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        .registerOverload("0", new SimpleCommand(({ message, prefix }) => {
+            const embed = new TranslationEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setTitle(message.guild.name);
             embed.setThumbnail(message.guild.iconURL);
-
-            embed.setDescription("Use the command format !config <option> to view more info about an option.");
+            embed.setDescription(new Translation(
+                "config.description", "Use the command format !config <option> to view more info about an option."
+            ));
 
             const parameters = config.parameters;
 
             for (let i = 0; i < parameters.length; i++) {
                 let parameter = parameters[i];
 
-                if (parameter.name instanceof Array) {
-                    let str = "";
+                if (Array.isArray(parameter.name)) {
+                    const str = new TranslationMerge().separator("\n");
                     for (let j = 0; j < parameter.name.length; j++) {
                         let sub = parameter.name[j];
                         sub.position = j;
 
-                        str += `\`${message.prefix}config ${sub.name}\` - ${sub.humanName}\n`;
+                        str.push(new TranslationMerge(`\`${prefix}config ${sub.name}\` -`, sub.humanName));
                     }
                     embed.addField(parameter.humanName, str, true);
                 } else {
-                    embed.addField(parameter.humanName, `\`${message.prefix}config ${parameter.name}\``, true);
+                    embed.addField(parameter.humanName, `\`${prefix}config ${parameter.name}\``, true);
                 }
             }
 
-            await message.channel.send({ embed });
+            return embed;
         }))
-        .registerOverload("1", new SimpleCommand(async (message, arg) => {
-            const embed = new Discord.RichEmbed;
-
+        .registerOverload("1", new SimpleCommand(({ message, prefix, content: arg }) => {
             const find = () => {
                 let rtn;
                 const find = p => {
@@ -82,33 +86,12 @@ module.exports = function install(cr, client, config) {
                 config.parameters.find(find);
                 return rtn;
             };
-            const parameter = find();
 
-            if (!parameter) {
-                embed.setColor(CONST.COLOR.ERROR);
-                embed.setDescription(await message.channel.translate("No such parameter. *shrugs*"));
-            } else {
-                embed.setColor(CONST.COLOR.PRIMARY);
-                embed.setThumbnail(message.guild.iconURL);
-                embed.setTitle(parameter.humanName);
-
-                const value = await config.get(message.guild.id, arg);
-                const human_readable = parameter.human(value);
-                embed.addField("Currently:", `\`${human_readable}\``);
-                embed.addField("Update:", `\`${message.prefix}config ${parameter.name} <new value>\``);
-                embed.addField("Allowed Types:", parameter.types
-                    .map(t => types_human.get(t) || `\`${t}\``)
-                    .join(", ") +
-                    (parameter.allowEmpty ? " or `none`" : ""));
-            }
-
-            await message.channel.send({ embed });
+            return getParameter(message, prefix, find());
         }))
-        .registerOverload("2+", new SimpleCommand(async (message, content) => {
+        .registerOverload("2+", new SimpleCommand(({ message, content }) => {
             const args = splitArgs(content, 2);
             const value = findArgs(args[1])[0];
-
-            const embed = new Discord.RichEmbed;
 
             const find = () => {
                 let rtn;
@@ -119,30 +102,8 @@ module.exports = function install(cr, client, config) {
                 config.parameters.find(find);
                 return rtn;
             };
-            const parameter = find();
 
-            if (!parameter) {
-                embed.setColor(CONST.COLOR.ERROR);
-                embed.setDescription(await message.channel.translate("No such parameter. *shrugs*"));
-            } else if (!parameter.check(value)) {
-                embed.setColor(CONST.COLOR.ERROR);
-                embed.setDescription(await message.channel.translate("New value has a wrong format. Should be {{format}}", {
-                    format: parameter.types
-                        .map(t => types_human.get(t) || `\`${t}\``)
-                        .join(", ") +
-                        (parameter.allowEmpty ? " or `none`" : ""),
-                }));
-            } else {
-                embed.setColor(CONST.COLOR.PRIMARY);
-
-                const new_value = parameter.format(value);
-                const human_readable = parameter.human(new_value);
-                await config.set(message.guild.id, { [parameter.name]: new_value });
-
-                embed.setDescription(`:ok_hand: Set to \`${human_readable}\``);
-            }
-
-            await message.channel.send({ embed });
+            return setParameter(message, find(), value);
         }));
 
     cr.registerAlias("config", "cfg");
@@ -158,51 +119,67 @@ module.exports = function install(cr, client, config) {
         .setCategory(Category.MODERATION)
         .setPermissions(CommandPermission.ADMIN)
 
-        .registerOverload("0", new SimpleCommand(async message => {
-            const embed = new Discord.RichEmbed;
+        .registerOverload("0", new SimpleCommand(({ message, prefix }) =>
+            getParameter(message, prefix, config.parameters.find(p => p.name === "prefix"))
+        ))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) =>
+            setParameter(message, config.parameters.find(p => p.name === "prefix"), content)
+        ));
 
-            const parameter = config.parameters.find(p => p.name === "prefix");
+    async function getParameter(message, prefix, parameter) {
+        const embed = new TranslationEmbed;
 
+        if (!parameter) {
+            embed.setColor(CONST.COLOR.ERROR);
+            embed.setDescription(new Translation("config.no_parameter", "No such parameter. *shrugs*"));
+        } else {
             embed.setColor(CONST.COLOR.PRIMARY);
             embed.setThumbnail(message.guild.iconURL);
             embed.setTitle(parameter.humanName);
 
             const value = await config.get(message.guild.id, parameter.name);
             const human_readable = parameter.human(value);
-            embed.addField("Currently:", `\`${human_readable}\``);
-            embed.addField("Update:", `\`${message.prefix}${parameter.name} <new value>\``);
-            embed.addField("Allowed Types:", parameter.types
-                .map(t => types_human.get(t) || `\`${t}\``)
-                .join(", ") +
-                (parameter.allowEmpty ? " or `none`" : ""));
+            embed.addField(new Translation("config.currently", "Currently:"), `\`${human_readable}\``);
+            embed.addField(new Translation("config.update", "Update:"), `\`${prefix}config ${parameter.name} <new value>\``);
+            embed.addField(new Translation("config.allowed_types", "Allowed Types:"), new ListFormat(
+                parameter.types
+                    .concat(parameter.allowEmpty ? ["none"] : [])
+                    .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
+                { type: "or" }
+            ));
+        }
 
-            await message.channel.send({ embed });
-        }))
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
-            const value = findArgs(content)[0];
+        return embed;
+    }
 
-            const embed = new Discord.RichEmbed;
+    async function setParameter(message, parameter, value) {
+        const embed = new TranslationEmbed;
 
-            const parameter = config.parameters.find(p => p.name === "prefix");
+        if (!parameter) {
+            embed.setColor(CONST.COLOR.ERROR);
+            embed.setDescription(new Translation("config.no_parameter", "No such parameter. *shrugs*"));
+        } else if (!parameter.check(value)) {
+            embed.setColor(CONST.COLOR.ERROR);
+            embed.setDescription(new Translation("config.wrong_format", "New value has a wrong format. Should be {{format}}", {
+                format: new ListFormat(
+                    parameter.types
+                        .concat(parameter.allowEmpty ? ["none"] : [])
+                        .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
+                    { type: "or" }
+                ),
+            }));
+        } else {
+            embed.setColor(CONST.COLOR.PRIMARY);
 
-            if (!parameter.check(value)) {
-                embed.setColor(CONST.COLOR.ERROR);
-                embed.setDescription(await message.channel.translate("New value has a wrong format. Should be {{format}}", {
-                    format: parameter.types
-                        .map(t => types_human.get(t) || `\`${t}\``)
-                        .join(", ") +
-                        (parameter.allowEmpty ? " or `none`" : ""),
-                }));
-            } else {
-                embed.setColor(CONST.COLOR.PRIMARY);
+            const new_value = parameter.format(value);
+            const human_readable = parameter.human(new_value);
+            await config.set(message.guild.id, { [parameter.name]: new_value });
 
-                const new_value = parameter.format(value);
-                const human_readable = parameter.human(new_value);
-                await config.set(message.guild.id, { [parameter.name]: new_value });
+            embed.setDescription(new Translation("config.success", ":ok_hand: Set to `{{value}}`", {
+                value: human_readable,
+            }));
+        }
 
-                embed.setDescription(`:ok_hand: Set to \`${human_readable}\``);
-            }
-
-            await message.channel.send({ embed });
-        }));
+        return embed;
+    }
 };

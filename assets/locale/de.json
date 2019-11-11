@@ -1,0 +1,401 @@
+{
+    "no": "nö",
+    "config": {
+        "no_parameter": "Keine solche Einstellung vorhanden. *schulter zuck*",
+        "wrong_format": "Neuer Wert hat das falsche Format. Sollte {{format}} sein.",
+        "currently": "Aktuell:",
+        "update": "Aktualisieren:",
+        "allowed_types": "Erlaubte Typen:",
+        "success": ":ok_hand: Geändert zu `{{value}}`",
+        "description": "Benutz' das Command `!config <option>` um eine Option anzusehen.",
+        "prefix": "❗ Prefix",
+        "uom": "📐 Maß-Vorliebe",
+        "announce": "🔔 Verkünde neue/gehende/gebannte User",
+        "announce_ch": "Kanal. 'none' deaktiviert Verkündungen",
+        "announce_bot": "Verkünde Bots",
+        "welcome": "👋 Verkünde neue User",
+        "leave": "🚶 Verkünde gehende User",
+        "ban": "🔨 Verkünde gebannte User",
+        "text": "Benutzerdefinierter Text ('{{user}}' als User, 'empty' = Standard)",
+        "type": {
+            "text": "Text",
+            "num": "Nummer",
+            "bool": "`true` oder `false`",
+            "ch": "\\#Channel",
+            "role": "Rollenname",
+            "none": "none"
+        }
+    },
+    "general": {
+        "lang_name": "Deutsch",
+        "lang_name_en": "German",
+        "error": "Äh... Ich... ähm, ich glaube... es gab da ein Problem...? Es ist aber nicht deine Schuld...",
+        "introduction": "**Trixie ist ein Alles-in-Einem Discord Bot für Ponyliebhaber**\n\nSie bietet eine Vielzahl toller Features, von denen viele die Bedürfnisse von My Little Pony Fans und Serveradmins zufrieden stellen dürften.\n\nIhre Auswahl an Commands reichen von nützlichen Zeug, einfachem Spaß, Imageboard Commands, Custom Commands, Soundboards bis hin zu einer kompletten Weboberfläche um Trixie zu konfigurieren und das Wachstum des Servers zu beobachten, und so viel mehr!\n\nFür eine Liste aller Commands, schreibe `{{prefix}}help`.",
+        "github": "Hilf der Entwicklung von TrixieBot auf <https://github.com/LonelessCodes/trixiebot> :heart::heart::heart:",
+        "report_bug": "Berichte von Bugs und reiche Featureanfragen ein auf <https://github.com/LonelessCodes/trixiebot/issues>",
+        "not_found": "Tja, dumm gelaufen. Ich hab da nicht so wirklich was gefunden? Tut mir auch leid und so"
+    },
+    "format": {
+        "and": "und",
+        "or": "oder"
+    },
+    "locale": {
+        "not_supported": "Sprache '{{locale}}' wird nicht unterstützt :c Versuch's mal mit {{locales}}",
+        "success": "Sprache des Servers zu {{locale}} geändert.",
+        "success_ch": "Sprache für {{channel}} zu {{locale}} geändert.",
+        "title": "Serversprachen"
+    },
+    "penis": {
+        "length": "Länge:",
+        "girth": "Umfang:",
+        "top_penises": "Beste Penisse dieses Servers",
+        "everyone": "JEDER HAT OMG VERDAMMT RIESIGE SCHWÄNZE. Sie sind so schön °˖✧◝(⁰▿⁰)◜✧˖°"
+    },
+    "textaction": {
+        "everyone": "alle {{count}} User"
+    },
+    "deleted": {
+        "title": "Gelöschte Nachrichten",
+        "description": "Gelöschte oder editierte Nachrichten: **{{count}}**",
+        "empty": "Naaaaaaah, nichts gefunden",
+        "clear_success": "Alle Nachrichten erfolgreich gelöscht"
+    },
+    "timeout": {
+        "timeouted": "{{userMention}} Du wurdest fett getimeoutet hier. Timeout abgelaufen in {{timeLeft}}",
+        "remove_all_success": "Alle Timeouts erfolgreich gelöscht",
+        "not_yourself": "Du kannst dich nicht selbst timeouten, du Doofie!",
+        "not_trixie": "Du kannst Trixie nicht timeouten. Ich bin literally Gott.",
+        "not_other_moderators": "Du kannst andere Mods oder Admins nicht timeouten. Das gehört sich nun wirklich nicht...",
+        "out_range": "Timeoutlänge sollte mindestens 10 Sekunden lang und kürzer als 3 Tage sein",
+        "success": {
+            "one": "{{users}} ist jetzt getimeouted für die nächsten {{timeLeft}}",
+            "other": "{{users}} sind jetzt getimeouted für die nächsten {{timeLeft}}"
+        }
+    },
+    "gif": {
+        "empty": "Leere Antwort vom Server :C",
+        "empty_response": "Keine GIFs für diese Suche gefunden.",
+        "nothing_trending": "Irgendwie trendet gerade nichts ¯\\_(ツ)_/¯"
+    },
+    "memberlog": {
+        "join": "Willkommen im Server, {{user}}!",
+        "leave": "*{{user}}* hat den Server verlassen. Tschüssi",
+        "ban": "{{user}} wurde vom Server gebannt. Lass dich von den Polizeihunden draußen nicht stören!"
+    },
+    "mute": {
+        "removed": "Gemutetes Wort \"{{word}}\" erfolgreich entfernt",
+        "cleared_all": "Alle gemuteten Wörter erfolgreich entfernt!",
+        "currently": "Gerade gemutet ist:",
+        "nothing_muted": "Nichts gemutet bis jetzt",
+        "exists": "Ist schon gemutet",
+        "success": "Verstanden! Nutzung von \"{{word}}\" ist jetzt ***illegal*** c:"
+    },
+    "derpi": {
+        "query_missing": "`query` **muss* gegeben sein",
+        "amount_out_range": "`amount` kann nicht kleiner als 1 oder größer als 5 sein!",
+        "warning": "Den Content den du versuchst aufzurufen verstößt gegen Discord's Community Guidelines :c musste ich leider raus filtern, denn ich bin ein gutes Pferdchen c:"
+    },
+    "alert": {
+        "announcement": "{{user}} ist live auf {{service}}!",
+        "success": "Werd' euch sagen wenn {{name}} online geht!",
+        "embed": {
+            "followers": "Followers",
+            "viewers": "Gesamte Aufrufe",
+            "game": "Spiel:",
+            "nsfw": "NSFW",
+            "category": "Kategorie:",
+            "tags": "Tags:"
+        },
+        "empty": "Hehe, nichts hier lül. Zeit Alerts hinzuzufügen.",
+        "invalid_url": "`page url` muss eine valide URL sein! Stattdessen hab ich ein doofes \"{{url}}\" bekommen",
+        "unknown_service": "MMMMMMMMMMMMMMH kennsch ne, die Webseite :c",
+        "page_missing": "Du solltest mir auch deine Kanalseite geben in der URL, anstatt von nur der Seite!",
+        "not_subscribed": "Ich hab diesen Streamer nicht verfolgt.",
+        "remove_success": "Keine Streamupdates mehr für {{name}}",
+        "compact_off": "Kompakte Online-Ankündigungen sind jetzt aus.",
+        "compact_on": "Kompakte Online-Ankündigungen sind jetzt an.",
+        "cleanup_off": "Lösche keine Online-Ankündigungen mehr beim offline gehen.",
+        "cleanup_on": "Räume Online-Ankündigungen jetzt wieder auf",
+        "url_missing": "`page url` muss eine valide URL sein. Stattdessen bekam ich nichts",
+        "no_exist": "Dieser User existiert nicht!",
+        "already_subscribed": "Der Server folgt diesem Streamer schon."
+    },
+    "ascii": {
+        "doesnt_exist": "Bild existiert nicht",
+        "failed_dl": "Konnte das Bild nicht runterladen",
+        "invalid_type": "Das Bild muss JPG, PNG oder GIF sein",
+        "error": "IIIIIIIIrgendwas ist schief gelaufen"
+    },
+    "bj": {
+        "hit_stand_double": "Schreib' `hit` um eine weitere Karte zu ziehen, `stand` um zu passen oder `double` zum verdoppeln",
+        "your_hand": "Dein Blatt",
+        "dealer_hand": "Dealer Blatt",
+        "result": {
+            "dealer": "**Dealer gewinnt!** Du hast {{money}} verloren",
+            "busted": "**BUSTED** Du hast {{money}} verloren",
+            "push": "**PUSH!**",
+            "win": "**DU GEWINNST** {{money}}"
+        },
+        "hit_stand": "Schreib' `hit` um eine weitere Karte zu ziehen oder `stand` um zu passen",
+        "value": "Wert:",
+        "busted": "BUSTED",
+        "invalid_bet": "Ungültiger Wetteinsatz! Plz gib eine Zahl uwu"
+    },
+    "sb": {
+        "checking": "Daten überprüfen...",
+        "error": {
+            "too_big": "Datei ist zu groß! Bitte versuch's unter 4MB zu halten. Selbst WAV kann das schaffen",
+            "unsupported": "{{extname}}-Dateien sind nicht unterstützt. Versuch's mal mit {{supported}}",
+            "out_of_space": "Trixie kann keine weiteren Uploads annehmen, weil der Speicherplatz knapp wird",
+            "file_missing": "Hänge einen Anhang an das Command an um ihn hinzuzufügen.",
+            "name_missing": "Reiche den Namen für den Soundclip als Argument im Command durch!",
+            "name_out_range": "Der Name des Soundclips sollte zwischen (inkl.) 2 und 24 Zeichen liegen!",
+            "user_clip_exists": "Du hast schon einen Soundclip mit dem Namen in deinem Soundboard",
+            "guild_clip_exists": "Du hast schon einen Soundclip mit dem Namen in diesem Server-Soundboard",
+            "pre_clip_exists": "Es gibt schon einen Standard-Clip mit diesem Namen",
+            "downloading": "Fehler beim Runterladen der Datei von Discord",
+            "too_long": "Der Soundclip darf nicht länger als {{time}} sein!"
+        },
+        "success": "Erfolgreich hinzugefügt!",
+        "buy_rate_limit": "Du kannst nur 2 Slots pro Stunde kaufen! Versuchs nochmal in {{time}}",
+        "max_slots": "Du hast das Maximum an Soundboardslots erreicht ({{max}})!",
+        "downloading": "Datei runterladen...",
+        "converting": "Datei konvertieren und optimieren...",
+        "checking_errors": "Datei nach Fehlern überprüfen...",
+        "saving": "In die Datenbank speichern und fertigstellen..."
+    },
+    "autoban": {
+        "no_configs": "Keine Autoban Konfigurationen bis jetzt. Füge welche durch `{{prefix}}autoban <userID\\|username#0000\\|glob>` hinzu",
+        "not_valid_id": "`{{id}}` ist keine gültige User-ID. User-IDs beinhalten ausschließlich Ziffern, du Dumbo",
+        "added_id": ":police_car: `{{id}}` als ID hinzugefügt",
+        "added_name": ":police_car: `{{name}}` hinzugefügt",
+        "added_as_id": ":police_car: `{{name}}s` User-ID gefunden. `{{id}}` als ID hinzugefügt",
+        "added_pattern": ":police_car: `{{pattern}}` als Pattern hinzugefügt",
+        "all_configs": "Alle Autobans für diesen Server",
+        "remove_configs": "Schreib die Nummer des Autobans, dass du gelöscht haben möchtest.",
+        "deleted": "`{{id}}` gelöscht :rotating_light:",
+        "no_parameter": "Kein solches Pattern konfiguriert",
+        "title": "Autobans",
+        "remove": {
+            "title": "Entfernbare Autobans"
+        }
+    },
+    "stats": {
+        "statistics": "Statistiken",
+        "today": "Heute",
+        "messages": {
+            "one": "{{count}} Nachricht",
+            "other": "{{count}} Nachrichten"
+        },
+        "commands": {
+            "one": "{{count}} Command",
+            "other": "{{count}} Commands"
+        },
+        "yesterday": "Gestern",
+        "avg_7d": "Durchschnitt (7 Tage)",
+        "users": "{{count}} User",
+        "avg_30d": "Durchschnitt (30 Tage)",
+        "avg_90d": "Durchschnitt (90 Tage)"
+    },
+    "animal": {
+        "dog": "Wuff",
+        "cat": "Miau",
+        "fox": "yip",
+        "shibe": "Bell!",
+        "bird": "Zwitschern"
+    },
+    "8ball": {
+        "pos0": "Es ist wahrscheinlich",
+        "pos2": "Ohne Zweifel",
+        "pos3": "Prognose: gut",
+        "pos4": "Ye",
+        "pos5": "Du kannst dich drauf verlassen",
+        "pos6": "So wie ich das sehe: ja",
+        "pos7": "Höchst wahrscheinlich",
+        "pos8": "Alle Zeichen deuten draufhin",
+        "pos9": "Zweifellos: so ist es",
+        "neg0": "Sehr zweifelhaft",
+        "neg1": "Meine Quellen sagen: nein",
+        "neg2": "Prognose: nicht so gut",
+        "neg3": "Zähl nicht drauf",
+        "neg4": "Nö",
+        "ntr0": "Kann ich jetzt nicht vorhersagen",
+        "ntr1": "Erzähl' ich dir besser nicht",
+        "ntr2": "Konzentrier' dich und frag' nochmal",
+        "ntr3": "Antwort ungewiss, versuch's nochmal",
+        "ntr4": "Frag später nochmal"
+    },
+    "casino": {
+        "minimum": "Mindesteinsatz sollte {{bet}} sein",
+        "maximum": "Höchsteinsatz sollte {{bet}} sein",
+        "not_enough": "Du hast nicht genug {{name}} zum zocken :c"
+    },
+    "coin": {
+        "bet": "Dein Einsatz:",
+        "invalid": "`{{bet}}` ist keine gültige Münzseite. `heads` oder `tails`?!",
+        "pending": "Die Münze fliegt in die Höhe...",
+        "success": "Oi! Die Münze ist auf {{result}} gelandet."
+    },
+    "role": {
+        "all_roles": "Eine Liste verfügbarer Rollen:",
+        "no_permissions": "Also ich weiß ja nicht was du hier zu suchen hast. Um das Role Command zu nutzen musst du mindestens Rollen verwalten können.",
+        "no_remove_other_mods": "Du kannst anderen Nutzern die auch Rollen verwalten dürfen nicht ihre Rollen wegnehmen! Bei uns nennt man das Betrug! Ne aber echt, das können sie auch selber machen.",
+        "not_available": "Ähm, also so wie's aussieht ist diese Rolle gerade nicht verfügbar.",
+        "cant_remove": "Du kannst dir keine Rolle entnehmen, wenn du sie nichtmal hast :3",
+        "remove_no_exist": "Diese Rolle existiert nicht. Nach logischer Schlussfolgerung kannst du sie also nicht haben.",
+        "remove_no_perms": "Du hast keine Erlaubnis diese Rolle zu entfernen.",
+        "removed": "Rolle entfernt.",
+        "add_perms_conflict": "Tschuldigung, aber du kannst keine Rolle hinzufügen, die höher im Rollenmanager ist als deine eigene höchte Rolle.",
+        "added_config": "Rolle ist jetzt für jeden verfügbar! Es ist freier Grundbesitz",
+        "remove_perms_conflict": "Du kannst keine Rolle von der Konfiguration entfernen die mächtiger ist als deine eigenen.",
+        "cannot_add_other_users": "Du kannst anderen Nutzern die auch Rollen verwalten dürfen keine Rollen zuteilen! Das können sie auch selber machen.",
+        "already_have": "Du hast diese Rolle schon! Yay?",
+        "no_role": "Weird... ich konnte diese Rolle nicht finden."
+    },
+    "audio": {
+        "error": "Ein Fehlerchen ist passiert und hat 'n paar Auas gemacht",
+        "already_playing": "Etwas wird gerade wiedergegeben. Da will ich mal nicht stören!",
+        "join_ch": "Du musst erst einem Sprachchannel beitreten!",
+        "ch_full": "Der Sprachchannel in dem du bist ist voll!",
+        "no_perms_join": "Trixie hat keine Berechtigungen um dem Sprachchannel beizutreten in dem du bist",
+        "no_perms_speak": "Trixie hat keine Berechtigungen um in dem Sprachchannel in dem du bist zu sprechen"
+    },
+    "bank": {
+        "payment_abort": "Dann nicht",
+        "daily": ":atm: {{user}}, du hast deine :yen: **{{money}}** erhalten",
+        "daily_too_soon": ":atm: {{user}}, daily :yen: Credits gibt's wieder in **{{time_left}}**.",
+        "account": "Bankkonto",
+        "balance": "Balance",
+        "last_transactions": "Letzte Transaktionen",
+        "transactions": "Transaktionen",
+        "transactions_desc": "{{user}}'s (Deine) ganzen Transaktionen",
+        "curr_balance": ":yen: Du hast momentan **{{money}}**. oof",
+        "no_account": "Es sieht fast so aus als hättest du noch gar kein Bankkonto eröffnet. Wie wär's damit, das jetzt zu machen? `{{prefix}}bank create`",
+        "already_have_account": ":atm: Du hast schon längst ein Bankkonto!",
+        "start_using": "Fang' an deine Accountbalance zu nutzen um Items zu kaufen und Features zu entsperren.",
+        "account_created": ":atm: Ayy jetzt hast du ein Bankkonto! Zieh's dir rein über `{{prefix}}bank`",
+        "create_first": "Bevor du irgendwelche geldbezogene Aktivitäten durchführen kannst, bitte öffne ein Bankkonto via `{{prefix}}bank create`",
+        "pay_same_user": "Okay, aber warum solltest du...",
+        "pay_user_no_account": "Dieser User hat noch kein Bankkonto eröffnet",
+        "pay_minimum": "Du kannst jemanden nur mindestens {{money}} zahlen",
+        "pay_not_enough": ":atm: Du hast nicht genug Geld auf deinem Account um {{user}} so viel zu zahlen",
+        "trans_no_money_yet": "Sieht so aus als hättest du noch kein Geld verdient oder ausgegeben! Lass uns damit starten: `{{prefix}}daily`, um Geld zu verdienen",
+        "payment_timeout": "Zeit ist rum. Versuch's nochmal",
+        "payment_success": ":atm: Nice, hier haste.",
+        "action": ":atm: Der neue Slot wird dich **{{money}}'* kosten. Schreib' entweder `buy` zum kaufen oder `cancel` zum abbrechen",
+        "payment_new_balance": "(:yen: neue Accountbalance: **{{money}}**)",
+        "not_enough": ":atm: Du hast nicht genug {{name}} um noch mehr Slots zu kaufen! Du brauchst **{{money}}**"
+    },
+    "tts": {
+        "invalid_msg": "Ehhh schicke lieber eine normale Nachricht. Diese Art von Nachricht ist bekannt dafür mich zu ficken"
+    },
+    "disable": {
+        "no_ch": "Ähm, ja... aber du musst mir einen Channel oder mehrere geben um sie zu deaktivieren",
+        "no_cmd": "Ähm, ja... aber du musst mir ein Command oder mehrere geben um sie zu deaktivieren"
+    },
+    "enable": {
+        "no_ch": "Ähm, ja... aber du musst mir einen Channel oder mehrere geben um sie zu aktivieren",
+        "no_cmd": "Ähm, ja... aber du musst mir ein Command oder mehrere geben um sie zu aktivieren"
+    },
+    "timeouts": {
+        "found_no_mentions": "Hab keinen der genannten User gefunden"
+    },
+    "fuck": {
+        "too_much": "Beruhig' dich, Bruder. Ich kann dich nicht so viel auf einmal hinzufügen lassen! Komm in ner Stunde oder so wieder.",
+        "out_of_range": "Text muss länger als 10 und kürzer als 256 Zeichen sein.",
+        "no_mentions": "Man darf keine Texte mit Rollen, Kanälen oder Usern hinzufügen.",
+        "exists": "Diese Phrase existiert schon!",
+        "success": "Hinzugefügt!",
+        "no_fucks": "Es tut mir leid, aber... Ich hab keine Ficks für dich. Füge Ficks hinzu via `{{prefix}}fuck add`"
+    },
+    "mlem": "Der Chat wurde gemlemt von {{user}} | Bild von n0nnny",
+    "blep": "Der Chat wurde geblept von {{user}} | Bild von n0nnny",
+    "command": {
+        "no_permissions": "Also ich weiß ja nun nicht was du hier machts, ja. Das ist ein beschränkter Bereich. Benötigte Berechtigungen:"
+    },
+    "waifu": {
+        "claim": {
+            "no_mention": "Du musst dein Traumwaifu angeben!",
+            "already_have": "Bruh. Du hast dieses Honigküchchen schon owo",
+            "already_claimed": "Oh nu. {{user}} hat diesen Liebling schon geclaimt!",
+            "success": "Erfolgreicher Claim!!! Kuscheleinheiten mit {{user}} im Anflug!"
+        },
+        "same": "hahahahahahahahahahaha das ist süß, aber nö",
+        "slots_full": "Du hast all deine Waifuslots schon gefüllt!",
+        "unclaim": {
+            "no_mention": "Du musst dein Waifu angeben",
+            "doesnt_exist": "Hast diesen Liebling gar nicht :v",
+            "success": "Auf Wiedersehen bb :C"
+        },
+        "steal": {
+            "cooldown_global": "Woah woah, nicht so schnell! Es gibt auch einen kleinen globalen Cooldown.",
+            "cooldown": "Woah woah, nicht so schnell! Das zu oft hintereinander zu machen wirkt doch dem eigentlichen Sinn des claim Commandes entgegen.",
+            "story": "{{owner}}s Waifu {{waifu}} scheint gerade in der Nähe aufgetaucht zu sein. Du schleichst dich vorsichtig an sie heran...",
+            "success": "Erfolgreicher Steal!!! {{user}} gehört jetzt dir!",
+            "failed": "{{user}} hat Wind von deinen Plänen bekommen und ist blitzschnell abgehauen :c",
+            "not_claimed_yet": "Dieses Waifu wurde noch nicht geclaimt! Nutze `{{prefix}}waifu claim {{user}}` um es dein zu nennen!"
+        },
+        "escape": {
+            "no_owner": "Du hast... keinen Besitzer... SEI FREI.",
+            "cooldown": "Woah woah, nicht so schnell! Das zu oft hintereinander zu machen wirkt doch dem eigentlichen Sinn hieran entgegen.",
+            "story": "Du bist zum Gassigehen mit deinem Besitzer {{owner}} an der frischen Luft. Du befolgst seine Befehle, in Vorbereitung für die perfekte Flucht...",
+            "story2": "Aus dem Nichts heraus zerrst du an deiner Leine.",
+            "success1": "Die Leine riss und du schnellst hinaus in die freie Welt",
+            "failed": "{{user}} reagiert schnell und greift dich beim Arm. \"Eines Tages...\" grummelst du in dich hinein."
+        },
+        "buy": {
+            "cooldown": "Du kannst nur 2 Slots pro Stunde kaufen! Versuch's nochmal in {{time}}",
+            "max_slots": "Du hast das Maximum an Waifuslots erreicht ({{slots}})!",
+            "success": "Nice, hier ist er. Wer wird dein neuer Waifu sein?"
+        },
+        "your_waifus": "Deine Waifus",
+        "no_waifus": "Keine Waifus zu sehen hier, nur Staub :(\nDu kannst Waifus bekommen indem du jemanden claimst! Nutze `{{prefix}}waifu claim` um jemanden zu claimen",
+        "owned_by": "Besessen von",
+        "footer": "Gesamte Waifus: {{waifus}} - Verfügbare Slots: {{slots}}"
+    },
+    "time": {
+        "millis": {
+            "one": "Millisekunde",
+            "other": "Millisekunden"
+        },
+        "secs": {
+            "one": "Sekunde",
+            "other": "Sekunden"
+        },
+        "mins": {
+            "one": "Minute",
+            "other": "Minuten"
+        },
+        "hrs": {
+            "one": "Stunde",
+            "other": "Stunden"
+        },
+        "dys": {
+            "one": "Tag",
+            "other": "Tage"
+        },
+        "wks": {
+            "one": "Woche",
+            "other": "Wochen"
+        },
+        "x_times_in": "{{x}} mal in {{timeframe}}"
+    },
+    "poll": {
+        "deprecation": "Das Poll Command ist veraltet und nicht länger verwaltbar und wird deswegen bald ersetzt"
+    },
+    "paginator": {
+        "page": "Seite {{page}}"
+    },
+    "birthday": {
+        "birthday": "Geburtstage",
+        "title": "Alle Geburtstage in Monat {{month}}"
+    },
+    "action": {
+        "hug": {
+            "self": "Eigenumarmung? Umarme doch jemanden den du lieb hast!"
+        },
+        "pat": {
+            "self": "Aww, gönn dir ein Pat <3"
+        }
+    }
+}

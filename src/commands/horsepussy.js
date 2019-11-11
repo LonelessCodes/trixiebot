@@ -56,7 +56,7 @@ const query = tags.map(t => encodeURIComponent(t))
     .join(",").replace(/\s+/g, "+")
     .toLowerCase();
 
-async function process(message) {
+async function process() {
     const image = await get({
         q: query,
         random_image: "true",
@@ -71,13 +71,13 @@ async function process(message) {
     str += `*<https://derpibooru.org/${image.id}>* `;
     str += `https:${image.representations.large}`;
 
-    await message.channel.send(str);
+    return str;
 }
 
 module.exports = function install(cr) {
     if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
-    cr.registerCommand("horsepussy", new SimpleCommand(message => process(message)))
+    cr.registerCommand("horsepussy", new SimpleCommand(() => process()))
         .setHelp(new HelpContent()
             .setDescription("Get some gud quality horse pussi OwO"))
         .setExplicit(true)

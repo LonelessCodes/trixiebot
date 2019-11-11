@@ -26,6 +26,9 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
+
 const filter_tags = ["shota", "cub", "self_harm", "suicide", "animal_abuse", "gore", "child_abuse"];
 
 async function fetchImages(params) {
@@ -64,8 +67,7 @@ async function process(message, msg, type) {
         const numParse = parseInt(args[0]);
         if (typeof numParse === "number" && !Number.isNaN(numParse)) {
             if (numParse < 1 || numParse > 5) {
-                message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
-                return;
+                return new Translation("derpi.amount_out_range", "`amount` cannot be smaller than 1 or greater than 5!");
             }
             amount = numParse;
         } else throw new Error("NaN Error"); // go catch
@@ -79,8 +81,7 @@ async function process(message, msg, type) {
     const tags = args[1].toLowerCase().trim().split(/,?\s+/g);
 
     if (tags.length === 0) {
-        await message.channel.send(await message.channel.translate("`query` **must** be given"));
-        return;
+        return new Translation("derpi.query_missing", "`query` **must** be given");
     }
 
     // filter nsfw tags in sfw channel
@@ -91,11 +92,11 @@ async function process(message, msg, type) {
     }
 
     // filter tags that are not allowed by the discord community guidelines
-    let warning = "";
+    let warning = null;
     if (filter_tags.some(tag => tags.includes(tag))) {
         for (const tag of filter_tags)
             findAndRemove(tags, tag);
-        warning = "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly\n";
+        warning = new Translation("derpi.warning", "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly");
     }
 
     if (type === "top") tags.push("order:score");
@@ -116,8 +117,7 @@ async function process(message, msg, type) {
                     limit: 300,
                 });
             } catch (_) {
-                await message.channel.send("❌ There's been an error talking to e621 :'c");
-                return;
+                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
             }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -145,8 +145,7 @@ async function process(message, msg, type) {
                     limit: amount,
                 });
             } catch (_) {
-                await message.channel.send("❌ There's been an error talking to e621 :'c");
-                return;
+                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
             }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -175,8 +174,7 @@ async function process(message, msg, type) {
                     limit: amount,
                 });
             } catch (_) {
-                await message.channel.send("❌ There's been an error talking to e621 :'c");
-                return;
+                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
             }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -204,8 +202,7 @@ async function process(message, msg, type) {
                     limit: amount,
                 });
             } catch (_) {
-                await message.channel.send("❌ There's been an error talking to e621 :'c");
-                return;
+                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
             }
             for (let i = 0; i < Math.min(amount, result.length); i++) {
                 if (whileBreak <= 0) break;
@@ -229,20 +226,20 @@ async function process(message, msg, type) {
     }
 
     if (results.length === 0) {
-        if (warning === "") await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-        else await message.channel.sendTranslated(warning);
-        return;
+        if (!warning) return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+        return warning;
     }
 
-    const output = warning + results.map(result => {
-        let str = "";
-        if (result.artist) str += `**${result.artist.join(", ")}** `;
-        str += `*<https://e621.net/post/show/${result.id}>* `;
-        str += result.image_url;
-        return str;
-    }).join("\n");
-
-    await message.channel.send(output);
+    return new TranslationMerge(
+        warning,
+        results.map(result => {
+            let str = "";
+            if (result.artist) str += `**${result.artist.join(", ")}** `;
+            str += `*<https://e621.net/post/show/${result.id}>* `;
+            str += result.image_url;
+            return str;
+        }).join("\n")
+    ).separator("\n");
 }
 
 module.exports = function install(cr) {
@@ -257,39 +254,38 @@ module.exports = function install(cr) {
      */
 
     e621Command.registerSubCommand("random", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "random")))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "random")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>")
             .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
             .addParameter("query", "a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)"));
 
     e621Command.registerSubCommand("latest", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "latest")))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "latest")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
 
     e621Command.registerSubCommand("top", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand((message, msg) => process(message, msg, "top")))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "top")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
 
     e621Command.registerSubCommand("popular", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, msg) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             let popular_order = "week";
 
-            if (/^day|week|month/i.test(msg)) {
-                const args = splitArgs(msg, 2);
+            if (/^day|week|month/i.test(content)) {
+                const args = splitArgs(content, 2);
                 popular_order = args[0].toLowerCase();
-                msg = args[1];
+                content = args[1];
             }
 
             let amount = 1;
             try {
-                const numParse = parseInt(msg);
+                const numParse = parseInt(content);
                 if (typeof numParse === "number" && !Number.isNaN(numParse)) {
                     if (numParse < 1 || numParse > 5) {
-                        message.channel.send(await message.channel.translate("`amount` cannot be smaller than 1 or greater than 5!"));
-                        return;
+                        return new Translation("derpi.amount_out_range", "`amount` cannot be smaller than 1 or greater than 5!");
                     }
                     amount = numParse;
                 } else throw new Error("NaN Error"); // go catch
@@ -330,19 +326,16 @@ module.exports = function install(cr) {
             }
 
             if (results.length === 0) {
-                await message.channel.sendTranslated("The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-                return;
+                return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
             }
 
-            const output = results.map(result => {
+            return results.map(result => {
                 let str = "";
                 if (result.artist) str += `**${result.artist.join(", ")}** `;
                 str += `*<https://e621.net/post/show/${result.id}>* `;
                 str += result.image_url;
                 return str;
             }).join("\n");
-
-            await message.channel.send(output);
         })).setHelp(new HelpContent()
             .setDescription("Returns the current most popular images by day, week or month.")
             .setUsage("<?timerange> <?amount>")

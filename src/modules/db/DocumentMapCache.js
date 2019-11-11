@@ -17,10 +17,6 @@
 const { isPlainObject } = require("../../util/util");
 const { CronJob } = require("cron");
 
-// DatabaseCache does not scale well now. Memory usage goes up linear to database size
-// Currently speed is of greater priority than scalability. Will have to change that
-// when bot gets bigger should limit cache to 1000 most active queries or so
-
 const DEFAULTS = {
     maxSize: 500,
     ttl: 0,

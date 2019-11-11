@@ -3,10 +3,6 @@
  * Created by Alexey Chistyakov <ross@newmail.ru> on 11.10.2014.
  */
 
-const settings = {
-    collection: "inc_counters",
-};
-
 /**
  * Get next sequence id for the given collection in the given database
  *
@@ -38,7 +34,7 @@ module.exports = getNextSequence;
  * @param {Function} callback
  */
 function getNextId(db, collectionName, callback) {
-    const collection = db.collection(settings.collection);
+    const collection = db.collection("inc_counters");
 
     collection.findOneAndUpdate(
         { _id: collectionName },

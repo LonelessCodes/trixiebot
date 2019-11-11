@@ -14,29 +14,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const NS_PER_SEC = 1e9;
-const NS_PER_MS = 1e6;
+const Resolvable = require("./Resolvable");
 
-class NanoTimer {
-    constructor() {
-        /** @type {bigint} */
-        this._begin = null;
+class NumberFormat extends Resolvable {
+    /**
+     * @param {number} num
+     * @param {Intl.NumberFormatOptions} opts
+     */
+    constructor(num, opts = {}) {
+        super();
+        this.num = num;
+        this.opts = opts;
     }
-    begin() {
-        this._begin = process.hrtime.bigint();
-        return this;
-    }
-    end() {
-        const end = process.hrtime.bigint();
-        return Number(end - this._begin);
+
+    resolve(i18n) {
+        return this.num.toLocaleString([i18n.locale, "en"], this.opts);
     }
 }
 
-function nanoTimer() {
-    return new NanoTimer().begin();
-}
-nanoTimer.NS_PER_SEC = NS_PER_SEC;
-nanoTimer.NS_PER_MS = NS_PER_MS;
-nanoTimer.NanoTimer = NanoTimer;
-
-module.exports = nanoTimer;
+module.exports = NumberFormat;

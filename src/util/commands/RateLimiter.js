@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const TimeUnit = require("../../modules/TimeUnit");
+const Translation = require("../../modules/i18n/Translation");
 
 class RateLimit {
     constructor(triesLeft, cooldown) {
@@ -127,9 +127,17 @@ class RateLimiter {
 
     toString() {
         if (this.max > 1) {
-            return this.max + " times in " + this.timeUnit.toString(this.timeNum);
+            return `${this.max} times in ${this.timeUnit.toString(this.timeNum)}`;
         } else {
             return this.timeUnit.toString(this.timeNum);
+        }
+    }
+
+    toTranslation() {
+        if (this.max > 1) {
+            return new Translation("time.x_times_in", "{{x}} times in {{timeframe}}", { x: this.max, timeframe: this.timeUnit.toTranslation(this.timeNum) });
+        } else {
+            return this.timeUnit.toTranslation(this.timeNum);
         }
     }
 
@@ -145,4 +153,3 @@ class RateLimiter {
 RateLimiter.RateLimit = RateLimit;
 
 module.exports = RateLimiter;
-module.exports.TimeUnit = TimeUnit;

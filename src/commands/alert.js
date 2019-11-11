@@ -28,6 +28,13 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandPermission = require("../util/commands/CommandPermission");
 
+// eslint-disable-next-line no-unused-vars
+const LocaleManager = require("../core/managers/LocaleManager");
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
+const NumberFormat = require("../modules/i18n/NumberFormat");
+
 const config = require("../config");
 
 const { default: TwitchClient } = require("twitch");
@@ -578,7 +585,13 @@ class ChannelQueryCursor {
 }
 
 class Manager extends EventEmitter {
-    constructor(db, client, services) {
+    /**
+     * @param {Db} db
+     * @param {LocaleManager} locale
+     * @param {Discord.Client} client
+     * @param {StreamProcessor[]} services
+     */
+    constructor(db, locale, client, services) {
         super();
 
         /** @type {OnlineChannel[]} */
@@ -586,6 +599,7 @@ class Manager extends EventEmitter {
 
         this.database = db.collection("alert");
         this.db_config = db.collection("alert_config");
+        this.locale = locale;
         this.client = client;
 
         /** @type {StreamProcessor[]} */
@@ -616,10 +630,14 @@ class Manager extends EventEmitter {
 
                     const embed = await channel.getEmbed();
 
-                    const onlineMessage = await channel.channel.sendTranslated("{{user}} is live on {{service}}!", {
-                        user: channel.name,
-                        service: channel.service.display_name,
-                    }, { embed });
+                    const onlineMessage = await this.locale.send(
+                        channel.channel,
+                        new Translation("alert.announcement", "{{user}} is live on {{service}}!", {
+                            user: channel.name,
+                            service: channel.service.display_name,
+                        }),
+                        { embed }
+                    );
 
                     channel.setMessage(onlineMessage);
 
@@ -826,11 +844,11 @@ class OnlineChannel extends Channel {
     }
 
     async getEmbed() {
-        const footer = [];
-        if (this.nsfw) footer.push("NSFW");
-        if (this.category) footer.push(`Category: ${this.category}`);
-        if (this.game) footer.push(`Game: ${this.game}`);
-        if (this.tags && this.tags.length > 0) footer.push(`Tags: ${this.tags.join(", ")}`);
+        const footer = new TranslationMerge().separator(" | ");
+        if (this.nsfw) footer.push(new Translation("alert.embed.nsfw", "NSFW"));
+        if (this.category) footer.push(new TranslationMerge(new Translation("alert.embed.category", "Category:"), this.category));
+        if (this.game) footer.push(new TranslationMerge(new Translation("alert.embed.game", "Game:"), this.game));
+        if (this.tags && this.tags.length > 0) footer.push(new TranslationMerge(new Translation("alert.embed.tags", "Tags:"), this.tags.join(", ")));
 
         const blur = this.thumbnail ?
             !this.channel.nsfw ?
@@ -852,8 +870,7 @@ class OnlineChannel extends Channel {
             !blur && this.thumbnail ?
                 `${this.thumbnail}?${Date.now()}` :
                 null;
-        const embed = new Discord.RichEmbed()
-
+        const embed = new TranslationEmbed()
             .setColor(this.service.color || CONST.COLOR.PRIMARY)
             .setURL(this.url);
 
@@ -863,20 +880,20 @@ class OnlineChannel extends Channel {
                 if (can_use_blur) embed.attachFile(attachment);
                 embed.setImage(thumbnail);
             }
-            embed.setFooter(footer.join(" | "));
+            embed.setFooter(footer);
 
             return embed;
         } else {
             embed.setAuthor(this.name)
                 .setTitle(this.title)
                 .setThumbnail(this.avatar);
-            if (this.followers != null) embed.addField("Followers", this.followers.toLocaleString("en"), true);
-            if (this.totalviews != null) embed.addField("Total Viewers", this.totalviews.toLocaleString("en"), true);
+            if (this.followers != null) embed.addField(new Translation("alert.embed.followers", "Followers"), new NumberFormat(this.followers), true);
+            if (this.totalviews != null) embed.addField(new Translation("alert.embed.viewers", "Total Viewers"), new NumberFormat(this.totalviews), true);
             if (thumbnail) {
                 if (can_use_blur) embed.attachFile(attachment);
                 embed.setImage(thumbnail);
             }
-            embed.setFooter(footer.join(" | "));
+            embed.setFooter(footer);
 
             return embed;
         }
@@ -893,12 +910,12 @@ class Config {
     }
 }
 
-module.exports = async function install(cr, client, _, db) {
+module.exports = async function install(cr, { client, locale, db }) {
     const services = [Picarto, Piczel, Smashcast];
     if (config.has("twitch.client_id")) services.push(Twitch);
     else log.namespace("config", "Found no API client ID for Twitch - Disabled alerting Twitch streams");
 
-    const manager = await new Manager(db, client, services);
+    const manager = await new Manager(db, locale, client, services);
 
     const alertCommand = cr.registerCommand("alert", new TreeCommand)
         .setHelp(new HelpContent()
@@ -917,8 +934,7 @@ module.exports = async function install(cr, client, _, db) {
         const s_channels = await manager.getChannels(message.guild);
 
         if (s_channels.length === 0) {
-            await message.channel.sendTranslated("Hehe, nothing here lol. Time to add some.");
-            return;
+            return new Translation("alert.empty", "Hehe, nothing here lol. Time to add some.");
         }
 
         /** @type {Map<any, Channel>} */
@@ -941,33 +957,27 @@ module.exports = async function install(cr, client, _, db) {
         .setHelp(new HelpContent().setUsage("", "list all active streaming alerts"));
 
     alertCommand.registerSubCommand("remove", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (message, url) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content: url }) => {
             const g_channel = message.mentions.channels.first() || message.channel;
 
             if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
-                await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
-                    url,
-                });
-                return;
+                return new Translation("alert.invalid_url", "`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", { url });
             }
 
             const config = await manager.parseConfig(g_channel, url);
             if (!config) {
-                await message.channel.sendTranslated("MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
-                return;
+                return new Translation("alert.unknown_service", "MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
             }
             if (!config.name) {
-                await message.channel.sendTranslated("You should also give me your channel page in the url instead of just the site!");
-                return;
+                return new Translation("alert.page_missing", "You should also give me your channel page in the url instead of just the site!");
             }
             if (!config.userId || !config._id) {
-                await message.channel.sendTranslated("I was not subscribed to this streamer.");
-                return;
+                return new Translation("alert.not_subscribed", "I was not subscribed to this streamer.");
             }
 
             await manager.removeChannel(config);
 
-            await message.channel.sendTranslated("Stopped alerting for {{name}}", {
+            return new Translation("alert.remove_success", "Stopped alerting for {{name}}", {
                 name: config.name,
             });
         }))
@@ -976,10 +986,10 @@ module.exports = async function install(cr, client, _, db) {
     alertCommand.registerSubCommand("compact", new SimpleCommand(async message => {
         if (await manager.isCompact(message.guild)) {
             await manager.unsetCompact(message.guild);
-            await message.channel.send("Compact online announcements are now turned off.");
+            return new Translation("alert.compact_off", "Compact online announcements are now turned off.");
         } else {
             await manager.setCompact(message.guild);
-            await message.channel.send("Compact online announcements are now turned on.");
+            return new Translation("alert.compact_on", "Compact online announcements are now turned on.");
         }
     }))
         .setHelp(new HelpContent().setUsage("", "toggle compact online announcements"));
@@ -987,52 +997,44 @@ module.exports = async function install(cr, client, _, db) {
     alertCommand.registerSubCommand("cleanup", new SimpleCommand(async message => {
         if (await manager.isCleanup(message.guild)) {
             await manager.unsetCleanup(message.guild);
-            await message.channel.send("Not deleting online announcements when going offline now.");
+            return new Translation("alert.cleanup_off", "Not deleting online announcements when going offline now.");
         } else {
             await manager.setCleanup(message.guild);
-            await message.channel.send("Cleaning up online announcements now.");
+            return new Translation("alert.cleanup_on", "Cleaning up online announcements now.");
         }
     }))
         .setHelp(new HelpContent().setUsage("", "toggle cleaning up online announcements"));
 
     alertCommand.registerDefaultCommand(new OverloadCommand)
         .registerOverload("0", list_command)
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const g_channel = message.mentions.channels.first() || message.channel;
 
             const url = content.replace(new RegExp(g_channel.toString(), "g"), "").trim();
             if (url === "") {
-                await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got nothing");
-                return;
+                return new Translation("alert.url_missing", "`page url` should be a vaid url! Instead I got nothing");
             }
             if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
-                await message.channel.sendTranslated("`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", {
-                    url,
-                });
-                return;
+                return new Translation("alert.invalid_url", "`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", { url });
             }
 
             const config = await manager.parseConfig(g_channel, url);
             if (!config) {
-                await message.channel.sendTranslated("MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
-                return;
+                return new Translation("alert.unknown_service", "MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
             }
             if (!config.name) {
-                await message.channel.sendTranslated("You should also give me your channel page in the url instead of just the site!");
-                return;
+                return new Translation("alert.page_missing", "You should also give me your channel page in the url instead of just the site!");
             }
             if (!config.userId) {
-                await message.channel.sendTranslated("That user does not exist!");
-                return;
+                return new Translation("alert.no_exist", "That user does not exist!");
             }
             if (config._id) {
-                await message.channel.sendTranslated("This server is already subscribed to this streamer.");
-                return;
+                return new Translation("alert.already_subscribed", "This server is already subscribed to this streamer.");
             }
 
             await manager.addChannel(config);
 
-            await message.channel.sendTranslated("Will be alerting y'all there when {{name}} goes online!", {
+            return new Translation("alert.success", "Will be alerting y'all there when {{name}} goes online!", {
                 name: config.name,
             });
         }));

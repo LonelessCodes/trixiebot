@@ -25,8 +25,11 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
-const Paginator = require("../../util/commands/Paginator");
-const { basicEmbed } = require("../../util/util");
+const PaginatorGuildAction = require("../../modules/actions/PaginatorGuildAction");
+const { basicTEmbed } = require("../../util/util");
+
+const Translation = require("../../modules/i18n/Translation");
+const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
 
 /**
  * {
@@ -41,77 +44,68 @@ const ID_PATTERN = /^[0-9]+$/;
 
 async function byID(database, message, id) {
     if (!ID_PATTERN.test(id)) {
-        await message.channel.send(`"${id}" is not a valid user ID. User IDs contain only digits. U dumbo`);
-        return;
+        return new Translation(
+            "autoban.not_valid_id",
+            "`{{id}}` is not a valid user ID. User IDs contain only digits. U dumbo",
+            { id }
+        );
     }
 
     await database.insertOne({ guildId: message.guild.id, action: "ban", type: "id", content: id });
 
-    const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-    embed.setDescription(`:police_car: Added \`${id}\` as an ID`);
-
-    await message.channel.send({ embed });
+    return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
+        .setDescription(new Translation("autoban.added_id", ":police_car: Added `{{id}}` as an ID", { id }));
 }
 
 const TAG_PATTERN = /^([^@#:]{2,32})#([0-9]{4})$/;
 
-/**
- * @param {any} database
- * @param {Message} message
- * @param {string} name
- * @returns {void}
- */
 async function byName(database, message, name) {
     const match = name.match(TAG_PATTERN);
     if (!match) {
         await database.insertOne({ guildId: message.guild.id, action: "ban", type: "name", content: name });
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        embed.setDescription(`:police_car: Added \`${name}\``);
-
-        await message.channel.send({ embed });
-        return;
+        return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
+            .setDescription(new Translation("autoban.added_name", ":police_car: Added `{{name}}`", { name }));
     }
 
     const user = message.client.users.find(user => user.username === match[1] && user.discriminator === match[2]);
     if (!user) {
         await database.insertOne({ guildId: message.guild.id, action: "ban", type: "tag", content: name });
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        embed.setDescription(`:police_car: Added \`${name}\``);
-
-        await message.channel.send({ embed });
-        return;
+        return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
+            .setDescription(new Translation("autoban.added_name", ":police_car: Added `{{name}}`", { name }));
     }
 
     const id = user.id;
     await database.insertOne({ guildId: message.guild.id, action: "ban", type: "id", content: id });
 
-    const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-    embed.setDescription(`:police_car: Found \`${name}\`'s user ID. Added \`${id}\` as an ID`);
-
-    await message.channel.send({ embed });
+    return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
+        .setDescription(new Translation(
+            "autoban.added_as_id",
+            ":police_car: Found `{{name}}`'s user ID. Added `{{id}}` as an ID",
+            { name, id }
+        ));
 }
 
 async function byGlob(database, message, pattern) {
     await database.insertOne({ guildId: message.guild.id, action: "ban", type: "glob", content: pattern });
 
-    const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-    embed.setDescription(`:police_car: Added \`${pattern}\` as a pattern`);
-
-    await message.channel.send({ embed });
+    return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
+        .setDescription(new Translation(
+            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern }
+        ));
 }
 
 async function byRegex(database, message, regex) {
     await database.insertOne({ guildId: message.guild.id, action: "ban", type: "regex", content: regex });
 
-    const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-    embed.setDescription(`:police_car: Added \`${regex}\` as a pattern`);
-
-    await message.channel.send({ embed });
+    return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
+        .setDescription(new Translation(
+            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern: regex }
+        ));
 }
 
-module.exports = function install(cr, client, config, db) {
+module.exports = function install(cr, { client, db }) {
     const database = db.collection("autoban");
     database.createIndex({ guildId: 1, action: 1, type: 1, content: 1 }, { unique: 1 });
 
@@ -158,54 +152,55 @@ module.exports = function install(cr, client, config, db) {
         .setPermissions(new CommandPermission([Discord.Permissions.FLAGS.BAN_MEMBERS]));
 
     autobanCmd.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("0", new SimpleCommand(async message => {
+        .registerOverload("0", new SimpleCommand(async context => {
             /**
              * LIST ALL BAN AND KICK CONFIGS
              */
-            const conditions = await database.find({ guildId: message.guild.id }).toArray();
+            const conditions = await database.find({ guildId: context.guild.id }).toArray();
             if (!conditions.length) {
-                await message.channel.send({
-                    embed: basicEmbed("Autobans", message.guild)
-                        .setDescription("No autoban configs yet. Add some by using `!autoban <userID|username#0000|glob>`"),
-                });
-                return;
+                return basicTEmbed("Autobans", context.guild)
+                    .setDescription(new Translation(
+                        "autoban.no_configs",
+                        "No autoban configs yet. Add some by using `{{prefix}}autoban <userID\\|username#0000\\|glob>`",
+                        { prefix: context.prefix }
+                    ));
             }
 
             const items = conditions.map(row => `\`${(row.type + "   ").slice(0, 5)}\` | \`${row.content}\``);
 
-            return new Paginator(
-                "Autobans",
-                "All the configured autobans for this server",
-                20, items, message.author,
-                { guild: message.guild }
-            ).display(message.channel);
+            new PaginatorGuildAction(
+                new Translation("autoban.title", "Autobans"),
+                new Translation("autoban.all_configs", "All the configured autobans for this server"),
+                items, context.author, context.guild,
+                { items_per_page: 20 }
+            ).display(context.channel, await context.translator());
         }))
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
-            if (ID_PATTERN.test(content)) await byID(database, message, content);
-            else await byName(database, message, content);
+        .registerOverload("1+", new SimpleCommand(({ content, message }) => {
+            if (ID_PATTERN.test(content)) return byID(database, message, content);
+            else return byName(database, message, content);
         }));
 
-    autobanCmd.registerSubCommand("id", new SimpleCommand(async (message, content) => {
+    autobanCmd.registerSubCommand("id", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        await byID(database, message, content.trim());
+        return byID(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<userID>", "add an autoban config banning the user with this specific, unique userID"));
 
-    autobanCmd.registerSubCommand("name", new SimpleCommand(async (message, content) => {
+    autobanCmd.registerSubCommand("name", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        await byName(database, message, content.trim());
+        return byName(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<username#0000|username>", "add an autoban config banning the user with this user tag (username#0000) or, if passed a username only, this username (case insensitive)"));
 
-    autobanCmd.registerSubCommand("glob", new SimpleCommand(async (message, content) => {
+    autobanCmd.registerSubCommand("glob", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        await byGlob(database, message, content.trim());
+        return byGlob(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<glob>", "add an autoban config banning users matching this glob pattern (always case insensitive)"));
 
-    autobanCmd.registerSubCommand("regexp", new SimpleCommand(async (message, content) => {
+    autobanCmd.registerSubCommand("regexp", new SimpleCommand(({ message, content }) => {
         if (content === "") return;
-        await byRegex(database, message, content.trim());
+        return byRegex(database, message, content.trim());
     })).setHelp(new HelpContent()
         .setUsage("<regexp>", "add an autoban config banning users matching this RegEx pattern (always with i and u flags)"));
 
@@ -216,26 +211,27 @@ module.exports = function install(cr, client, config, db) {
             .setUsageTitle("Remove configs:")
             .setUsage("<?thing>", "remove an autoban again. If no args given, returns a numbered list of autobans to choose from"))
 
-        .registerOverload("0", new SimpleCommand(async message => {
-            const conditions = await database.find({ guildId: message.guild.id }).toArray();
+        .registerOverload("0", new SimpleCommand(async context => {
+            const conditions = await database.find({ guildId: context.guild.id }).toArray();
             if (!conditions.length) {
-                await message.channel.send({
-                    embed: basicEmbed("Autobans", message.guild)
-                        .setDescription("No autoban configs yet. Add some by using `!autoban <userID|username#0000|glob>`"),
-                });
-                return;
+                return basicTEmbed("Autobans", context.guild)
+                    .setDescription(new Translation(
+                        "autoban.no_configs",
+                        "No autoban configs yet. Add some by using `{{prefix}}autoban <userID|username#0000|glob>`",
+                        { prefix: context.prefix }
+                    ));
             }
 
             const items = conditions.map(row => `\`${(row.type + "   ").slice(0, 5)}\` | \`${row.content}\``);
 
-            const paginator = new Paginator(
-                "Removable Autobans",
-                "Type the number of the autoban you would like to remove.",
-                20, items, message.author,
-                { number_items: true, guild: message.guild }
-            ).display(message.channel);
+            const paginator = new PaginatorGuildAction(
+                new Translation("autoban.remove.title", "Removable Autobans"),
+                new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove."),
+                items, context.author, context.guild,
+                { items_per_page: 20, number_items: true }
+            ).display(context.channel, await context.translator());
 
-            const msgs = await message.channel.awaitMessages(m => m.author.id === message.author.id && /[0-9]+/.test(m.content), { maxMatches: 1, time: 60000 });
+            const msgs = await context.channel.awaitMessages(m => m.author.id === context.author.id && /[0-9]+/.test(m.content), { maxMatches: 1, time: 60000 });
             if (msgs.size > 0) {
                 const m = msgs.first();
                 const num = parseInt(m.content) - 1;
@@ -244,29 +240,34 @@ module.exports = function install(cr, client, config, db) {
 
                     await database.deleteOne({ _id: row._id });
 
-                    const embed = new Discord.RichEmbed()
+                    const embed = new TranslationEmbed()
                         .setColor(CONST.COLOR.PRIMARY)
-                        .setDescription(`Deleted \`${row.content}\` :rotating_light:`);
+                        .setDescription(new Translation(
+                            "autoban.deleted",
+                            "Deleted `{{id}}` :rotating_light:",
+                            { id: row.content }
+                        ));
 
-                    await message.channel.send({ embed });
+                    await context.send({ embed });
                 }
             }
 
             await paginator.end();
         }))
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
-            const deleted = await database.deleteOne({ guildId: message.guild.id, content: content });
+        .registerOverload("1+", new SimpleCommand(async ({ guild, content }) => {
+            const deleted = await database.deleteOne({ guildId: guild.id, content: content });
 
-            const embed = new Discord.RichEmbed();
             if (deleted.result.n === 0) {
-                embed.setColor(CONST.COLOR.ERROR);
-                embed.setDescription("No such pattern configured");
-            } else {
-                embed.setColor(CONST.COLOR.PRIMARY);
-                embed.setDescription(`Deleted \`${content}\` :rotating_light:`);
+                return new TranslationEmbed().setColor(CONST.COLOR.ERROR)
+                    .setDescription(new Translation("autoban.no_parameter", "No such pattern configured"));
             }
 
-            await message.channel.send({ embed });
+            return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
+                .setDescription(new Translation(
+                    "autoban.deleted",
+                    "Deleted `{{id}}` :rotating_light:",
+                    { id: content }
+                ));
         }));
 
     autobanCmd.registerSubCommandAlias("*", "list");

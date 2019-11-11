@@ -23,7 +23,6 @@ module.exports = new class PromisesUtils {
         return new Promise(res => setTimeout(res, ms));
     }
 
-
     /**
      * @returns {Promise<void>}
      */

@@ -21,7 +21,7 @@ const { timeout } = require("../util/promises");
 const getChangelog = require("../modules/getChangelog");
 const INFO = require("../info");
 const CONST = require("../const");
-const nanoTimer = require("../modules/nanoTimer");
+const nanoTimer = require("../modules/timer");
 const Discord = require("discord.js");
 
 async function getCPUUsage() {
@@ -73,9 +73,9 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Paginator = require("../util/commands/Paginator");
+const PaginatorAction = require("../modules/actions/PaginatorAction");
 
-module.exports = function install(cr, client, _, __, error_cases) {
+module.exports = function install(cr, { client, error_cases }) {
     cr.registerCommand("info", new SimpleCommand(async () => {
         const guilds = client.guilds;
         const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
@@ -112,26 +112,28 @@ module.exports = function install(cr, client, _, __, error_cases) {
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("ping", new SimpleCommand(async (message, _, { timer }) => {
-        const internal_ping = timer.end() / nanoTimer.NS_PER_MS;
+    cr.registerCommand("ping", new SimpleCommand(async ({ message, received_at }) => {
+        const internal_ping = nanoTimer.diff(received_at) / nanoTimer.NS_PER_MS;
 
-        const pongText = await message.channel.translate("pong! Wee hee");
+        const pongText = "pong! Wee hee";
         const m = await message.channel.send(pongText);
 
         const ping = m.createdTimestamp - message.createdTimestamp;
-        await m.edit(pongText + "\n" +
+        await m.edit(
+            pongText + "\n" +
             "```" +
             `⏱ Real Latency:     ${ping}ms\n` +
             `⏱ Internal Latency: ${internal_ping.toFixed(1)}ms\n` +
             `💓 API Latency:      ${Math.round(client.ping)}ms\n` +
-            "```");
+            "```"
+        );
     }))
         .setHelp(new HelpContent().setDescription("Ping-Pong-Ping-Pong-Ping-WEE HEEEEE."))
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
     cr.registerAlias("ping", "trixie ping");
 
-    cr.registerCommand("changelog", new SimpleCommand(async message => {
+    cr.registerCommand("changelog", new SimpleCommand(async () => {
         const logs = await getChangelog();
 
         const latest = logs[0];
@@ -158,7 +160,7 @@ module.exports = function install(cr, client, _, __, error_cases) {
 
         embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
 
-        await message.channel.send({ embed });
+        return { embed };
     }))
         .setHelp(new HelpContent().setDescription("Gets the changes made to TrixieBot in the latest versions"))
         .setCategory(Category.INFO)
@@ -167,7 +169,7 @@ module.exports = function install(cr, client, _, __, error_cases) {
     // ERROR CASES
 
     cr.registerCommand("reporterror", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (_, caseId) => {
+        .registerOverload("1+", new SimpleCommand(async ({ content: caseId }) => {
             await error_cases.reportError(caseId);
             return ":ok_hand: The error will go under review soon!";
         }))
@@ -176,7 +178,7 @@ module.exports = function install(cr, client, _, __, error_cases) {
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("viewerrors", new SimpleCommand(async message => {
+    cr.registerCommand("viewerrors", new SimpleCommand(async context => {
         const errs = await error_cases.getErrors();
 
         const items = [];
@@ -200,13 +202,13 @@ module.exports = function install(cr, client, _, __, error_cases) {
             );
         }
 
-        new Paginator("Error Cases", "", 1, items, message.author).display(message.channel);
+        new PaginatorAction("Error Cases", "", items, context.author, { items_per_page: 1 }).display(context.channel, await context.translator());
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("approveerror", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (_, caseId) => {
+        .registerOverload("1+", new SimpleCommand(async ({ content: caseId }) => {
             await error_cases.acknowledgeError(caseId);
             return ":ok_hand:";
         }))

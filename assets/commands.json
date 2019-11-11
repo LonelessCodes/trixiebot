@@ -5,7 +5,7 @@
       "name": "8ball",
       "help": {
         "description": "An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy",
-        "usage": "\n`!8ball <question>` *(alias `!tellme`)*\n`question` - The question you are eager to ask",
+        "usage": "\n`!8ball <question>` *(alias `!tellme`, `!8`)*\n`question` - The question you are eager to ask",
         "category": "Misc"
       }
     },
@@ -39,7 +39,7 @@
       "name": "bank",
       "help": {
         "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
-        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional - Sets the singular of the currency name\n`plural` - optional - Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional - Sets the singular of the currency name\n`plural` - optional - Sets the plural of the currency name. If omitted, singular name will be used for everything",
         "category": "Currency"
       }
     },
@@ -132,14 +132,6 @@
       }
     },
     {
-      "name": "cider",
-      "help": {
-        "description": "Serve the chat some cider",
-        "usage": "\n`!cider`",
-        "category": "My Little Pony"
-      }
-    },
-    {
       "name": "coin",
       "help": {
         "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
@@ -165,7 +157,7 @@
     {
       "name": "daily",
       "help": {
-        "description": "Gather your daily payouts every 22 hours and occasionally get bonus money.",
+        "description": "Gather your daily payouts every day and occasionally get bonus money.",
         "usage": "\n`!daily` *(alias `!dailies`)*",
         "category": "Currency"
       }
@@ -395,7 +387,7 @@
     {
       "name": "locale",
       "help": {
-        "description": "Trixie supports multiple different languages, including `en`, `de`, `hu`. Here you can set them in your server",
+        "description": "Trixie supports multiple different languages, including `German`, `English`. Here you can set them in your server",
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional - set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional - set a channel to be a unique locale",
         "category": "Moderation"
@@ -498,14 +490,6 @@
         "description": "Poke poke",
         "usage": "\n`!poke <@user>`",
         "category": "Action"
-      }
-    },
-    {
-      "name": "poll",
-      "help": {
-        "description": "Create a poll that users can vote on",
-        "usage": "\n`!poll <duration> <option 1>, <option 2>, ..., <option n>`\n`duration` - Duration of the poll. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs\n`option` - a comma seperated list of options to vote for",
-        "category": "Misc"
       }
     },
     {
@@ -749,7 +733,7 @@
       "name": "waifu",
       "help": {
         "description": "This tool helps you manage your waifus with ease!",
-        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu trade <@your waifu> <@other waifu>` - Trade `your waifu` with `other waifu`\n`@your waifu` - Must be one of your waifus. This one will be traded\n`@other waifu` - Must be someone's waifu. This is the one you want to get\n\n`!waifu buyslot`\n\n",
+        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu buyslot`",
         "category": "Action"
       }
     },

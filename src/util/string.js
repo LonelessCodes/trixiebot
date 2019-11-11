@@ -20,9 +20,9 @@ const PATTERNS = Object.freeze({
 
 module.exports = new class StringUtils {
     /**
-     * @param {string} raw Original array
+     * @param {string[]} raw Original array
      * @param {number} expectedSize Size of the new array
-     * @returns {string}
+     * @returns {string[]}
      */
     normalizeArray(raw, expectedSize) {
         /**
@@ -137,6 +137,7 @@ module.exports = new class StringUtils {
         value = String(value);
         fill = String(fill);
 
-        return value.length >= width ? value : new Array(width - value.length + 1).join(fill) + value;
+        // String#repeat is kinda fancy, you gotta admit
+        return value.length >= width ? value : fill.repeat(Math.max(0, width - value.length)) + value;
     }
 };

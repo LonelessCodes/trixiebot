@@ -22,31 +22,35 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+const TranslationMerge = require("../modules/i18n/TranslationMerge");
+
 const coin = ["heads", "tails"];
 
 module.exports = function install(cr) {
-    cr.registerCommand("coin", new SimpleCommand(async (message, content) => {
+    cr.registerCommand("coin", new SimpleCommand(async ({ content, ctx }) => {
         let bet = content.toLowerCase();
         if (bet === "") {
             bet = await randomItem(coin);
-            await message.channel.send(`Your bet: ${bet}`);
+            await ctx.send(new TranslationMerge(new Translation("coin.bet", "Your bet:"), bet));
         }
 
         if (bet === "head") bet = "heads";
         else if (bet === "tail") bet = "tails";
 
         if (!coin.includes(bet)) {
-            await message.channel.send(`\`${bet}\` isn't a valid side of le coin. \`heads\` or \`tails\`?!`);
+            await ctx.send(new Translation("coin.invalid", "`{{bet}}` isn't a valid side of le coin. `heads` or `tails`?!", { bet }));
             return;
         }
 
         const result = await randomItem(coin);
 
-        await message.channel.send("The coin flips into the air...");
+        await ctx.send(new Translation("coin.pending", "The coin flips into the air..."));
         await timeout(2000);
-        await message.channel.send(result === bet ?
-            `Whew! The coin landed on ${result}.` :
-            `Sorry! The coin landed on ${result}.`);
+        await ctx.send(result === bet ?
+            new Translation("coin.success", "Whew! The coin landed on {{result}}.", { result }) :
+            new Translation("coin.busted", "Sorry! The coin landed on {{result}}.", { result })
+        );
     }))
         .setHelp(new HelpContent()
             .setUsage("<bet>")

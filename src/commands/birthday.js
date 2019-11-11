@@ -28,9 +28,12 @@ const Category = require("../util/commands/Category");
 const CommandPermission = require("../util/commands/CommandPermission");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Paginator = require("../util/commands/Paginator");
+const PaginatorGuildAction = require("../modules/actions/PaginatorGuildAction");
 
-module.exports = async function install(cr, client, config, db) {
+// eslint-disable-next-line no-warning-comments
+// TODO: translate
+
+module.exports = async function install(cr, { client, db }) {
     const database = db.collection("birthday");
     const database_config = db.collection("birthday_config");
 
@@ -102,14 +105,14 @@ module.exports = async function install(cr, client, config, db) {
 
     birthdayCmd.registerDefaultCommand(new OverloadCommand)
         .setScope(CommandScope.ALL)
-        .registerOverload("1+", new SimpleCommand(async (message, content) => {
-            const userId = message.author.id;
+        .registerOverload("1+", new SimpleCommand(async context => {
+            const userId = context.author.id;
 
             if (await database.findOne({ userId, times_changed: MAX_CHANGES })) {
                 return `You have used up all your ${MAX_CHANGES} chances to change your birthday`;
             }
 
-            const time = moment(content, ["MM-DD-YYYY", "YYYY-MM-DD"]);
+            const time = moment(context.content, ["MM-DD-YYYY", "YYYY-MM-DD"]);
 
             if (!time.isValid()) return "Nohhhh, do it like this, pls: YYYY-MM-DD";
 
@@ -123,8 +126,8 @@ module.exports = async function install(cr, client, config, db) {
                 (times_left > 0 ? ` If this was wrong, you have ${times_left} changes left.` : "");
         }));
 
-    birthdayCmd.registerSubCommand("reset", new SimpleCommand(async message => {
-        const userId = message.author.id;
+    birthdayCmd.registerSubCommand("reset", new SimpleCommand(async context => {
+        const userId = context.author.id;
 
         await database.deleteOne({ userId });
 
@@ -163,7 +166,7 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsage("<month>", "List all birthdays in this month in the server")
             .addParameter("month", "The month as a number. 1 for January, 2 for February, and so on."))
-        .registerOverload("1+", new SimpleCommand(async (message, month_str) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content: month_str, translator }) => {
             const month = parseInt(month_str) - 1;
             if (Number.isNaN(month) || month < 1 || month > 12) {
                 return `"${month_str}" is not a valid month. Type 1 for January, 2 for February, and so on.`;
@@ -179,11 +182,13 @@ module.exports = async function install(cr, client, config, db) {
 
             if (members.length === 0) return "No one got their birthday in this month :c";
 
-            new Paginator(
+            new PaginatorGuildAction(
                 "Birthdays",
                 `All birthdays in month ${pad(month + 1, 2)}`,
-                15, members, message.author, { guild: message.guild }
-            ).display(message.channel);
+                // new Translation("birthday.birthday", "Birthdays"),
+                // new Translation("birthday.title", "All birthdays in month {{month}}", { month: pad(month + 1, 2) }),
+                members, message.author, message.guild, { items_per_page: 15 }
+            ).display(message.channel, await translator());
         }));
 
     /*
@@ -200,7 +205,7 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsage("<role name>", "Set the birthday boy role")
             .addParameter("role name", "The birthday role name"))
-        .registerOverload("1+", new SimpleCommand(async (message, role_str) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content: role_str }) => {
             const guild = message.guild;
             const me = guild.me;
             if (!me.hasPermission(Discord.Permissions.FLAGS.MANAGE_ROLES)) {
@@ -226,8 +231,8 @@ module.exports = async function install(cr, client, config, db) {
             return `:ok_hand: Saved "${role.name}" as the new birthday role!`;
         }));
 
-    birthdayAdminCmd.registerSubCommand("toggle", new SimpleCommand(async message => {
-        const guild = message.guild;
+    birthdayAdminCmd.registerSubCommand("toggle", new SimpleCommand(async context => {
+        const guild = context.guild;
 
         const config_old = await database_config.findOne({ guildId: guild.id }) || { enabled: true };
         await database_config.updateOne({ guildId: guild.id }, { $set: { enabled: !config_old.enabled } }, { upsert: true });
@@ -241,22 +246,22 @@ module.exports = async function install(cr, client, config, db) {
         .setHelp(new HelpContent()
             .setUsage("", "Toggle the birthday announcer on or off"));
 
-    birthdayAdminCmd.registerDefaultCommand(new SimpleCommand(async message => {
-        const config = await database_config.findOne({ guildId: message.guild.id });
+    birthdayAdminCmd.registerDefaultCommand(new SimpleCommand(async context => {
+        const config = await database_config.findOne({ guildId: context.guild.id });
         if (!config) {
-            return basicEmbed("Birthday Config", message.guild)
+            return basicEmbed("Birthday Config", context.guild)
                 .addField("Enabled", "false", true)
                 .addField("Role", "none", true);
         }
 
-        const role = message.guild.roles.get(config.roleId);
+        const role = context.guild.roles.get(config.roleId);
         if (!role) {
-            return basicEmbed("Birthday Config", message.guild)
+            return basicEmbed("Birthday Config", context.guild)
                 .addField("Enabled", !!config.enabled, true)
                 .addField("Role", "none", true);
         }
 
-        return basicEmbed("Birthday Config", message.guild)
+        return basicEmbed("Birthday Config", context.guild)
             .addField("Enabled", !!config.enabled, true)
             .addField("Role", role.name, true);
     }));

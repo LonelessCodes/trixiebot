@@ -24,10 +24,12 @@ const Category = require("../../util/commands/Category");
 const MessageMentions = require("../../util/commands/MessageMentions");
 
 const { Attachment } = require("discord.js");
+const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
+const Translation = require("../../modules/i18n/Translation");
 
-class TextActionCommand extends BaseCommand {
-    constructor(image, content, noMentionMessage, permissions) {
-        super(permissions);
+class ImageActionCommand extends BaseCommand {
+    constructor(image, content, noMentionMessage) {
+        super();
 
         this.setRateLimiter(new RateLimiter(TimeUnit.SECOND, 10));
         this.setHelp(new HelpContent()
@@ -41,20 +43,22 @@ class TextActionCommand extends BaseCommand {
         this.everyone = false;
     }
 
-    async run(message, command_name, content) {
-        const mentions = new MessageMentions(content, message.guild);
+    async run(context) {
+        const mentions = new MessageMentions(context.content, context.guild);
         const mention = mentions.members.first();
         if (!mention && !mentions.everyone) {
-            await message.channel.sendTranslated(this.noMentionMessage.replace(new RegExp("{{user}}", "g"), userToString(message.member)));
+            await context.send(new TranslationFormatter(this.noMentionMessage, { user: userToString(context.member) }));
             return;
         }
 
         const phrase = await secureRandom(this.texts);
-        const user = mentions.everyone ? `all ${message.guild.memberCount} users` : userToString(mention);
+        const user = mentions.everyone ?
+            new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount }) :
+            userToString(mention);
 
         const attachment = new Attachment(this.image);
 
-        await message.channel.send(phrase.replace(new RegExp("{{user}}", "g"), user), attachment);
+        await context.send(new TranslationFormatter(phrase, { user }), attachment);
     }
 
     setAllowEveryone(v) {
@@ -63,4 +67,4 @@ class TextActionCommand extends BaseCommand {
     }
 }
 
-module.exports = TextActionCommand;
+module.exports = ImageActionCommand;

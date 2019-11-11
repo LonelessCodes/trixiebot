@@ -37,12 +37,14 @@ const extnames = {
 };
 
 // eslint-disable-next-line no-unused-vars
-module.exports = function install(cr, client, config, db) {
+module.exports = function install(cr, { client, config, locale, db }) {
     cr.registerCommand("file", new class extends BaseCommand {
-        async noPermission(message) { await message.channel.sendTranslated("no"); }
+        async noPermission(context) {
+            await context.send("no");
+        }
 
-        async call(message, msg) {
-            const file = path.resolve(path.join(process.cwd(), msg));
+        async call({ message, content }) {
+            const file = path.resolve(path.join(process.cwd(), content));
             if (!await fs.exists(file)) {
                 await message.channel.send("Doesn't exist");
                 return;
@@ -60,7 +62,7 @@ module.exports = function install(cr, client, config, db) {
                 return;
             }
 
-            const language = extnames[path.extname(msg)] || "";
+            const language = extnames[path.extname(content)] || "";
             const highWaterMark = 2000 - (2 * 4) - language.length;
 
             let tmp = await fs.readFile(file, { encoding: "utf8" });
@@ -76,9 +78,9 @@ module.exports = function install(cr, client, config, db) {
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("exec", new SimpleCommand(async (message, msg) => {
-        const content = await promisify(exec)(msg);
-        let escaped = resolveStdout("Out:\n" + content.stdout + "\nErr:\n" + content.stderr);
+    cr.registerCommand("exec", new SimpleCommand(async ({ message, content }) => {
+        const { stdout, stderr } = await promisify(exec)(content);
+        let escaped = resolveStdout("Out:\n" + stdout + "\nErr:\n" + stderr);
 
         while (escaped.length > 0) {
             let lastIndex = escaped.substring(0, 2000 - (2 * 3)).lastIndexOf("\n");
@@ -90,15 +92,15 @@ module.exports = function install(cr, client, config, db) {
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("eval", new SimpleCommand(async (message, msg) => {
-        const content = await eval(`(async () => {${msg}})()`);
-        return "```\n" + content + "\n```";
+    cr.registerCommand("eval", new SimpleCommand(async ({ content }) => {
+        const result = await eval(`(async () => {${content}})()`);
+        return "```\n" + result + "\n```";
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("send", new SimpleCommand(async (message, msg) => {
-        const s = splitArgs(msg, 2);
+    cr.registerCommand("send", new SimpleCommand(async ({ content }) => {
+        const s = splitArgs(content, 2);
         const guild = client.guilds.get(s[0]);
         if (!guild) {
             const channel = client.channels.get(s[0]);
@@ -129,7 +131,5 @@ module.exports = function install(cr, client, config, db) {
 
         await client.destroy();
         process.exit();
-    }))
-        .setCategory(Category.OWNER)
-        .setScope(CommandScope.ALL);
+    })).setCategory(Category.OWNER).setScope(CommandScope.ALL);
 };

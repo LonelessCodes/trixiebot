@@ -39,7 +39,7 @@ async function translate(type, text) {
 
 function translator(type, description) {
     return new OverloadCommand()
-        .registerOverload("1+", new SimpleCommand((message, text) => translate(type, text)))
+        .registerOverload("1+", new SimpleCommand(({ content }) => translate(type, content)))
         .setHelp(new HelpContent()
             .setDescription(description)
             .setUsage("<text>")

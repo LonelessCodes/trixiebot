@@ -14,14 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const SimpleCommand = require("../../core/commands/SimpleCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const Category = require("../../util/commands/Category");
-const CommandScope = require("../../util/commands/CommandScope");
-
-module.exports = function install(cr) {
-    cr.registerCommand("cider", new SimpleCommand(async message => "**🍺 " + await message.channel.translate("A round of cider is distributed in the chat!") + "**"))
-        .setHelp(new HelpContent().setDescription("Serve the chat some cider"))
-        .setCategory(Category.MLP)
-        .setScope(CommandScope.ALL);
+function timer() {
+    return process.hrtime.bigint();
+}
+timer.NS_PER_SEC = 1e9;
+timer.NS_PER_MS = 1e6;
+timer.typeof = "bigint";
+timer.diff = function diff(start) {
+    return Number(timer() - start);
 };
+
+module.exports = timer;

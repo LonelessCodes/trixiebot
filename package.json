@@ -47,7 +47,7 @@
     "node-fetch": "^2.6.0",
     "node-ipc": "^9.1.1",
     "node-opus": "^0.3.3",
-    "ogg": "^1.2.6",
+    "ogg": "github:matijagaspar/node-ogg#node-12",
     "prism-media": "^1.1.0",
     "ps-tree": "^1.2.0",
     "random-number-csprng": "^1.0.2",

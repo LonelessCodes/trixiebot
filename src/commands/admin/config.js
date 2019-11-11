@@ -61,7 +61,7 @@ module.exports = function install(cr, { config }) {
                 let parameter = parameters[i];
 
                 if (Array.isArray(parameter.name)) {
-                    const str = new TranslationMerge().setSeperator("\n");
+                    const str = new TranslationMerge().separator("\n");
                     for (let j = 0; j < parameter.name.length; j++) {
                         let sub = parameter.name[j];
                         sub.position = j;

@@ -22,7 +22,7 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
-const Paginator = require("../../util/commands/Paginator");
+const PaginatorGuildAction = require("../../modules/actions/PaginatorGuildAction");
 
 const Translation = require("../../modules/i18n/Translation");
 
@@ -137,12 +137,12 @@ module.exports = function install(cr, { client, db }) {
             items.push(str);
         }
 
-        new Paginator(
-            await context.translate(new Translation("deleted.title", "Deleted Messages")),
-            await context.translate(new Translation(
-                "deleted.description", "Messages deleted or edited by users: **{{count}}**\n", { count: items.length }
-            )),
-            page_limit, items, context.author, { guild: context.guild }
-        ).display(context.channel);
+        new PaginatorGuildAction(
+            new Translation("deleted.title", "Deleted Messages"),
+            new Translation(
+                "deleted.description", "Messages deleted or edited by users: **{{count}}**\n", { count: items.length },
+            ),
+            items, context.author, context.guild, { items_per_page: page_limit },
+        ).display(context.channel, await context.translator());
     }));
 };

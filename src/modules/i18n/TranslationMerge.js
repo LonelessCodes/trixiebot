@@ -24,7 +24,7 @@ class TranslationMerge extends Resolvable {
         this.sep = " ";
     }
 
-    setSeperator(sep = " ") {
+    separator(sep = " ") {
         this.sep = sep;
         return this;
     }

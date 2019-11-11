@@ -28,7 +28,7 @@ const Category = require("../util/commands/Category");
 const CommandPermission = require("../util/commands/CommandPermission");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Paginator = require("../util/commands/Paginator");
+const PaginatorGuildAction = require("../modules/actions/PaginatorGuildAction");
 
 module.exports = async function install(cr, { client, db }) {
     const database = db.collection("birthday");
@@ -163,7 +163,7 @@ module.exports = async function install(cr, { client, db }) {
         .setHelp(new HelpContent()
             .setUsage("<month>", "List all birthdays in this month in the server")
             .addParameter("month", "The month as a number. 1 for January, 2 for February, and so on."))
-        .registerOverload("1+", new SimpleCommand(async ({ message, content: month_str }) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content: month_str, translator }) => {
             const month = parseInt(month_str) - 1;
             if (Number.isNaN(month) || month < 1 || month > 12) {
                 return `"${month_str}" is not a valid month. Type 1 for January, 2 for February, and so on.`;
@@ -177,11 +177,13 @@ module.exports = async function install(cr, { client, db }) {
                 members.push(`${pad(month + 1, 2)}/${pad(user.date, 2)} - ${userToString(member)}`);
             }
 
-            new Paginator(
+            new PaginatorGuildAction(
                 "Birthdays",
                 `All birthdays in month ${pad(month + 1, 2)}`,
-                15, members, message.author, { guild: message.guild }
-            ).display(message.channel);
+                // new Translation("birthday.birthday", "Birthdays"),
+                // new Translation("birthday.title", "All birthdays in month {{month}}", { month: pad(month + 1, 2) }),
+                members, message.author, message.guild, { items_per_page: 15 },
+            ).display(message.channel, await translator());
         }));
 
     /*

@@ -21,7 +21,7 @@ const TreeCommand = require("../core/commands/TreeCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-const Paginator = require("../util/commands/Paginator");
+const PaginatorGuildAction = require("../modules/actions/PaginatorGuildAction");
 
 const Translation = require("../modules/i18n/Translation");
 const TranslationMerge = require("../modules/i18n/TranslationMerge");
@@ -31,7 +31,7 @@ function graph(uom, r, length, girth) {
         new Translation("penis.length", "Length:"),
         `**${(length * r).toFixed(1)} ${uom}**  `,
         new Translation("penis.girth", "Girth:"),
-        `**${(girth * r).toFixed(1)} ${uom}**`
+        `**${(girth * r).toFixed(1)} ${uom}**`,
     );
 }
 
@@ -69,8 +69,8 @@ module.exports = function install(cr, { client, db }) {
             const girth = 18;
             return new TranslationMerge(
                 pp(length) + " ( ͡° ͜ʖ ͡°)",
-                graph(uom, r, length, girth)
-            ).setSeperator("\n");
+                graph(uom, r, length, girth),
+            ).separator("\n");
         }
 
         const doc = await database.findOne({ userId: member.user.id });
@@ -89,15 +89,15 @@ module.exports = function install(cr, { client, db }) {
 
             return new TranslationMerge(
                 pp(length),
-                graph(uom, r, length, girth)
-            ).setSeperator("\n");
+                graph(uom, r, length, girth),
+            ).separator("\n");
         } else {
             const { length, girth } = doc;
 
             return new TranslationMerge(
                 pp(length),
-                graph(uom, r, length, girth)
-            ).setSeperator("\n");
+                graph(uom, r, length, girth),
+            ).separator("\n");
         }
     }));
 
@@ -116,16 +116,16 @@ module.exports = function install(cr, { client, db }) {
             items.push(
                 await ctx.translate(new TranslationMerge(
                     "**" + pp(penis.length) + `   ${member.user.tag}**`,
-                    graph(uom, r, penis.length, penis.girth)
-                ).setSeperator("\n"))
+                    graph(uom, r, penis.length, penis.girth),
+                ).separator("\n")),
             );
         }
 
-        new Paginator(
+        new PaginatorGuildAction(
             "Penis Leaderboard",
-            await ctx.translate(new Translation("penis.top_penises", "The top penises in this server")),
-            20, items, message.author, { number_items: true, guild: message.guild }
-        ).display(message.channel);
+            new Translation("penis.top_penises", "The top penises in this server"),
+            items, message.author, message.guild, { items_per_page: 20, number_items: true },
+        ).display(message.channel, await ctx.translator());
     }))
         .setHelp(new HelpContent()
             .setUsage("", "Shows where you are in the penis size ranking"));

@@ -27,7 +27,7 @@ const { userToString, basicTEmbed } = require("../util/util");
 const { splitArgs } = require("../util/string");
 const { toHumanTime } = require("../util/time");
 const { timeout } = require("../util/promises");
-const Paginator = require("../util/commands/Paginator");
+const PaginatorAction = require("../modules/actions/PaginatorAction");
 
 const Translation = require("../modules/i18n/Translation");
 const TranslationMerge = require("../modules/i18n/TranslationMerge");
@@ -99,7 +99,7 @@ module.exports = function install(cr, { locale }) {
             return new TranslationMerge(
                 str,
                 new Translation("bank.start_using", "Get started using your balance to purchase items and unlock features now.")
-            ).setSeperator("\n");
+            ).separator("\n");
         } else {
             return new Translation("bank.account_created", ":atm: Ayy you now have a bank account! Check it out at `{{prefix}}bank`", { prefix: message.prefix });
         }
@@ -172,12 +172,12 @@ module.exports = function install(cr, { locale }) {
             .addParameter("@user", "Use to pay money to")
             .addParameter("cost", "Ammount of money to pay"));
 
-    bankCmd.registerSubCommand("transactions", new SimpleCommand(async message => {
-        const user = message.author;
+    bankCmd.registerSubCommand("transactions", new SimpleCommand(async context => {
+        const user = context.author;
 
         const account = await credits.getAccount(user);
         if (!account) {
-            return new Translation("bank.create_first", "Before you can use any money related activities, please create a bank account using `{{prefix}}bank create`", { prefix: message.prefix });
+            return new Translation("bank.create_first", "Before you can use any money related activities, please create a bank account using `{{prefix}}bank create`", { prefix: context.prefix });
         }
 
         const trans_raw = await credits.getTransactions(user);
@@ -187,7 +187,7 @@ module.exports = function install(cr, { locale }) {
             for (let trans of trans_raw) {
                 transactions.push({
                     ts: moment(trans.ts).fromNow(),
-                    cost: (trans.cost >= 0 ? "+" : "") + await locale.translate(message.channel, new NumberFormat(trans.cost)),
+                    cost: (trans.cost >= 0 ? "+" : "") + await locale.translate(context.channel, new NumberFormat(trans.cost)),
                     description: trans.description,
                 });
             }
@@ -205,19 +205,18 @@ module.exports = function install(cr, { locale }) {
                     trans_str.push(
                         trans.ts + new Array(ts_length - trans.ts.length).fill(" ").join("") + " | " +
                         trans.cost + new Array(cost_length - trans.cost.length).fill(" ").join("") + " | " +
-                        trans.description
-                    );
+                        trans.description);
                 }
                 items.push("```cs\n" + trans_str.join("\n\n") + "\n```");
             }
 
-            new Paginator(
-                await locale.translate(message.channel, new Translation("bank.transactions", "Transactions")),
-                await locale.translate(message.channel, new Translation("bank.transactions_desc", "All of {{user}}'s (your) transactions", { user: userToString(user) })),
-                1, items, message.author
-            ).display(message.channel);
+            new PaginatorAction(
+                new Translation("bank.transactions", "Transactions"),
+                new Translation("bank.transactions_desc", "All of {{user}}'s (your) transactions", { user: userToString(user) }),
+                items, context.author, { items_per_page: 1 },
+            ).display(context.channel, await context.translator());
         } else {
-            return new Translation("bank.trans_no_money_yet", "Looks like you didn't earn or spend money yet! Let's start by `{{prefix}}daily`, to earn some munz", { prefix: message.prefix });
+            return new Translation("bank.trans_no_money_yet", "Looks like you didn't earn or spend money yet! Let's start by `{{prefix}}daily`, to earn some munz", { prefix: context.prefix });
         }
     }))
         .setHelp(new HelpContent()
@@ -226,10 +225,10 @@ module.exports = function install(cr, { locale }) {
 
     // redo this
     bankCmd.registerSubCommand("setname", new OverloadCommand)
-        .registerOverload("0", new SimpleCommand(async message => {
-            const name = await credits.getName(message.guild);
+        .registerOverload("0", new SimpleCommand(async context => {
+            const name = await credits.getName(context.guild);
 
-            await message.channel.send(`Current configuration:\nSingular: **${name.singular}**\nPlural: **${name.plural}**\n\nExample: **${credits.getBalanceString(Math.floor(Math.random() * 50), name)}**`);
+            await context.channel.send(`Current configuration:\nSingular: **${name.singular}**\nPlural: **${name.plural}**\n\nExample: **${credits.getBalanceString(Math.floor(Math.random() * 50), name)}**`);
         }))
         .registerOverload("1-2", new SimpleCommand(async ({ message, content }) => {
             const guild = message.guild;
@@ -307,7 +306,7 @@ module.exports = function install(cr, { locale }) {
 
         if (bonus > 0) str.push(new Translation("bank.daily_streak", "You completed a streak and added an extra :yen: **{{bonus}}** (**{{total}}** total)!", { bonus: credits.getBalanceString(bonus, currency_name, "bonus"), total: new NumberFormat(total) }));
 
-        return str.setSeperator("\n\n");
+        return str.separator("\n\n");
     }))
         .setHelp(new HelpContent()
             .setDescription("Gather your daily payouts every day and occasionally get bonus money."))

@@ -73,7 +73,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Paginator = require("../util/commands/Paginator");
+const PaginatorAction = require("../modules/actions/PaginatorAction");
 
 module.exports = function install(cr, { client, error_cases }) {
     cr.registerCommand("info", new SimpleCommand(async () => {
@@ -133,7 +133,7 @@ module.exports = function install(cr, { client, error_cases }) {
         .setScope(CommandScope.ALL);
     cr.registerAlias("ping", "trixie ping");
 
-    cr.registerCommand("changelog", new SimpleCommand(async message => {
+    cr.registerCommand("changelog", new SimpleCommand(async () => {
         const logs = await getChangelog();
 
         const latest = logs[0];
@@ -160,7 +160,7 @@ module.exports = function install(cr, { client, error_cases }) {
 
         embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
 
-        await message.channel.send({ embed });
+        return { embed };
     }))
         .setHelp(new HelpContent().setDescription("Gets the changes made to TrixieBot in the latest versions"))
         .setCategory(Category.INFO)
@@ -169,7 +169,7 @@ module.exports = function install(cr, { client, error_cases }) {
     // ERROR CASES
 
     cr.registerCommand("reporterror", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (_, caseId) => {
+        .registerOverload("1+", new SimpleCommand(async ({ content: caseId }) => {
             await error_cases.reportError(caseId);
             return ":ok_hand: The error will go under review soon!";
         }))
@@ -178,7 +178,7 @@ module.exports = function install(cr, { client, error_cases }) {
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("viewerrors", new SimpleCommand(async message => {
+    cr.registerCommand("viewerrors", new SimpleCommand(async context => {
         const errs = await error_cases.getErrors();
 
         const items = [];
@@ -198,17 +198,17 @@ module.exports = function install(cr, { client, error_cases }) {
                 "Content\n" +
                 `${err.content.replace("`", "´")}\n` +
                 `${err.err.stack}\n` +
-                "```"
+                "```",
             );
         }
 
-        new Paginator("Error Cases", "", 1, items, message.author).display(message.channel);
+        new PaginatorAction("Error Cases", "", items, context.author, { items_per_page: 1 }).display(context.channel, await context.translator());
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("approveerror", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async (_, caseId) => {
+        .registerOverload("1+", new SimpleCommand(async ({ content: caseId }) => {
             await error_cases.acknowledgeError(caseId);
             return ":ok_hand:";
         }))

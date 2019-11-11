@@ -25,7 +25,7 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
-const Paginator = require("../../util/commands/Paginator");
+const PaginatorGuildAction = require("../../modules/actions/PaginatorGuildAction");
 const { basicTEmbed } = require("../../util/util");
 
 const Translation = require("../../modules/i18n/Translation");
@@ -168,14 +168,12 @@ module.exports = function install(cr, { client, db }) {
 
             const items = conditions.map(row => `\`${(row.type + "   ").slice(0, 5)}\` | \`${row.content}\``);
 
-            // eslint-disable-next-line no-warning-comments
-            // TODO: find a way for Paginator to properly support Translations
-            new Paginator(
+            new PaginatorGuildAction(
                 "Autobans",
-                await context.translate(new Translation("autoban.all_configs", "All the configured autobans for this server")),
-                20, items, context.author,
-                { guild: context.guild },
-            ).display(context.channel);
+                new Translation("autoban.all_configs", "All the configured autobans for this server"),
+                items, context.author, context.guild,
+                { items_per_page: 20 },
+            ).display(context.channel, await context.translator());
         }))
         .registerOverload("1+", new SimpleCommand(({ content, message }) => {
             if (ID_PATTERN.test(content)) return byID(database, message, content);
@@ -226,14 +224,12 @@ module.exports = function install(cr, { client, db }) {
 
             const items = conditions.map(row => `\`${(row.type + "   ").slice(0, 5)}\` | \`${row.content}\``);
 
-            const paginator = new Paginator(
+            const paginator = new PaginatorGuildAction(
                 "Removable Autobans",
-                await context.translate(
-                    new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove."),
-                ),
-                20, items, context.author,
-                { number_items: true, guild: context.guild },
-            ).display(context.channel);
+                new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove."),
+                items, context.author, context.guild,
+                { items_per_page: 20, number_items: true },
+            ).display(context.channel, await context.translator());
 
             const msgs = await context.channel.awaitMessages(m => m.author.id === context.author.id && /[0-9]+/.test(m.content), { maxMatches: 1, time: 60000 });
             if (msgs.size > 0) {

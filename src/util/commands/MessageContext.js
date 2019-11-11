@@ -22,6 +22,8 @@ const AudioManager = require("../../core/managers/AudioManager");
 // eslint-disable-next-line no-unused-vars
 const LocaleManager = require("../../core/managers/LocaleManager");
 // eslint-disable-next-line no-unused-vars
+const I18nLocale = require("../../modules/i18n/I18nLocale");
+// eslint-disable-next-line no-unused-vars
 const Resolvable = require("../../modules/i18n/Resolvable");
 
 class MessageContext {
@@ -98,6 +100,14 @@ class MessageContext {
     translate(ch, resolvable) {
         if (ch instanceof TextChannel) return this._locale.translate(ch, resolvable);
         else return this._locale.translate(this.channel, ch);
+    }
+
+    /**
+     * @param {TextChannel|Resolvable} ch
+     * @returns {Promise<I18nLocale>}
+     */
+    translator(ch) {
+        return this._locale.translator(ch || this.channel);
     }
 
     edit(msg, content, options) {

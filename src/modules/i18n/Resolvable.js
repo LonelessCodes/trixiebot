@@ -25,16 +25,18 @@ class Resolvable {
     resolve() {
         return "";
     }
+
+    /**
+     * @param {Resolvable | string | number} item
+     * @param {I18nLocale} arg
+     * @returns {string}
+     */
+    static resolve(item, arg) {
+        if (typeof item === "number") return String(item);
+        if (typeof item === "string") return item;
+        if (typeof item.resolve === "function") return item.resolve(arg);
+        throw new TypeError("Item is not defined or not number, string or Resolvable");
+    }
 }
-// eslint-disable-next-line valid-jsdoc
-/**
- * @type {(item: Resolvable | string | number, arg: I18nLocale) => string}
- */
-Resolvable.resolve = function resolve(item, arg) {
-    if (typeof item === "number") return String(item);
-    if (typeof item === "string") return item;
-    if (typeof item.resolve === "function") return item.resolve(arg);
-    throw new TypeError("Item is not defined or not number, string or Resolvable");
-};
 
 module.exports = Resolvable;

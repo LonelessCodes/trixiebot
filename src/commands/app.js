@@ -68,7 +68,7 @@ module.exports = function install(cr, { client }) {
         return new TranslationEmbed()
             .setColor(CONST.COLOR.PRIMARY)
             .setAuthor("TrixieBot", client.user.avatarURL, INFO.WEBSITE)
-            .setDescription(desc.setSeperator(""))
+            .setDescription(desc.separator(""))
             .setFooter(`TrixieBot v${INFO.VERSION}`);
     }))
         .setHelp(new HelpContent().setDescription("First command to call."))

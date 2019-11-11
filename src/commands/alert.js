@@ -834,7 +834,7 @@ class OnlineChannel extends Channel {
     }
 
     async getEmbed() {
-        const footer = new TranslationMerge().setSeperator(" | ");
+        const footer = new TranslationMerge().separator(" | ");
         if (this.nsfw) footer.push(new Translation("alert.embed.nsfw", "NSFW"));
         if (this.category) footer.push(new TranslationMerge(new Translation("alert.embed.category", "Category:"), this.category));
         if (this.game) footer.push(new TranslationMerge(new Translation("alert.embed.game", "Game:"), this.game));

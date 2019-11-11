@@ -290,9 +290,9 @@ module.exports = function install(cr, { db }) {
         const m = new Translation("waifu.escape.story2", "As if out of nowhere you pull on your leash.");
         const m2 = await ctx.send(m);
         await timeout(500);
-        await m2.edit(new TranslationMerge(m, ".").setSeperator(""));
+        await m2.edit(new TranslationMerge(m, ".").separator(""));
         await timeout(500);
-        await m2.edit(new TranslationMerge(m, "..").setSeperator(""));
+        await m2.edit(new TranslationMerge(m, "..").separator(""));
 
         const random = await secureRandom(101);
 
@@ -304,7 +304,7 @@ module.exports = function install(cr, { db }) {
                 waifuId: message.author.id,
             });
             await ctx.send(
-                new TranslationMerge("... ***ATTACC***", new Translation("waifu.escape.success1", "The leash tore and you are dashing off in the free world")).setSeperator("\n"),
+                new TranslationMerge("... ***ATTACC***", new Translation("waifu.escape.success1", "The leash tore and you are dashing off in the free world")).separator("\n"),
                 new TranslationEmbed()
                     .setColor(CONST.COLOR.PRIMARY)
                     .setAuthor(new Translation("waifu.escape.success2", "Successful escape!!! {{user}} is now free!", { user: userToString(message.member, true) }), message.author.avatarURL)

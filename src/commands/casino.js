@@ -133,7 +133,7 @@ class Player {
         return new TranslationMerge(
             this.cards.map(card => card.render()).join(" - "),
             value
-        ).setSeperator("\n");
+        ).separator("\n");
     }
 }
 
@@ -148,7 +148,7 @@ class Dealer extends Player {
         return new TranslationMerge(
             this.cards[0].render() + " - " + this.cards.slice(1).map(() => "XX").join(" - "),
             new TranslationMerge(new Translation("bj.value", "Value:"), "--")
-        ).setSeperator("\n");
+        ).separator("\n");
     }
 }
 

@@ -369,5 +369,12 @@
   },
   "poll": {
     "deprecation": "The poll command has been deprecated as it is no longer maintainable and planned to be replaced"
+  },
+  "paginator": {
+    "page": "Page {{page}}"
+  },
+  "birthday": {
+    "birthday": "Birthdays",
+    "title": "All birthdays in month {{month}}"
   }
 }

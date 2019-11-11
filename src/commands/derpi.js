@@ -214,7 +214,7 @@ async function process(key, message, msg, type) {
             str += `https:${result.image_url}`;
             return str;
         }).join("\n")
-    ).setSeperator("\n");
+    ).separator("\n");
 }
 
 module.exports = function install(cr) {

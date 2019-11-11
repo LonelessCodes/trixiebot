@@ -19,9 +19,6 @@ const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-// eslint-disable-next-line no-unused-vars
-const { TextChannel, User } = require("discord.js");
-
 const random = require("../modules/random/random");
 const credits = require("../core/managers/CreditsManager");
 const { basicTEmbed } = require("../util/util");

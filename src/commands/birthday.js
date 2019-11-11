@@ -30,6 +30,9 @@ const CommandScope = require("../util/commands/CommandScope");
 
 const PaginatorGuildAction = require("../modules/actions/PaginatorGuildAction");
 
+// eslint-disable-next-line no-warning-comments
+// TODO: translate
+
 module.exports = async function install(cr, { client, db }) {
     const database = db.collection("birthday");
     const database_config = db.collection("birthday_config");

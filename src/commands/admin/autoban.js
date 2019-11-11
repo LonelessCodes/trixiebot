@@ -169,7 +169,7 @@ module.exports = function install(cr, { client, db }) {
             const items = conditions.map(row => `\`${(row.type + "   ").slice(0, 5)}\` | \`${row.content}\``);
 
             new PaginatorGuildAction(
-                "Autobans",
+                new Translation("autoban.title", "Autobans"),
                 new Translation("autoban.all_configs", "All the configured autobans for this server"),
                 items, context.author, context.guild,
                 { items_per_page: 20 }
@@ -225,7 +225,7 @@ module.exports = function install(cr, { client, db }) {
             const items = conditions.map(row => `\`${(row.type + "   ").slice(0, 5)}\` | \`${row.content}\``);
 
             const paginator = new PaginatorGuildAction(
-                "Removable Autobans",
+                new Translation("autoban.remove.title", "Removable Autobans"),
                 new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove."),
                 items, context.author, context.guild,
                 { items_per_page: 20, number_items: true }

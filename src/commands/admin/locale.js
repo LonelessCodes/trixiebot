@@ -15,7 +15,7 @@
  */
 
 const CONST = require("../../const");
-const { basicEmbed } = require("../../util/util");
+const { basicTEmbed } = require("../../util/util");
 const { splitArgs } = require("../../util/string");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
@@ -44,8 +44,8 @@ module.exports = function install(cr, { locale: locale_manager }) {
             const locale = await locale_manager.get(message.guild.id);
             const name = LocaleManager.getLocaleInfo(locale.global);
 
-            const embed = basicEmbed("Server Locales", message.guild)
-                .addField("Server:", name.name_en);
+            const embed = basicTEmbed(new Translation("locale.title", "Server Locales"), message.guild)
+                .addField(new Translation("locale.server", "Server:"), name.name_en);
 
             const channels = locale.channels || {};
             for (const channelId in channels) {

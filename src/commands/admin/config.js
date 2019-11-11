@@ -30,12 +30,12 @@ const TranslationMerge = require("../../modules/i18n/TranslationMerge");
 const ListFormat = require("../../modules/i18n/ListFormat");
 
 const types_human = new Map([
-    [String, "Text"],
-    [Number, "Number"],
-    [Boolean, "true or false"],
-    [Discord.TextChannel, "\\#Channel"],
-    [Discord.Role, "Role Name"],
-    [Discord.GuildMember, "\\@User"],
+    [String, new Translation("config.type.text", "Text")],
+    [Number, new Translation("config.type.num", "Number")],
+    [Boolean, new Translation("config.type.bool", "true or false")],
+    [Discord.TextChannel, new Translation("config.type.ch", "\\#Channel")],
+    [Discord.Role, new Translation("config.type.role", "Role Name")],
+    [Discord.GuildMember, new Translation("config.type.user", "\\@User")],
 ]);
 
 module.exports = function install(cr, { config }) {
@@ -144,7 +144,7 @@ module.exports = function install(cr, { config }) {
             embed.addField(new Translation("config.allowed_types", "Allowed Types:"), new ListFormat(
                 parameter.types
                     .concat(parameter.allowEmpty ? ["none"] : [])
-                    .map(t => types_human.get(t) || `\`${t}\``),
+                    .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
                 { type: "or" }
             ));
         }
@@ -164,7 +164,7 @@ module.exports = function install(cr, { config }) {
                 format: new ListFormat(
                     parameter.types
                         .concat(parameter.allowEmpty ? ["none"] : [])
-                        .map(t => types_human.get(t) || `\`${t}\``),
+                        .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
                     { type: "or" }
                 ),
             }));

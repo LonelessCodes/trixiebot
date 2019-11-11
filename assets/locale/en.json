@@ -139,7 +139,8 @@
     "hit_stand": "Type `hit` to draw another card or `stand` to pass",
     "value": "Value:",
     "busted": "BUSTED",
-    "invalid_bet": "Invalid bet! Plz put a number wumber uwu"
+    "invalid_bet": "Invalid bet! Plz put a number wumber uwu",
+    "blackjack": "BLACKJACK"
   },
   "sb": {
     "checking": "Checking data...",

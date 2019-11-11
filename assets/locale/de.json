@@ -139,7 +139,8 @@
         "hit_stand": "Schreib' `hit` um eine weitere Karte zu ziehen oder `stand` um zu passen",
         "value": "Wert:",
         "busted": "BUSTED",
-        "invalid_bet": "Ungültiger Wetteinsatz! Plz gib eine Zahl uwu"
+        "invalid_bet": "Ungültiger Wetteinsatz! Plz gib eine Zahl uwu",
+        "blackjack": "BLACKJACK"
     },
     "sb": {
         "checking": "Daten überprüfen...",

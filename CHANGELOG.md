@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.5...v3.0.0) (2019-11-11)
+
+
+### Bug Fixes
+
+* add missing licence headers ([ffdb907](https://bitbucket.org/Loneless/trixiebot/commits/ffdb907))
+* removed newline at end of translation ([a8a966f](https://bitbucket.org/Loneless/trixiebot/commits/a8a966f))
+* **help:** fixed help of several commands! ([bd1c7ca](https://bitbucket.org/Loneless/trixiebot/commits/bd1c7ca))
+* **MessageContext#translator:** check for instance of TextChannel ([2365828](https://bitbucket.org/Loneless/trixiebot/commits/2365828))
+
+
+### Features
+
+* changed logic in processor, dispatchers and command classes to use MessageContext and new Translation features ([476b7df](https://bitbucket.org/Loneless/trixiebot/commits/476b7df))
+* prepare more stuff ([c5b411d](https://bitbucket.org/Loneless/trixiebot/commits/c5b411d))
+* update Paginator to support TranslationResolvables ([afdab93](https://bitbucket.org/Loneless/trixiebot/commits/afdab93))
+* **i18n:** added German Translations ([6261663](https://bitbucket.org/Loneless/trixiebot/commits/6261663))
+* **i18n:** All new internationalization approach ([5f9d535](https://bitbucket.org/Loneless/trixiebot/commits/5f9d535))
+* **i18n:** make all translatable commands able to be translated ([61266df](https://bitbucket.org/Loneless/trixiebot/commits/61266df))
+* **RateLimiter:** add a toTranslation() method to get a i18n-able Resolvable back ([471d4bf](https://bitbucket.org/Loneless/trixiebot/commits/471d4bf))
+
+
+
 <a name="2.16.5"></a>
 ## [2.16.5](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.4...v2.16.5) (2019-11-11)
 

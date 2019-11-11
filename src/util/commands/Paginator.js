@@ -191,7 +191,7 @@ class Paginator extends Events {
         }
 
         try {
-            if (message.channel.permissionsFor(this.guild.me).has(Permissions.FLAGS.MANAGE_MESSAGES))
+            if (message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.MANAGE_MESSAGES))
                 reaction.remove(this.user);
         } catch (_) { _; }
 

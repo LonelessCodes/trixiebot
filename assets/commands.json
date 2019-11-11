@@ -39,7 +39,7 @@
       "name": "bank",
       "help": {
         "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
-        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional - Sets the singular of the currency name\n`plural` - optional - Sets the plural of the currency name. If omitted, singular name will be used for everything\n\n",
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional - Sets the singular of the currency name\n`plural` - optional - Sets the plural of the currency name. If omitted, singular name will be used for everything",
         "category": "Currency"
       }
     },
@@ -733,7 +733,7 @@
       "name": "waifu",
       "help": {
         "description": "This tool helps you manage your waifus with ease!",
-        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu buyslot`\n\n",
+        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu buyslot`",
         "category": "Action"
       }
     },

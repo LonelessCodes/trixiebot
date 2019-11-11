@@ -41,12 +41,33 @@ class HelpBuilder extends RichEmbed {
         if (command.rateLimiter)
             this.addField("Rate Limiting:", command.rateLimiter.toString());
 
+        const fields = HelpBuilder.generateUsage();
+
+        for (let { title, usage } of fields) {
+            if (usage !== "") this.addField(title || "Usage:", format(usage, { prefix }));
+        }
+
+        if (command.category) this.setFooter(`Category: ${command.category.toString()}`);
+    }
+
+    static createParameter(name, parameter) {
+        return `\`${name}\` ${parameter.optional ? "- optional " : ""}- ${parameter.content}`;
+    }
+
+    /**
+     * @param {string} prefix
+     * @param {{ type: string, nsfw: boolean }} channel
+     * @param {string} name
+     * @param {BaseCommand} command
+     * @returns {{ usage: string, title: string }[]}
+     */
+    static generateUsage(prefix, channel, name, command) {
         let fields = [{ usage: "", title: "" }];
         let i = 0;
 
         const func = (name, command, parentName) => {
             if (command instanceof ScopeCommand) {
-                command = command.getCmd(message.channel);
+                command = command.getCmd(channel);
                 if (!command) return;
             }
 
@@ -98,10 +119,10 @@ class HelpBuilder extends RichEmbed {
             if (command instanceof TreeCommand) {
                 for (const [sub_cmd_name, sub_command] of command.sub_commands) {
                     if (sub_command instanceof AliasCommand) continue;
-                    if (!sub_command.hasScope(message.channel)) continue;
+                    if (!sub_command.hasScope(channel)) continue;
                     if (!sub_command.isInSeason()) continue;
                     if (sub_cmd_name === "*") continue;
-                    if (!message.channel.nsfw && sub_command.explicit) continue;
+                    if (!channel.nsfw && sub_command.explicit) continue;
                     if (!sub_command.list) continue;
                     if (sub_command.category === Category.OWNER) continue;
 
@@ -115,29 +136,19 @@ class HelpBuilder extends RichEmbed {
         };
         func(name, command);
 
-        for (let { title, usage } of fields) {
-            usage = usage.replace(/\n{2,}/g, "\n\n");
+        return fields.map(f => ({ usage: f.usage.replace(/\n{2,}/g, "\n\n"), title: f.title }));
+    }
 
-            if (usage !== "") this.addField(title || "Usage:", format(usage, { prefix }));
+    static async sendHelp(message, name, command) {
+        if (command instanceof AliasCommand) {
+            command = command.command;
         }
 
-        if (command.category) this.setFooter(`Category: ${command.category.toString()}`);
-    }
+        if (!command.help) return;
 
-    createParameter(name, parameter) {
-        return `\`${name}\` ${parameter.optional ? "- optional " : ""}- ${parameter.content}`;
+        const embed = new HelpBuilder(message, name, command);
+        return await message.channel.send({ embed });
     }
 }
-
-HelpBuilder.sendHelp = async function sendHelp(message, name, command) {
-    if (command instanceof AliasCommand) {
-        command = command.command;
-    }
-
-    if (!command.help) return;
-
-    const embed = new HelpBuilder(message, name, command);
-    return await message.channel.send({ embed });
-};
 
 module.exports = HelpBuilder;

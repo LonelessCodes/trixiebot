@@ -1,7 +1,7 @@
 {
   "deleted": {
     "title": "Deleted Messages",
-    "description": "Messages deleted or edited by users: **{{count}}**\n",
+    "description": "Messages deleted or edited by users: **{{count}}**",
     "empty": "Yeeeeah, nothing found",
     "clear_success": "Removed all deleted messages successfully"
   },

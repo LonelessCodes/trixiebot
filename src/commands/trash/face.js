@@ -148,25 +148,25 @@ const faces = [
 
 module.exports = function install(cr) {
     cr.registerCommand("face", new SimpleCommand(() => randomItem(faces)))
-        .setHelp(new HelpContent().setDescription("Get a random ASCII face"))
+        .setHelp(new HelpContent().setUsage("", "Get a random ASCII face"))
         .setCategory(Category.MISC)
         .setScope(CommandScope.ALL);
     cr.registerCommand("lenny", new TextCommand(faces[0]))
-        .setHelp(new HelpContent().setDescription("( ͡° ͜ʖ ͡°)"))
+        .setHelp(new HelpContent().setUsage("", "( ͡° ͜ʖ ͡°)"))
         .setCategory(Category.MISC)
         .setScope(CommandScope.ALL);
     cr.registerCommand("shrug", new TextCommand(faces[1]))
-        .setHelp(new HelpContent().setDescription("¯\\_(ツ)_/¯"))
+        .setHelp(new HelpContent().setUsage("", "¯\\_(ツ)_/¯"))
         .setCategory(Category.MISC)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻"))
-        .setHelp(new HelpContent().setDescription("(╯°□°）╯︵ Tableflip"))
+        .setHelp(new HelpContent().setUsage("", "(╯°□°）╯︵ Tableflip"))
         .setCategory(Category.ACTION)
         .setScope(CommandScope.ALL);
     cr.registerAlias("tableflip", "tf");
     cr.registerCommand("untableflip", new TextCommand("┬─┬ ノ( ゜-゜ノ)"))
-        .setHelp(new HelpContent().setDescription("That's right, put it back where it was ノ( ゜-゜ノ)"))
+        .setHelp(new HelpContent().setUsage("", "That's right, put it back where it was ノ( ゜-゜ノ)"))
         .setCategory(Category.ACTION)
         .setScope(CommandScope.ALL);
     cr.registerAlias("untableflip", "utf");

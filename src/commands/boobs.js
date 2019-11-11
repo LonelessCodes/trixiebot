@@ -45,7 +45,7 @@ module.exports = function install(cr) {
             .setColor(CONST.COLOR.PRIMARY)
             .setImage(url);
     }))
-        .setHelp(new HelpContent().setDescription("I wonder what this does"))
+        .setHelp(new HelpContent().setUsage("", "I wonder what this does"))
         .setExplicit(true)
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);

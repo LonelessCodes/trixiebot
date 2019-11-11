@@ -38,7 +38,7 @@ class HelpBuilder extends RichEmbed {
         if (command.rateLimiter)
             this.addField("Rate Limiting:", command.rateLimiter.toString());
 
-        const fields = HelpBuilder.generateUsage();
+        const fields = HelpBuilder.generateUsage(prefix, message.channel, name, command);
 
         for (let { title, usage } of fields) {
             if (usage !== "") this.addField(title || "Usage:", format(usage, { prefix }));

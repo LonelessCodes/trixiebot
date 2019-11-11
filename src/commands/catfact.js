@@ -33,7 +33,7 @@ module.exports = function install(cr) {
         return magic.text;
     }))
         .setHelp(new HelpContent()
-            .setDescription("Get you a cat fact that will help you raise your babies better <3"))
+            .setUsage("", "Get you a cat fact that will help you raise your babies better <3"))
         .setCategory(Category.MISC)
         .setScope(CommandScope.ALL);
 };

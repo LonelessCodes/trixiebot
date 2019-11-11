@@ -146,8 +146,7 @@ module.exports = function install(cr, { client, db: database }) {
             return { embed };
         }))
         .setHelp(new HelpContent()
-            .setDescription("Haha, very funny")
-            .setUsage("<?command>")
+            .setUsage("<?command>", "Haha, very funny")
             .addParameterOptional("command", "The name of the command you want help for. Whole command list if omitted"))
         .setCategory(Category.INFO)
         .setScope(CommandScope.ALL);

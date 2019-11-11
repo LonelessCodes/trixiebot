@@ -35,7 +35,7 @@ module.exports = function install(cr) {
                 user: userToString(message.author, true),
             }))
     ))
-        .setHelp(new HelpContent().setDescription("Mlem the chat :3"))
+        .setHelp(new HelpContent().setUsage("", "Mlem the chat :3"))
         .setCategory(Category.ACTION)
         .setScope(CommandScope.ALL);
 
@@ -48,7 +48,7 @@ module.exports = function install(cr) {
                 user: userToString(message.author, true),
             }))
     ))
-        .setHelp(new HelpContent().setDescription("Blep the chat :3"))
+        .setHelp(new HelpContent().setUsage("", "Blep the chat :3"))
         .setCategory(Category.ACTION)
         .setScope(CommandScope.ALL);
 };

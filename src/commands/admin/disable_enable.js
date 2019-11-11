@@ -51,8 +51,7 @@ module.exports = function install(cr, { database }) {
             "Channels {{channels}} will no longer listen to commands",
         ], channels.size, { channels: new ListFormat(channels.map(c => c.toString())) });
     })).setHelp(new HelpContent()
-        .setDescription("Disable Trixie from listening to a channel")
-        .setUsage("<#channel>")
+        .setUsage("<#channel>", "Disable Trixie from listening to a channel")
         .addParameter("#channel", "A channel or multiple channels"));
 
     disableCmd.registerSubCommand("command", new SimpleCommand(async ({ message, content }) => {
@@ -79,8 +78,7 @@ module.exports = function install(cr, { database }) {
             "Commands {{commands}} will no longer listen",
         ], commands.length, { commands: new ListFormat(commands) });
     })).setHelp(new HelpContent()
-        .setDescription("Disable a command")
-        .setUsage("<command name>")
+        .setUsage("<command name>", "Disable a command")
         .addParameter("command name", "The name of a command or a space seperated list of commands"));
 
     /**
@@ -107,8 +105,7 @@ module.exports = function install(cr, { database }) {
             "Channels {{channels}} will listen to commands again",
         ], channels.size, { channels: new ListFormat(channels.map(c => c.toString())) });
     })).setHelp(new HelpContent()
-        .setDescription("Enable Trixie from listening to a channel again")
-        .setUsage("<#channel>")
+        .setUsage("<#channel>", "Enable Trixie from listening to a channel again")
         .addParameter("#channel", "A channel or multiple channels"));
 
     enableCmd.registerSubCommand("command", new SimpleCommand(async ({ message, content }) => {
@@ -135,7 +132,6 @@ module.exports = function install(cr, { database }) {
             "Commands {{commands}} will listen again",
         ], commands.length, { commands: new ListFormat(commands) });
     })).setHelp(new HelpContent()
-        .setDescription("Enable a command again")
-        .setUsage("<command name>")
+        .setUsage("<command name>", "Enable a command again")
         .addParameter("command name", "The name of a command or a space seperated list of commands"));
 };

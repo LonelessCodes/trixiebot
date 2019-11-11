@@ -139,7 +139,7 @@ module.exports = function install(cr) {
             }
         }))
         .setHelp(new HelpContent()
-            .setDescription("Talk with Trixie1!!! (using a cleverbot integration)"))
+            .setUsage("<text>", "Talk with Trixie1!!! (using a cleverbot integration)"))
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 

@@ -361,7 +361,7 @@ module.exports = function install(cr, { db }) {
             }
         );
     })).setHelp(new HelpContent()
-        .setDescription("Buy additional waifu slots with Trixie's currency"));
+        .setUsage("", "Buy additional waifu slots with Trixie's currency"));
 
     waifuCommand.registerSubCommand("setslots", new SimpleCommand(async ({ mentions, content }) => {
         const member = mentions.members.first();

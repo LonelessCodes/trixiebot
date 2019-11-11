@@ -78,8 +78,7 @@ module.exports = function install(cr) {
     if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
     cr.registerCommand("horsepussy", new SimpleCommand(() => process()))
-        .setHelp(new HelpContent()
-            .setDescription("Get some gud quality horse pussi OwO"))
+        .setHelp(new HelpContent().setUsage("", "Get some gud quality horse pussi OwO"))
         .setExplicit(true)
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);

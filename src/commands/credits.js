@@ -309,7 +309,7 @@ module.exports = function install(cr, { locale }) {
         return str.separator("\n\n");
     }))
         .setHelp(new HelpContent()
-            .setDescription("Gather your daily payouts every day and occasionally get bonus money."))
+            .setUsage("", "Gather your daily payouts every day and occasionally get bonus money."))
         .setCategory(Category.CURRENCY);
     cr.registerAlias("daily", "dailies");
 };

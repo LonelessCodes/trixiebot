@@ -78,8 +78,7 @@ module.exports = function install(cr) {
 
     cr.registerCommand("ascii", ascii_cmd)
         .setHelp(new HelpContent()
-            .setDescription("Generates ascii art from an image")
-            .setUsage("<?url>")
+            .setUsage("<?url>", "Generates ascii art from an image")
             .addParameterOptional("url", "Url to an image. Or add an attachment to your message"))
         .setCategory(Category.MISC)
         .setScope(CommandScope.ALL);

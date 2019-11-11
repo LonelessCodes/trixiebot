@@ -164,8 +164,7 @@ module.exports = function install(cr) {
 
         return { embed };
     }))
-        .setHelp(new HelpContent()
-            .setDescription("Get some stats about the alive-ness of this server"))
+        .setHelp(new HelpContent().setUsage("", "Get some stats about the alive-ness of this server"))
         .setCategory(Category.INFO);
 
     cr.registerCommand("userstats", new SimpleCommand(async ({ message, mentions }) => {
@@ -192,9 +191,7 @@ module.exports = function install(cr) {
 
         return { embed };
     }))
-        .setHelp(new HelpContent()
-            .setDescription("Get some stats about how active someone is on the server")
-            .setUsage("<?@user>", "")
+        .setHelp(new HelpContent().setUsage("<?@user>", "Get some stats about how active someone is on the server")
             .addParameterOptional("@user", "The member c:"))
         .setCategory(Category.INFO);
 
@@ -213,7 +210,6 @@ module.exports = function install(cr) {
 
         return { embed };
     }))
-        .setHelp(new HelpContent()
-            .setDescription("Receive information about this server"))
+        .setHelp(new HelpContent().setUsage("", "Receive information about this server"))
         .setCategory(Category.INFO);
 };

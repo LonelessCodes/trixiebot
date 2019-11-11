@@ -73,7 +73,7 @@ module.exports = function install(cr) {
     cr.registerCommand("cat", new SimpleCommand(async () =>
         new TranslationMerge(new Translation("animal.cat", "meow"), catFace(), await randomCat())
     ))
-        .setHelp(new HelpContent().setDescription("Random cat image :3"))
+        .setHelp(new HelpContent().setUsage("", "Random cat image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("cat", "kitty");
@@ -81,7 +81,7 @@ module.exports = function install(cr) {
     cr.registerCommand("dog", new SimpleCommand(async () =>
         new TranslationMerge(new Translation("animal.dog", "woof"), dogFace(), await randomDog())
     ))
-        .setHelp(new HelpContent().setDescription("Random dog image :3"))
+        .setHelp(new HelpContent().setUsage("", "Random dog image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("dog", "doggo");
@@ -92,7 +92,7 @@ module.exports = function install(cr) {
     cr.registerCommand("fox", new SimpleCommand(async () =>
         new TranslationMerge(new Translation("animal.fox", "yip"), "🦊", await randomFox())
     ))
-        .setHelp(new HelpContent().setDescription("Random fox image :3"))
+        .setHelp(new HelpContent().setUsage("", "Random fox image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("fox", "foxie");
@@ -102,7 +102,7 @@ module.exports = function install(cr) {
     cr.registerCommand("shibe", new SimpleCommand(async () =>
         new TranslationMerge(new Translation("animal.shibe", "weff"), dogFace(), await randomShibe())
     ))
-        .setHelp(new HelpContent().setDescription("Random SHIBE image :3"))
+        .setHelp(new HelpContent().setUsage("", "Random SHIBE image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("shibe", "shiba");
@@ -110,7 +110,7 @@ module.exports = function install(cr) {
     cr.registerCommand("bird", new SimpleCommand(async () =>
         new TranslationMerge(new Translation("animal.bird", "peep"), "ovo", await randomBird())
     ))
-        .setHelp(new HelpContent().setDescription("Random Birb image ovo"))
+        .setHelp(new HelpContent().setUsage("", "Random Birb image ovo"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("bird", "birb");

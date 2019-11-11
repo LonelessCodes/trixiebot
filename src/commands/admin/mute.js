@@ -52,8 +52,7 @@ module.exports = function install(cr, { db }) {
         }
     })
         .setHelp(new HelpContent()
-            .setDescription("Mute/Blacklist specific words in this server")
-            .setUsage("<phrase>")
+            .setUsage("<phrase>", "Mute/Blacklist specific words in this server")
             .addParameter("phrase", "Word or phrase to be muted/blacklisted"))
         .setCategory(Category.MODERATION)
         .setPermissions(permission)

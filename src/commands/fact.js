@@ -65,8 +65,7 @@ module.exports = function install(cr) {
     }
 
     cr.registerCommand("fact", new SimpleCommand(() => getFact()))
-        .setHelp(new HelpContent()
-            .setDescription("Gets random UberFacts fact"))
+        .setHelp(new HelpContent().setUsage("", "Gets random UberFacts fact"))
         .setCategory(Category.UTILS)
         .setScope(CommandScope.ALL, true);
 

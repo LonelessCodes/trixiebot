@@ -35,8 +35,7 @@ module.exports = function install(cr) {
             return new Translation("audio.error", "Some error happened and caused some whoopsies");
         }
     }))
-        .setHelp(new HelpContent()
-            .setDescription("Make Trixie leave the voice channel!"))
+        .setHelp(new HelpContent().setUsage("", "Make Trixie leave the voice channel!"))
         .setCategory(Category.AUDIO);
 
     cr.registerAlias("leavevc", "leave");
@@ -52,8 +51,7 @@ module.exports = function install(cr) {
             return new Translation("audio.error", "Some error happened and caused some whoopsies");
         }
     }))
-        .setHelp(new HelpContent()
-            .setDescription("Stop whatever Trixie is saying in VC"))
+        .setHelp(new HelpContent().setUsage("", "Stop whatever Trixie is saying in VC"))
         .setCategory(Category.AUDIO);
 
     cr.registerAlias("stopvc", "stop");
@@ -71,8 +69,7 @@ module.exports = function install(cr) {
             return new Translation("audio.error", "Some error happened and caused some whoopsies");
         }
     }))
-        .setHelp(new HelpContent()
-            .setDescription("Stop whatever Trixie is saying in VC"))
+        .setHelp(new HelpContent().setUsage("", "Stop whatever Trixie is saying in VC"))
         .setCategory(Category.AUDIO);
 
     cr.registerAlias("joinvc", "join");

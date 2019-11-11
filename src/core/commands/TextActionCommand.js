@@ -28,8 +28,7 @@ class TextActionCommand extends BaseCommand {
         super();
 
         this.setHelp(new HelpContent()
-            .setDescription(description)
-            .setUsage("<@user>"));
+            .setUsage("<@user>", description));
         this.setCategory(Category.ACTION);
 
         this.texts = content instanceof Array ? content : [content];

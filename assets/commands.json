@@ -21,8 +21,7 @@
     {
       "name": "ascii",
       "help": {
-        "description": "Generates ascii art from an image",
-        "usage": "\n`!ascii <?url>`\n`url` - optional - Url to an image. Or add an attachment to your message",
+        "usage": "\n`!ascii <?url>` - Generates ascii art from an image\n`url` - optional - Url to an image. Or add an attachment to your message",
         "category": "Misc"
       }
     },
@@ -46,8 +45,7 @@
     {
       "name": "bird",
       "help": {
-        "description": "Random Birb image ovo",
-        "usage": "\n`!bird` *(alias `!birb`, `!borb`, `!birbo`)*",
+        "usage": "\n`!bird` - Random Birb image ovo *(alias `!birb`, `!borb`, `!birbo`)*",
         "category": "Image"
       }
     },
@@ -62,8 +60,7 @@
     {
       "name": "bite",
       "help": {
-        "description": "Ouchie! Bite someone",
-        "usage": "\n`!bite <@user>`",
+        "usage": "\n`!bite <@user>` - Ouchie! Bite someone",
         "category": "Action"
       }
     },
@@ -77,8 +74,7 @@
     {
       "name": "blep",
       "help": {
-        "description": "Blep the chat :3",
-        "usage": "\n`!blep`",
+        "usage": "\n`!blep` - Blep the chat :3",
         "category": "Action"
       }
     },
@@ -86,24 +82,21 @@
       "name": "boobs",
       "help": {
         "explicit": true,
-        "description": "I wonder what this does",
-        "usage": "\n`!boobs` *(alias `!boobies`, `!bewbs`)*",
+        "usage": "\n`!boobs` - I wonder what this does *(alias `!boobies`, `!bewbs`)*",
         "category": "Image"
       }
     },
     {
       "name": "cat",
       "help": {
-        "description": "Random cat image :3",
-        "usage": "\n`!cat` *(alias `!kitty`)*",
+        "usage": "\n`!cat` - Random cat image :3 *(alias `!kitty`)*",
         "category": "Image"
       }
     },
     {
       "name": "catfact",
       "help": {
-        "description": "Get you a cat fact that will help you raise your babies better <3",
-        "usage": "\n`!catfact`",
+        "usage": "\n`!catfact` - Get you a cat fact that will help you raise your babies better <3",
         "category": "Misc"
       }
     },
@@ -118,8 +111,7 @@
     {
       "name": "chat",
       "help": {
-        "description": "Talk with Trixie1!!! (using a cleverbot integration)",
-        "usage": "\n`!chat` *(alias `!cleverbot`)*",
+        "usage": "\n`!chat <text>` - Talk with Trixie1!!! (using a cleverbot integration) *(alias `!cleverbot`)*",
         "category": "Fun"
       }
     },
@@ -149,16 +141,14 @@
     {
       "name": "cuddle",
       "help": {
-        "description": "Cuddle someone and give them a warm feeling",
-        "usage": "\n`!cuddle <@user>`",
+        "usage": "\n`!cuddle <@user>` - Cuddle someone and give them a warm feeling",
         "category": "Action"
       }
     },
     {
       "name": "daily",
       "help": {
-        "description": "Gather your daily payouts every day and occasionally get bonus money.",
-        "usage": "\n`!daily` *(alias `!dailies`)*",
+        "usage": "\n`!daily` - Gather your daily payouts every day and occasionally get bonus money. *(alias `!dailies`)*",
         "category": "Currency"
       }
     },
@@ -184,24 +174,22 @@
       "help": {
         "description": "Disable Trixie from listening to some commands or channels",
         "permissions": "Administrator or Manage Server",
-        "usage": "\n`!disable`\n\n`!disable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "usage": "\n`!disable`\n\n`!disable channel <#channel>` - Disable Trixie from listening to a channel\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>` - Disable a command\n`command name` - The name of a command or a space seperated list of commands",
         "category": "Moderation"
       }
     },
     {
       "name": "dog",
       "help": {
-        "description": "Random dog image :3",
-        "usage": "\n`!dog` *(alias `!doggo`, `!puppy`, `!bork`, `!pup`)*",
+        "usage": "\n`!dog` - Random dog image :3 *(alias `!doggo`, `!puppy`, `!bork`, `!pup`)*",
         "category": "Image"
       }
     },
     {
       "name": "dolan",
       "help": {
-        "description": "Translate something into dolan duck-ish",
         "rateLimiter": "2 times in 1 hour",
-        "usage": "\n`!dolan <text>`\n`text` - The text to translate",
+        "usage": "\n`!dolan <text>` - Translate something into dolan duck-ish\n`text` - The text to translate",
         "category": "Text"
       }
     },
@@ -226,23 +214,21 @@
       "help": {
         "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
         "permissions": "Administrator or Manage Server",
-        "usage": "\n`!enable`\n\n`!enable channel <#channel>`\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>`\n`command name` - The name of a command or a space seperated list of commands",
+        "usage": "\n`!enable`\n\n`!enable channel <#channel>` - Enable Trixie from listening to a channel again\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>` - Enable a command again\n`command name` - The name of a command or a space seperated list of commands",
         "category": "Moderation"
       }
     },
     {
       "name": "face",
       "help": {
-        "description": "Get a random ASCII face",
-        "usage": "\n`!face`",
+        "usage": "\n`!face` - Get a random ASCII face",
         "category": "Misc"
       }
     },
     {
       "name": "fact",
       "help": {
-        "description": "Gets random UberFacts fact",
-        "usage": "\n`!fact` *(alias `!uberfacts`)*",
+        "usage": "\n`!fact` - Gets random UberFacts fact *(alias `!uberfacts`)*",
         "category": "Utility"
       }
     },
@@ -257,8 +243,7 @@
     {
       "name": "fox",
       "help": {
-        "description": "Random fox image :3",
-        "usage": "\n`!fox` *(alias `!foxie`, `!foxi`, `!weff`)*",
+        "usage": "\n`!fox` - Random fox image :3 *(alias `!foxie`, `!foxi`, `!weff`)*",
         "category": "Image"
       }
     },
@@ -289,16 +274,14 @@
     {
       "name": "help",
       "help": {
-        "description": "Haha, very funny",
-        "usage": "\n`!help <?command>` *(alias `!h`)*\n`command` - optional - The name of the command you want help for. Whole command list if omitted",
+        "usage": "\n`!help <?command>` - Haha, very funny *(alias `!h`)*\n`command` - optional - The name of the command you want help for. Whole command list if omitted",
         "category": "Info"
       }
     },
     {
       "name": "holdhands",
       "help": {
-        "description": "Hold hands with a cutie",
-        "usage": "\n`!holdhands <@user>`",
+        "usage": "\n`!holdhands <@user>` - Hold hands with a cutie",
         "category": "Action"
       }
     },
@@ -306,16 +289,14 @@
       "name": "horsepussy",
       "help": {
         "explicit": true,
-        "description": "Get some gud quality horse pussi OwO",
-        "usage": "\n`!horsepussy` *(alias `!horsepussi`, `!ponypussy`, `!ponypussi`, `!ponepussi`, `!ponypoossy`)*",
+        "usage": "\n`!horsepussy` - Get some gud quality horse pussi OwO *(alias `!horsepussi`, `!ponypussy`, `!ponypussi`, `!ponepussi`, `!ponypoossy`)*",
         "category": "Image"
       }
     },
     {
       "name": "hug",
       "help": {
-        "description": "Hug someone!!!",
-        "usage": "\n`!hug <@user>` *(alias `!hugs`)*",
+        "usage": "\n`!hug <@user>` - Hug someone!!! *(alias `!hugs`)*",
         "category": "Action"
       }
     },
@@ -338,40 +319,35 @@
     {
       "name": "joinvc",
       "help": {
-        "description": "Stop whatever Trixie is saying in VC",
-        "usage": "\n`!joinvc` *(alias `!join`)*",
+        "usage": "\n`!joinvc` - Stop whatever Trixie is saying in VC *(alias `!join`)*",
         "category": "Audio"
       }
     },
     {
       "name": "kiss",
       "help": {
-        "description": "Kiss someone -3-",
-        "usage": "\n`!kiss <@user>`",
+        "usage": "\n`!kiss <@user>` - Kiss someone -3-",
         "category": "Action"
       }
     },
     {
       "name": "larson",
       "help": {
-        "description": "well\nyeah",
-        "usage": "\n`!larson`",
+        "usage": "\n`!larson` - well... yeah",
         "category": "Image"
       }
     },
     {
       "name": "leavevc",
       "help": {
-        "description": "Make Trixie leave the voice channel!",
-        "usage": "\n`!leavevc` *(alias `!leave`, `!begone`)*",
+        "usage": "\n`!leavevc` - Make Trixie leave the voice channel! *(alias `!leave`, `!begone`)*",
         "category": "Audio"
       }
     },
     {
       "name": "lenny",
       "help": {
-        "description": "( ͡° ͜ʖ ͡°)",
-        "usage": "\n`!lenny`",
+        "usage": "\n`!lenny` - ( ͡° ͜ʖ ͡°)",
         "category": "Misc"
       }
     },
@@ -379,8 +355,7 @@
       "name": "lick",
       "help": {
         "explicit": true,
-        "description": "Lick someone clean!",
-        "usage": "\n`!lick <@user>`",
+        "usage": "\n`!lick <@user>` - Lick someone clean!",
         "category": "Action"
       }
     },
@@ -396,8 +371,7 @@
     {
       "name": "mlem",
       "help": {
-        "description": "Mlem the chat :3",
-        "usage": "\n`!mlem`",
+        "usage": "\n`!mlem` - Mlem the chat :3",
         "category": "Action"
       }
     },
@@ -420,33 +394,29 @@
     {
       "name": "muteword",
       "help": {
-        "description": "Mute/Blacklist specific words in this server",
         "permissions": "Manage Messages",
-        "usage": "\n`!muteword <phrase>` *(alias `!muteword add`)*\n`phrase` - Word or phrase to be muted/blacklisted\n\n`!muteword remove <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted\n\n`!muteword clear` - Remove all muted words\n\n`!muteword list` - list all muted words and phrases",
+        "usage": "\n`!muteword <phrase>` - Mute/Blacklist specific words in this server *(alias `!muteword add`)*\n`phrase` - Word or phrase to be muted/blacklisted\n\n`!muteword remove <phrase>`\n`phrase` - Word or phrase to be unmuted/unblacklisted\n\n`!muteword clear` - Remove all muted words\n\n`!muteword list` - list all muted words and phrases",
         "category": "Moderation"
       }
     },
     {
       "name": "nom",
       "help": {
-        "description": "nomnom someone",
-        "usage": "\n`!nom <@user>` *(alias `!nomnom`)*",
+        "usage": "\n`!nom <@user>` - nomnom someone *(alias `!nomnom`)*",
         "category": "Action"
       }
     },
     {
       "name": "nuzzle",
       "help": {
-        "description": "Nuzzle someone",
-        "usage": "\n`!nuzzle <@user>`",
+        "usage": "\n`!nuzzle <@user>` - Nuzzle someone",
         "category": "Action"
       }
     },
     {
       "name": "pat",
       "help": {
-        "description": "*patpat*",
-        "usage": "\n`!pat <@user>`",
+        "usage": "\n`!pat <@user>` - *patpat*",
         "category": "Action"
       }
     },
@@ -470,25 +440,22 @@
     {
       "name": "pirate",
       "help": {
-        "description": "Translate something into pirate-ish",
         "rateLimiter": "2 times in 1 hour",
-        "usage": "\n`!pirate <text>`\n`text` - The text to translate",
+        "usage": "\n`!pirate <text>` - Translate something into pirate-ish\n`text` - The text to translate",
         "category": "Text"
       }
     },
     {
       "name": "point",
       "help": {
-        "description": "Point at someone",
-        "usage": "\n`!point <@user>`",
+        "usage": "\n`!point <@user>` - Point at someone",
         "category": "Action"
       }
     },
     {
       "name": "poke",
       "help": {
-        "description": "Poke poke",
-        "usage": "\n`!poke <@user>`",
+        "usage": "\n`!poke <@user>` - Poke poke",
         "category": "Action"
       }
     },
@@ -535,80 +502,70 @@
     {
       "name": "serverinfo",
       "help": {
-        "description": "Receive information about this server",
-        "usage": "\n`!serverinfo`",
+        "usage": "\n`!serverinfo` - Receive information about this server",
         "category": "Info"
       }
     },
     {
       "name": "shibe",
       "help": {
-        "description": "Random SHIBE image :3",
-        "usage": "\n`!shibe` *(alias `!shiba`)*",
+        "usage": "\n`!shibe` - Random SHIBE image :3 *(alias `!shiba`)*",
         "category": "Image"
       }
     },
     {
       "name": "shrug",
       "help": {
-        "description": "¯\\_(ツ)_/¯",
-        "usage": "\n`!shrug`",
+        "usage": "\n`!shrug` - ¯\\_(ツ)_/¯",
         "category": "Misc"
       }
     },
     {
       "name": "slap",
       "help": {
-        "description": "Slap someone real dirty >:c",
-        "usage": "\n`!slap <@user>`",
+        "usage": "\n`!slap <@user>` - Slap someone real dirty >:c",
         "category": "Action"
       }
     },
     {
       "name": "smile",
       "help": {
-        "description": "Smile at someone",
-        "usage": "\n`!smile <@user>`",
+        "usage": "\n`!smile <@user>` - Smile at someone",
         "category": "Action"
       }
     },
     {
       "name": "smol",
       "help": {
-        "description": "Make teeeeny tiny text",
-        "usage": "\n`!smol <string|user>` *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
+        "usage": "\n`!smol <string|user>` - Make teeeeny tiny text *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
         "category": "Text"
       }
     },
     {
       "name": "snuggle",
       "help": {
-        "description": "Snuggle someone and die from the cuteness!!! >3<",
-        "usage": "\n`!snuggle <@user>`",
+        "usage": "\n`!snuggle <@user>` - Snuggle someone and die from the cuteness!!! >3<",
         "category": "Action"
       }
     },
     {
       "name": "stare",
       "help": {
-        "description": "Stare at someone :eyes:",
-        "usage": "\n`!stare <@user>`",
+        "usage": "\n`!stare <@user>` - Stare at someone :eyes:",
         "category": "Action"
       }
     },
     {
       "name": "stats",
       "help": {
-        "description": "Get some stats about the alive-ness of this server",
-        "usage": "\n`!stats`",
+        "usage": "\n`!stats` - Get some stats about the alive-ness of this server",
         "category": "Info"
       }
     },
     {
       "name": "stopvc",
       "help": {
-        "description": "Stop whatever Trixie is saying in VC",
-        "usage": "\n`!stopvc` *(alias `!stop`)*",
+        "usage": "\n`!stopvc` - Stop whatever Trixie is saying in VC *(alias `!stop`)*",
         "category": "Audio"
       }
     },
@@ -622,16 +579,14 @@
     {
       "name": "tableflip",
       "help": {
-        "description": "(╯°□°）╯︵ Tableflip",
-        "usage": "\n`!tableflip` *(alias `!tf`)*",
+        "usage": "\n`!tableflip` - (╯°□°）╯︵ Tableflip *(alias `!tf`)*",
         "category": "Action"
       }
     },
     {
       "name": "tickle",
       "help": {
-        "description": "Nuuuu I'm so ticklish!!!! >~<\nTickle someone",
-        "usage": "\n`!tickle <@user>`",
+        "usage": "\n`!tickle <@user>` - Nuuuu I'm so ticklish!!!! >~<\nTickle someone",
         "category": "Action"
       }
     },
@@ -646,8 +601,7 @@
     {
       "name": "touch",
       "help": {
-        "description": "Touch someone o.o\"",
-        "usage": "\n`!touch <@user>`",
+        "usage": "\n`!touch <@user>` - Touch someone o.o\"",
         "category": "Action"
       }
     },
@@ -700,16 +654,14 @@
     {
       "name": "untableflip",
       "help": {
-        "description": "That's right, put it back where it was ノ( ゜-゜ノ)",
-        "usage": "\n`!untableflip` *(alias `!utf`)*",
+        "usage": "\n`!untableflip` - That's right, put it back where it was ノ( ゜-゜ノ) *(alias `!utf`)*",
         "category": "Action"
       }
     },
     {
       "name": "userstats",
       "help": {
-        "description": "Get some stats about how active someone is on the server",
-        "usage": "\n`!userstats <?@user>`\n`@user` - optional - The member c:",
+        "usage": "\n`!userstats <?@user>` - Get some stats about how active someone is on the server\n`@user` - optional - The member c:",
         "category": "Info"
       }
     },
@@ -733,7 +685,7 @@
       "name": "waifu",
       "help": {
         "description": "This tool helps you manage your waifus with ease!",
-        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu buyslot`",
+        "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu buyslot` - Buy additional waifu slots with Trixie's currency",
         "category": "Action"
       }
     },
@@ -748,9 +700,8 @@
     {
       "name": "yoda",
       "help": {
-        "description": "Translate something into yoda-ish",
         "rateLimiter": "2 times in 1 hour",
-        "usage": "\n`!yoda <text>`\n`text` - The text to translate",
+        "usage": "\n`!yoda <text>` - Translate something into yoda-ish\n`text` - The text to translate",
         "category": "Text"
       }
     }

@@ -33,8 +33,7 @@ module.exports = function install(cr) {
             return tinytext(mention.displayName);
         }))
         .setHelp(new HelpContent()
-            .setDescription("Make teeeeny tiny text")
-            .setUsage("<string|user>")
+            .setUsage("<string|user>", "Make teeeeny tiny text")
             .addParameter("string|user", "text or user to smollerize uwu"))
         .setCategory(Category.TEXT)
         .setScope(CommandScope.ALL);

@@ -10,6 +10,8 @@
     * XP System
     * Reputation System (Reputation level shown in profile, @Loneless 🍩 or 🍩 as reaction to +1)
     * Badges (default badges by Trixie and custom badges that a server can create, incl. automatic assignment on specific custom events)
+* Add Database abstraction that makes it easier to keep track of all database tables and operations
+    * then allow users to export their data 
 
 ## Things I really really want
 

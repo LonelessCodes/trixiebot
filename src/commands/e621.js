@@ -238,7 +238,7 @@ async function process(message, msg, type) {
             str += `*<https://e621.net/post/show/${result.id}>* `;
             str += result.image_url;
             return str;
-        }).join("\n"),
+        }).join("\n")
     ).separator("\n");
 }
 

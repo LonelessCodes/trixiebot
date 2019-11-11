@@ -47,7 +47,7 @@ async function byID(database, message, id) {
         return new Translation(
             "autoban.not_valid_id",
             "`{{id}}` is not a valid user ID. User IDs contain only digits. U dumbo",
-            { id },
+            { id }
         );
     }
 
@@ -83,7 +83,7 @@ async function byName(database, message, name) {
         .setDescription(new Translation(
             "autoban.added_as_id",
             ":police_car: Found `{{name}}`'s user ID. Added `{{id}}` as an ID",
-            { name, id },
+            { name, id }
         ));
 }
 
@@ -92,7 +92,7 @@ async function byGlob(database, message, pattern) {
 
     return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
         .setDescription(new Translation(
-            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern },
+            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern }
         ));
 }
 
@@ -101,7 +101,7 @@ async function byRegex(database, message, regex) {
 
     return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY)
         .setDescription(new Translation(
-            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern: regex },
+            "autoban.added_pattern", ":police_car: Added `{{pattern}}` as a pattern", { pattern: regex }
         ));
 }
 
@@ -162,7 +162,7 @@ module.exports = function install(cr, { client, db }) {
                     .setDescription(new Translation(
                         "autoban.no_configs",
                         "No autoban configs yet. Add some by using `{{prefix}}autoban <userID\\|username#0000\\|glob>`",
-                        { prefix: context.prefix },
+                        { prefix: context.prefix }
                     ));
             }
 
@@ -172,7 +172,7 @@ module.exports = function install(cr, { client, db }) {
                 "Autobans",
                 new Translation("autoban.all_configs", "All the configured autobans for this server"),
                 items, context.author, context.guild,
-                { items_per_page: 20 },
+                { items_per_page: 20 }
             ).display(context.channel, await context.translator());
         }))
         .registerOverload("1+", new SimpleCommand(({ content, message }) => {
@@ -218,7 +218,7 @@ module.exports = function install(cr, { client, db }) {
                     .setDescription(new Translation(
                         "autoban.no_configs",
                         "No autoban configs yet. Add some by using `{{prefix}}autoban <userID|username#0000|glob>`",
-                        { prefix: context.prefix },
+                        { prefix: context.prefix }
                     ));
             }
 
@@ -228,7 +228,7 @@ module.exports = function install(cr, { client, db }) {
                 "Removable Autobans",
                 new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove."),
                 items, context.author, context.guild,
-                { items_per_page: 20, number_items: true },
+                { items_per_page: 20, number_items: true }
             ).display(context.channel, await context.translator());
 
             const msgs = await context.channel.awaitMessages(m => m.author.id === context.author.id && /[0-9]+/.test(m.content), { maxMatches: 1, time: 60000 });
@@ -245,7 +245,7 @@ module.exports = function install(cr, { client, db }) {
                         .setDescription(new Translation(
                             "autoban.deleted",
                             "Deleted `{{id}}` :rotating_light:",
-                            { id: row.content },
+                            { id: row.content }
                         ));
 
                     await context.send({ embed });
@@ -266,7 +266,7 @@ module.exports = function install(cr, { client, db }) {
                 .setDescription(new Translation(
                     "autoban.deleted",
                     "Deleted `{{id}}` :rotating_light:",
-                    { id: content },
+                    { id: content }
                 ));
         }));
 

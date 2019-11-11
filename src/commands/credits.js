@@ -213,7 +213,7 @@ module.exports = function install(cr, { locale }) {
             new PaginatorAction(
                 new Translation("bank.transactions", "Transactions"),
                 new Translation("bank.transactions_desc", "All of {{user}}'s (your) transactions", { user: userToString(user) }),
-                items, context.author, { items_per_page: 1 },
+                items, context.author, { items_per_page: 1 }
             ).display(context.channel, await context.translator());
         } else {
             return new Translation("bank.trans_no_money_yet", "Looks like you didn't earn or spend money yet! Let's start by `{{prefix}}daily`, to earn some munz", { prefix: context.prefix });

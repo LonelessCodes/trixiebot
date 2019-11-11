@@ -17,7 +17,7 @@ const regex = (input, flags) => new RegExp(input, flags);
 
 const r_line_terminator = merge(
     esc("n"),
-    esc("r"),
+    esc("r")
 );
 const non_terminator = (input = "") => negateSet(r_line_terminator + input);
 

@@ -198,7 +198,7 @@ module.exports = function install(cr, { client, error_cases }) {
                 "Content\n" +
                 `${err.content.replace("`", "´")}\n` +
                 `${err.err.stack}\n` +
-                "```",
+                "```"
             );
         }
 

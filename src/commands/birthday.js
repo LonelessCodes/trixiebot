@@ -182,7 +182,7 @@ module.exports = async function install(cr, { client, db }) {
                 `All birthdays in month ${pad(month + 1, 2)}`,
                 // new Translation("birthday.birthday", "Birthdays"),
                 // new Translation("birthday.title", "All birthdays in month {{month}}", { month: pad(month + 1, 2) }),
-                members, message.author, message.guild, { items_per_page: 15 },
+                members, message.author, message.guild, { items_per_page: 15 }
             ).display(message.channel, await translator());
         }));
 

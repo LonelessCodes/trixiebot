@@ -31,7 +31,7 @@ function graph(uom, r, length, girth) {
         new Translation("penis.length", "Length:"),
         `**${(length * r).toFixed(1)} ${uom}**  `,
         new Translation("penis.girth", "Girth:"),
-        `**${(girth * r).toFixed(1)} ${uom}**`,
+        `**${(girth * r).toFixed(1)} ${uom}**`
     );
 }
 
@@ -69,7 +69,7 @@ module.exports = function install(cr, { client, db }) {
             const girth = 18;
             return new TranslationMerge(
                 pp(length) + " ( ͡° ͜ʖ ͡°)",
-                graph(uom, r, length, girth),
+                graph(uom, r, length, girth)
             ).separator("\n");
         }
 
@@ -89,14 +89,14 @@ module.exports = function install(cr, { client, db }) {
 
             return new TranslationMerge(
                 pp(length),
-                graph(uom, r, length, girth),
+                graph(uom, r, length, girth)
             ).separator("\n");
         } else {
             const { length, girth } = doc;
 
             return new TranslationMerge(
                 pp(length),
-                graph(uom, r, length, girth),
+                graph(uom, r, length, girth)
             ).separator("\n");
         }
     }));
@@ -116,15 +116,15 @@ module.exports = function install(cr, { client, db }) {
             items.push(
                 await ctx.translate(new TranslationMerge(
                     "**" + pp(penis.length) + `   ${member.user.tag}**`,
-                    graph(uom, r, penis.length, penis.girth),
-                ).separator("\n")),
+                    graph(uom, r, penis.length, penis.girth)
+                ).separator("\n"))
             );
         }
 
         new PaginatorGuildAction(
             "Penis Leaderboard",
             new Translation("penis.top_penises", "The top penises in this server"),
-            items, message.author, message.guild, { items_per_page: 20, number_items: true },
+            items, message.author, message.guild, { items_per_page: 20, number_items: true }
         ).display(message.channel, await ctx.translator());
     }))
         .setHelp(new HelpContent()

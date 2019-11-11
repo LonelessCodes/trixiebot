@@ -253,7 +253,7 @@ module.exports = function install(cr, { db }) {
             });
             await ctx.edit(m2, "... ***ATTACC***", new TranslationEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
-                .setAuthor(new Translation("waifu.steal.success", "Successful steal!!! {{user}} now belongs to you!", { user: userToString(waifuUser, true) }), waifuUser.user.avatarURL),
+                .setAuthor(new Translation("waifu.steal.success", "Successful steal!!! {{user}} now belongs to you!", { user: userToString(waifuUser, true) }), waifuUser.user.avatarURL)
             );
             await timeout(60000);
             await m1.delete().catch(() => { /* Do nothing */ });

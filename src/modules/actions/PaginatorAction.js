@@ -120,7 +120,7 @@ class PaginatorAction extends events.EventEmitter {
     pagination(message, translator, page_num) {
         const collector = message.createReactionCollector(
             (reaction, user) => this.checkReaction(reaction, user),
-            { time: this.timeout, max: 1 },
+            { time: this.timeout, max: 1 }
         );
 
         collector.on("end", (collected, reason) => {
@@ -216,7 +216,7 @@ class PaginatorAction extends events.EventEmitter {
         embed.setDescription(rows.separator("\n"));
 
         if (this.show_page_numbers) embed.setFooter(new Translation(
-            "paginator.page", "Page {{page}}", { page: `${page_num}/${this.page_count}` },
+            "paginator.page", "Page {{page}}", { page: `${page_num}/${this.page_count}` }
         ));
 
         return [

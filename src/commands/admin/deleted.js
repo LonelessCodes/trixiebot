@@ -140,9 +140,9 @@ module.exports = function install(cr, { client, db }) {
         new PaginatorGuildAction(
             new Translation("deleted.title", "Deleted Messages"),
             new Translation(
-                "deleted.description", "Messages deleted or edited by users: **{{count}}**\n", { count: items.length },
+                "deleted.description", "Messages deleted or edited by users: **{{count}}**\n", { count: items.length }
             ),
-            items, context.author, context.guild, { items_per_page: page_limit },
+            items, context.author, context.guild, { items_per_page: page_limit }
         ).display(context.channel, await context.translator());
     }));
 };

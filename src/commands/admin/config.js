@@ -145,7 +145,7 @@ module.exports = function install(cr, { config }) {
                 parameter.types
                     .concat(parameter.allowEmpty ? ["none"] : [])
                     .map(t => types_human.get(t) || `\`${t}\``),
-                { type: "or" },
+                { type: "or" }
             ));
         }
 
@@ -165,7 +165,7 @@ module.exports = function install(cr, { config }) {
                     parameter.types
                         .concat(parameter.allowEmpty ? ["none"] : [])
                         .map(t => types_human.get(t) || `\`${t}\``),
-                    { type: "or" },
+                    { type: "or" }
                 ),
             }));
         } else {

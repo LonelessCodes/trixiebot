@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.16.5"></a>
+## [2.16.5](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.4...v2.16.5) (2019-11-11)
+
+
+### Bug Fixes
+
+* **backport:** fixed Paginator reaction removal ([59de3cf](https://bitbucket.org/Loneless/trixiebot/commits/59de3cf))
+
+
+
 <a name="2.16.4"></a>
 ## [2.16.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.3...v2.16.4) (2019-11-09)
 

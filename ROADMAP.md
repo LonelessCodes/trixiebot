@@ -18,6 +18,7 @@
 * Mod Log (in a channel and on web)
 * ban, kick und tempban commands. warn/strike commands
 * Make basic custom commands work
+* create packages for code used by both trixiebot and trixieweb
 
 ## 2019
 

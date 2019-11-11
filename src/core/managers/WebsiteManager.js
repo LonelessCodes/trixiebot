@@ -57,9 +57,7 @@ class WebsiteManager {
         this.initializeIPC();
     }
 
-    async initializeIPC() {
-        await ipc.promiseStart;
-
+    initializeIPC() {
         /**
          * @param {Date} ts
          * @returns {string}

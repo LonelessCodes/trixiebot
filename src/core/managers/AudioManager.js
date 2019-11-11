@@ -91,9 +91,7 @@ class VCGuild extends EventEmitter {
         if (!this.vc.connection) {
             await this.vc.join();
 
-            this.vc.connection.once("disconnect", () => {
-                this.leave();
-            });
+            this.vc.connection.once("disconnect", () => this.leave());
         }
 
         this.emit("connected", this.vc.connection);

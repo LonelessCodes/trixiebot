@@ -300,7 +300,7 @@ class SampleUploader extends Events {
             throw err;
         }
 
-        this._setStatus(new Translation("sb.checking_errors", "Checking converted file for errors..."));
+        // this._setStatus(new Translation("sb.checking_errors", "Checking converted file for errors..."));
 
         // try {
         //     await ffprobe(sample.file);

@@ -15,14 +15,14 @@
  */
 
 const { basicEmbed } = require("../../../util/util");
-const Events = require("events");
+const events = require("events");
 const AudioManager = require("../AudioManager");
 // eslint-disable-next-line no-unused-vars
 const { PredefinedSample, UserSample, GuildSample } = require("./Sample");
 // eslint-disable-next-line no-unused-vars
 const { User, Guild, TextChannel, Message, MessageReaction, Permissions } = require("discord.js");
 
-class SampleList extends Events {
+class SampleList extends events.EventEmitter {
     /**
      * @param {User} user
      * @param {Guild} guild

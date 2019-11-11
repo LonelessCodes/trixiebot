@@ -247,12 +247,13 @@ class Monitor extends events.EventEmitter {
 }
 
 /**
- * @param {string[]} command
+ * @param {string[]|string} command
  * @param {{}} opts
  * @returns {Monitor}
  */
 function respawn(command, opts) {
-    if (typeof command !== "function" && !Array.isArray(command)) return respawn(command.command, command);
+    if (typeof command === "object" && !Array.isArray(command)) return respawn(command.command, command);
+    if (!Array.isArray(command)) command = [command];
     return new Monitor(command, opts || {});
 }
 

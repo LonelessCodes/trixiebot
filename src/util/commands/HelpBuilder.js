@@ -27,17 +27,14 @@ class HelpBuilder extends RichEmbed {
     constructor(message, name, command) {
         super();
 
-        const help = command.help;
+        const prefix = message.channel.type === "text" ? message.prefix : "";
 
         this.setColor(CONST.COLOR.PRIMARY);
         this.setAuthor(`${ucFirst(name)} command`, message.client.user.avatarURL);
-        if (help.description) this.setDescription(help.description);
 
-        const prefix = message.channel.type === "text" ? message.prefix : "";
-
+        if (command.help.description) this.setDescription(command.help.description);
         if (command.permissions && command.permissions !== CommandPermission.USER)
             this.addField("Permissions required:", command.permissions.toString());
-
         if (command.rateLimiter)
             this.addField("Rate Limiting:", command.rateLimiter.toString());
 

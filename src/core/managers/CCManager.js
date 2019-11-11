@@ -124,7 +124,7 @@ class CCManager {
 
         const dir = path.join(__dirname, "cc_worker");
         const file = path.join(dir, "worker.js");
-        this.fork = respawn([file], { cwd: dir, fork: true, env: process.env }).restart();
+        this.fork = respawn(file, { cwd: dir, fork: true, env: process.env }).restart();
         this.cpc = cpc(this.fork);
         this.cpc.addListener("ready", () => {
             const time = nanoTimer.diff(timer) / nanoTimer.NS_PER_MS;

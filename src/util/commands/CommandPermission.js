@@ -15,18 +15,15 @@
  */
 
 const { isOwner } = require("../util");
+const { ucFirst } = require("../string");
 // eslint-disable-next-line no-unused-vars
 const { Permissions, GuildMember, User } = require("discord.js");
 
 const { FLAGS } = Permissions;
 
-function ucFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 const NAMES = new Map;
 for (const key in FLAGS) {
-    NAMES.set(FLAGS[key], key.split(/_/g).map(v => ucFirst(v.toLowerCase())).join(" ")); // Most hacky but perfect
+    NAMES.set(FLAGS[key], ucFirst(key.replace(/_/g, " ").toLowerCase())); // Most hacky but perfect
 }
 
 class CommandPermission {

@@ -101,7 +101,7 @@
   "general": {
     "lang_name": "English",
     "lang_name_en": "English",
-    "error": "Uh... I... uhm I think... I might have run into a problem there...? It's not your fault, though...",
+    "error": "Uh... I think... I might've run into a problem there...?\nIf you believe this is unintended behaviour, report the error with `{{prefix}}reporterror {{caseId}}`",
     "introduction": "**Trixie is an all-in-one Discord Bot for pony lovers**\n\nShe offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins.\n\nHer set of commands range from utility stuff, simple fun, imageboard commands, custom commands, soundboards, to even a full web dashboard to configure Trixie and watch the growth of your server and so much more!\n\nFor a list of all commands, go `{{prefix}}help`.",
     "github": "Help the development of TrixieBot on <https://github.com/LonelessCodes/trixiebot> :heart::heart::heart:",
     "report_bug": "Report bugs and submit feature requests at <https://github.com/LonelessCodes/trixiebot/issues>",
@@ -143,7 +143,7 @@
     "blackjack": "BLACKJACK"
   },
   "sb": {
-    "checking": "Checking data...",
+    "checking": "Checking file data...",
     "error": {
       "too_big": "The file is too big! Please try to keep it below 4 MB. Even WAV can do that",
       "unsupported": "{{extname}} files are not supported at this time. Try uploading {{supported}} files.",
@@ -166,7 +166,7 @@
     "saving": "Saving to database and finishing up..."
   },
   "autoban": {
-    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userID\\|username#0000\\|glob>`",
+    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userID|username#0000|glob>`",
     "not_valid_id": "`{{id}}` is not a valid user ID. User IDs contain only digits. U dumbo",
     "added_id": ":police_car: Added `{{id}}` as an ID",
     "added_name": ":police_car: Added `{{name}}`",

@@ -34,7 +34,10 @@ walk("./src/").then(files => {
             return obj[index];
         }, tree);
 
-        if (val) continue;
+        if (val &&
+            val.one && val.one === item.phrase.one &&
+            val.other && val.other === item.phrase.other) continue;
+        if (val && val === item.phrase) continue;
 
         // Split the provided term and run the callback for each subterm.
         const split = item.id.split(".");

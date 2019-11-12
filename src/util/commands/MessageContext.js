@@ -85,11 +85,8 @@ class MessageContext {
      * @returns {Promise<{ global: string, channels: Object<string, string>} | string>}
      */
     locale(ch) {
-        if (!ch) {
-            return this._locale.get(this.guild.id);
-        } else {
-            return this._locale.get(ch.guild.id, ch.id);
-        }
+        if (ch instanceof TextChannel) return this._locale.get(ch.guild.id, ch.id);
+        else return this._locale.get(this.guild.id);
     }
 
     /**

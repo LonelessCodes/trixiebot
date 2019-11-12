@@ -74,16 +74,16 @@ class CommandDispatcher {
     }
 
     async rateLimit(context, command_name) {
-        if (!this.global_ratelimit || (this.global_ratelimit_message && !this.global_ratelimit_message.testAndAdd(`${command_name}:${context.guild.id}:${context.channel.id}`))) return;
+        if (!this.global_ratelimit_message.testAndAdd(`${command_name}:${context.guild.id}:${context.channel.id}`)) return;
 
         await context.send(new TranslationPlural("command.ratelimit", [
             "Whoa whoa not so fast! You may only do this {{count}} time every {{time_frame}}. " +
             "There is still {{time_left}} left to wait.",
             "Whoa whoa not so fast! You may only do this {{count}} times every {{time_frame}}. " +
             "There is still {{time_left}} left to wait.",
-        ], this.global_ratelimit.max, {
+        ], {
             count: this.global_ratelimit.max,
-            time_frame: this.global_ratelimit.timeUnit.toString(),
+            time_frame: this.global_ratelimit.timeUnit.toTranslation(this.global_ratelimit.timeNum),
             time_left: toHumanTime(this.global_ratelimit.tryAgainIn(context.author.id)),
         }));
     }

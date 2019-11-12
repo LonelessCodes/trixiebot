@@ -66,7 +66,6 @@ class BaseCommand {
                 "Whoa whoa not so fast! You may only do this {{count}} time every {{time_frame}}. There is still {{time_left}} left to wait.",
                 "Whoa whoa not so fast! You may only do this {{count}} times every {{time_frame}}. There is still {{time_left}} left to wait.",
             ],
-            this.rateLimiter.max,
             {
                 count: this.rateLimiter.max,
                 time_frame: this.rateLimiter.timeUnit.toTranslation(),

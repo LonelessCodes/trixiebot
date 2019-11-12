@@ -49,7 +49,7 @@ module.exports = function install(cr, { database }) {
         return new TranslationPlural("disable.success_ch", [
             "Channel {{channels}} will no longer listen to commands",
             "Channels {{channels}} will no longer listen to commands",
-        ], channels.size, { channels: new ListFormat(channels.map(c => c.toString())) });
+        ], { count: channels.size, channels: new ListFormat(channels.map(c => c.toString())) });
     })).setHelp(new HelpContent()
         .setUsage("<#channel>", "Disable Trixie from listening to a channel")
         .addParameter("#channel", "A channel or multiple channels"));
@@ -76,7 +76,7 @@ module.exports = function install(cr, { database }) {
         return new TranslationPlural("disable.success_cmd", [
             "Command {{commands}} will no longer listen",
             "Commands {{commands}} will no longer listen",
-        ], commands.length, { commands: new ListFormat(commands) });
+        ], { count: commands.length, commands: new ListFormat(commands) });
     })).setHelp(new HelpContent()
         .setUsage("<command name>", "Disable a command")
         .addParameter("command name", "The name of a command or a space seperated list of commands"));
@@ -103,7 +103,7 @@ module.exports = function install(cr, { database }) {
         return new TranslationPlural("enable.success_ch", [
             "Channel {{channels}} will listen to commands again",
             "Channels {{channels}} will listen to commands again",
-        ], channels.size, { channels: new ListFormat(channels.map(c => c.toString())) });
+        ], { count: channels.size, channels: new ListFormat(channels.map(c => c.toString())) });
     })).setHelp(new HelpContent()
         .setUsage("<#channel>", "Enable Trixie from listening to a channel again")
         .addParameter("#channel", "A channel or multiple channels"));
@@ -130,7 +130,7 @@ module.exports = function install(cr, { database }) {
         return new TranslationPlural("enable.success_cmd", [
             "Command {{commands}} will listen again",
             "Commands {{commands}} will listen again",
-        ], commands.length, { commands: new ListFormat(commands) });
+        ], { count: commands.length, commands: new ListFormat(commands) });
     })).setHelp(new HelpContent()
         .setUsage("<command name>", "Enable a command again")
         .addParameter("command name", "The name of a command or a space seperated list of commands"));

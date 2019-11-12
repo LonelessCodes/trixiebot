@@ -18,11 +18,17 @@ const Resolvable = require("./Resolvable");
 const { formatter } = require("./i18n_utils");
 
 class TranslationPlural extends Resolvable {
-    constructor(id, phrase, count, args) {
+    // eslint-disable-next-line valid-jsdoc
+    /**
+     * @param {string} id
+     * @param {string[]} phrase
+     * @param {{ [arg: string]: Resolvable|string; count: Resolvable|string|number; }} args
+     */
+    constructor(id, phrase, args) {
         super();
         this.id = id;
         this.phrase = phrase;
-        this.count = count;
+        this.count = Number(args["count"]);
         this.args = args;
     }
 
@@ -34,8 +40,7 @@ class TranslationPlural extends Resolvable {
         return new TranslationPlural(
             this.id,
             Array.isArray(this.phrase) ? this.phrase.slice() : Object.assign({}, this.phrase),
-            typeof num === "number" ? num : this.count,
-            this.args
+            typeof num === "number" ? Object.assign({}, this.args, { count: num }) : Object.assign({}, this.args)
         );
     }
 

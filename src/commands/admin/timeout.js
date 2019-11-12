@@ -254,8 +254,8 @@ module.exports = function install(cr, { db }) {
             await ctx.send(new TranslationPlural(
                 "timeout.success",
                 ["{{users}} is now timeouted for the next {{timeLeft}}", "{{users}} are now timeouted for the next {{timeLeft}}"],
-                members.size,
                 {
+                    count: members.size,
                     users: new ListFormat(members.map(member => userToString(member))),
                     timeLeft: timestr,
                 }

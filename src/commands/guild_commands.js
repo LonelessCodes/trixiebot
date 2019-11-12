@@ -73,10 +73,10 @@ function getString(start, end, [commands = [], messages = [], users = []]) {
     const list = new ListFormat();
 
     const msgs_total = messages.reduce((sum, entry) => sum + entry.value, 0);
-    list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], msgs_total, { count: msgs_total }));
+    list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], { count: msgs_total }));
 
     const cmds_total = commands.reduce((sum, entry) => sum + entry.value, 0);
-    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], cmds_total, { count: cmds_total }));
+    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], { count: cmds_total }));
 
     const joined_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.added, 0);
     const left_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.removed, 0);
@@ -105,10 +105,10 @@ function getAverageString(start, divider, [commands = [], messages = [], users =
     const list = new ListFormat();
 
     const msgs_total = messages.reduce((sum, entry) => sum + entry.value, 0) / divider;
-    list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], msgs_total, { count: msgs_total.toFixed(2) }));
+    list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], { count: msgs_total.toFixed(2) }));
 
     const cmds_total = commands.reduce((sum, entry) => sum + entry.value, 0) / divider;
-    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], cmds_total, { count: cmds_total.toFixed(2) }));
+    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], { count: cmds_total.toFixed(2) }));
 
     const joined_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.added, 0);
     const left_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.removed, 0);

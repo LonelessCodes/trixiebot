@@ -62,27 +62,23 @@ class PaginatorAction extends events.EventEmitter {
         this.wrap_page_ends = wrap_page_ends;
         this.number_items = number_items;
         this.prefix_suffix = [prefix_suffix[0] || "", prefix_suffix[1] || ""];
-
-        /** @type {Message} */
-        this.message = null;
     }
 
     /**
      * Begins pagination on page 1 as a new Message in the provided TextChannel
      * @param {TextChannel} channel The channel to render the Paginator in
      * @param {I18nLocale} translator The translator object to build the messages
-     * @returns {PaginatorAction}
+     * @returns {Promise<Message>}
      */
-    display(channel, translator) {
-        this.paginate(channel, translator, 1);
-        return this;
+    async display(channel, translator) {
+        return await this.paginate(channel, translator, 1);
     }
 
     /**
      * @param {TextChannel} channel
      * @param {I18nLocale} translator
      * @param {number} page_num
-     * @returns {void}
+     * @returns {Promise<Message>}
      */
     async paginate(channel, translator, page_num) {
         if (page_num < 1)
@@ -90,17 +86,17 @@ class PaginatorAction extends events.EventEmitter {
         else if (page_num > this.page_count)
             page_num = this.page_count;
 
-        const msg = this.renderPage(page_num).map(elem => Resolvable.resolve(elem, translator));
-        this.initialize(await channel.send(...msg), translator, page_num);
+        const page = this.renderPage(page_num).map(elem => Resolvable.resolve(elem, translator));
+        return await this.initialize(await channel.send(...page), translator, page_num);
     }
 
     /**
      * @param {Message} message
      * @param {I18nLocale} translator
      * @param {number} page_num
+     * @returns {Promise<Message>}
      */
     async initialize(message, translator, page_num) {
-        this.message = message;
         if (this.page_count > 1) {
             await message.react(PaginatorAction.LEFT);
             await message.react(PaginatorAction.STOP);
@@ -110,6 +106,8 @@ class PaginatorAction extends events.EventEmitter {
             await message.react(PaginatorAction.STOP);
             this.pagination(message, translator, page_num);
         }
+
+        return message;
     }
 
     /**
@@ -228,7 +226,7 @@ class PaginatorAction extends events.EventEmitter {
     /**
      * @param {Message} message
      */
-    async end(message = this.message) {
+    async end(message) {
         await message.clearReactions().catch(() => { /* Do nothing */ });
         this.emit("end", message);
     }

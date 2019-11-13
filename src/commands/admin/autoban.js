@@ -229,7 +229,8 @@ module.exports = function install(cr, { client, db }) {
                 new Translation("autoban.remove_configs", "Type the number of the autoban you would like to remove."),
                 items, context.author, context.guild,
                 { items_per_page: 20, number_items: true }
-            ).display(context.channel, await context.translator());
+            );
+            const paginator_msg = await paginator.display(context.channel, await context.translator());
 
             const msgs = await context.channel.awaitMessages(m => m.author.id === context.author.id && /[0-9]+/.test(m.content), { maxMatches: 1, time: 60000 });
             if (msgs.size > 0) {
@@ -252,7 +253,7 @@ module.exports = function install(cr, { client, db }) {
                 }
             }
 
-            await paginator.end();
+            await paginator.end(paginator_msg);
         }))
         .registerOverload("1+", new SimpleCommand(async ({ guild, content }) => {
             const deleted = await database.deleteOne({ guildId: guild.id, content: content });

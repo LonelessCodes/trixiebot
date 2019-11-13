@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.1.0"></a>
+# [3.1.0](https://bitbucket.org/Loneless/trixiebot/compare/v3.0.0...v3.1.0) (2019-11-13)
+
+
+### Bug Fixes
+
+* **logging:** make trixie log without colour again, as it caused some formatting issues. (Also I don't need color anyway) ([196123f](https://bitbucket.org/Loneless/trixiebot/commits/196123f))
+* **time unit display:** fixed weird useless rate limit messages ([6ce688e](https://bitbucket.org/Loneless/trixiebot/commits/6ce688e))
+* **translations parsing:** update modified translations as well ([bada505](https://bitbucket.org/Loneless/trixiebot/commits/bada505))
+
+
+### Features
+
+* **TranslationPlural:** count as argument has been replaced by putting a "count" prop as a formatter prop ([a79bd0f](https://bitbucket.org/Loneless/trixiebot/commits/a79bd0f))
+* re-wrote the CommandDispatcher and replaced BaseCommand#beforeProcessCall() with a nicer approach ([c63a7e3](https://bitbucket.org/Loneless/trixiebot/commits/c63a7e3))
+
+
+
 <a name="3.0.0"></a>
 # [3.0.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.5...v3.0.0) (2019-11-11)
 

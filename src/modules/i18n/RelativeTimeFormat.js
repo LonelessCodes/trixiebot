@@ -21,7 +21,7 @@ class RelativeTimeFormat extends Resolvable {
     /**
      * @param {Date|moment} date
      * @param {Object} [opts]
-     * @param {"long"|"short"} [style]
+     * @param {"long"|"short"} [opts.style]
      */
     constructor(date, opts = {}) {
         super();

@@ -22,7 +22,7 @@ const MessageContext = require("../../util/commands/MessageContext");
 class SimpleCommand extends BaseCommand {
     // eslint-disable-next-line valid-jsdoc
     /**
-     * @param {(message: MessageContext, add: { pass_through: any, command_name: string }) => *} func
+     * @param {(message: MessageContext, command_name: string) => *} func
      */
     constructor(func = async () => { /* Do nothing */ }) {
         super();
@@ -30,8 +30,8 @@ class SimpleCommand extends BaseCommand {
         this.func = func;
     }
 
-    async run(context, command_name, pass_through) {
-        const result = await this.func(context, { pass_through, command_name });
+    async run(context, command_name) {
+        const result = await this.func(context, command_name);
         if (!result) return;
 
         // allow returning a [content, opts] like array

@@ -144,7 +144,7 @@ class CommandProcessor {
             prefix_used = false;
         }
 
-        const [command_name_raw, content] = splitArgs(raw_content, 2);
+        const [command_name_raw, content] = prefix_used ? splitArgs(raw_content, 2) : ["", raw_content];
         const command_name = command_name_raw.toLowerCase();
 
         const ctx = new MessageContext(message, this.locale, config, content, prefix, prefix_used, received_at);

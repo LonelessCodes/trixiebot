@@ -24,7 +24,7 @@ class TranslationPlural extends Resolvable {
      * @param {string[]} phrase
      * @param {{ [arg: string]: Resolvable|string; count: Resolvable|string|number; }} args
      */
-    constructor(id, phrase, args) {
+    constructor(id, phrase, args = {}) {
         super();
         this.id = id;
         this.phrase = phrase;

@@ -67,6 +67,11 @@ class MessageContext {
         return this.message.author;
     }
     get member() {
+        if (!this.guild) return null;
+
+        if (!this.message.member) {
+            this.message.member = this.guild.member(this.author) || null;
+        }
         return this.message.member;
     }
 

@@ -134,7 +134,7 @@ class Core {
         for (const [name, cmd] of this.processor.REGISTRY.commands) {
             if (cmd instanceof AliasCommand) continue;
             if (!cmd.help) continue;
-            if (!cmd.hasScope(CommandScope.FLAGS.GUILD)) continue;
+            if (!cmd.scope.has(CommandScope.FLAGS.GUILD)) continue;
             if (!cmd.isInSeason()) continue;
             jason.commands.push({
                 name,

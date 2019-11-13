@@ -21,48 +21,54 @@ const OverloadCommand = require("../../core/commands/OverloadCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
 const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
+const CommandScope = require("../../util/commands/CommandScope");
 const Category = require("../../util/commands/Category");
 
 const Translation = require("../../modules/i18n/Translation");
 const TranslationMerge = require("../../modules/i18n/TranslationMerge");
+const ListFormat = require("../../modules/i18n/ListFormat");
 
-module.exports = function install(cr, { db }) {
+module.exports = async function install(cr, { db }) {
     const database = db.collection("mute");
 
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
-    const muteWordCommand = cr.registerCommand("muteword", new class extends TreeCommand {
-        /**
-         * TODO: CACHE DATABASE STUFF
-         */
+    /** @type {Map<string, Set<string>>} */
+    const muted_words = new Map;
+    for (let { word, guildId } of await database.find({}).toArray()) {
+        if (muted_words.has(guildId)) muted_words.get(guildId).add(word);
+        else muted_words.set(guildId, new Set([word]));
+    }
 
-        async beforeProcessCall({ message, content }) {
-            const muted_words = (await database.find({ guildId: message.guild.id }).toArray()).map(doc => doc.word);
+    cr.registerProcessedHandler(new CommandScope(CommandScope.FLAGS.GUILD), true, async ({ message, content }) => {
+        if (!muted_words.has(message.guild.id)) return;
 
-            if (muted_words.length > 0 && !permission.test(message.member)) {
-                const msg = content.toLowerCase();
-                for (const word of muted_words) {
-                    if (msg.indexOf(word) === -1) continue;
+        const words = muted_words.get(message.guild.id);
+        if (words.size > 0 && !permission.test(message.member)) {
+            const msg = content.toLowerCase();
+            for (const word of words) {
+                if (msg.indexOf(word) === -1) continue;
 
-                    await message.delete().catch(() => { /* Do nothing */ });
-                }
+                await message.delete().catch(() => { /* Do nothing */ });
             }
-
-            return muted_words;
         }
-    })
+    });
+
+    const muteWordCommand = cr.registerCommand("muteword", new TreeCommand)
         .setHelp(new HelpContent()
             .setUsage("<phrase>", "Mute/Blacklist specific words in this server")
             .addParameter("phrase", "Word or phrase to be muted/blacklisted"))
         .setCategory(Category.MODERATION)
-        .setPermissions(permission)
-        .setIgnore(false);
+        .setPermissions(permission);
 
     const removeCommand = new OverloadCommand()
         .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const word = content.trim().toLowerCase();
 
             await database.deleteOne({ guildId: message.guild.id, word });
+            const set = muted_words.get(message.guild.id);
+            if (set.size <= 1) muted_words.delete(message.guild.id);
+            else set.delete(word);
 
             return new Translation("mute.removed", "Removed muted word \"{{word}}\" successfully", { word });
         }))
@@ -75,14 +81,18 @@ module.exports = function install(cr, { db }) {
 
     muteWordCommand.registerSubCommand("clear", new SimpleCommand(async message => {
         await database.deleteMany({ guildId: message.guild.id });
+        muted_words.delete(message.guild.id);
 
         return new Translation("mute.cleared_all", "Removed all muted words successfully");
     }))
         .setHelp(new HelpContent().setUsage("", "Remove all muted words"));
 
-    muteWordCommand.registerSubCommand("list", new SimpleCommand((message, { pass_through: muted_words }) => {
-        if (muted_words.length > 0) {
-            return new TranslationMerge(new Translation("mute.currently", "Currently muted are:"), "\n", "`" + muted_words.join("`, `") + "`");
+    muteWordCommand.registerSubCommand("list", new SimpleCommand(message => {
+        if (muted_words.has(message.guild.id) && muted_words.get(message.guild.id).size > 0) {
+            return new TranslationMerge(
+                new Translation("mute.currently", "Currently muted are:"), "\n",
+                new ListFormat([...muted_words.get(message.guild.id)].map(w => `\`${w}\``))
+            );
         } else {
             return new Translation("mute.nothing_muted", "Nothing yet muted");
         }
@@ -90,17 +100,16 @@ module.exports = function install(cr, { db }) {
         .setHelp(new HelpContent().setUsage("", "list all muted words and phrases"));
 
     muteWordCommand.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async ({ message, content }, { pass_through: muted_words = [] }) => {
-            /**
-             * @type {string}
-             */
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const word = content.trim().toLowerCase();
 
-            if (muted_words.includes(word)) {
+            if (muted_words.has(word)) {
                 return new Translation("mute.exists", "Already got this muted");
             }
 
             await database.insertOne({ guildId: message.guild.id, word });
+            if (muted_words.has(message.guild.id)) muted_words.get(message.guild.id).add(word);
+            else muted_words.set(message.guild.id, new Set([word]));
 
             return new Translation("mute.success", "Got it! Blacklisted use of \"{{word}}\"", { word });
         }));

@@ -18,6 +18,8 @@
 const BaseCommand = require("./commands/BaseCommand");
 const AliasCommand = require("./commands/AliasCommand");
 const CCManager = require("./managers/CCManager");
+// eslint-disable-next-line no-unused-vars
+const CommandScope = require("../util/commands/CommandScope");
 
 class CommandRegistry {
     constructor(client, database) {
@@ -25,12 +27,21 @@ class CommandRegistry {
 
         /** @type {Map<string, BaseCommand>} */
         this.commands = new Map;
-        /** @type {Map<string|RegExp, BaseCommand>} */
+        /** @type {Map<RegExp, BaseCommand>} */
         this.keywords = new Map;
+        /** @type {Array<{ scope: CommandScope; priority: boolean; handler(context: MessageContext): Promise<void> }>} */
+        this.processed_handlers = [];
     }
 
-    // Classical Commands
+    /*
+     * Classical Commands
+     */
 
+    /**
+     * @param {string} id
+     * @param {BaseCommand} command
+     * @returns {BaseCommand}
+     */
     registerCommand(id, command) {
         if (this.commands.has(id)) throw new Error("Command name already exists");
 
@@ -38,6 +49,10 @@ class CommandRegistry {
         return command;
     }
 
+    /**
+     * @param {string} command
+     * @param {string} alias
+     */
     registerAlias(command, alias) {
         if (!this.commands.has(command)) throw new Error(command + " isn't in the command map...");
         if (this.commands.has(alias)) throw new Error("Alias '" + alias + "' is already registered in the command map...");
@@ -47,13 +62,15 @@ class CommandRegistry {
         this.registerCommand(alias, new AliasCommand(command, cmd));
     }
 
-    getCommand(command_name) {
-        const command = this.commands.get(command_name);
-        if (command) return command;
-    }
+    /*
+    * Keyword Commands
+    */
 
-    // Keyword Commands
-
+    /**
+     * @param {RegExp} match
+     * @param {BaseCommand} command
+     * @returns {BaseCommand}
+     */
     registerKeyword(match, command) {
         if (this.keywords.has(match)) throw new Error("Keyword name already exists");
 
@@ -61,17 +78,66 @@ class CommandRegistry {
         return command;
     }
 
-    getKeyword(content) {
-        for (let [regex, cmd] of this.keywords) {
-            if (typeof regex === "string" && content.includes(regex)) return [regex, cmd];
-            if (regex instanceof RegExp && regex.test(content)) return [regex, cmd];
+    // eslint-disable-next-line valid-jsdoc
+    /**
+     * @param {Message} message
+     * @param {boolean} prefix_used
+     * @param {string} command_name
+     * @returns {{ type: number; trigger: string | RegExp; command: BaseCommand; }}
+     */
+    getCommand(message, prefix_used, command_name) {
+        if (prefix_used) {
+            const command = this.commands.get(command_name);
+            if (command) return {
+                type: CommandRegistry.TYPE.COMMAND,
+                trigger: command_name,
+                command: command,
+                ...CommandRegistry.resolveCommand(command_name, command),
+            };
+        }
+
+        for (let [regex, command] of this.keywords) {
+            if (regex.test(message.content)) return {
+                type: CommandRegistry.TYPE.KEYWORD,
+                trigger: regex,
+                command: command,
+                ...CommandRegistry.resolveCommand(regex, command),
+            };
         }
     }
 
-    *[Symbol.iterator]() {
-        yield* this.commands;
-        yield* this.keywords;
+    /*
+    * Message Processed Handlers
+    */
+
+    // eslint-disable-next-line valid-jsdoc
+    /**
+     * @param {CommandScope} scope
+     * @param {boolean} priority
+     * @param {(context: MessageContext) => Promise<void>} handler
+     */
+    registerProcessedHandler(scope, priority, handler) {
+        this.processed_handlers.push({ scope, priority, handler });
+    }
+
+    // eslint-disable-next-line valid-jsdoc
+    /**
+     * @param {RegExp|string} trigger
+     * @param {BaseCommand} command
+     * @returns {{ trigger: RegExp|string, command: BaseCommand }}
+     */
+    static resolveCommand(trigger, command) {
+        while (command instanceof AliasCommand) {
+            trigger = command.parentName;
+            command = command.command;
+        }
+
+        return { trigger, command };
     }
 }
+CommandRegistry.TYPE = Object.freeze({
+    COMMAND: 0,
+    KEYWORD: 1,
+});
 
 module.exports = CommandRegistry;

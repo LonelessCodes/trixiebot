@@ -57,7 +57,7 @@ CommandPermission.ADMIN = new class extends CommandPermission {
      * @returns {boolean}
      */
     test(member) {
-        if (member instanceof User) return false;
+        if (!(member instanceof GuildMember)) return false;
         return member.hasPermission(FLAGS.MANAGE_GUILD, false, true, true) ||
             module.exports.OWNER.test(member);
     }

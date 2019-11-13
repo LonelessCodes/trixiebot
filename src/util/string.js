@@ -36,6 +36,11 @@ module.exports = new class StringUtils {
         return normalized;
     }
 
+    /**
+     * @param {string} args
+     * @param {number} expectedArgs
+     * @returns {string[]}
+     */
     splitArgs(args, expectedArgs = 0) {
         if (expectedArgs < 1) return [args];
 
@@ -56,6 +61,10 @@ module.exports = new class StringUtils {
         return module.exports.normalizeArray(raw, expectedArgs);
     }
 
+    /**
+     * @param {string} str
+     * @returns {string[]}
+     */
     findArgs(str) {
         const array = [];
         let tmp = "";
@@ -126,6 +135,11 @@ module.exports = new class StringUtils {
         return string.split(" ").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
     }
 
+    /**
+     * @param {string} message
+     * @param {Object} format
+     * @returns {string}
+     */
     format(message, format = {}) {
         for (const f in format) {
             message = message.replace(new RegExp(`{{\\s*${module.exports.escapeRegExp(f)}\\s*}}`, "g"), format[f]);
@@ -133,6 +147,12 @@ module.exports = new class StringUtils {
         return message;
     }
 
+    /**
+     * @param {any} value
+     * @param {number} width
+     * @param {string} fill
+     * @returns {string}
+     */
     pad(value, width, fill = "0") {
         value = String(value);
         fill = String(fill);

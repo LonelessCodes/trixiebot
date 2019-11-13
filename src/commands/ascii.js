@@ -35,7 +35,7 @@ const CommandScope = require("../util/commands/CommandScope");
 const Translation = require("../modules/i18n/Translation");
 
 module.exports = function install(cr) {
-    const ascii_cmd = new SimpleCommand(async ({ message, content, ctx }, { command_name }) => {
+    const ascii_cmd = new SimpleCommand(async ({ message, content, ctx }, command_name) => {
         const urls = [];
         const match = content.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g);
         urls.push(...(match || []));

@@ -18,7 +18,7 @@ const { formatter } = require("./i18n_utils");
 const Resolvable = require("./Resolvable");
 
 class TranslationFormatter extends Resolvable {
-    constructor(id, args) {
+    constructor(id, args = {}) {
         super();
         this.id = id;
         this.args = args;

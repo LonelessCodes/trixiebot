@@ -17,6 +17,10 @@
 const CommandPermission = require("./CommandPermission");
 
 class Category {
+    /**
+     * @param {CommandPermission} permissions
+     * @param {string} name
+     */
     constructor(permissions, name) {
         this.permissions = permissions;
         this.name = name;

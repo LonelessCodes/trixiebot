@@ -25,7 +25,7 @@ class ScopedCommand extends BaseCommand {
         this.scopes = [];
     }
 
-    async run(context, command_name, pass_through) {
+    async run(context, command_name) {
         if (this.scopes.length === 0) {
             throw new Error("No Scopes registered");
         }
@@ -42,7 +42,7 @@ class ScopedCommand extends BaseCommand {
             return;
         }
 
-        await command.run(context, command_name, pass_through);
+        await command.run(context, command_name);
     }
 
     getCmd(channel) {

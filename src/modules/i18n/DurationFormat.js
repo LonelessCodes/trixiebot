@@ -15,19 +15,25 @@
  */
 
 const Resolvable = require("./Resolvable");
-const { formatter } = require("./i18n_utils");
+const { toHumanTime } = require("../../util/time");
+const moment = require("moment");
 
-class Translation extends Resolvable {
-    constructor(id, phrase, args = {}) {
+class RelativeTimeFormat extends Resolvable {
+    /**
+     * @param {number|moment.Duration} duration
+     * @param {Object} [opts]
+     * @param {"long"|"short"} [opts.style]
+     */
+    constructor(duration, opts = {}) {
         super();
-        this.id = id;
-        this.phrase = phrase;
-        this.args = args;
+        this.duration = moment.duration(duration);
+        this.opts = Object.assign({ style: "short" }, opts);
     }
 
     resolve(i18n) {
-        return formatter(i18n, i18n.translate(this.id, this.phrase), this.args);
+        if (this.opts.style === "long") return this.duration.locale(i18n.locale).humanize(false);
+        else return toHumanTime(this.duration.asMilliseconds());
     }
 }
 
-module.exports = Translation;
+module.exports = RelativeTimeFormat;

@@ -25,6 +25,7 @@ const OverloadCommand = require("../../core/commands/OverloadCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
 const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
+const CommandScope = require("../../util/commands/CommandScope");
 const Category = require("../../util/commands/Category");
 const MessageMentions = require("../../util/commands/MessageMentions");
 
@@ -46,73 +47,72 @@ module.exports = function install(cr, { db }) {
 
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
-    const timeoutCommand = cr.registerCommand("timeout", new class extends TreeCommand {
-        async beforeProcessCall({ message, ctx }) {
-            if (!timeout_notices[message.channel.id])
-                timeout_notices[message.channel.id] = {};
+    cr.registerProcessedHandler(new CommandScope(CommandScope.FLAGS.GUILD), true, async ({ message, ctx }) => {
+        if (!timeout_notices[message.channel.id])
+            timeout_notices[message.channel.id] = {};
 
-            const timeout_entry = await database.findOne({ guildId: message.guild.id, memberId: message.author.id });
-            if (timeout_entry) {
-                const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
-                if (timeleft > 0) {
-                    const content = message.content;
-                    message.delete().catch(() => { /* Do nothing */ });
+        const timeout_entry = await database.findOne({ guildId: message.guild.id, memberId: message.author.id });
+        if (timeout_entry) {
+            const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
+            if (timeleft > 0) {
+                const content = message.content;
+                message.delete().catch(() => { /* Do nothing */ });
 
-                    const expiresIn = toHumanTime(timeleft);
+                const expiresIn = toHumanTime(timeleft);
 
-                    const timeoutNotice = new Translation(
-                        "timeout.timeouted",
-                        "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}",
-                        {
-                            userMention: message.member.toString(),
-                            timeLeft: `__**${expiresIn}**__`,
-                        }
-                    );
-
-                    if (timeout_notices[message.channel.id].time &&
-                        (timeout_notices[message.channel.id].last ||
-                            timeout_notices[message.channel.id].time.getTime() + (60000 * 10) > Date.now())) {
-                        timeout_notices[message.channel.id].time = new Date;
-                        timeout_notices[message.channel.id].message.delete();
-                        timeout_notices[message.channel.id].message =
-                            await ctx.send(timeoutNotice);
-                        return;
+                const timeoutNotice = new Translation(
+                    "timeout.timeouted",
+                    "{{userMention}} You've been timeouted from writing in this server. Your timeout is over in {{timeLeft}}",
+                    {
+                        userMention: message.member.toString(),
+                        timeLeft: `__**${expiresIn}**__`,
                     }
+                );
 
-                    const notice = await ctx.send(timeoutNotice);
-
-                    await database_messages.insertOne({
-                        guildId: message.guild.id,
-                        memberId: message.author.id,
-                        message: content,
-                        timeoutEnd: timeout_entry.expiresAt,
-                    });
-
-                    timeout_notices[message.channel.id] = {
-                        last: true,
-                        time: new Date,
-                        message: notice,
-                    };
-
+                if (timeout_notices[message.channel.id].time &&
+                    (timeout_notices[message.channel.id].last ||
+                        timeout_notices[message.channel.id].time.getTime() + (60000 * 10) > Date.now())) {
+                    timeout_notices[message.channel.id].time = new Date;
+                    timeout_notices[message.channel.id].message.delete();
+                    timeout_notices[message.channel.id].message =
+                        await ctx.send(timeoutNotice);
                     return;
-                } else if (timeleft <= 0) {
-                    // mongodb has some problems with syncing the expiresAt index properly.
-                    // It can take up to a minute for it to remove the document, so we just
-                    // remove it manually if it hasn't been cleared already
-                    await database.deleteOne({ _id: timeout_entry._id }).catch(() => { /* Do nothing */ });
                 }
-            }
 
-            timeout_notices[message.channel.id].last = false;
+                const notice = await ctx.send(timeoutNotice);
+
+                await database_messages.insertOne({
+                    guildId: message.guild.id,
+                    memberId: message.author.id,
+                    message: content,
+                    timeoutEnd: timeout_entry.expiresAt,
+                });
+
+                timeout_notices[message.channel.id] = {
+                    last: true,
+                    time: new Date,
+                    message: notice,
+                };
+
+                return;
+            } else if (timeleft <= 0) {
+                // mongodb has some problems with syncing the expiresAt index properly.
+                // It can take up to a minute for it to remove the document, so we just
+                // remove it manually if it hasn't been cleared already
+                await database.deleteOne({ _id: timeout_entry._id }).catch(() => { /* Do nothing */ });
+            }
         }
-    })
+
+        timeout_notices[message.channel.id].last = false;
+    });
+
+    const timeoutCommand = cr.registerCommand("timeout", new TreeCommand)
         .setHelp(new HelpContent()
             .setUsage("<time> <user mention 1> <user mention 2> ...")
             .addParameter("time", "timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs")
             .addParameter("user mention", "user to timeout. Multiple users possible"))
         .setCategory(Category.MODERATION)
-        .setPermissions(permission)
-        .setIgnore(false);
+        .setPermissions(permission);
 
     timeoutCommand.registerSubCommand("remove", new SimpleCommand(async ({ message, mentions, ctx }) => {
         const members = mentions.members.array();

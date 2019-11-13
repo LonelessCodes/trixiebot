@@ -27,7 +27,7 @@ class OverloadCommand extends BaseCommand {
         this._linked_to = this;
     }
 
-    async run(context, command_name, pass_through) {
+    async run(context, command_name) {
         const args = context.content.split(/\s+/).filter(s => s !== "");
 
         if (this.overloads.size === 0) {
@@ -50,7 +50,7 @@ class OverloadCommand extends BaseCommand {
             return;
         }
 
-        await command.run(context, command_name, pass_through);
+        await command.run(context, command_name);
     }
 
     /**

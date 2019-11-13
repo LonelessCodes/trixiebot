@@ -17,6 +17,10 @@
 const { toHumanTime } = require("../../util/time");
 const { format } = require("../../util/string");
 const { Message, Channel } = require("discord.js");
+// eslint-disable-next-line no-unused-vars
+const { Category } = require("../../util/commands/Category");
+// eslint-disable-next-line no-unused-vars
+const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const CommandScope = require("../../util/commands/CommandScope");
 const RateLimiter = require("../../util/commands/RateLimiter");
@@ -36,13 +40,17 @@ class BaseCommand {
     constructor() {
         this.id = Symbol("command id");
 
+        /** @type {RateLimiter} */
         this._rateLimitMessageRateLimiter = null;
+        /** @type {RateLimiter} */
         this.rateLimiter = null;
         this.permissions = CommandPermission.USER;
-        this.ignore = true;
         this.list = true;
+        /** @type {Category} */
         this._category = null;
+        /** @type {HelpContent} */
         this.help = null;
+        /** @type {string[]} */
         this.aliases = [];
         this.explicit = false;
         this.scope = new CommandScope(CommandScope.DEFAULT).freeze();
@@ -102,11 +110,6 @@ class BaseCommand {
         return this;
     }
 
-    setIgnore(v = false) {
-        this.ignore = v;
-        return this;
-    }
-
     setCategory(v) {
         this._category = v;
         this.setPermissions(v.permissions);
@@ -146,10 +149,8 @@ class BaseCommand {
         return this.season.isToday();
     }
 
-    async beforeProcessCall() { /* Do nothing */ }
-
-    async run(ctx, command_name, pass_through) {
-        return await this.call(ctx, { pass_through, command_name });
+    async run(ctx, command_name) {
+        return await this.call(ctx, command_name);
     }
 
     async call() { /* Do nothing */ }

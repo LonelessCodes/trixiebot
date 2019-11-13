@@ -25,7 +25,7 @@ class TreeCommand extends BaseCommand {
         this.sub_commands = new Map;
     }
 
-    async run(context, command_name, pass_through) {
+    async run(context, command_name) {
         const args = splitArgs(context.content, 2);
 
         if (this.sub_commands.size === 0) {
@@ -50,9 +50,9 @@ class TreeCommand extends BaseCommand {
             return;
         }
 
-        command_name += (is_default ? "" : " " + args[0]);
+        command_name += is_default ? "" : (" " + args[0]);
         context.content = is_default ? context.content : args[1];
-        await command.run(context, command_name, pass_through);
+        await command.run(context, command_name);
     }
 
     registerSubCommand(id, command) {

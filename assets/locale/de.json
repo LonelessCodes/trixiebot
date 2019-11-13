@@ -29,7 +29,7 @@
     "general": {
         "lang_name": "Deutsch",
         "lang_name_en": "German",
-        "error": "Äh... Ich... ähm, ich glaube... es gab da ein Problem...? Es ist aber nicht deine Schuld...",
+        "error": "Äh... Ich glaube... es gab da ein Problem...? Wenn du findest dass das gerade ungewolltes Verhalten war, melden den Fehler mit `{{prefix}}reporterror {{caseId}}`",
         "introduction": "**Trixie ist ein Alles-in-Einem Discord Bot für Ponyliebhaber**\n\nSie bietet eine Vielzahl toller Features, von denen viele die Bedürfnisse von My Little Pony Fans und Serveradmins zufrieden stellen dürften.\n\nIhre Auswahl an Commands reichen von nützlichen Zeug, einfachem Spaß, Imageboard Commands, Custom Commands, Soundboards bis hin zu einer kompletten Weboberfläche um Trixie zu konfigurieren und das Wachstum des Servers zu beobachten, und so viel mehr!\n\nFür eine Liste aller Commands, schreibe `{{prefix}}help`.",
         "github": "Hilf der Entwicklung von TrixieBot auf <https://github.com/LonelessCodes/trixiebot> :heart::heart::heart:",
         "report_bug": "Berichte von Bugs und reiche Featureanfragen ein auf <https://github.com/LonelessCodes/trixiebot/issues>",
@@ -143,7 +143,7 @@
         "blackjack": "BLACKJACK"
     },
     "sb": {
-        "checking": "Daten überprüfen...",
+        "checking": "Dateidaten überprüfen...",
         "error": {
             "too_big": "Datei ist zu groß! Bitte versuch's unter 4MB zu halten. Selbst WAV kann das schaffen",
             "unsupported": "{{extname}}-Dateien sind nicht unterstützt. Versuch's mal mit {{supported}}",
@@ -163,10 +163,11 @@
         "downloading": "Datei runterladen...",
         "converting": "Datei konvertieren und optimieren...",
         "checking_errors": "Datei nach Fehlern überprüfen...",
-        "saving": "In die Datenbank speichern und fertigstellen..."
+        "saving": "In die Datenbank speichern und fertigstellen...",
+        "doesnt_exist": "❌ Das Sample existiert nicht"
     },
     "autoban": {
-        "no_configs": "Keine Autoban Konfigurationen bis jetzt. Füge welche durch `{{prefix}}autoban <userID\\|username#0000\\|glob>` hinzu",
+        "no_configs": "Keine Autoban Konfigurationen bis jetzt. Füge welche durch `{{prefix}}autoban <userID|username#0000|glob>` hinzu",
         "not_valid_id": "`{{id}}` ist keine gültige User-ID. User-IDs beinhalten ausschließlich Ziffern, du Dumbo",
         "added_id": ":police_car: `{{id}}` als ID hinzugefügt",
         "added_name": ":police_car: `{{name}}` hinzugefügt",
@@ -251,7 +252,8 @@
         "remove_perms_conflict": "Du kannst keine Rolle von der Konfiguration entfernen die mächtiger ist als deine eigenen.",
         "cannot_add_other_users": "Du kannst anderen Nutzern die auch Rollen verwalten dürfen keine Rollen zuteilen! Das können sie auch selber machen.",
         "already_have": "Du hast diese Rolle schon! Yay?",
-        "no_role": "Weird... ich konnte diese Rolle nicht finden."
+        "no_role": "Weird... ich konnte diese Rolle nicht finden.",
+        "no_roles": ""
     },
     "audio": {
         "error": "Ein Fehlerchen ist passiert und hat 'n paar Auas gemacht",
@@ -285,7 +287,8 @@
         "payment_success": ":atm: Nice, hier haste.",
         "action": ":atm: Der neue Slot wird dich **{{money}}'* kosten. Schreib' entweder `buy` zum kaufen oder `cancel` zum abbrechen",
         "payment_new_balance": "(:yen: neue Accountbalance: **{{money}}**)",
-        "not_enough": ":atm: Du hast nicht genug {{name}} um noch mehr Slots zu kaufen! Du brauchst **{{money}}**"
+        "not_enough": ":atm: Du hast nicht genug {{name}} um noch mehr Slots zu kaufen! Du brauchst **{{money}}**",
+        "daily_streak": ""
     },
     "tts": {
         "invalid_msg": "Ehhh schicke lieber eine normale Nachricht. Diese Art von Nachricht ist bekannt dafür mich zu ficken"
@@ -312,7 +315,11 @@
     "mlem": "Der Chat wurde gemlemt von {{user}} | Bild von n0nnny",
     "blep": "Der Chat wurde geblept von {{user}} | Bild von n0nnny",
     "command": {
-        "no_permissions": "Also ich weiß ja nun nicht was du hier machts, ja. Das ist ein beschränkter Bereich. Benötigte Berechtigungen:"
+        "no_permissions": "Also ich weiß ja nun nicht was du hier machts, ja. Das ist ein beschränkter Bereich. Benötigte Berechtigungen:",
+        "ratelimit": {
+            "one": "",
+            "other": ""
+        }
     },
     "waifu": {
         "claim": {
@@ -356,28 +363,28 @@
     },
     "time": {
         "millis": {
-            "one": "Millisekunde",
-            "other": "Millisekunden"
+            "one": "{{count}} Millisekunde",
+            "other": "{{count}} Millisekunden"
         },
         "secs": {
-            "one": "Sekunde",
-            "other": "Sekunden"
+            "one": "{{count}} Sekunde",
+            "other": "{{count}} Sekunden"
         },
         "mins": {
-            "one": "Minute",
-            "other": "Minuten"
+            "one": "{{count}} Minute",
+            "other": "{{count}} Minuten"
         },
         "hrs": {
-            "one": "Stunde",
-            "other": "Stunden"
+            "one": "{{count}} Stunde",
+            "other": "{{count}} Stunden"
         },
         "dys": {
-            "one": "Tag",
-            "other": "Tage"
+            "one": "{{count}} Tag",
+            "other": "{{count}} Tage"
         },
         "wks": {
-            "one": "Woche",
-            "other": "Wochen"
+            "one": "{{count}} Woche",
+            "other": "{{count}} Wochen"
         },
         "x_times_in": "{{x}} mal in {{timeframe}}"
     },

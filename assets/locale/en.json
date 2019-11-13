@@ -163,7 +163,8 @@
     "downloading": "Downloading file...",
     "converting": "Converting and optimizing sound file...",
     "checking_errors": "Checking converted file for errors...",
-    "saving": "Saving to database and finishing up..."
+    "saving": "Saving to database and finishing up...",
+    "doesnt_exist": "❌ That sample doesn't exist"
   },
   "autoban": {
     "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userID|username#0000|glob>`",
@@ -251,7 +252,8 @@
     "remove_perms_conflict": "Sorry, you can't remove a role to the config that is more powerful than your owns.",
     "cannot_add_other_users": "You cannot add roles to other users with Manage Roles permission.",
     "already_have": "You already have this role! Yay?",
-    "no_role": "Hmm... I couldn't really find your role."
+    "no_role": "Hmm... I couldn't really find your role.",
+    "no_roles": "This server doesn't have any publicly available roles :/"
   },
   "audio": {
     "error": "Some error happened and caused some whoopsies",
@@ -285,7 +287,8 @@
     "payment_success": ":atm: 'Aight! There you go.",
     "action": ":atm: The new slot will cost you **{{money}}**. Type either `buy` or `cancel`",
     "payment_new_balance": "(:yen: new account balance: **{{money}}**)",
-    "not_enough": ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**."
+    "not_enough": ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**.",
+    "daily_streak": "You completed a streak and added an extra :yen: **{{bonus}}** (**{{total}}** total)!"
   },
   "tts": {
     "invalid_msg": "Ehhh rather send a normal message. This kind of message is know to kinda break me"

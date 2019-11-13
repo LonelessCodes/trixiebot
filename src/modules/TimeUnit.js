@@ -15,6 +15,7 @@
  */
 
 const TranslationPlural = require("./i18n/TranslationPlural");
+const { format } = require("../util/string");
 
 class TimeUnit {
     /**
@@ -35,15 +36,17 @@ class TimeUnit {
     }
 
     toString(number) {
-        if (number) {
-            return number === 1 ? `${number} ${this.translation.phrase[0]}` : `${number} ${this.translation.phrase[1]}`;
+        if (typeof number === "number") {
+            return number === 1 ?
+                format(this.translation.phrase[0], { count: number }) :
+                format(this.translation.phrase[1], { count: number });
         } else {
             return this.translation.phrase[0];
         }
     }
 
     toTranslation(number) {
-        if (number) {
+        if (typeof number === "number") {
             return this.translation.clone(number);
         } else {
             return this.translation.phrase[0];
@@ -51,11 +54,11 @@ class TimeUnit {
     }
 }
 
-TimeUnit.MILLISECOND = new TimeUnit(1, new TranslationPlural("time.millis", ["millisecond", "milliseconds"]));
-TimeUnit.SECOND = new TimeUnit(1000, new TranslationPlural("time.secs", ["second", "seconds"]));
-TimeUnit.MINUTE = new TimeUnit(60000, new TranslationPlural("time.mins", ["minute", "minutes"]));
-TimeUnit.HOUR = new TimeUnit(3600000, new TranslationPlural("time.hrs", ["hour", "hours"]));
-TimeUnit.DAY = new TimeUnit(3600000 * 24, new TranslationPlural("time.dys", ["day", "days"]));
-TimeUnit.WEEK = new TimeUnit(3600000 * 24 * 7, new TranslationPlural("time.wks", ["week", "weeks"]));
+TimeUnit.MILLISECOND = new TimeUnit(1, new TranslationPlural("time.millis", ["{{count}} millisecond", "{{count}} milliseconds"]));
+TimeUnit.SECOND = new TimeUnit(1000, new TranslationPlural("time.secs", ["{{count}} second", "{{count}} seconds"]));
+TimeUnit.MINUTE = new TimeUnit(60000, new TranslationPlural("time.mins", ["{{count}} minute", "{{count}} minutes"]));
+TimeUnit.HOUR = new TimeUnit(3600000, new TranslationPlural("time.hrs", ["{{count}} hour", "{{count}} hours"]));
+TimeUnit.DAY = new TimeUnit(3600000 * 24, new TranslationPlural("time.dys", ["{{count}} day", "{{count}} days"]));
+TimeUnit.WEEK = new TimeUnit(3600000 * 24 * 7, new TranslationPlural("time.wks", ["{{count}} week", "{{count}} weeks"]));
 
 module.exports = TimeUnit;

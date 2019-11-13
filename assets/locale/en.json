@@ -312,7 +312,11 @@
   "mlem": "The chat got mlem'd by {{user}} | Art by n0nnny",
   "blep": "The chat got blep'd by {{user}} | Art by n0nnny",
   "command": {
-    "no_permissions": "IDK what you're doing here. This is restricted area >:c Required Permissions:"
+    "no_permissions": "IDK what you're doing here. This is restricted area >:c Required Permissions:",
+    "ratelimit": {
+      "one": "Whoa whoa not so fast! You may only do this {{count}} time every {{time_frame}}. There is still {{time_left}} left to wait.",
+      "other": "Whoa whoa not so fast! You may only do this {{count}} times every {{time_frame}}. There is still {{time_left}} left to wait."
+    }
   },
   "waifu": {
     "claim": {
@@ -356,28 +360,28 @@
   },
   "time": {
     "millis": {
-      "one": "millisecond",
-      "other": "milliseconds"
+      "one": "{{count}} millisecond",
+      "other": "{{count}} milliseconds"
     },
     "secs": {
-      "one": "second",
-      "other": "seconds"
+      "one": "{{count}} second",
+      "other": "{{count}} seconds"
     },
     "mins": {
-      "one": "minute",
-      "other": "minutes"
+      "one": "{{count}} minute",
+      "other": "{{count}} minutes"
     },
     "hrs": {
-      "one": "hour",
-      "other": "hours"
+      "one": "{{count}} hour",
+      "other": "{{count}} hours"
     },
     "dys": {
-      "one": "day",
-      "other": "days"
+      "one": "{{count}} day",
+      "other": "{{count}} days"
     },
     "wks": {
-      "one": "week",
-      "other": "weeks"
+      "one": "{{count}} week",
+      "other": "{{count}} weeks"
     },
     "x_times_in": "{{x}} times in {{timeframe}}"
   },

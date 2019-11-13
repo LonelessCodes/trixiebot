@@ -62,6 +62,26 @@ class CommandRegistry {
         this.registerCommand(alias, new AliasCommand(command, cmd));
     }
 
+    /**
+     * Unsused function until I finally manage to seperate aliases from the BaseCommand objects
+     * in an attempt to finally make Commands fully pluggable and reusable
+     * @param {string|BaseCommand} command_name
+     * @returns {string[]}
+     */
+    getAliasesFor(command_name) {
+        const aliases = [];
+        if (typeof command_name === "string") {
+            for (let [name, command] of this.commands) {
+                if (command instanceof AliasCommand && command.parentName === command_name) aliases.push(name);
+            }
+        } else if (command_name instanceof BaseCommand) {
+            for (let [name, command] of this.commands) {
+                if (command instanceof AliasCommand && command.command === command_name) aliases.push(name);
+            }
+        }
+        return aliases;
+    }
+
     /*
     * Keyword Commands
     */

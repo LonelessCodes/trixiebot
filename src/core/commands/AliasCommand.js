@@ -17,19 +17,15 @@
 const BaseCommand = require("./BaseCommand");
 
 class AliasCommand extends BaseCommand {
-    constructor(originalName, command) {
+    constructor(parentName, command) {
         super();
 
-        this.originalName = originalName;
+        this.parentName = parentName;
         this.command = command;
     }
 
     get parentCategory() {
         return this.command.category;
-    }
-
-    get parentName() {
-        return this.originalName;
     }
 
     get category() {

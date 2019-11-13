@@ -29,6 +29,13 @@ class HelpContent {
         return this;
     }
 
+    /**
+     * Sets the description field in a help embed.
+     *
+     * **Only allowed in top level commands!!!**
+     * @param {string} description
+     * @returns {HelpContent}
+     */
     setDescription(description) {
         this.description = description;
         return this;

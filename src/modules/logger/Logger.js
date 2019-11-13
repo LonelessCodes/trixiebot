@@ -32,7 +32,7 @@ function getTimeString() {
     return chalk.cyan.bold(time) + ">";
 }
 
-const format = (...args) => util.formatWithOptions({ colors: true }, ...args);
+const format = (...args) => util.format(...args);
 
 class Logger extends Function {
     /**

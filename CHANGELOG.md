@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.1.1"></a>
+## [3.1.1](https://github.com/LonelessCodes/trixiebot/compare/v3.1.0...v3.1.1) (2019-11-14)
+
+
+### Bug Fixes
+
+* **birthday cmd:** fixed birthday month only throwing error ([3b836b2](https://github.com/LonelessCodes/trixiebot/commit/3b836b2))
+* **CommandDispatcher:** fixed Trixie throwing errors in DMs ([a6ae682](https://github.com/LonelessCodes/trixiebot/commit/a6ae682))
+
+
+
 <a name="3.1.0"></a>
 # [3.1.0](https://bitbucket.org/Loneless/trixiebot/compare/v3.0.0...v3.1.0) (2019-11-13)
 

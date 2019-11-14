@@ -188,16 +188,6 @@ class CommandDispatcher {
         const is_mod_cmd = command && is_guild && command.category === Category.MODERATION && command.permissions.test(context.member);
 
         if (!is_owner_cmd) {
-            if (!is_mod_cmd) {
-                const disabled_chs = await this.disabled_channels.findOne({
-                    guildId: context.guild.id,
-                    channels: {
-                        $all: [context.channel.id],
-                    },
-                });
-                if (disabled_chs) return false;
-            }
-
             if (await this.blacklisted_users.has(context.author.id)) {
                 if (command && is_command) await context.send(new Translation(
                     "general.blacklisted",
@@ -207,9 +197,21 @@ class CommandDispatcher {
                 return false;
             }
 
-            if (is_guild && !is_owner && !is_mod) {
-                const timeouted = await this.timeout.findOne({ guildId: context.guild.id, memberId: context.author.id });
-                if (timeouted) return false;
+            if (is_guild) {
+                if (!is_mod_cmd) {
+                    const disabled_chs = await this.disabled_channels.findOne({
+                        guildId: context.guild.id,
+                        channels: {
+                            $all: [context.channel.id],
+                        },
+                    });
+                    if (disabled_chs) return false;
+                }
+
+                if (!is_owner && !is_mod) {
+                    const timeouted = await this.timeout.findOne({ guildId: context.guild.id, memberId: context.author.id });
+                    if (timeouted) return false;
+                }
             }
         }
 

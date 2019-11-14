@@ -166,7 +166,7 @@ module.exports = async function install(cr, { client, db }) {
         .setHelp(new HelpContent()
             .setUsage("<month>", "List all birthdays in this month in the server")
             .addParameter("month", "The month as a number. 1 for January, 2 for February, and so on."))
-        .registerOverload("1+", new SimpleCommand(async ({ message, content: month_str, translator }) => {
+        .registerOverload("1+", new SimpleCommand(async ({ message, content: month_str, ctx }) => {
             const month = parseInt(month_str) - 1;
             if (Number.isNaN(month) || month < 1 || month > 12) {
                 return `"${month_str}" is not a valid month. Type 1 for January, 2 for February, and so on.`;
@@ -188,7 +188,7 @@ module.exports = async function install(cr, { client, db }) {
                 // new Translation("birthday.birthday", "Birthdays"),
                 // new Translation("birthday.title", "All birthdays in month {{month}}", { month: pad(month + 1, 2) }),
                 members, message.author, message.guild, { items_per_page: 15 }
-            ).display(message.channel, await translator());
+            ).display(message.channel, await ctx.translator());
         }));
 
     /*

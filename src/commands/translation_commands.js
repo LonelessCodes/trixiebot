@@ -26,6 +26,75 @@ const TimeUnit = require("../modules/TimeUnit");
 
 const baseURL = "https://api.funtranslations.com/translate/";
 
+/*
+ * OWO Translator:
+ */
+function random(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const faces = {
+    ".": ["uwu", "UvU", ";;w;;", ";;", ":3c", "=w='"],
+    "!": ["UwU", "OwO", "OwO;;", "ÒwÓ"],
+    "?": ["OwO;;", "? ^^;;", "? =w='", "? :<"],
+};
+
+function owos(input) {
+    return input
+        .replace(/(?<![.?!])$/, Math.random() > 0.7 ? " " + random(faces["."]) : "")
+        .replace(/(!+|\?+|((?<!\.)\.(?!\.)))/g, match => match[0] in faces ? " " + random(faces[match[0]]) : match);
+}
+
+function casing(input) {
+    return input.split(/(?<=[!.?]\s*)/g)
+        .map(satz => satz[0].toUpperCase() + satz.slice(1).toLowerCase())
+        .join("");
+}
+
+function stutter(input) {
+    return input.split(/\s+/)
+        .map(word => {
+            const r = Math.random();
+            if (r > 0.15 || word === "") return word;
+
+            return word[0] + ("-" + word[0]).repeat(r > 0.05 ? 1 : 2) + word.slice(1);
+        })
+        .join(" ");
+}
+
+function transform(input) {
+    return input.split(/\s+/g)
+        .map(word => word
+            .replace(/^you$/gi, "u")
+            .replace(/^your$/gi, "ur")
+            .replace(/^you're$/gi, "u're")
+            .replace(/l/gi, "w")
+            .replace(/th/gi, "t")
+            .replace(/^no/i, "nwo")
+            .replace(/d(?!$)/gi, "w")
+            .replace(/o$/i, "ow")
+            .replace(/r([aeiou])/gi, (_, match) => `w${match}`)
+            .replace(/(?<=\w)([^AEIOUaeiou]+)ou/, (_, match) => `${"w".repeat(match.length)}ou`)
+            .replace(/eou/, "ewou"))
+        .join(" ");
+}
+
+function translateOwo(input) {
+    return owos(
+        stutter(
+            casing(
+                transform(
+                    input
+                )
+            )
+        )
+    );
+}
+
+/*
+ * Translator APIs
+ */
+
 async function translate(type, text) {
     const url = `${baseURL}${type}.json?text=${encodeURIComponent(text)}`;
     const request = await fetch(url);
@@ -52,4 +121,12 @@ module.exports = function install(cr) {
     cr.registerCommand("pirate", translator("pirate", "Translate something into pirate-ish"));
     cr.registerCommand("yoda", translator("yoda", "Translate something into yoda-ish"));
     cr.registerCommand("dolan", translator("dolan", "Translate something into dolan duck-ish"));
+
+    cr.registerCommand("owo", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(({ content }) => translateOwo(content)))
+        .setHelp(new HelpContent()
+            .setUsage("<text>", "Translate anything to h-hewwo language")
+            .addParameter("text", "The text to translate"))
+        .setCategory(Category.TEXT)
+        .setScope(CommandScope.ALL);
 };

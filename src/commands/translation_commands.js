@@ -69,6 +69,7 @@ function transform(input) {
             .replace(/^your$/gi, "ur")
             .replace(/^you're$/gi, "ur")
             .replace(/l/gi, "w")
+            .replace(/v/gi, "w")
             .replace(/th/gi, "t")
             .replace(/^no/i, "nwo")
             .replace(/d(?!$)/gi, "w")

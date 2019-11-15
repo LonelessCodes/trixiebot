@@ -29,6 +29,9 @@ const parseInterval = require("math-interval-parser").default;
 const I18nLocale = require("./I18nLocale");
 const events = require("events");
 
+// support for OwO language
+plurals["owo"] = plurals["en"];
+
 const PluralsForLocale = {};
 
 function postProcess(msg, args, count = 1) {

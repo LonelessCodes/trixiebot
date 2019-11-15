@@ -253,7 +253,7 @@
         "cannot_add_other_users": "Du kannst anderen Nutzern die auch Rollen verwalten dürfen keine Rollen zuteilen! Das können sie auch selber machen.",
         "already_have": "Du hast diese Rolle schon! Yay?",
         "no_role": "Weird... ich konnte diese Rolle nicht finden.",
-        "no_roles": ""
+        "no_roles": "Der Server hat gerade keine öffentlich verfügbaren Rollen :/"
     },
     "audio": {
         "error": "Ein Fehlerchen ist passiert und hat 'n paar Auas gemacht",
@@ -288,7 +288,7 @@
         "action": ":atm: Der neue Slot wird dich **{{money}}'* kosten. Schreib' entweder `buy` zum kaufen oder `cancel` zum abbrechen",
         "payment_new_balance": "(:yen: neue Accountbalance: **{{money}}**)",
         "not_enough": ":atm: Du hast nicht genug {{name}} um noch mehr Slots zu kaufen! Du brauchst **{{money}}**",
-        "daily_streak": ""
+        "daily_streak": "Du hast einen Streak fertiggestellt und extra :yen: **{{bonus}}** (**{{total}}** gesamt) erhalten!"
     },
     "tts": {
         "invalid_msg": "Ehhh schicke lieber eine normale Nachricht. Diese Art von Nachricht ist bekannt dafür mich zu ficken"
@@ -317,8 +317,8 @@
     "command": {
         "no_permissions": "Also ich weiß ja nun nicht was du hier machts, ja. Das ist ein beschränkter Bereich. Benötigte Berechtigungen:",
         "ratelimit": {
-            "one": "",
-            "other": ""
+            "one": "Woah woah nicht so schnell! Du kannst das nur {{count}} mal in {{time_frame}} machen. Es sind immer noch {{time_left}} zu warten.",
+            "other": "Woah woah nicht so schnell! Du kannst das nur {{count}} mal in {{time_frame}} machen. Es sind immer noch {{time_left}} zu warten."
         }
     },
     "waifu": {

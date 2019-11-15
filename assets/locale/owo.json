@@ -1,0 +1,409 @@
+{
+    "no": "nwo",
+    "config": {
+        "no_parameter": "Nwo such parameter. *shrugs*",
+        "wrong_format": "Nwew vawue has a wrong format :< Shouwd be {{format}}",
+        "currently": "Cuwwentwy:",
+        "update": "Upwate:",
+        "allowed_types": "Awwowed types UwU:\n",
+        "success": ":ok_hand: set tow `{{value}}` owo",
+        "description": "Use te command format `!config <option>` to view mowe infow awout an option ;;w;;",
+        "prefix": "❗ Pwewix",
+        "uom": "📐 Mweasurement preference",
+        "announce": "🔔 Announce nwew/weaving/banned users",
+        "announce_ch": "Channew. 'none' disabwes annouwncemewnts ;;",
+        "announce_bot": "Annouwnce bots",
+        "welcome": "👋 Annouwnce nwew users",
+        "leave": "🚶 A-annouwnce weaving users",
+        "ban": "🔨 Annouwnce banned usews",
+        "text": "Custom text ('{{user}}' as user, e-empty = dewault) =w='",
+        "type": {
+            "text": "Wext",
+            "num": "Numbw",
+            "bool": "true or false =w='",
+            "ch": "\\#Channew",
+            "role": "Wowe name",
+            "none": "nwone"
+        }
+    },
+    "general": {
+        "lang_name": "H-Hewwo",
+        "lang_name_en": "OwO",
+        "error": "Uh.. uwu I tink.. uwu I might've wun i-i-intow a pwobwem tewe.. uwu;;\nI-If u bewieve t-tis is unintenwed behaviour, weport te erwow wit `{{prefix}}weporterwor {{caseId}}`",
+        "introduction": "**twixie is an aww-in-one discord bot for pony wovers**\n\nShe offers a vawiety of gweat featuwes, many of which tow s-satisfy te neews of my wittwe pony f-fans and server awmins :3c\n\nHer set of commanws w-wange fwom utiwity stuff, simpwe fun, i-imageboard commanws, custom commanws, sounwboarws, tow even a fuww web washboard tow configuwe twixie and watch t-te gwowt o-of ur server a-and sow m-much mowe ÒwÓ\n\nFor a wist of aww commanws, gow `{{prefix}}help` =w='",
+        "github": "Hewp te wevewopment o-o-of twixiebot on <https://github.com/LonelessCodes/trixiebot> :heart::heart::heart:",
+        "report_bug": "Weport b-bugs and submit featuwe w-w-wequests at <https://github.com/LonelessCodes/trixiebot/issues>",
+        "not_found": "Te **gweat and powerfuw twixie** c-... Couw-... *couwwn't find anyting*. Tewe, i s-said it.. ;;~;;"
+    },
+    "format": {
+        "and": "and",
+        "or": "or"
+    },
+    "locale": {
+        "not_supported": "Wocawe '{{locale}}' is n-nwot supported :c try {{locales}}",
+        "success": "Changed w-wocawe for te server to {{locale}}",
+        "success_ch": "Changed w-wocawe for {{channel}} to {{locale}}",
+        "title": "Serwer wocawes"
+    },
+    "penis": {
+        "length": "Lwengt OwO;;:",
+        "girth": "Girf =w=':",
+        "top_penises": "Te top shlongs in tis server ;w; *notices ur shlongs*",
+        "everyone": "Everyone has fucking huge s-shlongs k UvU U'r a-aww beautifuw"
+    },
+    "textaction": {
+        "everyone": "aww {{count}} users"
+    },
+    "deleted": {
+        "title": "Deweted mwessages",
+        "description": "Mwessages deweted or e-edited bi users: **{{count}}**",
+        "empty": "Yeeeeah, nwoting fwound ^^;;",
+        "clear_success": "Wemoved awl delet mwesages succeswully ;v;"
+    },
+    "timeout": {
+        "timeouted": "{{userMention}} wou've been timewouted f-f-fwom wwiting in tis server =w=' Wour timewout is over in {{timeLeft}}",
+        "remove_all_success": "Wemovd alw tiemouts succesfulli :3",
+        "not_yourself": "U cant tiemout yoursewf, dummi! UvU",
+        "not_trixie": "U cant timeout trixiebowot! i lub u ;;w;;",
+        "not_other_moderators": "U c-cant timeout oter mwoderators or admins. Tat's just lwood",
+        "out_range": "Timewout w-wengt wwouwd be at weast 10 seconws wong and shorter tan 3 ways ;;w;;",
+        "success": {
+            "one": "{{users}} is nwow timewouted for te wext {{timeLeft}} :3c",
+            "other": "{{users}} r nwow timewouted for te wext {{timeLeft}} :3c"
+        }
+    },
+    "gif": {
+        "empty": "Empty wesponse for g-gwobaw wanwom gif",
+        "empty_response": "Nwow gifs wewe found m-matching tis query ;;w;;",
+        "nothing_trending": "Appawentwy nwoting is t-t-twenwing wight nwow ;;w;;"
+    },
+    "memberlog": {
+        "join": "*notices ur new member* W-Wewcome to te server, {{user}} OwO",
+        "leave": "*{{user}}* has weft te server ;;w;; Bye bye",
+        "ban": "{{user}} has been banned f-f-fwom t-te server ;;w;; D-Don't wet te woor hit u-ur a-a-ass on te way out ÒwÓ"
+    },
+    "mute": {
+        "removed": "Wemoved muted word \"{{word}}\" successfuwwy =w='",
+        "cleared_all": "Wemoved aww m-muted worws successfuwwy",
+        "currently": "Curwentwy muted awe:",
+        "nothing_muted": "Nwoting yet muted ;;",
+        "exists": "Awweawy got tis muted",
+        "success": "Got it ÒwÓ Bwackwisted use of \"{{word}}\""
+    },
+    "derpi": {
+        "query_missing": "`query` **must** be given ;;w;;",
+        "amount_out_range": "`amount` cannot be smawwer t-t-tan 1 o-or gweater twan 5 ;;",
+        "warning": "T-T-Te content u wewe trying tow wook up viowates Discord's c-community guiwdewines :c i had tow fiwter it, cause i wanna be a good fiwwy"
+    },
+    "alert": {
+        "announcement": "{{user}} is wive o-on {{service}} ÒwÓ",
+        "success": "Wiww b-be awerting y'aww tewe when {{name}} g-goes onwine ÒwÓ",
+        "embed": {
+            "followers": "Fowwowers",
+            "viewers": "Totaw v-v-viewers",
+            "game": "Game:",
+            "nsfw": "NSFW uvu",
+            "category": "Category:",
+            "tags": "Tags:"
+        },
+        "empty": "Hehe, nwoting hewe wow ;;w;; Time tow a-a-awd some UvU",
+        "invalid_url": "`page url` swouwd be a vaid url OwO I-I-Instead i got a-a-a wousy \"{{url}}\" ;;w;;",
+        "unknown_service": "Mmmmmmmmmmmmhhhhhhhh i won't k-know t-tis website ;;w;;",
+        "page_missing": "U s-swouwd a-awsow give me ur channew page in te url instead of just te site ÒwÓ",
+        "not_subscribed": "I was nwot subscwibed t-t-tow t-tis stweamer UvU",
+        "remove_success": "Stopped awerting for {{name}}",
+        "compact_off": "Compact o-onwine awwouncements awe nwow t-turned off uwu",
+        "compact_on": "Compact onwine awwouncements awe nwow turned on =w='",
+        "cleanup_off": "Nwot weweting onwine awwouncements when going offwine nwow Uv",
+        "cleanup_on": "Cweaning up o-onwine awwouncements nwow UvU",
+        "url_missing": "`page url` swouwd be a vaid url UwU Instead i got nwoting",
+        "no_exist": "Tat user woes nwot exist OwO;;",
+        "already_subscribed": "Tis server is awweawy subscwibed tow tis stweamer ;;w;;"
+    },
+    "ascii": {
+        "doesnt_exist": "Image woesn't exist ;;",
+        "failed_dl": "Couwwn't wownwoad image ;;",
+        "invalid_type": "T-T-Te image must b-be jpg, png o-or gif =w='",
+        "error": "Soooooooooooooooooooooooooometing went wwong"
+    },
+    "bj": {
+        "hit_stand_double": "T-Type `hit` tow wwaw anoter carw, `stand` tow p-pass or `double` tow woubwe wown :3c",
+        "your_hand": "Ur hand",
+        "dealer_hand": "Weawer hand",
+        "result": {
+            "dealer": "**weawer wins UwU** u wost {{money}} ;;w;;",
+            "busted": "**BUSTEW ÒwÓ** u w-w-wost {{money}}",
+            "push": "**PUSH UwU**",
+            "win": "**you w-won** {{money}} uwu"
+        },
+        "hit_stand": "T-Type `hit` tow wwaw anoter carw or `stand` tow p-pass :3c",
+        "value": "Walue:",
+        "busted": "BUSTED uwu",
+        "invalid_bet": "Invawid bet OwO;; Pwz put a number wumber uwu",
+        "blackjack": "Bwackjack"
+    },
+    "sb": {
+        "checking": "C-Checking f-f-fiwe w-wata.. ;;w;;",
+        "error": {
+            "too_big": "Te fiwe i-is too big OwO Pwease try tow k-k-keep i-it bewow 4 MB. Even wav can do tat",
+            "unsupported": "{{extname}} fiwes a-a-awe nwot supported at t-t-tis time ;; Try u-u-upwoawing {{supported}} fiwes uwu",
+            "out_of_space": "T-Twixie c-cannot accept a-any mowe u-upwoaws, a-as i'm wunning out of w-w-wisk space",
+            "file_missing": "Attach a-a sound fiwe tow tis c-command tow awd it :3c",
+            "name_missing": "Pass te name for te s-s-sounwcwip as an argument t-tow tis commanw!",
+            "name_out_range": "Te name f-for te sounwcwip swouwd be between (incl) 2 and 24 chawacters UwU",
+            "user_clip_exists": "U awweawy have a sounwcwip wit tat name in ur sounwboard",
+            "guild_clip_exists": "U-U-U awweawy h-have a sounwcwip wit tat name in tis server's sounwboard :3c",
+            "pre_clip_exists": "Tewe is a-awweawy a pwewefined sounwcwip wit tis name",
+            "downloading": "Erwor wownwoawing te fiwe fwom discord's s-servers",
+            "too_long": "Te sounwcwip cannot be wonger tan {{time}}"
+        },
+        "success": "Successfuwwy awwew OwO",
+        "buy_rate_limit": "U can onwy purchase 2 swots an hour owo;; Wait {{time}} befowe u can gow again",
+        "max_slots": "U h-have weached te m-m-maximum awount of s-sounwboard swots, which is {{max}} OwO;;",
+        "downloading": "Wownwoawing f-fiwe.. UvU",
+        "converting": "C-Converting and optimizing s-s-sound fiwe...",
+        "checking_errors": "Checkin conwerted fiwe for erwors...",
+        "saving": "Saving tow watabase and finishing up...",
+        "doesnt_exist": "❌ tat sampwe woesn't exist ;;"
+    },
+    "autoban": {
+        "no_configs": "Nwow autoban configs y-y-yet ;;w;; Awd some by using `{{prefix}}autoban <userID|username#0000|glob>`",
+        "not_valid_id": "`{{id}}` is nwot a-a-a vawid user iw ^^' User ids contain onwy wigits ;; U wumbo",
+        "added_id": ":police_car:  awwed `{{id}}` as an i-id",
+        "added_name": ":police_car: awwed `{{name}}`\n",
+        "added_as_id": ":police_car: found `{{name}}`'s user iw uwu Awwed `{{id}}` as an id",
+        "added_pattern": ":police_car:  awwed `{{pattern}}` a-as a pattern\n",
+        "all_configs": "All te configuwed autobans for tis server",
+        "remove_configs": "Type te number of te autoban u wouwd wike tow wemove UvU",
+        "deleted": "Weweted `{{id}}` :rotating_light:",
+        "no_parameter": "Nwo s-such pattern configuwed",
+        "title": "Auwobans",
+        "remove": {
+            "title": "Wemowabwe auwobans"
+        }
+    },
+    "stats": {
+        "statistics": "Statistics",
+        "today": "Toway",
+        "messages": {
+            "one": "{{count}} M-Message =w='",
+            "other": "{{count}} M-Messages"
+        },
+        "commands": {
+            "one": "{{count}} Command",
+            "other": "{{count}} Commanws"
+        },
+        "yesterday": "Yesterway",
+        "avg_7d": "Avewage (7 ways)",
+        "users": "{{count}} U-Users UvU",
+        "avg_30d": "Avewage (30 ways)",
+        "avg_90d": "Avewage (90 ways)"
+    },
+    "animal": {
+        "dog": "woof :3",
+        "cat": "meow uwu",
+        "fox": "yip",
+        "shibe": "W-W-Weff :3c",
+        "bird": "peep .>."
+    },
+    "8ball": {
+        "pos0": "It i-is certain",
+        "pos2": "Wiwout a woubt",
+        "pos3": "Outwook good",
+        "pos4": "Yus",
+        "pos5": "U may wewy on it",
+        "pos6": "As i see it, yes",
+        "pos7": "Most wikewy",
+        "pos8": "Signs point t-t-tow yes",
+        "pos9": "It is weciwewwy so",
+        "neg0": "Very w-woubtfuw ;;",
+        "neg1": "My sources say nwow",
+        "neg2": "Outwook nwot s-s-sow good",
+        "neg3": "Won't wount on it",
+        "neg4": "Nwo",
+        "ntr0": "Cannot pwewict nwow",
+        "ntr1": "Better n-n-nwot teww u nwow",
+        "ntr2": "Concentwate and ask again",
+        "ntr3": "Wepwy h-h-hazy, try again ;;",
+        "ntr4": "A-A-Ask again later"
+    },
+    "casino": {
+        "minimum": "Minimum bet swouwd be {{bet}} uwu",
+        "maximum": "Maximum bet swouwd be {{bet}}",
+        "not_enough": "U dwon't have ewough {{name}} tow gambwe :c"
+    },
+    "coin": {
+        "bet": "Ur bett =w=':",
+        "invalid": "`{{bet}}` isn't a vawid siwe of we coin ;; `heads` or `tails` ? =w='",
+        "pending": "Te coin fwips i-intow te air...",
+        "success": "Whew OwO T-Te coin wanwed on {{result}} ;;"
+    },
+    "role": {
+        "all_roles": "H-H-Hewe's a wist of avaiwabwe wowes:",
+        "no_permissions": "Idk what u'we w-woing hewe, mister =w=' T-To use te wowe command on otter users u must have p-permissions tow manage w-wowes uwu",
+        "no_remove_other_mods": "U cannot w-w-wemove wowes fwom o-otter users wit manage wowes permission ;;w;;",
+        "not_available": "Uh appawentwy tis server woesn't h-h-have tis wowe avaiwabwe wight nwow",
+        "cant_remove": "Cant wemove a wowe wiwout having it first ;;",
+        "remove_no_exist": "Tis wowe w-woesn't exist sow u c-can't have it =w='",
+        "remove_no_perms": "U won't have permission t-tow wemove tis wowe =w='",
+        "removed": "W-Wowe wemovew ;;",
+        "add_perms_conflict": "Sorry, u can't awd a wowe tow te c-config tat is mowe powerfuw tan ur o-o-owns ;;",
+        "added_config": "M-Mawe te wowe avaiwabwe f-for everyone UwU It's fwee weaw estate =w='",
+        "remove_perms_conflict": "Sorry, u can't wemove a wowe tow te config tat is mowe powerfuw tan ur owns ;;",
+        "cannot_add_other_users": "U cannot awd wowes tow otter users wit m-manage w-wowes p-p-permission",
+        "already_have": "U awweawy have tis wowe ÒwÓ Yay ?",
+        "no_role": "Hmm... I couwwn't weawwy find ur wowe",
+        "no_roles": "Tis serwer w-w-woesn't hawe any pubwicwy a-a-awaiwabwe w-wowes ;w;;"
+    },
+    "audio": {
+        "error": "S-Some erwor happened and caused s-some whoopsies",
+        "already_playing": "Someting is awweawy pwaying, won't wanna interwupt OwO;;",
+        "join_ch": "U need tow join a voice channew first ÒwÓ",
+        "ch_full": "Te voice channew ur in i-is fuww OwO",
+        "no_perms_join": "Twixie woesn't have permissions tow join t-te vc ur i-in",
+        "no_perms_speak": "Twixie woesn't have permissions tow speak in te v-vc ur in"
+    },
+    "bank": {
+        "payment_abort": "Ten nwot",
+        "daily": ":atm: {{user}}, u weceived ur :yen: **{{money}}** OwO",
+        "daily_too_soon": ":atm: {{user}}, waiwy :yen: cwewits weset in **{{time_left}}** ;;w;;",
+        "account": "Bank awwount",
+        "balance": "B-Baka-Bawance",
+        "last_transactions": "Wast t-twansactions",
+        "transactions": "Twansactions",
+        "transactions_desc": "Aww of {{user}}'s (ur) twansactions",
+        "curr_balance": ":yen: u curwentwy have an awwount bawance of **{{money}}** ;;w;; Oof uwu",
+        "no_account": "It wooks wike u haven't opened a b-b-bank awwount yet =w=' How awout woing sow wit `-`{{prefix}}bank create`",
+        "already_have_account": ":atm: u have awweawy cweated a bank awwount OwO",
+        "start_using": "Get started using ur bawance tow purchase items and unwock featuwes nwow UvU",
+        "account_created": ":atm: ayy u nwow have a bank awwount OwO;; Check it o-o-out at `{{prefix}}bank`",
+        "create_first": "Befowe u can use a-any money wewated activities, pwease cweate a-a bank a-awwount using `{{prefix}}bank create` uwu",
+        "pay_same_user": "O-O-Okay, but why swouwd you...",
+        "pay_user_no_account": "Tis user wiwn't open a bank a-a-awwount yet",
+        "pay_minimum": "U can onwy pay someone at weast {{money}} ;;w;;",
+        "pay_not_enough": ":atm: u-u wow nwot have ewough money o-o-on ur awwount tow pay {{user}} tis much",
+        "trans_no_money_yet": "Wooks w-wike u wiwn't earn o-or spend money yet UwU;; Wet's start by `{{prefix}}daily`, tow e-earn some munz",
+        "payment_timeout": "Time's up =w=' T-Try again",
+        "payment_success": ":atm: 'aight OwO T-Tewe u go ;;",
+        "action": ":atm: te new s-swot wiww cost u **{{money}}** UvU Type eiter `buy` or `cancel` :3c",
+        "payment_new_balance": "(:yen: new awwount b-bawance: **{{money}}**)",
+        "not_enough": ":atm: u won't hawe ewough {{name}} tow buy mowe swots UwU U n-need **{{money}}** =w='",
+        "daily_streak": "U compweted a s-stweak and awwed an extwa :yen: **{{bonus}}** (**{{total}}** totaw) OwO;;"
+    },
+    "tts": {
+        "invalid_msg": "Ehhh water send a nwormaw message ;;w;; Tis kind of message is know t-tow k-kinwa bweak me"
+    },
+    "disable": {
+        "no_ch": "U-U-Uhm, i guess... But u gotta give me a channew or mowe tow wisabwe",
+        "no_cmd": "Uhm, i guess... But u gotta give me a command or mowe tow wisabwe UvU"
+    },
+    "enable": {
+        "no_ch": "Uhm, i-i guess... B-But u gotta give me a channew or mowe tow enabwe",
+        "no_cmd": "Uhm, i guess... B-But u gotta give me a c-command or mowe tow enabwe"
+    },
+    "timeouts": {
+        "found_no_mentions": "Found n-nwone of te mentioned users hewe =w='"
+    },
+    "fuck": {
+        "too_much": "Coow wown, bwo ;;w;; I can't wet u awd sow much at o-once ÒwÓ Come back in an hour or so =w='",
+        "out_of_range": "Text wust be wonger tan 10 a-and shorter tan 256 chawacters :3c",
+        "no_mentions": "U may nwot awd texts wit m-mentioned wowes, channews or users ;;w;; tats weeli inawwowiate",
+        "exists": "Tis phwase awweawy exists OwO",
+        "success": "Awwew ÒwÓ",
+        "no_fucks": "I'm sorry, but... I won't have any fuckie wuckies to give uwu A-Awd fucks using `{{prefix}}fuck add`"
+    },
+    "mlem": "T-Te chat got mwem'd by {{user}} | art by n0nnny",
+    "blep": "Te chat got bwep'd by {{user}} | art by n0nnny",
+    "command": {
+        "no_permissions": "Idk what ur woing hewe =w=' Tis is westwicted awea >:c wequiwed permissions:",
+        "ratelimit": {
+            "one": "Whoa whoa nwot sow fast OwO;; U may onwy wow tis {{count}} time ewery {{time_frame}} :3c Tewe i-is stiww {{time_left}} weft to wait ;;",
+            "other": "Whoa whoa nwot sow fast OwO;; U may onwy wow tis {{count}} wimes ewery {{time_frame}} :3c Tewe i-is stiww {{time_left}} weft to wait ;;"
+        }
+    },
+    "waifu": {
+        "claim": {
+            "no_mention": "Must mention ur w-wweam waifu OwO",
+            "already_have": "Bwuh :3c U awweawy have tis wad owo",
+            "already_claimed": "Oh nu UvU {{user}} awweawy cwaimed tis b-beautifuw user OwO;;",
+            "success": "Successfuw c-cwaim OwO;; Weep snug wit {{user}} incoming ÒwÓ"
+        },
+        "same": "Hahahahahahahahahahahaha tat's cute, but nah uwu",
+        "slots_full": "Stop it. Get s-some hewp =w=' U have fiwwed aww u-ur waifu swots a-awweawy",
+        "unclaim": {
+            "no_mention": "Must mention u-ur waifu",
+            "doesnt_exist": "Never had t-tis hun to begin wit ;;w;",
+            "success": "Good bye bb ;;"
+        },
+        "steal": {
+            "cooldown_global": "Whoa whoa nwot sow fast ÒwÓ T-Tewe's awsow a wittwe g-gwobaw coowwown uwu",
+            "cooldown": "Whoa w-whoa nwot s-sow fast OwO W-Woing tis toow often in a w-w-wow wiww obvi wefeat te purpose of te cwaim cowwand",
+            "story": "{{owner}}'s waifu {{waifu}} just s-seemed tow have appeawed nearby ;;w;; Ur quietwy appwoaching tem...",
+            "success": "Successfuw steaw UwU {{user}} nwow bewongs t-t-tow y-you ÒwÓ",
+            "failed": "{{user}} had got wind of ur pwans and w-washed off at te next chance ;n;",
+            "not_claimed_yet": "Tis waifu has nwot been cwaimed yet ;; Use `{{prefix}}waifu claim @ {{user}}` tow caww tem ur own ÒwÓ"
+        },
+        "escape": {
+            "no_owner": "U won't... Have an owner... Be fwee =w='",
+            "cooldown": "W-W-Whoa whoa nwot sow fast OwO;; W-W-Woing tis toow often in a wow wiww obvi wefeat te p-purpose o-o-of tis aww",
+            "story": "Ur out for wawkies wit ur owner, {{owner}} :3c Ur fowwowing tem and teir orwers, pwepawing for te perfect escape...",
+            "story2": "As if out of nwowhewe u puww on ur weash",
+            "success1": "Te weash towe and u a-awe weshing off in te fwee worwd",
+            "failed": "{{user}} weacted quickwy an gwabs u by ur arm =w=' \"one way...\" u mumbwe tow yoursewf"
+        },
+        "buy": {
+            "cooldown": "U can o-onwy purchase 2 swots an h-hour OwO Wait {{time}} befowe u can g-g-gow again",
+            "max_slots": "U have weached te maximum awount o-of waifu s-swots, which is {{swots}} ÒwÓ",
+            "success": "'aight OwO;; Tewe u go ;;w;; Whow wiww be ur new w-waifu ? =w='"
+        },
+        "your_waifus": "Ur waifus",
+        "no_waifus": "N-N-Nwow waifus tow see hewe, just wust ;~;\nU can get waifus by c-cwaiming someone UwU Use `{{prefix}}waifu claim` tow get startew",
+        "owned_by": "Owned by",
+        "footer": "Totaw waifus: {{waifus}} - awaiwabwe swots: {{swots}}"
+    },
+    "time": {
+        "millis": {
+            "one": "{{count}} miwwisecond",
+            "other": "{{count}} m-miwwiseconws"
+        },
+        "secs": {
+            "one": "{{count}} second",
+            "other": "{{count}} seconws"
+        },
+        "mins": {
+            "one": "{{count}} winute",
+            "other": "{{count}} winuts"
+        },
+        "hrs": {
+            "one": "{{count}} houw",
+            "other": "{{count}} houws"
+        },
+        "dys": {
+            "one": "{{count}} way",
+            "other": "{{count}} ways"
+        },
+        "wks": {
+            "one": "{{count}} week",
+            "other": "{{count}} w-weeks"
+        },
+        "x_times_in": "{{x}} times i-in {{timeframe}}"
+    },
+    "poll": {
+        "deprecation": "The poll command has been deprecated as it is no longer maintainable and planned to be replaced"
+    },
+    "paginator": {
+        "page": "P-Page {{page}} ;;w;;"
+    },
+    "birthday": {
+        "birthday": "Birtways",
+        "title": "Aww birtways in mont {{month}}"
+    },
+    "action": {
+        "hug": {
+            "self": "Hugging yoursewf ? =w=' How a-awout huggig s-s-someone u wowe OwO;;"
+        },
+        "pat": {
+            "self": "Aww, take a pat <3"
+        }
+    }
+}

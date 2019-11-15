@@ -140,7 +140,8 @@
     "value": "Value:",
     "busted": "BUSTED",
     "invalid_bet": "Invalid bet! Plz put a number wumber uwu",
-    "blackjack": "BLACKJACK"
+    "blackjack": "BLACKJACK",
+    "title": "Blackjack"
   },
   "sb": {
     "checking": "Checking file data...",

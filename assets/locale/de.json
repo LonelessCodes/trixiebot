@@ -140,7 +140,8 @@
         "value": "Wert:",
         "busted": "BUSTED",
         "invalid_bet": "Ungültiger Wetteinsatz! Plz gib eine Zahl uwu",
-        "blackjack": "BLACKJACK"
+        "blackjack": "BLACKJACK",
+        "title": "Blackjack"
     },
     "sb": {
         "checking": "Dateidaten überprüfen...",

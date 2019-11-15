@@ -231,7 +231,7 @@ class BlackJack {
     }
 
     async render(guild, author) {
-        const embed = basicTEmbed("Blackjack", author);
+        const embed = basicTEmbed(new Translation("bj.title", "Blackjack"), author);
 
         if (!this.done) {
             this.doubledown_able = this.doubledown_able && await credits.canPurchase(author, this.bet * 2);

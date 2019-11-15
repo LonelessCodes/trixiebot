@@ -67,7 +67,7 @@ function transform(input) {
         .map(word => word
             .replace(/^you$/gi, "u")
             .replace(/^your$/gi, "ur")
-            .replace(/^you're$/gi, "u're")
+            .replace(/^you're$/gi, "ur")
             .replace(/l/gi, "w")
             .replace(/th/gi, "t")
             .replace(/^no/i, "nwo")

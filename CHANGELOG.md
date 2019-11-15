@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/LonelessCodes/trixiebot/compare/v3.1.1...v3.2.0) (2019-11-15)
+
+
+### Bug Fixes
+
+* **owo cmd:** you're should translate to ur ([73d0f2c](https://github.com/LonelessCodes/trixiebot/commit/73d0f2c))
+
+
+### Features
+
+* new command "owo" to translate anything to owo language ([a96f75f](https://github.com/LonelessCodes/trixiebot/commit/a96f75f))
+* **i18n:** add H-Hewwo language support! ([efca095](https://github.com/LonelessCodes/trixiebot/commit/efca095))
+
+
+
 <a name="3.1.1"></a>
 ## [3.1.1](https://github.com/LonelessCodes/trixiebot/compare/v3.1.0...v3.1.1) (2019-11-14)
 

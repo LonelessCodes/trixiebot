@@ -16,6 +16,8 @@
 
 const { isPlainObject } = require("../../util/util");
 const { CronJob } = require("cron");
+// eslint-disable-next-line no-unused-vars
+const mongo = require("mongodb");
 
 const DEFAULTS = {
     maxSize: 500,
@@ -26,7 +28,7 @@ const DEFAULTS = {
 class DocumentMapCache {
     /**
      * Creates a new manager for caching database documents
-     * @param {any} collection The database collection to get documents from
+     * @param {mongo.Collection} collection The database collection to get documents from
      * @param {string} keyName The document property to get docs from
      * @param {Object} [opts] The indexes for the collection
      * @param {Object} [opts.indexes] The indexes for the collection

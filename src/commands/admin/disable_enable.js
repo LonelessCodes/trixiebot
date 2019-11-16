@@ -46,7 +46,9 @@ module.exports = function install(cr, { db }) {
         await disabled_chs.updateOne({
             guildId: message.guild.id,
         }, {
-            $addToSet: { channels: [...channels.array().map(c => c.id)] },
+            $addToSet: {
+                channels: { $each: channels.array().map(c => c.id) },
+            },
         }, { upsert: true });
 
         return new TranslationPlural("disable.success_ch", [
@@ -73,7 +75,9 @@ module.exports = function install(cr, { db }) {
         await disabled_cmds.updateOne({
             guildId: message.guild.id,
         }, {
-            $addToSet: { commands: [...commands] },
+            $addToSet: {
+                commands: { $each: commands },
+            },
         }, { upsert: true });
 
         return new TranslationPlural("disable.success_cmd", [
@@ -100,7 +104,7 @@ module.exports = function install(cr, { db }) {
         await disabled_chs.updateOne({
             guildId: message.guild.id,
         }, {
-            $pull: { channels: [...channels.array().map(c => c.id)] },
+            $pullAll: { channels: channels.array().map(c => c.id) },
         });
 
         return new TranslationPlural("enable.success_ch", [
@@ -127,7 +131,7 @@ module.exports = function install(cr, { db }) {
         await disabled_cmds.updateOne({
             guildId: message.guild.id,
         }, {
-            $pull: { commands: [...commands] },
+            $pullAll: { commands: commands },
         });
 
         return new TranslationPlural("enable.success_cmd", [

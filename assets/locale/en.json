@@ -289,7 +289,14 @@
     "action": ":atm: The new slot will cost you **{{money}}**. Type either `buy` or `cancel`",
     "payment_new_balance": "(:yen: new account balance: **{{money}}**)",
     "not_enough": ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**.",
-    "daily_streak": "You completed a streak and added an extra :yen: **{{bonus}}** (**{{total}}** total)!"
+    "daily_streak": "You completed a streak and added an extra :yen: **{{bonus}}** (**{{total}}** total)!",
+    "name": {
+      "success": "Nice! \"{{name}}\" set. Try it out now.",
+      "current": "Current configuration:",
+      "too_long": "The name of your this currency should be shorter than 100 character",
+      "forbidden_chars": "That name contains forbidden characters that would break me :'c",
+      "example": "Example: **{{example}}**"
+    }
   },
   "tts": {
     "invalid_msg": "Ehhh rather send a normal message. This kind of message is know to kinda break me"

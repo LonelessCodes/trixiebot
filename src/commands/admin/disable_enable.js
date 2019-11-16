@@ -24,7 +24,10 @@ const Translation = require("../../modules/i18n/Translation");
 const TranslationPlural = require("../../modules/i18n/TranslationPlural");
 const ListFormat = require("../../modules/i18n/ListFormat");
 
-module.exports = function install(cr, { database }) {
+module.exports = function install(cr, { db }) {
+    const disabled_chs = db.collection("disabled_channels");
+    const disabled_cmds = db.collection("disabled_commands");
+
     /**
      * DISABLE
      */
@@ -40,7 +43,7 @@ module.exports = function install(cr, { database }) {
             return new Translation("disable.no_ch", "Uhm, I guess... but you gotta give me a channel or more to disable");
         }
 
-        await database.collection("disabled_channels").updateOne({
+        await disabled_chs.updateOne({
             guildId: message.guild.id,
         }, {
             $addToSet: { channels: [...channels.array().map(c => c.id)] },
@@ -67,7 +70,7 @@ module.exports = function install(cr, { database }) {
             else dontExist.push(name);
         }
 
-        await database.collection("disabled_commands").updateOne({
+        await disabled_cmds.updateOne({
             guildId: message.guild.id,
         }, {
             $addToSet: { commands: [...commands] },
@@ -94,7 +97,7 @@ module.exports = function install(cr, { database }) {
             return new Translation("enable.no_ch", "Uhm, I guess... but you gotta give me a channel or more to enable");
         }
 
-        await database.collection("disabled_channels").updateOne({
+        await disabled_chs.updateOne({
             guildId: message.guild.id,
         }, {
             $pull: { channels: [...channels.array().map(c => c.id)] },
@@ -121,7 +124,7 @@ module.exports = function install(cr, { database }) {
             else dontExist.push(name);
         }
 
-        await database.collection("disabled_commands").updateOne({
+        await disabled_cmds.updateOne({
             guildId: message.guild.id,
         }, {
             $pull: { commands: [...commands] },

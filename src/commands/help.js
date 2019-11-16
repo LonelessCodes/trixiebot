@@ -82,9 +82,9 @@ module.exports = function install(cr, { client, db: database }) {
             const is_guild = message.channel.type === "text";
             const is_dm = message.channel.type === "dm";
 
-            const disabledCommands = is_guild ? await database.collection("disabled_commands").find({
+            const disabledCommands = is_guild ? await database.collection("disabled_commands").findOne({
                 guildId: message.guild.id,
-            }).toArray() : [];
+            }) || { commands: [] } : { commands: [] };
 
             const custom_commands = is_guild ? await cr.CC.getCommands(message.guild.id, message.channel.id) : [];
 
@@ -95,7 +95,7 @@ module.exports = function install(cr, { client, db: database }) {
                 if (command instanceof AliasCommand) continue;
                 if (!command.hasScope(message.channel)) continue;
                 if (!command.isInSeason()) continue;
-                if (disabledCommands.some(row => row.name === name)) continue;
+                if (disabledCommands.commands.includes(name)) continue;
                 if (!message.channel.nsfw && command.explicit) continue;
                 if (!command.list) continue;
                 if (!command.category) continue;

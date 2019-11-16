@@ -23,12 +23,12 @@ async function purchaseSlots(context, activeList, cooldown, cost, success, handl
 
     if (!await credits.canPurchase(context.author, cost)) {
         return new Translation("bank.not_enough", ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**.", {
-            name: name.plural || name.singular, money: credits.getBalanceString(cost, name),
+            name, money: credits.getBalanceTrans(cost, name),
         });
     }
 
     await context.send(new Translation("bank.action", ":atm: The new slot will cost you **{{money}}**. Type either `buy` or `cancel`", {
-        money: credits.getBalanceString(cost, name),
+        money: credits.getBalanceTrans(cost, name),
     }));
 
     activeList.add(context.author.id);
@@ -52,7 +52,7 @@ async function purchaseSlots(context, activeList, cooldown, cost, success, handl
             activeList.delete(context.author.id);
             return new TranslationMerge(
                 success || new Translation("bank.payment_success", ":atm: 'Aight! There you go."),
-                new Translation("bank.payment_new_balance", "(:yen: new account balance: **{{money}}**)", { money: credits.getBalanceString(new_balance, name) })
+                new Translation("bank.payment_new_balance", "(:yen: new account balance: **{{money}}**)", { money: credits.getBalanceTrans(new_balance, name) })
             );
         }
 

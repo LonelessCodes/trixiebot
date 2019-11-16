@@ -41,19 +41,17 @@ module.exports = function install(cr, { locale }) {
             .setUsage("", "Look at your bank account"))
         .setCategory(Category.CURRENCY);
 
-    bankCmd.registerDefaultCommand(new SimpleCommand(async message => {
-        const member = message.member;
-
+    bankCmd.registerDefaultCommand(new SimpleCommand(async ({ guild, channel, member, prefix }) => {
         const account = await credits.getAccount(member);
         if (!account) {
-            return new Translation("bank.no_account", "It looks like you haven't opened a bank account yet. How about doing so with `{{prefix}}bank create`", { prefix: message.prefix });
+            return new Translation("bank.no_account", "It looks like you haven't opened a bank account yet. How about doing so with `{{prefix}}bank create`", { prefix });
         }
 
         const embed = basicTEmbed(new Translation("bank.account", "Bank Account"), member);
 
         embed.addField(
             new Translation("bank.balance", "Balance"),
-            new TranslationFormatter("```cs\n{{m}}\n```", { m: credits.getBalanceTrans(account.balance, await credits.getName(message.guild)) })
+            new TranslationFormatter("```cs\n{{m}}\n```", { m: credits.getBalanceTrans(account.balance, await credits.getName(guild)) })
         );
 
         const trans_raw = await credits.getTransactions(member, 5);
@@ -63,7 +61,7 @@ module.exports = function install(cr, { locale }) {
             for (let trans of trans_raw) {
                 transactions.push({
                     ts: moment(trans.ts).fromNow(),
-                    cost: (trans.cost >= 0 ? "+" : "") + await locale.translate(message.channel, new NumberFormat(trans.cost)),
+                    cost: (trans.cost >= 0 ? "+" : "") + await locale.translate(channel, new NumberFormat(trans.cost)),
                     description: trans.description,
                 });
             }
@@ -88,35 +86,35 @@ module.exports = function install(cr, { locale }) {
     }));
     bankCmd.registerSubCommandAlias("*", "show");
 
-    bankCmd.registerSubCommand("create", new SimpleCommand(async message => {
-        const user = message.author;
+    bankCmd.registerSubCommand("create", new SimpleCommand(async context => {
+        const user = context.author;
 
         const account = await credits.createAccount(user);
 
         if (account.exists) {
             let str = new TranslationMerge(new Translation("bank.already_have_account", ":atm: You have already created a bank account!"));
-            if (account.account.balance > 0) str.push(new Translation("bank.already_balance", "You even already have **{{money}}**!", { money: credits.getBalanceTrans(account.account.balance, await credits.getName(message.guild)) }));
+            if (account.account.balance > 0) str.push(new Translation("bank.already_balance", "You even already have **{{money}}**!", { money: credits.getBalanceTrans(account.account.balance, await credits.getName(context.guild)) }));
             return new TranslationMerge(
                 str,
                 new Translation("bank.start_using", "Get started using your balance to purchase items and unlock features now.")
             ).separator("\n");
         } else {
-            return new Translation("bank.account_created", ":atm: Ayy you now have a bank account! Check it out at `{{prefix}}bank`", { prefix: message.prefix });
+            return new Translation("bank.account_created", ":atm: Ayy you now have a bank account! Check it out at `{{prefix}}bank`", { prefix: context.prefix });
         }
     }))
         .setHelp(new HelpContent()
             .setUsage("", "Create a bank account to send, receive, spend and earn credits."));
     bankCmd.registerSubCommandAlias("create", "open");
 
-    bankCmd.registerSubCommand("balance", new SimpleCommand(async message => {
-        const user = message.author;
+    bankCmd.registerSubCommand("balance", new SimpleCommand(async context => {
+        const user = context.author;
 
         const account = await credits.getAccount(user);
         if (!account) {
-            return new Translation("bank.create_first", "Before you can use any money related activities, please create a bank account using `{{prefix}}bank create`", { prefix: message.prefix });
+            return new Translation("bank.create_first", "Before you can use any money related activities, please create a bank account using `{{prefix}}bank create`", { prefix: context.prefix });
         }
 
-        return new Translation("bank.curr_balance", ":yen: You currently have an account balance of **{{money}}**. oof", { money: credits.getBalanceTrans(account.balance, await credits.getName(message.guild)) });
+        return new Translation("bank.curr_balance", ":yen: You currently have an account balance of **{{money}}**. oof", { money: credits.getBalanceTrans(account.balance, await credits.getName(context.guild)) });
     }))
         .setHelp(new HelpContent()
             .setUsage("", "Check out the balance on your account!"));
@@ -165,7 +163,7 @@ module.exports = function install(cr, { locale }) {
         await credits.makeTransaction(message.guild, other_user, amount, "pay", `Got money from ${userToString(me, true)}`);
         await credits.makeTransaction(message.guild, me, -amount, "pay", `Sent money to ${userToString(other_user, true)}`);
 
-        return new TranslationFormatter(`💴 **{{money}}**\n${userToString(me)} ▶ ${userToString(other_user)}`, { money: credits.getBalanceString(amount, name) });
+        return new TranslationFormatter(`💴 **{{money}}**\n${userToString(me)} ▶ ${userToString(other_user)}`, { money: credits.getBalanceTrans(amount, name) });
     }))
         .setHelp(new HelpContent()
             .setUsage("<@user> <cost>", "Pay some other user money")
@@ -228,15 +226,19 @@ module.exports = function install(cr, { locale }) {
         .registerOverload("0", new SimpleCommand(async context => {
             const name = await credits.getName(context.guild);
 
-            await context.channel.send(`Current configuration:\nSingular: **${name.singular}**\nPlural: **${name.plural}**\n\nExample: **${credits.getBalanceString(Math.floor(Math.random() * 50), name)}**`);
+            return new TranslationMerge(
+                new Translation("bank.name.current", "Current configuration:"),
+                "`" + name + "`",
+                new Translation("bank.name.example", "Example: **{{example}}**", { example: credits.getBalanceTrans(Math.floor(Math.random() * 50), name) })
+            ).separator("\n");
         }))
-        .registerOverload("1-2", new SimpleCommand(async ({ message, content }) => {
-            const guild = message.guild;
-            const [singular, plural] = splitArgs(content, 2);
+        .registerOverload("1+", new SimpleCommand(async ({ guild, content }) => {
+            if (content.length > 100) return new Translation("bank.name.too_long", "The name of your this currency should be shorter than 100 character");
+            if (/`/g.test(content)) return new Translation("bank.name.forbidden_chars", "That name contains forbidden characters that would break me :'c");
 
-            await credits.setName(guild, singular, plural === "" ? undefined : plural);
+            await credits.setName(guild, content);
 
-            await message.channel.send("Nice! Okay, try it out now");
+            return new Translation("bank.name.success", "Nice! \"{{name}}\" set. Try it out now.", { name: content });
         }))
         .setHelp(new HelpContent()
             .setUsage("<?singular> <?plural>", "Change the name of the currency. If not given any arguments, view the current configuration")
@@ -245,6 +247,10 @@ module.exports = function install(cr, { locale }) {
         .setPermissions(CommandPermissions.ADMIN);
 
     bankCmd.registerSubCommandAlias("setname", "name");
+
+    /*
+     * Owner Commands
+     */
 
     bankCmd.registerSubCommand("set", new SimpleCommand(async ({ message, content }) => {
         const member = message.mentions.members.first();
@@ -295,7 +301,7 @@ module.exports = function install(cr, { locale }) {
 
         await credits.makeTransaction(context.guild, user, total, "dailies", "Collected dailies");
 
-        const str = new TranslationMerge(new Translation("bank.daily", ":atm: {{user}}, you received your :yen: **{{money}}**!", { user: userToString(user), money: credits.getBalanceString(dailies, currency_name, "daily") }));
+        const str = new TranslationMerge(new Translation("bank.daily", ":atm: {{user}}, you received your :yen: **{{money}}**!", { user: userToString(user), money: credits.getBalanceTrans(dailies, currency_name, "daily") }));
 
         const bonus_chars = "BONUS".split("");
         for (let i = 0; i < bonus_chars.length; i++) {
@@ -304,7 +310,7 @@ module.exports = function install(cr, { locale }) {
         }
         str.push("Streak:   " + bonus_chars.join("   "));
 
-        if (bonus > 0) str.push(new Translation("bank.daily_streak", "You completed a streak and added an extra :yen: **{{bonus}}** (**{{total}}** total)!", { bonus: credits.getBalanceString(bonus, currency_name, "bonus"), total: new NumberFormat(total) }));
+        if (bonus > 0) str.push(new Translation("bank.daily_streak", "You completed a streak and added an extra :yen: **{{bonus}}** (**{{total}}** total)!", { bonus: credits.getBalanceTrans(bonus, currency_name, "bonus"), total: new NumberFormat(total) }));
 
         return str.separator("\n\n");
     }))

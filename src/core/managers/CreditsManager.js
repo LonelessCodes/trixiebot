@@ -16,7 +16,6 @@
 
 const database = require("../../modules/db/database");
 const moment = require("moment");
-const secureRandom = require("../../modules/random/secureRandom");
 // eslint-disable-next-line no-unused-vars
 const { GuildMember, User, Guild } = require("discord.js");
 
@@ -76,7 +75,6 @@ class CreditsManager {
      */
     async getBalance(user) {
         const account = await this.getAccount(user);
-
         if (!account) return;
 
         return account.balance;
@@ -200,7 +198,7 @@ class CreditsManager {
         }));
 
         /** @type {number} */
-        const dailies = await secureRandom([150, 175, 200]);
+        const dailies = 200;
 
         if (lastDaily) {
             const last = moment(lastDaily.lastDaily);
@@ -249,22 +247,13 @@ class CreditsManager {
     /**
      * Get the currency name configuration of a guild
      * @param {Guild} guild
-     * @returns {Promise<{ singular: string, plural: string }>}
+     * @returns {Promise<string>}
      */
     async getName(guild) {
-        if (!guild) return {
-            singular: "credit",
-            plural: "credits",
-        };
+        if (!guild) return "credits";
 
         const config = await this.config.then(db => db.findOne({ guildId: guild.id }));
-
-        if (!config) return {
-            singular: "credit",
-            plural: "credits",
-        };
-
-        if (!config.plural) config.plural = config.singular;
+        if (!config) return "credits";
 
         return config.name;
     }
@@ -272,17 +261,11 @@ class CreditsManager {
     /**
      * Set the currency name configuration of a guild
      * @param {Guild} guild
-     * @param {string} singular
-     * @param {string} plural
+     * @param {string} name
      */
-    async setName(guild, singular, plural) {
+    async setName(guild, name) {
         await this.config.then(db => db.updateOne({ guildId: guild.id }, {
-            $set: {
-                name: {
-                    plural,
-                    singular,
-                },
-            },
+            $set: { name },
         }, { upsert: true }));
     }
 
@@ -298,25 +281,23 @@ class CreditsManager {
     /**
      * Convert a balance to a univeral string
      * @param {number} balance
-     * @param {{ singular: string, plural: string }} names
+     * @param {string} name
      * @param {string} middl
      * @returns {string}
      */
-    getBalanceString(balance = 0, names, middl) {
-        if (balance === 1 || !names.plural) return `${balance.toLocaleString("en")} ${middl ? middl + " " : ""}${names.singular}`;
-        else return `${balance.toLocaleString("en")} ${middl ? middl + " " : ""}${names.plural}`;
+    getBalanceString(balance = 0, name, middl) {
+        return `${balance.toLocaleString("en")} ${middl ? middl + " " : ""}${name}`;
     }
 
     /**
      * Convert a balance to a univeral translation resolvable
      * @param {number} balance
-     * @param {{ singular: string, plural: string }} names
+     * @param {string} name
      * @param {string} middl
      * @returns {TranslationMerge}
      */
-    getBalanceTrans(balance = 0, names, middl) {
-        if (balance === 1 || !names.plural) return new TranslationMerge(new NumberFormat(balance), middl, names.singular);
-        else return new TranslationMerge(new NumberFormat(balance), middl, names.plural);
+    getBalanceTrans(balance = 0, name, middl) {
+        return new TranslationMerge(new NumberFormat(balance), middl, name);
     }
 }
 

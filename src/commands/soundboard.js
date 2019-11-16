@@ -379,12 +379,12 @@ module.exports = function install(cr, { locale }) {
 
         if (!await credits.canPurchase(user, cost)) {
             return new Translation("bank.not_enough", ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**.", {
-                name: name.plural || name.singular, money: credits.getBalanceString(cost, name),
+                name, money: credits.getBalanceTrans(cost, name),
             });
         }
 
         await context.send(new Translation("bank.action", ":atm: The new slot will cost you **{{money}}**. Type either `buy` or `cancel`", {
-            money: credits.getBalanceString(cost, name),
+            money: credits.getBalanceTrans(cost, name),
         }));
 
         active.add(isUser ? user.id : guild.id);
@@ -405,7 +405,7 @@ module.exports = function install(cr, { locale }) {
                         credits.makeTransaction(context.guild, user, -cost, "soundboard/slot", isUser ? "Bought a soundboard slot" : "Bought a soundboard slot for server " + guild.name),
                     ]);
 
-                    context.send(new Translation("bank.payment_success", ":atm: 'Aight! There you go. (:yen: new account balance: **{{money}}**)", { money: credits.getBalanceString(new_balance, name) }));
+                    context.send(new Translation("bank.payment_success", ":atm: 'Aight! There you go. (:yen: new account balance: **{{money}}**)", { money: credits.getBalanceTrans(new_balance, name) }));
                     return;
                 }
 

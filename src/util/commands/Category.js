@@ -15,11 +15,12 @@
  */
 
 const CommandPermission = require("./CommandPermission");
+const Translation = require("../../modules/i18n/Translation");
 
 class Category {
     /**
      * @param {CommandPermission} permissions
-     * @param {string} name
+     * @param {Translation} name
      */
     constructor(permissions, name) {
         this.permissions = permissions;
@@ -27,48 +28,27 @@ class Category {
     }
 
     toString() {
+        return this.name.phrase;
+    }
+
+    toTranslation() {
         return this.name;
     }
 }
 
 module.exports = Object.freeze({
-    // Messages analysis
-    ANALYSIS: new Category(CommandPermission.USER, "Analysis"),
-
-    // Actions with other users
-    ACTION: new Category(CommandPermission.USER, "Action"),
-
-    // Text transformation and translation
-    TEXT: new Category(CommandPermission.USER, "Text"),
-
-    // Stuff with audio
-    AUDIO: new Category(CommandPermission.USER, "Audio"),
-
-    // Currency system and stuff
-    CURRENCY: new Category(CommandPermission.USER, "Currency"),
-
-    // Games you can play with trixie
-    GAMES: new Category(CommandPermission.USER, "Games"),
-
-    // Image generation and look up
-    IMAGE: new Category(CommandPermission.USER, "Image"),
-    FUN: new Category(CommandPermission.USER, "Fun"),
-
-    // Info commands about the bot or the server
-    INFO: new Category(CommandPermission.USER, "Info"),
-
-
-    UTILS: new Category(CommandPermission.USER, "Utility"),
-    MISC: new Category(CommandPermission.USER, "Misc"),
-
-    // Any mlp related commands
-    MLP: new Category(CommandPermission.USER, "My Little Pony"),
-
-    // Server moderation and administration
-    MODERATION: new Category(CommandPermission.ADMIN, "Moderation"),
-
-    // Owner only commands
-    OWNER: new Category(CommandPermission.OWNER, "Owner"),
+    CONFIG: new Category(CommandPermission.ADMIN, new Translation("category.config", "Configuration")),
+    MODERATION: new Category(CommandPermission.ADMIN, new Translation("category.moderation", "Moderation")),
+    AUDIO: new Category(CommandPermission.USER, new Translation("category.audio", "Audio")),
+    ECONOMY: new Category(CommandPermission.USER, new Translation("category.economy", "Economy")),
+    SOCIAL: new Category(CommandPermission.USER, new Translation("category.social", "Social")),
+    ACTION: new Category(CommandPermission.USER, new Translation("category.action", "Action")),
+    FUN: new Category(CommandPermission.USER, new Translation("category.fun", "Fun")),
+    IMAGE: new Category(CommandPermission.USER, new Translation("category.image", "Image")),
+    INFO: new Category(CommandPermission.USER, new Translation("category.info", "Info")),
+    UTIL: new Category(CommandPermission.USER, new Translation("category.util", "Utility")),
+    TRIXIE: new Category(CommandPermission.USER, new Translation("category.trixie", "Trixie")),
+    OWNER: new Category(CommandPermission.OWNER, new Translation("category.owner", "Owner")),
 
     Category,
 });

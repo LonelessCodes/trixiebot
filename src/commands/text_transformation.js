@@ -35,7 +35,7 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent()
             .setUsage("<string|user>", "Make teeeeny tiny text")
             .addParameter("string|user", "text or user to smollerize uwu"))
-        .setCategory(Category.TEXT)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
     cr.registerAlias("smol", "small");
 };

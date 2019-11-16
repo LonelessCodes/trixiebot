@@ -923,7 +923,7 @@ module.exports = async function install(cr, { client, locale, db }) {
             .setUsage("<page url> <?channel>", "Subscribe Trixie to a streaming channel!")
             .addParameter("page url", "copy the url of the stream page and paste it in here")
             .addParameterOptional("channel", "the channel to post the alert to later. If omitted will be this channel"))
-        .setCategory(Category.UTILS)
+        .setCategory(Category.UTIL)
         .setPermissions(new CommandPermission([Discord.Permissions.FLAGS.MANAGE_CHANNELS]));
 
     /**

@@ -149,15 +149,15 @@ const faces = [
 module.exports = function install(cr) {
     cr.registerCommand("face", new SimpleCommand(() => randomItem(faces)))
         .setHelp(new HelpContent().setUsage("", "Get a random ASCII face"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
     cr.registerCommand("lenny", new TextCommand(faces[0]))
         .setHelp(new HelpContent().setUsage("", "( ͡° ͜ʖ ͡°)"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
     cr.registerCommand("shrug", new TextCommand(faces[1]))
         .setHelp(new HelpContent().setUsage("", "¯\\_(ツ)_/¯"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("tableflip", new TextCommand("(╯°□°）╯︵ ┻━┻"))

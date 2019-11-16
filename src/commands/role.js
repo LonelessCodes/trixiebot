@@ -95,7 +95,7 @@ module.exports = function install(cr, { db }) {
             .setUsage("<role> <?user mention 1> <?user mention 2> ...", "to add roles")
             .addParameter("role", "The role you would like to have added")
             .addParameterOptional("user mention", "this is irrelevant to you, if you don't have rights to manage roles yourself"))
-        .setCategory(Category.UTILS);
+        .setCategory(Category.UTIL);
 
     /*
      * SUB COMMANDS

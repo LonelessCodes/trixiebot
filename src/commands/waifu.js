@@ -90,7 +90,7 @@ module.exports = function install(cr, { db }) {
         .setHelp(new HelpContent()
             .setDescription("This tool helps you manage your waifus with ease!")
             .setUsage("", "Show all waifus you have claimed"))
-        .setCategory(Category.ACTION);
+        .setCategory(Category.FUN);
 
     /**
      * SUB COMMANDS

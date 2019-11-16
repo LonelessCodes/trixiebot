@@ -51,6 +51,6 @@ module.exports = function install(cr) {
             .setDescription("What would Trump say?\nGets a random Trump quote")
             .setUsage("<?@mention>")
             .addParameterOptional("@mention", "If mentioned a user, command will return a personalized quote"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 };

@@ -113,7 +113,7 @@ function translator(type, description) {
         .setHelp(new HelpContent()
             .setUsage("<text>", description)
             .addParameter("text", "The text to translate"))
-        .setCategory(Category.TEXT)
+        .setCategory(Category.FUN)
         .setRateLimiter(new RateLimiter(TimeUnit.HOUR, 1, 2))
         .setScope(CommandScope.ALL);
 }
@@ -128,6 +128,6 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent()
             .setUsage("<text>", "Translate anything to h-hewwo language")
             .addParameter("text", "The text to translate"))
-        .setCategory(Category.TEXT)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 };

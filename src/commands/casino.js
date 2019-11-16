@@ -42,7 +42,7 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent()
             .setUsage("<bet>", "Play a round of blackjack")
             .addParameter("bet", "The money you're willing to bet. Between " + BlackJack.MIN_BET + " and " + BlackJack.MAX_BET))
-        .setCategory(Category.CURRENCY);
+        .setCategory(Category.ECONOMY);
 
     cr.registerAlias("blackjack", "bj");
 };

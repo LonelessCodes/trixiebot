@@ -38,7 +38,7 @@ module.exports = function install(cr, { db }) {
         return ":sparkles: Subscribed to my newsletter! You'll get important updates right in your DM's! Unsubscribe at any time through `" + context.prefix + "unsubscribe`";
     }))
         .setHelp(new HelpContent().setUsage("", "Subscribe to Trixie's newsletter to receive infos about updates and deprecations."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("unsubscribe", new SimpleCommand(async context => {
@@ -49,7 +49,7 @@ module.exports = function install(cr, { db }) {
         return ":sweat_drops: Successfully unsubscribed! No more inbox spammin' for you";
     }))
         .setHelp(new HelpContent().setUsage("", "Unsubscribe from Trixie's newsletter."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("newsletter", new SimpleCommand(async ({ message, content }) => {

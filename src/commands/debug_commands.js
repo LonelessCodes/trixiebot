@@ -109,7 +109,7 @@ module.exports = function install(cr, { client, error_cases }) {
         return { embed };
     }))
         .setHelp(new HelpContent().setDescription("Gets the bot technical information. Nothing all that interesting."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("ping", new SimpleCommand(async ({ message, received_at }) => {
@@ -129,7 +129,7 @@ module.exports = function install(cr, { client, error_cases }) {
         );
     }))
         .setHelp(new HelpContent().setDescription("Ping-Pong-Ping-Pong-Ping-WEE HEEEEE."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("ping", "trixie ping");
 
@@ -163,7 +163,7 @@ module.exports = function install(cr, { client, error_cases }) {
         return { embed };
     }))
         .setHelp(new HelpContent().setDescription("Gets the changes made to TrixieBot in the latest versions"))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     // ERROR CASES
@@ -175,7 +175,7 @@ module.exports = function install(cr, { client, error_cases }) {
         }))
         .setHelp(new HelpContent()
             .setUsage("<error case id>", "Report a processing error"))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("viewerrors", new SimpleCommand(async context => {

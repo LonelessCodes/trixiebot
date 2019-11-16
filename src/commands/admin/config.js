@@ -44,7 +44,7 @@ module.exports = function install(cr, { config }) {
             .setUsage("<?parameter> <?value>", "view the Trixie's config in this server")
             .addParameterOptional("parameter", "view only this parameter's config")
             .addParameterOptional("value", "set a parameter in Trixie's config. \"default\" for default config"))
-        .setCategory(Category.MODERATION)
+        .setCategory(Category.CONFIG)
         .setPermissions(CommandPermission.ADMIN)
 
         .registerOverload("0", new SimpleCommand(({ message, prefix }) => {
@@ -116,7 +116,7 @@ module.exports = function install(cr, { config }) {
             .setDescription("Alias for `{{prefix}}config prefix <?value>`")
             .setUsage("<?prefix>", "view Trixie's prefix in this server")
             .addParameterOptional("prefix", "set the prefix in Trixie's config. \"default\" for default prefix `(!)`"))
-        .setCategory(Category.MODERATION)
+        .setCategory(Category.CONFIG)
         .setPermissions(CommandPermission.ADMIN)
 
         .registerOverload("0", new SimpleCommand(({ message, prefix }) =>

@@ -94,7 +94,7 @@ module.exports = async function install(cr, { client, db }) {
             .setDescription("Automatically give birthday boiz in your server a specific role.")
             .setUsage("<YYYY-MM-DD>", "Set your birthday")
             .addParameterOptional("YYYY-MM-DD", "Your b-day in Year-Month-Day format"))
-        .setCategory(Category.FUN)
+        .setCategory(Category.UTIL)
         .setScope(CommandScope.ALL);
 
     /**

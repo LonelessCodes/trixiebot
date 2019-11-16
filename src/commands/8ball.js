@@ -138,7 +138,7 @@ module.exports = function install(cr) {
             .setDescription("An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy")
             .setUsage("<question>")
             .addParameter("question", "The question you are eager to ask"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
     cr.registerAlias("8ball", "tellme");
     cr.registerAlias("8ball", "8");

@@ -6,7 +6,7 @@
       "help": {
         "description": "An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy",
         "usage": "\n`!8ball <question>` *(alias `!tellme`, `!8`)*\n`question` - The question you are eager to ask",
-        "category": "Misc"
+        "category": "Fun"
       }
     },
     {
@@ -22,7 +22,7 @@
       "name": "ascii",
       "help": {
         "usage": "\n`!ascii <?url>` - Generates ascii art from an image\n`url` - optional - Url to an image. Or add an attachment to your message",
-        "category": "Misc"
+        "category": "Utility"
       }
     },
     {
@@ -38,8 +38,8 @@
       "name": "bank",
       "help": {
         "description": "Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.",
-        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?singular> <?plural>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`singular` - optional - Sets the singular of the currency name\n`plural` - optional - Sets the plural of the currency name. If omitted, singular name will be used for everything",
-        "category": "Currency"
+        "usage": "\n`!bank` - Look at your bank account *(alias `!bank show`)*\n\n`!bank create` - Create a bank account to send, receive, spend and earn credits. *(alias `!bank open`)*\n\n`!bank balance` - Check out the balance on your account!\n\n`!bank pay <@user> <cost>` - Pay some other user money\n`@user` - Use to pay money to\n`cost` - Ammount of money to pay\n\n`!bank transactions` - Display all your transactions from ever! *(alias `!bank trans`)*\n\n`!bank setname <?name>` - Change the name of the currency. If not given any arguments, view the current configuration *(alias `!bank name`)*\n`name` - optional - New currency name",
+        "category": "Economy"
       }
     },
     {
@@ -54,7 +54,7 @@
       "help": {
         "description": "Automatically give birthday boiz in your server a specific role.",
         "usage": "\n`!birthday <YYYY-MM-DD>` - Set your birthday\n`YYYY-MM-DD` - optional - Your b-day in Year-Month-Day format\n\n`!birthday reset` - Reset your birthday. Trixie will no longer know it.\n\n`!birthday month <month>` - List all birthdays in this month in the server\n`month` - The month as a number. 1 for January, 2 for February, and so on.\n\n**Admin Area:**\n`!birthday config` - Configure the automatic birthday role thing in your server\n\n`!birthday config role <role name>` - Set the birthday boy role\n`role name` - The birthday role name\n\n`!birthday config toggle` - Toggle the birthday announcer on or off",
-        "category": "Fun"
+        "category": "Utility"
       }
     },
     {
@@ -68,7 +68,7 @@
       "name": "blackjack",
       "help": {
         "usage": "\n`!blackjack <bet>` - Play a round of blackjack *(alias `!bj`)*\n`bet` - The money you're willing to bet. Between 10 and 2000",
-        "category": "Currency"
+        "category": "Economy"
       }
     },
     {
@@ -97,7 +97,7 @@
       "name": "catfact",
       "help": {
         "usage": "\n`!catfact` - Get you a cat fact that will help you raise your babies better <3",
-        "category": "Misc"
+        "category": "Fun"
       }
     },
     {
@@ -105,7 +105,7 @@
       "help": {
         "description": "Gets the changes made to TrixieBot in the latest versions",
         "usage": "\n`!changelog`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -120,14 +120,14 @@
       "help": {
         "description": "Chuck\nNorris\nFacts!!!",
         "usage": "\n`!chucknorris`",
-        "category": "Misc"
+        "category": "Fun"
       }
     },
     {
       "name": "coin",
       "help": {
-        "usage": "\n`!coin <bet>`\n`bet` - your bet. Either `heads` or `tails`",
-        "category": "Misc"
+        "usage": "\n`!coin <?bet>`\n`bet` - optional - your bet. Either `heads` or `tails`",
+        "category": "Utility"
       }
     },
     {
@@ -135,7 +135,7 @@
       "help": {
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!config <?parameter> <?value>` - view the Trixie's config in this server *(alias `!cfg`, `!opts`)*\n`parameter` - optional - view only this parameter's config\n`value` - optional - set a parameter in Trixie's config. \"default\" for default config",
-        "category": "Moderation"
+        "category": "Configuration"
       }
     },
     {
@@ -149,7 +149,7 @@
       "name": "daily",
       "help": {
         "usage": "\n`!daily` - Gather your daily payouts every day and occasionally get bonus money. *(alias `!dailies`)*",
-        "category": "Currency"
+        "category": "Economy"
       }
     },
     {
@@ -175,7 +175,7 @@
         "description": "Disable Trixie from listening to some commands or channels",
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!disable`\n\n`!disable channel <#channel>` - Disable Trixie from listening to a channel\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>` - Disable a command\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
+        "category": "Configuration"
       }
     },
     {
@@ -190,7 +190,7 @@
       "help": {
         "rateLimiter": "2 times in 1 hour",
         "usage": "\n`!dolan <text>` - Translate something into dolan duck-ish\n`text` - The text to translate",
-        "category": "Text"
+        "category": "Fun"
       }
     },
     {
@@ -198,7 +198,7 @@
       "help": {
         "description": "**TrixieBot costs $12 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤",
         "usage": "\n`!donate`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -215,14 +215,14 @@
         "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!enable`\n\n`!enable channel <#channel>` - Enable Trixie from listening to a channel again\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>` - Enable a command again\n`command name` - The name of a command or a space seperated list of commands",
-        "category": "Moderation"
+        "category": "Configuration"
       }
     },
     {
       "name": "face",
       "help": {
         "usage": "\n`!face` - Get a random ASCII face",
-        "category": "Misc"
+        "category": "Fun"
       }
     },
     {
@@ -268,7 +268,7 @@
       "help": {
         "description": "Get a link to TrixieBot's Github repo.",
         "usage": "\n`!github`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -305,7 +305,7 @@
       "help": {
         "description": "Gets the bot technical information. Nothing all that interesting.",
         "usage": "\n`!info`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -313,7 +313,7 @@
       "help": {
         "description": "Gives a link to invite TrixieBot to your own server.",
         "usage": "\n`!invite`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -348,7 +348,7 @@
       "name": "lenny",
       "help": {
         "usage": "\n`!lenny` - ( ͡° ͜ʖ ͡°)",
-        "category": "Misc"
+        "category": "Fun"
       }
     },
     {
@@ -365,7 +365,7 @@
         "description": "Trixie supports multiple different languages, including `German`, `English`, `OwO`. Here you can set them in your server",
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!locale <?locale> <?channel>` - view the Trixie's locales in this server\n`locale` - optional - set a global locale. If `channel` is given, sets as channel-only locale\n`channel` - optional - set a channel to be a unique locale",
-        "category": "Moderation"
+        "category": "Configuration"
       }
     },
     {
@@ -380,7 +380,7 @@
       "help": {
         "description": "Query the MLP Wikia for fun! Everything there: ALL the ponies, ALL the episodes, ALL the places.",
         "usage": "\n`!mlp <query>` - come look it up with me owo *(alias `!pony`)*\n`query` - what you would like to look up",
-        "category": "My Little Pony"
+        "category": "Utility"
       }
     },
     {
@@ -388,7 +388,7 @@
       "help": {
         "description": "Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com",
         "usage": "\n`!mlpquote` *(alias `!mlpquotes`)*",
-        "category": "My Little Pony"
+        "category": "Fun"
       }
     },
     {
@@ -417,7 +417,7 @@
       "name": "owo",
       "help": {
         "usage": "\n`!owo <text>` - Translate anything to h-hewwo language\n`text` - The text to translate",
-        "category": "Text"
+        "category": "Fun"
       }
     },
     {
@@ -433,7 +433,7 @@
         "explicit": true,
         "description": "Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.",
         "usage": "\n`!penis <?mention>` *(alias `!cock`, `!dick`)*\n`mention` - optional - User who's penis you wish to ~~pleasure~~ measure\n\n`!penis leaderboard` - Shows where you are in the penis size ranking",
-        "category": "Action"
+        "category": "Fun"
       }
     },
     {
@@ -441,7 +441,7 @@
       "help": {
         "description": "Ping-Pong-Ping-Pong-Ping-WEE HEEEEE.",
         "usage": "\n`!ping` *(alias `!trixie ping`)*",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -449,7 +449,7 @@
       "help": {
         "rateLimiter": "2 times in 1 hour",
         "usage": "\n`!pirate <text>` - Translate something into pirate-ish\n`text` - The text to translate",
-        "category": "Text"
+        "category": "Fun"
       }
     },
     {
@@ -472,7 +472,7 @@
         "description": "Alias for `{{prefix}}config prefix <?value>`",
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!prefix <?prefix>` - view Trixie's prefix in this server\n`prefix` - optional - set the prefix in Trixie's config. \"default\" for default prefix `(!)`",
-        "category": "Moderation"
+        "category": "Configuration"
       }
     },
     {
@@ -480,14 +480,14 @@
       "help": {
         "description": "Get a link to Trixie's bug report page.",
         "usage": "\n`!reportbug`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
       "name": "reporterror",
       "help": {
         "usage": "\n`!reporterror <error case id>` - Report a processing error",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -524,7 +524,7 @@
       "name": "shrug",
       "help": {
         "usage": "\n`!shrug` - ¯\\_(ツ)_/¯",
-        "category": "Misc"
+        "category": "Fun"
       }
     },
     {
@@ -545,7 +545,7 @@
       "name": "smol",
       "help": {
         "usage": "\n`!smol <string|user>` - Make teeeeny tiny text *(alias `!small`)*\n`string|user` - text or user to smollerize uwu",
-        "category": "Text"
+        "category": "Fun"
       }
     },
     {
@@ -580,7 +580,7 @@
       "name": "subscribe",
       "help": {
         "usage": "\n`!subscribe` - Subscribe to Trixie's newsletter to receive infos about updates and deprecations.",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -617,7 +617,7 @@
       "help": {
         "description": "First command to call.",
         "usage": "\n`!trixie`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -625,7 +625,7 @@
       "help": {
         "description": "What would Trump say?\nGets a random Trump quote",
         "usage": "\n`!trump <?@mention>`\n`@mention` - optional - If mentioned a user, command will return a personalized quote",
-        "category": "Misc"
+        "category": "Fun"
       }
     },
     {
@@ -655,7 +655,7 @@
       "name": "unsubscribe",
       "help": {
         "usage": "\n`!unsubscribe` - Unsubscribe from Trixie's newsletter.",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -677,7 +677,7 @@
       "help": {
         "description": "Returns the currently running version of TrixieBot",
         "usage": "\n`!version` *(alias `!v`)*",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -685,7 +685,7 @@
       "help": {
         "description": "Vote for TrixieBot on bot listing sites! Pls",
         "usage": "\n`!vote`",
-        "category": "Info"
+        "category": "Trixie"
       }
     },
     {
@@ -693,7 +693,7 @@
       "help": {
         "description": "This tool helps you manage your waifus with ease!",
         "usage": "\n`!waifu` - Show all waifus you have claimed\n\n`!waifu claim <@mention>` - Claim the person you mentioned if not already claimed.\n\n`!waifu unclaim <@mention>` - Unclaim the person you mentioned if already claimed.\n\n`!waifu steal <@mention>` - Steals a random waifu with a chance of 5%. Cooldown: 5 minutes\n`@mention` - The waifu you want to perform actions on\n\n`!waifu escape` - Don't like your new owner or would rather be free? Simply run away! ... with a small 5% chance. Cooldown: 5 minutes\n\n`!waifu buyslot` - Buy additional waifu slots with Trixie's currency",
-        "category": "Action"
+        "category": "Fun"
       }
     },
     {
@@ -709,7 +709,7 @@
       "help": {
         "rateLimiter": "2 times in 1 hour",
         "usage": "\n`!yoda <text>` - Translate something into yoda-ish\n`text` - The text to translate",
-        "category": "Text"
+        "category": "Fun"
       }
     }
   ]

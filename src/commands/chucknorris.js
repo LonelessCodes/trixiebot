@@ -35,6 +35,6 @@ module.exports = function install(cr) {
     }))
         .setHelp(new HelpContent()
             .setDescription("Chuck\nNorris\nFacts!!!"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 };

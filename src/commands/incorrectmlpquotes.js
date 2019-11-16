@@ -49,8 +49,7 @@ module.exports = function install(cr) {
     }))
         .setHelp(new HelpContent()
             .setDescription("Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com"))
-        .setCategory(Category.MLP)
-        .dontList()
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 
     cr.registerAlias("mlpquote", "mlpquotes");

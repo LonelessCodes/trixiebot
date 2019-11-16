@@ -80,6 +80,6 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent()
             .setUsage("<?url>", "Generates ascii art from an image")
             .addParameterOptional("url", "Url to an image. Or add an attachment to your message"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.UTIL)
         .setScope(CommandScope.ALL);
 };

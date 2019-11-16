@@ -37,6 +37,9 @@ function sortCommands(commands) {
         .join(", ");
 }
 
+const ordered = [];
+for (let key in Category) if (Category[key] instanceof CategoryClass) ordered.push(Category[key]);
+
 module.exports = function install(cr, { client, db: database }) {
     cr.registerCommand("help", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async ({ message, content, ctx }) => {
@@ -109,21 +112,6 @@ module.exports = function install(cr, { client, db: database }) {
                     .sort().map(s => `\`${s}\``)
                     .join(", "));
             }
-
-            const ordered = [
-                Category.MLP,
-                Category.ANALYSIS,
-                Category.ACTION,
-                Category.TEXT,
-                Category.AUDIO,
-                Category.CURRENCY,
-                Category.IMAGE,
-                Category.FUN,
-                Category.MODERATION,
-                Category.INFO,
-                Category.UTILS,
-                Category.MISC,
-            ];
 
             for (const cat of ordered) {
                 const commands = categories.get(cat);

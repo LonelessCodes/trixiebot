@@ -33,7 +33,7 @@ module.exports = function install(cr, { db }) {
      */
     const disableCmd = cr.registerCommand("disable", new TreeCommand)
         .setHelp(new HelpContent("Disable Trixie from listening to some commands or channels"))
-        .setCategory(Category.MODERATION);
+        .setCategory(Category.CONFIG);
 
     disableCmd.registerDefaultCommand(new HelpCommand);
 
@@ -89,7 +89,7 @@ module.exports = function install(cr, { db }) {
      */
     const enableCmd = cr.registerCommand("enable", new TreeCommand)
         .setHelp(new HelpContent("If you have disabled channels or commands for Trixie, you can enable them here again."))
-        .setCategory(Category.MODERATION);
+        .setCategory(Category.CONFIG);
 
     enableCmd.registerSubCommand("channel", new SimpleCommand(async ({ message }) => {
         const channels = message.mentions.channels;

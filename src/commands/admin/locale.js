@@ -37,7 +37,7 @@ module.exports = function install(cr, { locale: locale_manager }) {
             .setUsage("<?locale> <?channel>", "view the Trixie's locales in this server")
             .addParameterOptional("locale", "set a global locale. If `channel` is given, sets as channel-only locale")
             .addParameterOptional("channel", "set a channel to be a unique locale"))
-        .setCategory(Category.MODERATION)
+        .setCategory(Category.CONFIG)
         .setPermissions(CommandPermission.ADMIN)
 
         .registerOverload("0", new SimpleCommand(async message => {

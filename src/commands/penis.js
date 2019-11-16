@@ -48,7 +48,7 @@ module.exports = function install(cr, { client, db }) {
             .setDescription("Check on what package your buddy is carrying~ (or you are caring)\nRandomy generated penis size.")
             .setUsage("<?mention>")
             .addParameterOptional("mention", "User who's penis you wish to ~~pleasure~~ measure"))
-        .setCategory(Category.ACTION);
+        .setCategory(Category.FUN);
 
     /**
      * SUB COMMANDS

@@ -39,7 +39,7 @@ module.exports = function install(cr, { locale }) {
         .setHelp(new HelpContent()
             .setDescription("Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.")
             .setUsage("", "Look at your bank account"))
-        .setCategory(Category.CURRENCY);
+        .setCategory(Category.ECONOMY);
 
     bankCmd.registerDefaultCommand(new SimpleCommand(async ({ guild, channel, member, prefix }) => {
         const account = await credits.getAccount(member);
@@ -241,9 +241,8 @@ module.exports = function install(cr, { locale }) {
             return new Translation("bank.name.success", "Nice! \"{{name}}\" set. Try it out now.", { name: content });
         }))
         .setHelp(new HelpContent()
-            .setUsage("<?singular> <?plural>", "Change the name of the currency. If not given any arguments, view the current configuration")
-            .addParameterOptional("singular", "Sets the singular of the currency name")
-            .addParameterOptional("plural", "Sets the plural of the currency name. If omitted, singular name will be used for everything"))
+            .setUsage("<?name>", "Change the name of the currency. If not given any arguments, view the current configuration")
+            .addParameterOptional("name", "New currency name"))
         .setPermissions(CommandPermissions.ADMIN);
 
     bankCmd.registerSubCommandAlias("setname", "name");
@@ -252,30 +251,31 @@ module.exports = function install(cr, { locale }) {
      * Owner Commands
      */
 
-    bankCmd.registerSubCommand("set", new SimpleCommand(async ({ message, content }) => {
-        const member = message.mentions.members.first();
-        if (!member) return;
+    bankCmd.registerSubCommand("set", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
+            const member = message.mentions.members.first();
+            if (!member) return;
 
-        const account = await credits.getAccount(member);
-        if (!account) {
-            return "To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`";
-        }
+            const account = await credits.getAccount(member);
+            if (!account) {
+                return "To pay someone money, you need to tell me *who* I should pay it to. Remember it's `<@user> <amount>`";
+            }
 
-        const args = splitArgs(content, 3); // if someone adds the currency name at the end, it should still work
+            const args = splitArgs(content, 3); // if someone adds the currency name at the end, it should still work
 
-        let amount = 0;
-        try {
-            amount = parseFloat(args[1]);
-        } catch (_) {
-            return "That is not a valid number, bruh! Remember it's `<@user> <amount>`";
-        }
+            let amount = 0;
+            try {
+                amount = parseFloat(args[1]);
+            } catch (_) {
+                return "That is not a valid number, bruh! Remember it's `<@user> <amount>`";
+            }
 
-        const old_balance = await credits.getBalance(member);
-        const new_balance = await credits.makeTransaction(message.guild, member, amount - old_balance, "set_balance",
-            "Balance was set to " + credits.getBalanceString(amount, await credits.getName(message.guild)) + " by " + userToString(message.author, true));
+            const old_balance = await credits.getBalance(member);
+            const new_balance = await credits.makeTransaction(message.guild, member, amount - old_balance, "set_balance",
+                "Balance was set to " + credits.getBalanceString(amount, await credits.getName(message.guild)) + " by " + userToString(message.author, true));
 
-        return "yo :ok_hand: new balance: " + new_balance;
-    }))
+            return "yo :ok_hand: new balance: " + new_balance;
+        }))
         .setCategory(Category.OWNER);
 
     cr.registerCommand("daily", new SimpleCommand(async context => {
@@ -316,6 +316,6 @@ module.exports = function install(cr, { locale }) {
     }))
         .setHelp(new HelpContent()
             .setUsage("", "Gather your daily payouts every day and occasionally get bonus money."))
-        .setCategory(Category.CURRENCY);
+        .setCategory(Category.ECONOMY);
     cr.registerAlias("daily", "dailies");
 };

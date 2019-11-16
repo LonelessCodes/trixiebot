@@ -30,23 +30,23 @@ const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
 module.exports = function install(cr, { client }) {
     cr.registerCommand("donate", new TextCommand("https://paypal.me/loneless ❤"))
         .setHelp(new HelpContent().setDescription("**TrixieBot costs $12 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤"))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("version", new TextCommand(`v${INFO.VERSION}`))
         .setHelp(new HelpContent().setDescription("Returns the currently running version of TrixieBot"))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("version", "v");
 
     if (INFO.INVITE) cr.registerCommand("invite", new TextCommand(INFO.INVITE))
         .setHelp(new HelpContent().setDescription("Gives a link to invite TrixieBot to your own server."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("vote", new TextCommand(":eyes: https://discordbots.org/bot/397037692963258368/vote"))
         .setHelp(new HelpContent().setDescription("Vote for TrixieBot on bot listing sites! Pls"))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("trixie", new SimpleCommand(({ message, prefix }) => {
@@ -72,16 +72,16 @@ module.exports = function install(cr, { client }) {
             .setFooter(`TrixieBot v${INFO.VERSION}`);
     }))
         .setHelp(new HelpContent().setDescription("First command to call."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("github", new TextCommand(new Translation("general.github", "Help the development of TrixieBot on <https://github.com/LonelessCodes/trixiebot> :heart::heart::heart:")))
         .setHelp(new HelpContent().setDescription("Get a link to TrixieBot's Github repo."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 
     cr.registerCommand("reportbug", new TextCommand(new Translation("general.report_bug", "Report bugs and submit feature requests at <https://github.com/LonelessCodes/trixiebot/issues>")))
         .setHelp(new HelpContent().setDescription("Get a link to Trixie's bug report page."))
-        .setCategory(Category.INFO)
+        .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
 };

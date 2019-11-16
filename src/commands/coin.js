@@ -53,8 +53,8 @@ module.exports = function install(cr) {
         );
     }))
         .setHelp(new HelpContent()
-            .setUsage("<bet>")
-            .addParameter("bet", "your bet. Either `heads` or `tails`"))
-        .setCategory(Category.MISC)
+            .setUsage("<?bet>")
+            .addParameterOptional("bet", "your bet. Either `heads` or `tails`"))
+        .setCategory(Category.UTIL)
         .setScope(CommandScope.ALL);
 };

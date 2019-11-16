@@ -34,6 +34,6 @@ module.exports = function install(cr) {
     }))
         .setHelp(new HelpContent()
             .setUsage("", "Get you a cat fact that will help you raise your babies better <3"))
-        .setCategory(Category.MISC)
+        .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 };

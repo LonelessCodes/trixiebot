@@ -76,6 +76,8 @@ class CommandDispatcher {
         this.disabled_commands.createIndex({ guildId: 1 }, { unique: true });
         this.disabled_channels = this.database.collection("disabled_channels");
         this.disabled_channels.createIndex({ guildId: 1 }, { unique: true });
+        this.disabled_categories = this.database.collection("disabled_categories");
+        this.disabled_categories.createIndex({ guildId: 1 }, { unique: true });
         this.disabled_commands_channels = this.database.collection("disabled_commands_channels");
         this.disabled_commands_channels.createIndex({ guildId: 1, command: 1 }, { unique: true });
     }
@@ -224,11 +226,17 @@ class CommandDispatcher {
 
         if (is_guild) {
             if (is_command && !is_owner_cmd && !is_mod_cmd) {
-                const [disabled_cmds, disabled_cmd_chs] = await Promise.all([
+                const [disabled_cmds, disabled_cats, disabled_cmd_chs] = await Promise.all([
                     this.disabled_commands.findOne({
                         guildId: context.guild.id,
                         commands: {
                             $all: [cmd_name],
+                        },
+                    }),
+                    this.disabled_categories.findOne({
+                        guildId: context.guild.id,
+                        categories: {
+                            $all: [command.category.id],
                         },
                     }),
                     this.disabled_commands_channels.findOne({
@@ -241,6 +249,7 @@ class CommandDispatcher {
                 ]);
 
                 if (disabled_cmds) return false;
+                if (disabled_cats) return false;
                 if (disabled_cmd_chs) return false;
             }
 

@@ -85,6 +85,9 @@ module.exports = function install(cr, { client, db: database }) {
             const disabledCommands = is_guild ? await database.collection("disabled_commands").findOne({
                 guildId: message.guild.id,
             }) || { commands: [] } : { commands: [] };
+            const disabledCategories = is_guild ? await database.collection("disabled_categories").findOne({
+                guildId: message.guild.id,
+            }) || { categories: [] } : { categories: [] };
 
             const custom_commands = is_guild ? await cr.CC.getCommands(message.guild.id, message.channel.id) : [];
 
@@ -113,7 +116,7 @@ module.exports = function install(cr, { client, db: database }) {
                     .join(", "));
             }
 
-            for (const cat of ordered) {
+            for (const cat of ordered.filter(c => !disabledCategories.categories.includes(c.id))) {
                 const commands = categories.get(cat);
                 if (commands && commands.size > 0) {
                     embed.addField(cat.toString() + " Commands", sortCommands(commands));

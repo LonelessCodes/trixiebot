@@ -19,10 +19,12 @@ const Translation = require("../../modules/i18n/Translation");
 
 class Category {
     /**
+     * @param {string} id
      * @param {CommandPermission} permissions
      * @param {Translation} name
      */
-    constructor(permissions, name) {
+    constructor(id, permissions, name) {
+        this.id = id;
         this.permissions = permissions;
         this.name = name;
     }
@@ -37,18 +39,18 @@ class Category {
 }
 
 module.exports = Object.freeze({
-    CONFIG: new Category(CommandPermission.ADMIN, new Translation("category.config", "Configuration")),
-    MODERATION: new Category(CommandPermission.ADMIN, new Translation("category.moderation", "Moderation")),
-    AUDIO: new Category(CommandPermission.USER, new Translation("category.audio", "Audio")),
-    ECONOMY: new Category(CommandPermission.USER, new Translation("category.economy", "Economy")),
-    SOCIAL: new Category(CommandPermission.USER, new Translation("category.social", "Social")),
-    ACTION: new Category(CommandPermission.USER, new Translation("category.action", "Action")),
-    FUN: new Category(CommandPermission.USER, new Translation("category.fun", "Fun")),
-    IMAGE: new Category(CommandPermission.USER, new Translation("category.image", "Image")),
-    INFO: new Category(CommandPermission.USER, new Translation("category.info", "Info")),
-    UTIL: new Category(CommandPermission.USER, new Translation("category.util", "Utility")),
-    TRIXIE: new Category(CommandPermission.USER, new Translation("category.trixie", "Trixie")),
-    OWNER: new Category(CommandPermission.OWNER, new Translation("category.owner", "Owner")),
+    CONFIG: new Category("config", CommandPermission.ADMIN, new Translation("category.config", "Configuration")),
+    MODERATION: new Category("mod", CommandPermission.ADMIN, new Translation("category.moderation", "Moderation")),
+    AUDIO: new Category("audio", CommandPermission.USER, new Translation("category.audio", "Audio")),
+    ECONOMY: new Category("economy", CommandPermission.USER, new Translation("category.economy", "Economy")),
+    SOCIAL: new Category("social", CommandPermission.USER, new Translation("category.social", "Social")),
+    ACTION: new Category("action", CommandPermission.USER, new Translation("category.action", "Action")),
+    FUN: new Category("fun", CommandPermission.USER, new Translation("category.fun", "Fun")),
+    IMAGE: new Category("image", CommandPermission.USER, new Translation("category.image", "Image")),
+    INFO: new Category("info", CommandPermission.USER, new Translation("category.info", "Info")),
+    UTIL: new Category("util", CommandPermission.USER, new Translation("category.util", "Utility")),
+    TRIXIE: new Category("trixie", CommandPermission.USER, new Translation("category.trixie", "Trixie")),
+    OWNER: new Category("owner", CommandPermission.OWNER, new Translation("category.owner", "Owner")),
 
     Category,
 });

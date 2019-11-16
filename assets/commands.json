@@ -174,7 +174,7 @@
       "help": {
         "description": "Disable Trixie from listening to some commands or channels",
         "permissions": "Administrator or Manage Server",
-        "usage": "\n`!disable`\n\n`!disable channel <#channel>` - Disable Trixie from listening to a channel\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>` - Disable a command\n`command name` - The name of a command or a space seperated list of commands",
+        "usage": "\n`!disable`\n\n`!disable channel <#channel>` - Disable Trixie from listening to a channel\n`#channel` - A channel or multiple channels\n\n`!disable command <command name>` - Disable a command\n`command name` - The name of a command or a space seperated list of commands\n\n`!disable category <category name>` - Disable a category of commands\n`category name` - The name of a category or a space seperated list of categories",
         "category": "Configuration"
       }
     },
@@ -214,7 +214,7 @@
       "help": {
         "description": "If you have disabled channels or commands for Trixie, you can enable them here again.",
         "permissions": "Administrator or Manage Server",
-        "usage": "\n`!enable`\n\n`!enable channel <#channel>` - Enable Trixie from listening to a channel again\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>` - Enable a command again\n`command name` - The name of a command or a space seperated list of commands",
+        "usage": "\n`!enable`\n\n`!enable channel <#channel>` - Enable Trixie from listening to a channel again\n`#channel` - A channel or multiple channels\n\n`!enable command <command name>` - Enable a command again\n`command name` - The name of a command or a space seperated list of commands\n\n`!enable category <category name>` - Enable a category of commands again\n`category name` - The name of a category or a space seperated list of categories",
         "category": "Configuration"
       }
     },
@@ -473,6 +473,13 @@
         "permissions": "Administrator or Manage Server",
         "usage": "\n`!prefix <?prefix>` - view Trixie's prefix in this server\n`prefix` - optional - set the prefix in Trixie's config. \"default\" for default prefix `(!)`",
         "category": "Configuration"
+      }
+    },
+    {
+      "name": "profile",
+      "help": {
+        "usage": "\n`!profile <?user>` - View your or someone elses profile\n`user` - optional - The user you want to view\n\n",
+        "category": "Social"
       }
     },
     {

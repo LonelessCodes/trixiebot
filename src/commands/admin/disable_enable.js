@@ -19,14 +19,23 @@ const HelpCommand = require("../../core/commands/HelpCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
+const CategoryClass = Category.Category;
 
 const Translation = require("../../modules/i18n/Translation");
 const TranslationPlural = require("../../modules/i18n/TranslationPlural");
 const ListFormat = require("../../modules/i18n/ListFormat");
+const Resolvable = require("../../modules/i18n/Resolvable");
+
+// disabled channels
+// disabled commands
+// disabled commands in channels
+// disabled categories
+// disabled categories in channels
 
 module.exports = function install(cr, { db }) {
     const disabled_chs = db.collection("disabled_channels");
     const disabled_cmds = db.collection("disabled_commands");
+    const disabled_cats = db.collection("disabled_categories");
 
     /**
      * DISABLE
@@ -88,6 +97,44 @@ module.exports = function install(cr, { db }) {
         .setUsage("<command name>", "Disable a command")
         .addParameter("command name", "The name of a command or a space seperated list of commands"));
 
+    disableCmd.registerSubCommand("category", new SimpleCommand(async ({ message, content, ctx }) => {
+        const categoriesRaw = content.toLowerCase().split(/\s+/g);
+        if (categoriesRaw.length < 1) {
+            return new Translation("disable.no_category", "Uhm, I guess... but you gotta give me a category or more to disable");
+        }
+
+        const trans = await ctx.translator();
+        /** @type {Map<string, CategoryClass>} */
+        const all_categories = new Map;
+        for (let category of Object.keys(Category).filter(c => Category[c] instanceof CategoryClass).map(c => Category[c])) {
+            all_categories.set(category.name.phrase.toLowerCase(), category);
+            all_categories.set(Resolvable.resolve(category.name, trans).toLowerCase(), category);
+        }
+
+        /** @type {CategoryClass[]} */
+        const categories = [];
+        const dontExist = [];
+        for (const name of categoriesRaw) {
+            if (all_categories.has(name)) categories.push(all_categories.get(name));
+            else dontExist.push(name);
+        }
+
+        await disabled_cats.updateOne({
+            guildId: message.guild.id,
+        }, {
+            $addToSet: {
+                categories: { $each: categories.map(c => c.id) }
+            },
+        }, { upsert: true });
+
+        return new TranslationPlural("disable.success_cat", [
+            "Commands in category {{categories}} will no longer listen",
+            "Commands in categories {{categories}} will no longer listen",
+        ], { count: categories.length, categories: new ListFormat(categories.map(c => c.name)) });
+    })).setHelp(new HelpContent()
+        .setUsage("<category name>", "Disable a category of commands")
+        .addParameter("category name", "The name of a category or a space seperated list of categories"));
+
     /**
      * ENABLE
      */
@@ -141,4 +188,40 @@ module.exports = function install(cr, { db }) {
     })).setHelp(new HelpContent()
         .setUsage("<command name>", "Enable a command again")
         .addParameter("command name", "The name of a command or a space seperated list of commands"));
+
+    enableCmd.registerSubCommand("category", new SimpleCommand(async ({ message, content, ctx }) => {
+        const categoriesRaw = content.toLowerCase().split(/\s+/g);
+        if (categoriesRaw.length < 1) {
+            return new Translation("enable.no_category", "Uhm, I guess... but you gotta give me a category or more to enable");
+        }
+
+        const trans = await ctx.translator();
+        /** @type {Map<string, CategoryClass>} */
+        const all_categories = new Map;
+        for (let category of Object.keys(Category).filter(c => Category[c] instanceof CategoryClass).map(c => Category[c])) {
+            all_categories.set(category.name.phrase.toLowerCase(), category);
+            all_categories.set(Resolvable.resolve(category.name, trans).toLowerCase(), category);
+        }
+
+        /** @type {CategoryClass[]} */
+        const categories = [];
+        const dontExist = [];
+        for (const name of categoriesRaw) {
+            if (all_categories.has(name)) categories.push(all_categories.get(name));
+            else dontExist.push(name);
+        }
+
+        await disabled_cats.updateOne({
+            guildId: message.guild.id,
+        }, {
+            $pullAll: { categories: categories.map(c => c.id) },
+        });
+
+        return new TranslationPlural("disable.success_cat", [
+            "Commands in category {{categories}} will listen again",
+            "Commands in categories {{categories}} will listen again",
+        ], { count: categories.length, categories: new ListFormat(categories.map(c => c.name)) });
+    })).setHelp(new HelpContent()
+        .setUsage("<category name>", "Enable a category of commands again")
+        .addParameter("category name", "The name of a category or a space seperated list of categories"));
 };

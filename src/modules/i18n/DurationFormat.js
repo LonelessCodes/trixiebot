@@ -18,7 +18,7 @@ const Resolvable = require("./Resolvable");
 const { toHumanTime } = require("../../util/time");
 const moment = require("moment");
 
-class RelativeTimeFormat extends Resolvable {
+class DurationFormat extends Resolvable {
     /**
      * @param {number|moment.Duration} duration
      * @param {Object} [opts]
@@ -36,4 +36,4 @@ class RelativeTimeFormat extends Resolvable {
     }
 }
 
-module.exports = RelativeTimeFormat;
+module.exports = DurationFormat;

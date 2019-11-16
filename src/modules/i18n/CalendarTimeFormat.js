@@ -17,7 +17,7 @@
 const Resolvable = require("./Resolvable");
 const moment = require("moment");
 
-class RelativeTimeFormat extends Resolvable {
+class CalendarTimeFormat extends Resolvable {
     /**
      * @param {Date|moment} date
      */
@@ -31,4 +31,4 @@ class RelativeTimeFormat extends Resolvable {
     }
 }
 
-module.exports = RelativeTimeFormat;
+module.exports = CalendarTimeFormat;

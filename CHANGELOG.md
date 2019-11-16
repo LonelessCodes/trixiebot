@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.0"></a>
+# [3.3.0](https://github.com/LonelessCodes/trixiebot/compare/v3.2.0...v3.3.0) (2019-11-16)
+
+
+### Bug Fixes
+
+* add blackjack title translation ([b035a9a](https://github.com/LonelessCodes/trixiebot/commit/b035a9a))
+* **disable enable cmd:** fixed typo (that wouldn't have happened if I used Typescript ([cc5ff4f](https://github.com/LonelessCodes/trixiebot/commit/cc5ff4f))
+* enable and disable commands work again!!! ([afba304](https://github.com/LonelessCodes/trixiebot/commit/afba304))
+* fixed class names ([2f6c5a8](https://github.com/LonelessCodes/trixiebot/commit/2f6c5a8))
+* **help cmd:** fixed help still showing disabled commands ([7cb6435](https://github.com/LonelessCodes/trixiebot/commit/7cb6435))
+
+
+### Features
+
+* **credits:** simplified custom credit names ([a014e5b](https://github.com/LonelessCodes/trixiebot/commit/a014e5b))
+* allow disabling whole categories of commands via !disable category and !enable category ([5bc2cc0](https://github.com/LonelessCodes/trixiebot/commit/5bc2cc0))
+* update categories ([26ff1ef](https://github.com/LonelessCodes/trixiebot/commit/26ff1ef))
+
+
+
 <a name="3.2.0"></a>
 # [3.2.0](https://github.com/LonelessCodes/trixiebot/compare/v3.1.1...v3.2.0) (2019-11-15)
 

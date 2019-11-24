@@ -92,7 +92,7 @@ module.exports = function install(cr, { client, config, locale, db }) {
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("eval", new SimpleCommand(async ({ content }) => {
+    cr.registerCommand("eval", new SimpleCommand(async ({ message, ctx, content }) => {
         const result = await eval(`(async () => {${content}})()`);
         return "```\n" + result + "\n```";
     }))

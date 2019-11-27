@@ -123,7 +123,7 @@ module.exports = function install(cr, { db }) {
             guildId: message.guild.id,
         }, {
             $addToSet: {
-                categories: { $each: categories.map(c => c.id) }
+                categories: { $each: categories.map(c => c.id) },
             },
         }, { upsert: true });
 

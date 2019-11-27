@@ -33,15 +33,16 @@ const Translation = require("../modules/i18n/Translation");
 const TranslationMerge = require("../modules/i18n/TranslationMerge");
 const TranslationFormatter = require("../modules/i18n/TranslationFormatter");
 const NumberFormat = require("../modules/i18n/NumberFormat");
+const Resolvable = require("../modules/i18n/Resolvable");
 
-module.exports = function install(cr, { locale }) {
+module.exports = function install(cr) {
     const bankCmd = cr.registerCommand("bank", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Trixie's own currency system so you can send, receive, spend, earn credits for additional features or rewards.")
             .setUsage("", "Look at your bank account"))
         .setCategory(Category.ECONOMY);
 
-    bankCmd.registerDefaultCommand(new SimpleCommand(async ({ guild, channel, member, prefix }) => {
+    bankCmd.registerDefaultCommand(new SimpleCommand(async ({ guild, member, prefix, ctx }) => {
         const account = await credits.getAccount(member);
         if (!account) {
             return new Translation("bank.no_account", "It looks like you haven't opened a bank account yet. How about doing so with `{{prefix}}bank create`", { prefix });
@@ -56,12 +57,14 @@ module.exports = function install(cr, { locale }) {
 
         const trans_raw = await credits.getTransactions(member, 5);
 
+        const locale = await ctx.translator();
+
         if (trans_raw.length > 0) {
             const transactions = [];
             for (let trans of trans_raw) {
                 transactions.push({
-                    ts: moment(trans.ts).fromNow(),
-                    cost: (trans.cost >= 0 ? "+" : "") + await locale.translate(channel, new NumberFormat(trans.cost)),
+                    ts: moment(trans.ts).locale(locale.locale).fromNow(),
+                    cost: (trans.cost >= 0 ? "+" : "") + Resolvable.resolve(new NumberFormat(trans.cost), locale),
                     description: trans.description,
                 });
             }
@@ -180,12 +183,14 @@ module.exports = function install(cr, { locale }) {
 
         const trans_raw = await credits.getTransactions(user);
 
+        const locale = await context.translator();
+
         if (trans_raw.length > 0) {
             const transactions = [];
             for (let trans of trans_raw) {
                 transactions.push({
-                    ts: moment(trans.ts).fromNow(),
-                    cost: (trans.cost >= 0 ? "+" : "") + await locale.translate(context.channel, new NumberFormat(trans.cost)),
+                    ts: moment(trans.ts).locale(locale.locale).fromNow(),
+                    cost: (trans.cost >= 0 ? "+" : "") + Resolvable.resolve(new NumberFormat(trans.cost), locale),
                     description: trans.description,
                 });
             }

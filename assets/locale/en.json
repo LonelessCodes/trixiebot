@@ -115,7 +115,8 @@
     "not_supported": "Locale '{{locale}}' is not supported :c Try {{locales}}",
     "success": "Changed locale for the server to {{locale}}",
     "success_ch": "Changed locale for {{channel}} to {{locale}}",
-    "title": "Server Locales"
+    "title": "Server Locales",
+    "server": "Server:"
   },
   "textaction": {
     "everyone": "all {{count}} users"

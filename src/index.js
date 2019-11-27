@@ -74,7 +74,12 @@ client.addListener("resume", replayed => djs_log(`Replayed ${replayed} events`))
 
 // Initialize Bot
 initialize(client)
-    .then(() => log.namespace("app", "Ready uwu.", `bootup_time:${(nanoTimer.diff(bootup_timer) / nanoTimer.NS_PER_SEC).toFixed(3)}s`))
+    .then(() => {
+        log.namespace("app", "Ready uwu.", `bootup_time:${(nanoTimer.diff(bootup_timer) / nanoTimer.NS_PER_SEC).toFixed(3)}s`);
+
+        // tell pm2 that we are now ready
+        process.send("ready");
+    })
     .catch(async err => {
         log.error("Failed to log in", err);
         await exit(1); // 1 - Uncaught Fatal Exception

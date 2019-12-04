@@ -118,11 +118,7 @@ class ConfigManager {
         this.client = client;
 
         this.db = db.collection("guild_config");
-        this._cache = new DocumentMapCache(this.db, "guildId", {
-            indexes: {
-                removedFrom: { expireAfterSeconds: 7 * 24 * 3600, sparse: true },
-            },
-        });
+        this._cache = new DocumentMapCache(this.db, "guildId");
 
         const values = {};
 
@@ -147,18 +143,6 @@ class ConfigManager {
         this.default_config = values;
 
         this.parameters = parameters;
-
-        this.addListeners();
-    }
-
-    addListeners() {
-        this.client.addListener("guildCreate", async guild => {
-            await this._cache.update(guild.id, { removedFrom: undefined });
-        });
-
-        this.client.addListener("guildDelete", async guild => {
-            await this._cache.update(guild.id, { removedFrom: new Date });
-        });
     }
 
     async get(guildId, parameter) {

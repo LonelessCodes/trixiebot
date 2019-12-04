@@ -34,23 +34,7 @@ class LocaleManager {
     constructor(client, db) {
         this.client = client;
         this.db = db.collection("locale");
-        this._cache = new DocumentMapCache(this.db, "guildId", {
-            indexes: {
-                removedFrom: { expireAfterSeconds: 7 * 24 * 3600, sparse: true },
-            },
-        });
-
-        this.addListeners();
-    }
-
-    addListeners() {
-        this.client.addListener("guildCreate", async guild => {
-            await this._cache.update(guild.id, { removedFrom: undefined });
-        });
-
-        this.client.addListener("guildDelete", async guild => {
-            await this._cache.update(guild.id, { removedFrom: new Date });
-        });
+        this._cache = new DocumentMapCache(this.db, "guildId");
     }
 
     async get(guildId, channelid) {

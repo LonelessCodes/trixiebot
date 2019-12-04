@@ -563,7 +563,6 @@ class ChannelQueryCursor {
     process(config) {
         const guild = this.manager.client.guilds.get(config.guildId);
         if (!guild) {
-            this.manager.removeChannel(new Config(this.service, null, config.name, config.userId, config._id));
             return null;
         }
         if (!guild.available) return null;

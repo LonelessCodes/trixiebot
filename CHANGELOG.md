@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.1"></a>
+## [3.3.1](https://github.com/LonelessCodes/trixiebot/compare/v3.3.0...v3.3.1) (2019-12-04)
+
+
+### Bug Fixes
+
+* fixed bank transactions not being of custom locale ([458b60c](https://github.com/LonelessCodes/trixiebot/commit/458b60c))
+* fixed problems with servers losing their alerts and configurations ([9760e2c](https://github.com/LonelessCodes/trixiebot/commit/9760e2c))
+* tiny fixes ([4886586](https://github.com/LonelessCodes/trixiebot/commit/4886586))
+
+
+### Features
+
+* tell pm2 when the process is ready ([c021c8a](https://github.com/LonelessCodes/trixiebot/commit/c021c8a))
+
+
+
 <a name="3.3.0"></a>
 # [3.3.0](https://github.com/LonelessCodes/trixiebot/compare/v3.2.0...v3.3.0) (2019-11-16)
 

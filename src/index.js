@@ -78,7 +78,7 @@ initialize(client)
         log.namespace("app", "Ready uwu.", `bootup_time:${(nanoTimer.diff(bootup_timer) / nanoTimer.NS_PER_SEC).toFixed(3)}s`);
 
         // tell pm2 that we are now ready
-        process.send("ready");
+        if (typeof process.send === "function") process.send("ready");
     })
     .catch(async err => {
         log.error("Failed to log in", err);

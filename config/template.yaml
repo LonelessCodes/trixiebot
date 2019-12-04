@@ -18,7 +18,7 @@ database:
     pass: XXXX
 
 discord:
-  token:         XXXX
+  token:  XXXX
 
 # the dir for user generated files created one level up outside the project root
 user_files_dir: trixiefiles

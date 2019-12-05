@@ -18,7 +18,7 @@ const config = require("../config");
 const log = require("../log");
 const { splitArgs } = require("../util/string");
 const { findAndRemove } = require("../util/array");
-const fetch = require("node-fetch");
+const Derpibooru = require("../modules/Derpibooru");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
@@ -33,31 +33,86 @@ const TranslationMerge = require("../modules/i18n/TranslationMerge");
 //                                                                                               no real gore, but candy gore is allowed
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "(gore AND -candy gore)", "foal abuse"];
 
-function getArtist(tags) {
-    const arr = tags.split(/,\s*/g);
-    for (const tag of arr) {
-        if (/^artist:[\w\s]+/gi.test(tag)) {
-            const artist = tag.replace(/^artist:/i, "");
-            return artist;
+async function getEm(key, type, amount, tags) {
+    const derpi = new Derpibooru(key);
+
+    const results = [];
+    switch (type) {
+        case "first": {
+            const result = await derpi.fetch("search", tags, {
+                sf: "id",
+                sd: "asc",
+                perpage: amount,
+            });
+            if (!result.search) break;
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
+                const image = result.search[i];
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artists: Derpibooru.getArtists(image.tags),
+                });
+            }
+            break;
+        }
+        case "latest": {
+            const result = await derpi.fetch("search", tags, {
+                sf: "id",
+                sd: "desc",
+                perpage: amount,
+            });
+            if (!result.search) break;
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
+                const image = result.search[i];
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artists: Derpibooru.getArtists(image.tags),
+                });
+            }
+            break;
+        }
+        case "top": {
+            const result = await derpi.fetch("search", tags, {
+                sf: "score",
+                sd: "desc",
+                perpage: amount,
+            });
+            if (!result.search) break;
+            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
+                const image = result.search[i];
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artists: Derpibooru.getArtists(image.tags),
+                });
+            }
+            break;
+        }
+        case "random": {
+            const result = await derpi.fetch("search", tags);
+            if (!result.total) break;
+
+            const promises = [];
+            for (let i = 0; i < Math.min(amount, result.total); i++) {
+                const promise = derpi.fetch("search", tags, {
+                    random_image: true,
+                }).then(response => derpi.fetch(response.id));
+                promises.push(promise);
+            }
+
+            for (const image of await Promise.all(promises)) {
+                results.push({
+                    image_url: image.representations.large,
+                    id: image.id,
+                    artists: Derpibooru.getArtists(image.tags),
+                });
+            }
+            break;
         }
     }
-}
 
-async function fetchDerpi(params) {
-    const scope = params.scope || "search";
-    delete params.scope;
-
-    let string = [];
-    for (const key in params)
-        string.push(key + "=" + params[key]);
-    string = string.join("&");
-
-    const url = `https://derpibooru.org/${scope}.json?${string}`;
-
-    const response = await fetch(url, { timeout: 10000 })
-        .then(request => request.json());
-
-    return response;
+    return results;
 }
 
 async function process(key, message, msg, type) {
@@ -100,96 +155,7 @@ async function process(key, message, msg, type) {
     if (length_before > tags.length) warning = new Translation("derpi.warning", "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly");
     tags.push(...filter_tags.map(tag => "-" + tag));
 
-    // join to a query string
-    const query = tags.map(t => encodeURIComponent(t)).join(",").replace(/\s+/g, "+");
-
-    const results = [];
-    const promises = [];
-    let responses = [];
-    let result;
-    switch (type) {
-        case "first":
-            result = await fetchDerpi({
-                q: query,
-                sf: "id",
-                sd: "asc",
-                perpage: amount,
-                key,
-            });
-            if (!result.search) break;
-            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                const image = result.search[i];
-                results.push({
-                    image_url: image.representations.large,
-                    id: image.id,
-                    artist: getArtist(image.tags),
-                });
-            }
-            break;
-        case "latest":
-            result = await fetchDerpi({
-                q: query,
-                sf: "id",
-                sd: "desc",
-                perpage: amount,
-                key,
-            });
-            if (!result.search) break;
-            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                const image = result.search[i];
-                results.push({
-                    image_url: image.representations.large,
-                    id: image.id,
-                    artist: getArtist(image.tags),
-                });
-            }
-            break;
-        case "top":
-            result = await fetchDerpi({
-                q: query,
-                sf: "score",
-                sd: "desc",
-                perpage: amount,
-                key,
-            });
-            if (!result.search) break;
-            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                const image = result.search[i];
-                results.push({
-                    image_url: image.representations.large,
-                    id: image.id,
-                    artist: getArtist(image.tags),
-                });
-            }
-            break;
-        case "random":
-            result = await fetchDerpi({
-                q: query,
-                key,
-            });
-            if (!result.total) break;
-            for (let i = 0; i < Math.min(amount, result.total); i++) {
-                const promise = fetchDerpi({
-                    q: query,
-                    random_image: "true",
-                    key,
-                }).then(response => fetchDerpi({
-                    scope: response.id,
-                    key,
-                }));
-                promises.push(promise);
-            }
-            responses = await Promise.all(promises);
-
-            for (const image of responses) {
-                results.push({
-                    image_url: image.representations.large,
-                    id: image.id,
-                    artist: getArtist(image.tags),
-                });
-            }
-            break;
-    }
+    const results = await getEm(key, type, amount, tags);
 
     if (results.length === 0) {
         if (!warning) return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
@@ -213,7 +179,7 @@ async function process(key, message, msg, type) {
         warning,
         results.map(result => {
             let str = "";
-            if (result.artist) str += `**${result.artist}** `;
+            if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
             str += `*<https://derpibooru.org/${result.id}>* `;
             str += `https:${result.image_url}`;
             return str;

@@ -16,58 +16,24 @@
 
 const config = require("../config");
 const log = require("../log");
-const fetch = require("node-fetch");
+const Derpibooru = require("../modules/Derpibooru");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-function getArtist(tags) {
-    const arr = tags.split(/,\s*/g);
-    for (const tag of arr) {
-        if (/^artist:[\w\s]+/gi.test(tag)) {
-            const artist = tag.replace(/^artist:/i, "");
-            return artist;
-        }
-    }
-}
-
-async function get(params) {
-    const scope = params.scope || "search";
-    delete params.scope;
-
-    let string = [];
-    for (const key in params)
-        string.push(key + "=" + params[key]);
-    string = string.join("&");
-
-    const result = await fetch(`https://derpibooru.org/${scope}.json?key=${config.get("derpibooru.key")}&${string}`, {
-        timeout: 10000,
-    });
-    return await result.json();
-}
-
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "gore", "foal abuse"];
 
 const tags = ["pony", "vulva", "-penis", "nudity", "-photo", ...filter_tags.map(tag => "-" + tag), "upvotes.gte:150"];
 
-const query = tags.map(t => encodeURIComponent(t))
-    .join(",").replace(/\s+/g, "+")
-    .toLowerCase();
-
-async function process() {
-    const image = await get({
-        q: query,
-        random_image: "true",
-    }).then(({ id }) => get({
-        scope: id,
-    }));
-
-    const artist = getArtist(image.tags);
+async function process(key) {
+    const search = await Derpibooru.fetch(key, "search", tags, { random_image: true });
+    const image = await Derpibooru.fetch(key, search.id);
+    const artists = Derpibooru.getArtists(image.tags);
 
     let str = "";
-    if (artist) str += `**${artist}** `;
+    if (artists.length) str += artists.map(a => `**${a}**`).join(", ") + " ";
     str += `*<https://derpibooru.org/${image.id}>* `;
     str += `https:${image.representations.large}`;
 
@@ -77,7 +43,7 @@ async function process() {
 module.exports = function install(cr) {
     if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
-    cr.registerCommand("horsepussy", new SimpleCommand(() => process()))
+    cr.registerCommand("horsepussy", new SimpleCommand(() => process(config.get("derpibooru.key"))))
         .setHelp(new HelpContent().setUsage("", "Get some gud quality horse pussi OwO"))
         .setExplicit(true)
         .setCategory(Category.IMAGE)

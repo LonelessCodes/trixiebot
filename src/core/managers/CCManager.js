@@ -131,7 +131,7 @@ class CCManager {
             log(`Worker ready. boot_time:${time.toFixed(1)}ms`);
         });
 
-        this.worker_methods = new WorkerMethods(this.client, this.database, this.settings_db, this.cpc);
+        this.worker_methods = new WorkerMethods(this.client, this.cpc);
 
         /** @type {Map<string, Trigger[]} */
         this.trigger_cache = new Map;

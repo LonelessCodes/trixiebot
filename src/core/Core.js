@@ -15,8 +15,8 @@
  */
 
 const fetch = require("node-fetch");
-const path = require("path");
 const fs = require("fs-extra");
+const path = require("path");
 
 const log = require("../log").namespace("core");
 const config = require("../config");
@@ -26,19 +26,20 @@ const helpToJSON = require("../util/commands/helpToJSON");
 const nanoTimer = require("../modules/timer");
 const random = require("../modules/random/random");
 const calendar_events = require("../modules/calendar_events");
-const AliasCommand = require("./commands/AliasCommand");
-const CommandScope = require("../util/commands/CommandScope");
-const LocaleManager = require("./managers/LocaleManager");
-const ConfigManager = require("./managers/ConfigManager");
-const { Parameter } = ConfigManager;
 
 const CommandProcessor = require("./CommandProcessor");
+
+const DatabaseManager = require("./managers/DatabaseManager");
+const CM = require("./managers/ConfigManager");
+const LocaleManager = require("./managers/LocaleManager");
 const WebsiteManager = require("./managers/WebsiteManager");
 const UpvotesManager = require("./managers/UpvotesManager");
 const MemberLog = require("./listeners/MemberLog");
 
 const Discord = require("discord.js");
 
+const CommandScope = require("../util/commands/CommandScope");
+const AliasCommand = require("./commands/AliasCommand");
 const Translation = require("../modules/i18n/Translation");
 
 function fetchPost(url, opts) {
@@ -46,7 +47,13 @@ function fetchPost(url, opts) {
         opts.body = JSON.stringify(opts.json);
         delete opts.json;
     }
-    return fetch(url, { method: "POST", ...opts });
+    return fetch(url, {
+        method: "POST", ...opts,
+        headers: {
+            "Content-Type": "application/json",
+            ...(opts.headers || {}),
+        },
+    });
 }
 
 class Core {
@@ -56,31 +63,31 @@ class Core {
      */
     constructor(client, db) {
         this.client = client;
-        this.db = db;
+        this.db = new DatabaseManager(db);
 
-        this.config = new ConfigManager(this.client, this.db, [
-            new Parameter("prefix", new Translation("config.prefix", "❗ Prefix"), config.get("prefix") || "!", String),
+        this.config = new CM(this.client, this.db, [
+            new CM.Parameter("prefix", new Translation("config.prefix", "❗ Prefix"), config.get("prefix") || "!", String),
 
-            new Parameter("uom", new Translation("config.uom", "📐 Measurement preference"), "cm", ["cm", "in"]),
+            new CM.Parameter("uom", new Translation("config.uom", "📐 Measurement preference"), "cm", ["cm", "in"]),
 
-            new Parameter([
-                new Parameter("announce.channel", new Translation("config.announce_ch", "Channel. 'none' disables announcements"), null, Discord.TextChannel, true),
-                new Parameter("announce.bots", new Translation("config.announce_bot", "Announce Bots"), true, Boolean),
+            new CM.Parameter([
+                new CM.Parameter("announce.channel", new Translation("config.announce_ch", "Channel. 'none' disables announcements"), null, Discord.TextChannel, true),
+                new CM.Parameter("announce.bots", new Translation("config.announce_bot", "Announce Bots"), true, Boolean),
             ], new Translation("config.announce", "🔔 Announce new/leaving/banned users")),
 
-            new Parameter([
-                new Parameter("welcome.enabled", "true/false", false, Boolean),
-                new Parameter("welcome.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
+            new CM.Parameter([
+                new CM.Parameter("welcome.enabled", "true/false", false, Boolean),
+                new CM.Parameter("welcome.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
             ], new Translation("config.welcome", "👋 Announce new users")),
 
-            new Parameter([
-                new Parameter("leave.enabled", "true/false", false, Boolean),
-                new Parameter("leave.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
+            new CM.Parameter([
+                new CM.Parameter("leave.enabled", "true/false", false, Boolean),
+                new CM.Parameter("leave.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
             ], new Translation("config.leave", "🚶 Announce leaving users")),
 
-            new Parameter([
-                new Parameter("ban.enabled", "true/false", false, Boolean),
-                new Parameter("ban.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
+            new CM.Parameter([
+                new CM.Parameter("ban.enabled", "true/false", false, Boolean),
+                new CM.Parameter("ban.text", new Translation("config.text", "Custom Text ('{{user}}' as user, empty = default)"), null, String, true),
             ], new Translation("config.ban", "🔨 Announce banned users")),
         ]);
 
@@ -106,7 +113,8 @@ class Core {
     }
 
     async loadCommands(commands_package) {
-        if (!commands_package || typeof commands_package !== "string") throw new Error("Cannot load commands if not given a path to look at!");
+        if (!commands_package || typeof commands_package !== "string")
+            throw new Error("Cannot load commands if not given a path to look at!");
 
         log("Installing Commands...");
 
@@ -115,11 +123,13 @@ class Core {
         const files = await walk(path.resolve(__dirname, "..", commands_package))
             .then(files => files.filter(file => path.extname(file) === ".js"));
 
-        await Promise.all(files.map(async file => {
-            const install = require(path.resolve("../" + commands_package, file));
-            await install(this.processor.REGISTRY, {
-                client: this.client, config: this.config, locale: this.locale, db: this.db, error_cases: this.processor.error_cases,
-            });
+        const install_opts = {
+            client: this.client,
+            config: this.config, locale: this.locale, db: this.db, error_cases: this.processor.error_cases,
+        };
+        await Promise.all(files.map(file => {
+            const install = require(path.resolve(`../${commands_package}`, file));
+            return install(this.processor.REGISTRY, install_opts);
         }));
 
         const install_time = nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC;
@@ -151,8 +161,8 @@ class Core {
         });
 
         const str = JSON.stringify(jason, null, 2);
-        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str, { mode: 0o666 });
-        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str, { mode: 0o666 });
+        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str);
+        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str);
 
         const build_time = (nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC) - install_time;
 
@@ -166,8 +176,8 @@ class Core {
     async setStatus() {
         let timeout_ref = null;
 
-        const statuses = await fs.readFile(path.join(__dirname, "../../assets/text/statuses.txt"), "utf8")
-            .then(txt => txt.split("\n").filter(s => s !== ""));
+        const txt = await fs.readFile(path.join(process.cwd(), "assets/text/statuses.txt"), "utf8");
+        const statuses = txt.split("\n").filter(s => s !== "");
 
         const updateStatus = async () => {
             clearTimeout(timeout_ref);
@@ -215,73 +225,67 @@ class Core {
     }
 
     async updateStatistics() {
+        const id = this.client.user.id;
         const server_count = this.client.guilds.size;
 
         const promises = [];
 
         if (config.has("botlists.divinediscordbots_com"))
-            promises.push(fetchPost(`https://divinediscordbots.com/bot/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://divinediscordbots.com/bot/${id}/stats`, {
                 json: { server_count },
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: config.get("botlists.divinediscordbots_com"),
                 },
             }).catch(err => err));
 
         if (config.has("botlists.botsfordiscord_com"))
-            promises.push(fetchPost(`https://botsfordiscord.com/api/bot/${this.client.user.id}`, {
+            promises.push(fetchPost(`https://botsfordiscord.com/api/bot/${id}`, {
                 json: { server_count },
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: config.get("botlists.botsfordiscord_com"),
                 },
             }).catch(err => err));
 
         if (config.has("botlists.discord_bots_gg"))
-            promises.push(fetchPost(`https://discord.bots.gg/api/v1/bots/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://discord.bots.gg/api/v1/bots/${id}/stats`, {
                 json: { guildCount: server_count },
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: config.get("botlists.discord_bots_gg"),
                 },
             }).catch(err => err));
 
         if (config.has("botlists.botlist_space"))
-            promises.push(fetchPost(`https://botlist.space/api/bots/${this.client.user.id}`, {
+            promises.push(fetchPost(`https://botlist.space/api/bots/${id}`, {
                 json: { server_count },
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: config.get("botlists.botlist_space"),
                 },
             }).catch(err => err));
 
         if (config.has("botlists.ls_terminal_ink"))
-            promises.push(fetchPost(`https://ls.terminal.ink/api/v2/bots/${this.client.user.id}`, {
+            promises.push(fetchPost(`https://ls.terminal.ink/api/v2/bots/${id}`, {
                 json: { bot: { count: server_count } },
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: config.get("botlists.ls_terminal_ink"),
                 },
             }).catch(err => err));
 
         if (config.has("botlists.discordbotlist_com"))
-            promises.push(fetchPost(`https://discordbotlist.com/api/bots/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://discordbotlist.com/api/bots/${id}/stats`, {
                 json: {
                     guilds: server_count,
                     users: this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0),
                     voice_connections: this.client.voiceConnections.size,
                 },
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: "Bot " + config.get("botlists.discordbotlist_com"),
                 },
             }).catch(err => err));
 
         if (config.has("botlists.discordbots_org"))
-            promises.push(fetchPost(`https://discordbots.org/api/bots/${this.client.user.id}/stats`, {
+            promises.push(fetchPost(`https://top.gg/api/bots/${id}/stats`, {
                 json: { server_count },
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: config.get("botlists.discordbots_org"),
                 },
             }).catch(err => err));

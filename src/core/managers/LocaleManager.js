@@ -33,8 +33,7 @@ const i18n = new I18n({
 class LocaleManager {
     constructor(client, db) {
         this.client = client;
-        this.db = db.collection("locale");
-        this._cache = new DocumentMapCache(this.db, "guildId");
+        this._cache = new DocumentMapCache(db.collection("locale"), "guildId");
     }
 
     async get(guildId, channelid) {

@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const getNextSequence = require("../../modules/getNextSequence");
+const getNextSequence = require("../../modules/db/getNextSequence");
 // eslint-disable-next-line no-unused-vars
 const { Message } = require("discord.js");
 

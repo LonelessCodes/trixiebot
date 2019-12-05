@@ -41,9 +41,7 @@ class CreditsManager {
     async getAccount(user) {
         if (user instanceof GuildMember) user = user.user;
 
-        const account = await this.accounts.then(db => db.findOne({ userId: user.id }));
-
-        return account;
+        return await this.accounts.then(db => db.findOne({ userId: user.id }));
     }
 
     /**

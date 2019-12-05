@@ -14,26 +14,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = new class PromisesUtils {
+// eslint-disable-next-line no-unused-vars
+const Mongo = require("mongodb");
+
+class DatabaseManager {
     /**
-     * @param {number} ms Delay in milliseconds
-     * @returns {Promise<void>}
+     * @param {Mongo.Db} db
      */
-    timeout(ms) {
-        return new Promise(res => setTimeout(res, ms));
+    constructor(db) {
+        this.db = db;
+
+        this.slots = new (require("./database/SlotsDatabase"))(db);
     }
 
-    /**
-     * @returns {Promise<void>}
-     */
-    immediate() {
-        return new Promise(res => setImmediate(res));
+    collection(name) {
+        return this.db.collection(name);
     }
 
-    /**
-     * @returns {Promise<void>}
-     */
-    tick() {
-        return new Promise(res => process.nextTick(res));
+    async getUser(user) {
+        return {
+            slots: await this.slots.getUser(user),
+        };
     }
-};
+}
+
+module.exports = DatabaseManager;

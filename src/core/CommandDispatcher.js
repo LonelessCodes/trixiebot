@@ -59,7 +59,6 @@ class CommandDispatcher {
      */
     constructor(client, database, registry) {
         this.client = client;
-        this.database = database;
         this.REGISTRY = registry;
 
         this.global_ratelimit = new RateLimiter(TimeUnit.MINUTE, 15, 40);
@@ -67,18 +66,18 @@ class CommandDispatcher {
 
         // caches
         this.blacklisted_users = new DocumentMapCache(
-            this.database.collection("blacklisted"), "userId", { maxSize: 0, ttl: 3600 }
+            database.collection("blacklisted"), "userId", { maxSize: 0, ttl: 3600 }
         );
 
-        this.timeout = this.database.collection("timeout");
+        this.timeout = database.collection("timeout");
         this.timeout.createIndex({ guildId: 1, memberId: 1 }, { unique: true });
-        this.disabled_commands = this.database.collection("disabled_commands");
+        this.disabled_commands = database.collection("disabled_commands");
         this.disabled_commands.createIndex({ guildId: 1 }, { unique: true });
-        this.disabled_channels = this.database.collection("disabled_channels");
+        this.disabled_channels = database.collection("disabled_channels");
         this.disabled_channels.createIndex({ guildId: 1 }, { unique: true });
-        this.disabled_categories = this.database.collection("disabled_categories");
+        this.disabled_categories = database.collection("disabled_categories");
         this.disabled_categories.createIndex({ guildId: 1 }, { unique: true });
-        this.disabled_commands_channels = this.database.collection("disabled_commands_channels");
+        this.disabled_commands_channels = database.collection("disabled_commands_channels");
         this.disabled_commands_channels.createIndex({ guildId: 1, command: 1 }, { unique: true });
     }
 

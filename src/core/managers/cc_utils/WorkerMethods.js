@@ -56,12 +56,8 @@ async function convertError(promise, context) {
 }
 
 class WorkerMethods {
-    constructor(client, database, settings_db, cpc) {
+    constructor(client, cpc) {
         this.client = client;
-
-        this.database = database;
-
-        this.settings_db = settings_db;
 
         /** @type {Map<string, Map<string, Discord.Message>>} */
         this.message_cache = new Map;

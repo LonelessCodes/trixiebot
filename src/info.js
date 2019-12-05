@@ -23,8 +23,8 @@ const dev = process.env.NODE_ENV === "development";
 if (!config.has("user_files_dir")) throw new Error("No user files dir specified in config");
 
 module.exports = Object.freeze({
-    WEBSITE: config.get("website_url"),
-    INVITE: config.get("invite_url"),
+    WEBSITE: config.has("website_url") ? config.get("website_url") : null,
+    INVITE: config.has("invite_url") ? config.get("invite_url") : null,
     VERSION: packageFile.version,
     DEV: dev,
     FILES_BASE: path.resolve(path.join(__dirname, "..", "..", config.get("user_files_dir"))),

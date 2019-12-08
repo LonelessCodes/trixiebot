@@ -33,7 +33,7 @@ const PaginatorGuildAction = require("../modules/actions/PaginatorGuildAction");
 // eslint-disable-next-line no-warning-comments
 // TODO: translate
 
-module.exports = async function install(cr, { client, db }) {
+module.exports = function install(cr, { client, db }) {
     const database = db.collection("birthday");
     const database_config = db.collection("birthday_config");
 
@@ -87,7 +87,7 @@ module.exports = async function install(cr, { client, db }) {
     // TODO: allow instant updating
     // Run every hour instead of every day to update new entries at least hourly
     new CronJob("0 0 * * * *", tick).start();
-    await tick();
+    tick();
 
     const birthdayCmd = cr.registerCommand("birthday", new TreeCommand)
         .setHelp(new HelpContent()

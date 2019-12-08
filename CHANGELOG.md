@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.2"></a>
+## [3.3.2](https://github.com/LonelessCodes/trixiebot/compare/v3.3.1...v3.3.2) (2019-12-08)
+
+
+### Bug Fixes
+
+* fixed config command throwing error when setting .enabled properties ([bb868e5](https://github.com/LonelessCodes/trixiebot/commit/bb868e5))
+* fixed config.website_url and config.invite_url crashing bot if omitted ([c7c0d42](https://github.com/LonelessCodes/trixiebot/commit/c7c0d42))
+* fixed eval command having no access to message object ([ec0dad9](https://github.com/LonelessCodes/trixiebot/commit/ec0dad9))
+* stop blocking bootup ([11f01ff](https://github.com/LonelessCodes/trixiebot/commit/11f01ff))
+
+
+### Features
+
+* move waifu slots to new DatabaseManager ([3f22668](https://github.com/LonelessCodes/trixiebot/commit/3f22668))
+
+
+
 <a name="3.3.1"></a>
 ## [3.3.1](https://github.com/LonelessCodes/trixiebot/compare/v3.3.0...v3.3.1) (2019-12-04)
 

@@ -84,7 +84,7 @@ class Parameter {
             return "#" + (this.client.channels.get(value) || { name: "deleted-channel" }).name;
         }
 
-        return value;
+        return String(value);
     }
 
     check(value) {

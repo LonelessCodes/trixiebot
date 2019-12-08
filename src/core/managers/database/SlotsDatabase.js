@@ -18,6 +18,7 @@
 const Mongo = require("mongodb");
 // eslint-disable-next-line no-unused-vars
 const { GuildMember, User } = require("discord.js");
+const SlotsCursor = require("./slots/SlotsCursor");
 
 class SlotsDatabase {
     /**
@@ -27,7 +28,7 @@ class SlotsDatabase {
         this.db = db.collection("slots");
         this.db.createIndex({ userId: 1 }, { unique: true });
 
-        /** @type {Map<string, { min: number; max: number; }>} */
+        /** @type {Map<string, SlotsDatabase>} */
         this._slots = new Map;
     }
 
@@ -38,8 +39,9 @@ class SlotsDatabase {
      * @returns {SlotsDatabase}
      */
     register(name, min, max) {
-        this._slots.set(name, { min, max });
-        return this;
+        const slot = new SlotsCursor(this.db, name, min, max);
+        this._slots.set(name, slot);
+        return slot;
     }
 
     /**
@@ -47,16 +49,9 @@ class SlotsDatabase {
      * @param {GuildMember|User} user
      * @returns {Promise<boolean>}
      */
-    async hasMax(name, user) {
-        if (user instanceof GuildMember) user = user.user;
-
+    hasMax(name, user) {
         if (!this._slots.has(name)) throw new Error("You need to register '" + name + "' first");
-
-        const doc = await this.db.findOne({ userId: user.id }, { projection: { [name]: 1 } });
-        if (!doc || typeof doc[name] !== "number") return false;
-
-        const slot = this._slots.get(name);
-        return doc[name] >= (slot.max - slot.min);
+        return this._slots.get(name).hasMax(user);
     }
 
     /**
@@ -64,17 +59,9 @@ class SlotsDatabase {
      * @param {GuildMember|User} user
      * @returns {Promise<number>}
      */
-    async get(name, user) {
-        if (user instanceof GuildMember) user = user.user;
-
+    get(name, user) {
         if (!this._slots.has(name)) throw new Error("You need to register '" + name + "' first");
-
-        const slot = this._slots.get(name);
-
-        const doc = await this.db.findOne({ userId: user.id }, { projection: { [name]: 1 } });
-        if (!doc || typeof doc[name] !== "number") return slot.min;
-
-        return Math.min(slot.max, doc[name] + slot.min);
+        return this._slots.get(name).get(user);
     }
 
     /**
@@ -83,12 +70,9 @@ class SlotsDatabase {
      * @param {number} [inc=1]
      * @returns {Promise<void>}
      */
-    async add(name, user, inc = 1) {
-        if (user instanceof GuildMember) user = user.user;
-
+    add(name, user, inc = 1) {
         if (!this._slots.has(name)) throw new Error("You need to register '" + name + "' first");
-
-        await this.db.updateOne({ userId: user.id }, { $inc: { [name]: inc } });
+        return this._slots.get(name).add(user, inc);
     }
 
     /**
@@ -97,23 +81,18 @@ class SlotsDatabase {
      * @param {number} val
      * @returns {Promise<void>}
      */
-    async set(name, user, val) {
-        if (user instanceof GuildMember) user = user.user;
-
+    set(name, user, val) {
         if (!this._slots.has(name)) throw new Error("You need to register '" + name + "' first");
-
-        await this.db.updateOne({ userId: user.id }, { $set: { [name]: val } });
+        return this._slots.get(name).set(user, val);
     }
 
     /**
      * @param {GuildMember|User} user
-     * @returns {{}}
+     * @returns {Promise<any>}
      */
-    async getUser(user) {
+    getUser(user) {
         if (user instanceof GuildMember) user = user.user;
-        const doc = await this.db.findOne({ userId: user.id }, { projection: { _id: 0, userId: 0 } });
-        if (!doc) return null;
-        return doc;
+        return this.db.findOne({ userId: user.id }, { projection: { _id: 0, userId: 0 } });
     }
 }
 

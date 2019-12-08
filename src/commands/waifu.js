@@ -60,9 +60,7 @@ async function getData(message, content, database, databaseSlots) {
         guildId: message.guild.id,
     });
 
-    const slots = await databaseSlots.findOne({
-        waifuId: message.author.id,
-    });
+    const slots = await databaseSlots.get(message.author);
 
     return {
         mentions,
@@ -84,7 +82,7 @@ const MAX_SLOTS = 15;
 
 module.exports = function install(cr, { db }) {
     const database = db.collection("waifu");
-    const databaseSlots = db.collection("waifu_slots");
+    const databaseSlots = db.slots.register("waifu", DEFAULT_SLOTS, MAX_SLOTS);
 
     const waifuCommand = cr.registerCommand("waifu", new TreeCommand)
         .setHelp(new HelpContent()
@@ -347,14 +345,13 @@ module.exports = function install(cr, { db }) {
         }
 
         const cost = prices[slots]; // slots length is pretty much also the index of the next slot
-        const new_slots = slots + 1;
 
         return await purchaseSlots(
             ctx, buy_active, buy_cooldown_user, cost,
             new Translation("waifu.buy.success", "'Aight! There you go. Who will be your new waifu?"),
             async cost => {
                 const [, new_balance] = await Promise.all([
-                    databaseSlots.updateOne({ waifuId: user.id }, { $set: { slots: new_slots } }, { upsert: true }),
+                    databaseSlots.add(user),
                     credits.makeTransaction(message.guild, user, -cost, "waifu/slot", "Bought a waifu slot"),
                 ]);
                 return new_balance;
@@ -372,7 +369,7 @@ module.exports = function install(cr, { db }) {
         const slots = parseInt(v[1]);
         if (Number.isNaN(slots)) return;
 
-        await databaseSlots.updateOne({ waifuId: member.user.id }, { $set: { slots } }, { upsert: true });
+        await databaseSlots.set(member, slots);
 
         return "yo :ok_hand:";
     }))

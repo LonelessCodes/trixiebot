@@ -160,9 +160,13 @@ class Core {
             return 0;
         });
 
-        const str = JSON.stringify(jason, null, 2);
-        await fs.writeFile(path.join(process.cwd(), "assets", "commands.json"), str);
-        await fs.writeFile(path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json"), str);
+        const var_dir = path.join(process.cwd(), ".var");
+        const src = path.join(var_dir, "commands.json");
+        const dest = path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json");
+
+        if (!await fs.pathExists(var_dir)) await fs.mkdir(var_dir);
+        await fs.writeFile(src, JSON.stringify(jason, null, 2));
+        await fs.copy(src, dest, { overwrite: true });
 
         const build_time = (nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC) - install_time;
 

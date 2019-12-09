@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const cpc = require("../../../../modules/concurrency/cpc")(process);
+const cpc = require("trixie-ipc/cpc")(process);
 const { Permissions: DiscordPermissions } = require("discord.js");
 const c = require("./types");
 

@@ -17,8 +17,8 @@
 const info = require("../../info");
 const log = require("../../log").namespace("ipc");
 const ipc = require("node-ipc");
-const IPCAdapter = require("./IPCAdapter");
-const cpc = require("./cpc");
+const cpc = require("trixie-ipc/cpc");
+const IPCServerAdapter = require("trixie-ipc/IPCServerAdapter");
 
 ipc.config.silent = true;
 ipc.config.id = info.DEV ? "trixiedev" : "trixiebot";
@@ -27,6 +27,9 @@ ipc.config.logger = log.bind(log);
 
 ipc.serve();
 
-module.exports = cpc(new IPCAdapter(ipc.server));
+module.exports = cpc(
+    new IPCServerAdapter(ipc.server)
+        .on("connect", socket_id => log.debug("IPC", `Connected to ${socket_id}`))
+        .on("disconnect", socket_id => log.debug("IPC", `Disconnected from ${socket_id}`)));
 
 ipc.server.start();

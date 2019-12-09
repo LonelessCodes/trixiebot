@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const cpc = require("../../modules/concurrency/cpc");
-const respawn = require("../../modules/concurrency/respawn");
+const cpc = require("trixie-ipc/cpc");
+const respawn = require("trixie-ipc/respawn");
 const nanoTimer = require("../../modules/timer");
 const log = require("../../log").namespace("cc manager");
 const path = require("path");

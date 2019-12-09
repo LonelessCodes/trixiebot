@@ -175,10 +175,11 @@ module.exports = function install(cr, { db }) {
             .addParameter("role", "The role you would like to have removed")
             .addParameter("user mention", "This is irrelevant to you, if you don't have rights to manage roles yourself"));
 
-    const listRoles = roleCommand.registerSubCommand("available", new SimpleCommand(async message =>
-        await rolesMessage(message.guild, message.channel, database)
-    ))
-        .setHelp(new HelpContent().setUsage("", "Show all public roles that you can add to yourself."));
+    const listRoles = new SimpleCommand(async message => await rolesMessage(message.guild, message.channel, database))
+        .setHelp(new HelpContent().setUsage("", "Show all public roles that you can add to yourself."))
+        .setCategory(Category.UTIL);
+
+    roleCommand.registerSubCommand("available", listRoles);
     cr.registerCommand("roles", new AliasCommand("role", listRoles));
 
     const roleConfig = roleCommand.registerSubCommand("config", new TreeCommand)

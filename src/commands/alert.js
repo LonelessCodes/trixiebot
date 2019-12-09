@@ -34,6 +34,8 @@ const PiczelProcessor = require("../modules/alert/processor/PiczelProcessor");
 const SmashcastProcessor = require("../modules/alert/processor/SmashcastProcessor");
 const TwitchProcessor = require("../modules/alert/processor/TwitchProcessor");
 
+const URL_REGEX = /^(https?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/;
+
 module.exports = async function install(cr, { client, locale, db }) {
     const services = [
         PicartoProcessor,
@@ -78,21 +80,61 @@ module.exports = async function install(cr, { client, locale, db }) {
             embed.addField("#" + g_channel.name, str);
         }
 
-        await message.channel.send({ embed });
+        return embed;
     });
 
     alertCommand.registerSubCommand("list", list_command)
         .setHelp(new HelpContent().setUsage("", "list all active streaming alerts"));
 
-    alertCommand.registerSubCommand("remove", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async ({ message, content: url }) => {
+    alertCommand.registerDefaultCommand(new OverloadCommand)
+        .registerOverload("0", list_command)
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const g_channel = message.mentions.channels.first() || message.channel;
 
-            if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
+            const url = content
+                .replace(new RegExp(g_channel.toString(), "g"), "")
+                .replace(/<.*>/, str => str.slice(1, str.length - 1)) // clean links
+                .trim();
+
+            if (url === "") {
+                return new Translation("alert.url_missing", "`page url` should be a vaid url! Instead I got nothing");
+            }
+            if (!URL_REGEX.test(url)) {
                 return new Translation("alert.invalid_url", "`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", { url });
             }
 
             const config = await manager.parseConfig(g_channel, url);
+            if (!config) {
+                return new Translation("alert.unknown_service", "MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
+            }
+            if (!config.name) {
+                return new Translation("alert.page_missing", "You should also give me your channel page in the url instead of just the site!");
+            }
+            if (!config.userId) {
+                return new Translation("alert.no_exist", "That user does not exist!");
+            }
+            if (config._id) {
+                return new Translation("alert.already_subscribed", "This server is already subscribed to this streamer.");
+            }
+
+            await manager.addChannel(config);
+
+            return new Translation("alert.success", "Will be alerting y'all there when {{name}} goes online!", {
+                name: config.name,
+            });
+        }));
+
+    alertCommand.registerSubCommand("remove", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
+            const url = content
+                .replace(/<.*>/, str => str.slice(1, str.length - 1)) // clean links
+                .trim();
+
+            if (!URL_REGEX.test(url)) {
+                return new Translation("alert.invalid_url", "`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", { url });
+            }
+
+            const config = await manager.parseConfig(message.channel, url);
             if (!config) {
                 return new Translation("alert.unknown_service", "MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
             }
@@ -132,40 +174,6 @@ module.exports = async function install(cr, { client, locale, db }) {
         }
     }))
         .setHelp(new HelpContent().setUsage("", "toggle cleaning up online announcements"));
-
-    alertCommand.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("0", list_command)
-        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
-            const g_channel = message.mentions.channels.first() || message.channel;
-
-            const url = content.replace(new RegExp(g_channel.toString(), "g"), "").trim();
-            if (url === "") {
-                return new Translation("alert.url_missing", "`page url` should be a vaid url! Instead I got nothing");
-            }
-            if (!/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(url)) {
-                return new Translation("alert.invalid_url", "`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", { url });
-            }
-
-            const config = await manager.parseConfig(g_channel, url);
-            if (!config) {
-                return new Translation("alert.unknown_service", "MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
-            }
-            if (!config.name) {
-                return new Translation("alert.page_missing", "You should also give me your channel page in the url instead of just the site!");
-            }
-            if (!config.userId) {
-                return new Translation("alert.no_exist", "That user does not exist!");
-            }
-            if (config._id) {
-                return new Translation("alert.already_subscribed", "This server is already subscribed to this streamer.");
-            }
-
-            await manager.addChannel(config);
-
-            return new Translation("alert.success", "Will be alerting y'all there when {{name}} goes online!", {
-                name: config.name,
-            });
-        }));
 
     alertCommand.registerSubCommandAlias("*", "add");
 };

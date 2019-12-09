@@ -74,7 +74,9 @@ module.exports = async function install(cr, { db }) {
         }))
         .setHelp(new HelpContent()
             .setUsage("<phrase>")
-            .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"));
+            .addParameter("phrase", "Word or phrase to be unmuted/unblacklisted"))
+        .setCategory(Category.MODERATION)
+        .setPermissions(permission);
 
     muteWordCommand.registerSubCommand("remove", removeCommand);
     cr.registerCommand("unmute", removeCommand);

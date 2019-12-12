@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.0"></a>
+# [3.4.0](https://github.com/LonelessCodes/trixiebot/compare/v3.3.2...v3.4.0) (2019-12-12)
+
+
+### Bug Fixes
+
+* fixed roles command not working ([75b3a81](https://github.com/LonelessCodes/trixiebot/commit/75b3a81))
+* fixed unmute command not working ([6859945](https://github.com/LonelessCodes/trixiebot/commit/6859945))
+* **disable/enable cmds:** fixed action when no command or category is given ([1ccc4a8](https://github.com/LonelessCodes/trixiebot/commit/1ccc4a8))
+* **help:** fixed alias being added way too often in new system ([21d44ee](https://github.com/LonelessCodes/trixiebot/commit/21d44ee))
+* **waifu cmd:** fixed NaN slots, allowing for infinite waifus ([59b3c30](https://github.com/LonelessCodes/trixiebot/commit/59b3c30))
+
+
+### Features
+
+* realise sending large text responses in owner commands ([dcd6f1c](https://github.com/LonelessCodes/trixiebot/commit/dcd6f1c))
+* **alert cmd:** allow posting NSFW and SFW streams into seperate channels ([4d18f3c](https://github.com/LonelessCodes/trixiebot/commit/4d18f3c))
+* **alert cmd:** support passing links in "<" url ">" format ([5de3e78](https://github.com/LonelessCodes/trixiebot/commit/5de3e78))
+* **alert cmd:** update help content with new features ([a88dda2](https://github.com/LonelessCodes/trixiebot/commit/a88dda2))
+* **help:** add multiple usages ([fb27a4a](https://github.com/LonelessCodes/trixiebot/commit/fb27a4a))
+
+
+
 <a name="3.3.2"></a>
 ## [3.3.2](https://github.com/LonelessCodes/trixiebot/compare/v3.3.1...v3.3.2) (2019-12-08)
 

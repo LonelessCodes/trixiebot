@@ -68,7 +68,7 @@ async function getData(message, content, database, databaseSlots) {
         owner_waifus,
         owner_of_me,
         all_waifus,
-        slots: slots ? slots.slots : DEFAULT_SLOTS,
+        slots,
     };
 }
 

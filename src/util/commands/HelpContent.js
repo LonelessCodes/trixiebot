@@ -19,8 +19,7 @@ class HelpContent {
         this.title = null;
         this.description = description;
         this.parameters = parameters;
-        this.options = options;
-        this.usage = usage;
+        this.usage = Array.isArray(options) ? options : [{ options, usage }];
         this.related = related;
     }
 
@@ -58,8 +57,12 @@ class HelpContent {
     }
 
     setUsage(options, usage) {
-        this.options = options;
-        this.usage = usage;
+        this.usage = Array.isArray(options) ? options : [{ options, usage }];
+        return this;
+    }
+
+    addUsage(options, usage) {
+        this.usage.push({ options, usage });
         return this;
     }
 

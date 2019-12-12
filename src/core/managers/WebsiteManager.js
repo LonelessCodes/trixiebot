@@ -46,6 +46,14 @@ function cleanContent(str, guild) {
         });
 }
 
+/**
+ * @param {Date} ts
+ * @returns {string}
+ */
+function ts(ts) {
+    return ts.toISOString();
+}
+
 class WebsiteManager {
     constructor(REGISTRY, client, config, locale, database) {
         this.REGISTRY = REGISTRY;
@@ -58,14 +66,6 @@ class WebsiteManager {
     }
 
     initializeIPC() {
-        /**
-         * @param {Date} ts
-         * @returns {string}
-         */
-        function ts(ts) {
-            return ts.toISOString();
-        }
-
         ipc.answer("checkGuilds", guildIds => guildIds.filter(guildId => this.client.guilds.has(guildId)));
 
         ipc.answer("overview", async guildId => {
@@ -145,8 +145,7 @@ class WebsiteManager {
             for (let [name, command] of this.REGISTRY.commands) {
                 if (command instanceof AliasCommand) continue;
                 if (command.category === Category.OWNER) continue;
-                const help = command.help;
-                if (!help) continue;
+                if (!command.help) continue;
 
                 const enabled = !(disabledCommands && disabledCommands.commands.includes(name));
 

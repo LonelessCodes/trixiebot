@@ -69,7 +69,7 @@ module.exports = function install(cr, { db }) {
         .addParameter("#channel", "A channel or multiple channels"));
 
     disableCmd.registerSubCommand("command", new SimpleCommand(async ({ message, content }) => {
-        const commandsRaw = content.toLowerCase().split(/\s+/g);
+        const commandsRaw = content.toLowerCase().split(/\s+/g).filter(c => c !== "");
         if (commandsRaw.length < 1) {
             return new Translation("disable.no_cmd", "Uhm, I guess... but you gotta give me a command or more to disable");
         }
@@ -98,7 +98,7 @@ module.exports = function install(cr, { db }) {
         .addParameter("command name", "The name of a command or a space seperated list of commands"));
 
     disableCmd.registerSubCommand("category", new SimpleCommand(async ({ message, content, ctx }) => {
-        const categoriesRaw = content.toLowerCase().split(/\s+/g);
+        const categoriesRaw = content.toLowerCase().split(/\s+/g).filter(c => c !== "");
         if (categoriesRaw.length < 1) {
             return new Translation("disable.no_category", "Uhm, I guess... but you gotta give me a category or more to disable");
         }
@@ -163,7 +163,7 @@ module.exports = function install(cr, { db }) {
         .addParameter("#channel", "A channel or multiple channels"));
 
     enableCmd.registerSubCommand("command", new SimpleCommand(async ({ message, content }) => {
-        const commandsRaw = content.toLowerCase().split(/\s+/g);
+        const commandsRaw = content.toLowerCase().split(/\s+/g).filter(c => c !== "");
         if (commandsRaw.length < 1) {
             return new Translation("enable.no_cmd", "Uhm, I guess... but you gotta give me a command or more to enable");
         }
@@ -190,7 +190,7 @@ module.exports = function install(cr, { db }) {
         .addParameter("command name", "The name of a command or a space seperated list of commands"));
 
     enableCmd.registerSubCommand("category", new SimpleCommand(async ({ message, content, ctx }) => {
-        const categoriesRaw = content.toLowerCase().split(/\s+/g);
+        const categoriesRaw = content.toLowerCase().split(/\s+/g).filter(c => c !== "");
         if (categoriesRaw.length < 1) {
             return new Translation("enable.no_category", "Uhm, I guess... but you gotta give me a category or more to enable");
         }

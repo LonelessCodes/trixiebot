@@ -304,11 +304,16 @@
   },
   "disable": {
     "no_ch": "Uhm, I guess... but you gotta give me a channel or more to disable",
-    "no_cmd": "Uhm, I guess... but you gotta give me a command or more to disable"
+    "no_cmd": "Uhm, I guess... but you gotta give me a command or more to disable",
+    "success_cat": {
+      "one": "Commands in category {{categories}} will listen again",
+      "other": "Commands in categories {{categories}} will listen again"
+    }
   },
   "enable": {
     "no_ch": "Uhm, I guess... but you gotta give me a channel or more to enable",
-    "no_cmd": "Uhm, I guess... but you gotta give me a command or more to enable"
+    "no_cmd": "Uhm, I guess... but you gotta give me a command or more to enable",
+    "no_category": "Uhm, I guess... but you gotta give me a category or more to enable"
   },
   "timeouts": {
     "found_no_mentions": "Found none of the mentioned users here"
@@ -414,5 +419,19 @@
     "pat": {
       "self": "Aww, take a pat <3"
     }
+  },
+  "category": {
+    "config": "Configuration",
+    "moderation": "Moderation",
+    "audio": "Audio",
+    "economy": "Economy",
+    "social": "Social",
+    "action": "Action",
+    "fun": "Fun",
+    "image": "Image",
+    "info": "Info",
+    "util": "Utility",
+    "trixie": "Trixie",
+    "owner": "Owner"
   }
 }

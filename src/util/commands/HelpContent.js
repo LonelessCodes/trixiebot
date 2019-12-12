@@ -19,7 +19,7 @@ class HelpContent {
         this.title = null;
         this.description = description;
         this.parameters = parameters;
-        this.usage = Array.isArray(options) ? options : [{ options, usage }];
+        this.usage = Array.isArray(options) ? options : (options || usage) ? [{ options, usage }] : [];
         this.related = related;
     }
 

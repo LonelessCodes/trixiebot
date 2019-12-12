@@ -95,20 +95,20 @@ class HelpBuilder extends RichEmbed {
                     else if (!options && !usage)
                         field.usage += `\`${prefix}${name}\``;
 
-                    let aliases = [...command.aliases.map(v => {
-                        if (v !== "*") return parentName ? parentName + " " + v : v;
-                        else return parentName;
-                    }).filter(a => !!a)];
-
-                    if (command instanceof TreeCommand && command.sub_commands.has("*")) {
-                        aliases = [...aliases, ...command.sub_commands.get("*").aliases.map(v => name + " " + v)];
-                    }
-
-                    if (aliases.length > 0)
-                        field.usage += ` *(alias ${aliases.map(a => `\`${prefix}${a}\``).join(", ")})*`;
-
                     field.usage += "\n";
                 }
+
+                let aliases = [...command.aliases.map(v => {
+                    if (v !== "*") return parentName ? parentName + " " + v : v;
+                    else return parentName;
+                }).filter(a => !!a)];
+
+                if (command instanceof TreeCommand && command.sub_commands.has("*")) {
+                    aliases = [...aliases, ...command.sub_commands.get("*").aliases.map(v => name + " " + v)];
+                }
+
+                if (aliases.length > 0)
+                    field.usage += ` *(alias ${aliases.map(a => `\`${prefix}${a}\``).join(", ")})*\n`;
 
                 if (help.parameters.size > 0) {
                     for (const [name, parameter] of help.parameters) {

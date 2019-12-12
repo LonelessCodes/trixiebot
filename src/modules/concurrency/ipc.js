@@ -29,7 +29,7 @@ ipc.serve();
 
 module.exports = cpc(
     new IPCServerAdapter(ipc.server)
-        .on("connect", socket_id => log.debug("IPC", `Connected to ${socket_id}`))
-        .on("disconnect", socket_id => log.debug("IPC", `Disconnected from ${socket_id}`)));
+        .on("connect", socket_id => log(`Connected to ${socket_id}`))
+        .on("disconnect", socket_id => log(`Disconnected from ${socket_id}`)));
 
 ipc.server.start();

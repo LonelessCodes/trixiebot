@@ -36,6 +36,23 @@ const extnames = {
     ".json": "json",
 };
 
+async function sendLargeText(channel, str, lang = "") {
+    const collector = channel.createMessageCollector(m => m.content.toLowerCase() === "quit!", { maxMatches: 1 });
+    let quit = false;
+    collector.once("collect", () => quit = true);
+
+    while (str.length > 0) {
+        if (quit) break;
+
+        let lastIndex = str.substring(0, 2000 - (2 * 4) - lang.length).lastIndexOf("\n");
+        const result = str.substring(0, lastIndex).replace(/`/g, "´");
+        await channel.send("```" + lang + "\n" + result + "\n```");
+        str = str.substring(lastIndex + 1); // + 1 because of the last \n
+    }
+
+    collector.stop();
+}
+
 // eslint-disable-next-line no-unused-vars
 module.exports = function install(cr, { client, config, locale, db }) {
     cr.registerCommand("file", new class extends BaseCommand {
@@ -63,16 +80,9 @@ module.exports = function install(cr, { client, config, locale, db }) {
             }
 
             const language = extnames[path.extname(content)] || "";
-            const highWaterMark = 2000 - (2 * 4) - language.length;
+            const file_content = await fs.readFile(file, { encoding: "utf8" });
 
-            let tmp = await fs.readFile(file, { encoding: "utf8" });
-
-            while (tmp.length > 0) {
-                let lastIndex = tmp.substring(0, highWaterMark).lastIndexOf("\n");
-                const result = tmp.substring(0, lastIndex).replace(/`/g, "´");
-                tmp = tmp.substring(lastIndex + 1);
-                await message.channel.send(`\`\`\`${result}\`\`\``);
-            }
+            await sendLargeText(message.channel, file_content, language);
         }
     })
         .setCategory(Category.OWNER)
@@ -80,21 +90,15 @@ module.exports = function install(cr, { client, config, locale, db }) {
 
     cr.registerCommand("exec", new SimpleCommand(async ({ message, content }) => {
         const { stdout, stderr } = await promisify(exec)(content);
-        let escaped = resolveStdout("Out:\n" + stdout + "\nErr:\n" + stderr);
-
-        while (escaped.length > 0) {
-            let lastIndex = escaped.substring(0, 2000 - (2 * 3)).lastIndexOf("\n");
-            const result = escaped.substring(0, lastIndex).replace(/`/g, "´");
-            escaped = escaped.substring(lastIndex + 1);
-            await message.channel.send(`\`\`\`${result}\`\`\``);
-        }
+        await sendLargeText(message.channel, resolveStdout("Out:\n" + stdout + "\nErr:\n" + stderr));
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
+    // eslint-disable-next-line no-unused-vars
     cr.registerCommand("eval", new SimpleCommand(async ({ message, ctx, content }) => {
         const result = await eval(`(async () => {${content}})()`);
-        return "```\n" + result + "\n```";
+        await sendLargeText(message.channel, String(result));
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);

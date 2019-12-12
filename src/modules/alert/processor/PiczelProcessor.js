@@ -18,8 +18,10 @@ const fetch = require("node-fetch");
 const log = require("../../../log").namespace("alert cmd");
 
 const Processor = require("./Processor");
-const Config = require("../Config");
-const OnlineChannel = require("../OnlineChannel");
+const ParsedStream = require("../stream/ParsedStream");
+const OnlineStream = require("../stream/OnlineStream");
+// eslint-disable-next-line no-unused-vars
+const Stream = require("../stream/Stream");
 
 class PiczelProcessor extends Processor {
     constructor(manager) {
@@ -33,34 +35,31 @@ class PiczelProcessor extends Processor {
         return /^(http:\/\/|https:\/\/)?(www\.piczel\.tv|piczel\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
     }
 
-    async getChannel(channel, url) {
+    async parseStreamer(url) {
         const regexp = /^(?:http:\/\/|https:\/\/)?(?:www\.piczel\.tv|piczel\.tv)\/watch\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 
-        if (!channel_name) return new Config(this, channel);
+        if (!channel_name) return new ParsedStream(this);
 
         try {
             let channelPage = await this.request("streams/" + channel_name);
-            if (channelPage.error || !channelPage.data[0] || !channelPage.data[0].user) return new Config(this, channel, channel_name);
+            if (channelPage.error || !channelPage.data[0] || !channelPage.data[0].user) return new ParsedStream(this, channel_name);
 
             channelPage = channelPage.data[0];
 
             const user_id = channelPage.user.id.toString();
-            const name = channelPage.user.username;
+            const username = channelPage.user.username;
 
-            const savedConfig = await this.getDBEntry(channel.guild, user_id);
-            if (savedConfig) return new Config(this, channel, name, user_id, savedConfig._id);
-
-            return new Config(this, channel, name, user_id);
+            return new ParsedStream(this, username, user_id);
         } catch (err) {
-            return new Config(this, channel, channel_name);
+            return new ParsedStream(this, channel_name);
         }
     }
 
     formatURL(channel, fat = false) {
-        if (fat) return this.url + "/watch/**" + channel.name + "**";
-        else return "https://" + this.url + "/watch/" + channel.name;
+        if (fat) return this.url + "/watch/**" + channel.username + "**";
+        else return "https://" + this.url + "/watch/" + channel.username;
     }
 
     async request(api) {
@@ -74,42 +73,55 @@ class PiczelProcessor extends Processor {
             const piczelOnline = await this.request("streams/?nsfw=true&live_only=false");
             if (piczelOnline.error) throw new Error("Piczel error:", piczelOnline.error);
 
-            const stream = this.manager.getConfigs(this);
+            const db_stream = this.manager.getServiceConfigsStream(this);
 
-            stream.addListener("data", config => this.checkChange(piczelOnline, config));
-            stream.once("end", () => { /* Do nothing */ });
-            stream.once("error", err => { log(err); });
+            db_stream.addListener("data", config => this.checkChange(piczelOnline, config));
+            db_stream.once("end", () => { /* Do nothing */ });
+            db_stream.once("error", err => { log(err); });
         } catch (_) { _; } // Piczel is down
     }
 
     /**
      * @param {any} piczelOnline
-     * @param {Channel} savedConfig
+     * @param {Stream} savedConfig
      */
-    checkChange(piczelOnline, savedConfig) {
-        const oldChannel = this.online.find(oldChannel =>
-            savedConfig.userId === oldChannel.userId &&
-            savedConfig.channel.guild.id === oldChannel.channel.guild.id);
+    async checkChange(piczelOnline, savedConfig) {
+        const oldStream = this.online.find(oldstream =>
+            savedConfig.userId === oldstream.userId &&
+            savedConfig.guild.id === oldstream.guild.id);
 
-        const channelPage = piczelOnline.find(channelPage => savedConfig.userId === channelPage.user.id.toString());
-        if (!channelPage) {
+        const streamPage = piczelOnline.find(streamPage => savedConfig.userId === streamPage.user.id.toString());
+        if (!streamPage) {
+            if (!savedConfig.messageId && !oldStream) return;
             // remove the channel from the recently online list
-            if (savedConfig.messageId || oldChannel) this.emit("offline", oldChannel || savedConfig);
+            this.emit("offline", oldStream || savedConfig);
+        } else if (oldStream && !oldStream.curr_channel.equals(savedConfig.getChannel(streamPage.adult))) {
+            // channel changed adult state and
+            if (!savedConfig.getSendable(streamPage.adult)) this.emit("offline", oldStream);
+
+            this.emit("change", new OnlineStream(oldStream, this.serializeRaw(streamPage)));
         } else {
+            // channel changed and last message still posted
+            if (!oldStream && savedConfig.lastChannelId && !savedConfig.lastChannel.equals(savedConfig.getChannel(streamPage.adult)))
+                await savedConfig.delete();
+
             // if the channel was not recently online, set it online
-            if (oldChannel || savedConfig.messageId) return;
+            if (oldStream || savedConfig.messageId) return;
+            if (!savedConfig.getSendable(streamPage.adult)) return;
 
-            const onlineChannel = new OnlineChannel(savedConfig, {
-                title: channelPage.title,
-                followers: channelPage.follower_count,
-                avatar: channelPage.user.avatar ? channelPage.user.avatar.avatar.url : null,
-                nsfw: channelPage.adult,
-                tags: channelPage.tags,
-                thumbnail: `https://piczel.tv/static/thumbnail/stream_${channelPage.id}.jpg`,
-            });
-
-            this.emit("online", onlineChannel);
+            this.emit("online", new OnlineStream(savedConfig, this.serializeRaw(streamPage)));
         }
+    }
+
+    serializeRaw(raw) {
+        return {
+            title: raw.title,
+            followers: raw.follower_count,
+            avatar: raw.user.avatar ? raw.user.avatar.avatar.url : null,
+            nsfw: raw.adult,
+            tags: raw.tags,
+            thumbnail: `https://piczel.tv/static/thumbnail/stream_${raw.id}.jpg`,
+        };
     }
 
     get base() { return "https://piczel.tv/api/"; }

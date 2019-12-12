@@ -14,14 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Config {
-    constructor(service, channel, name, userId, _id) {
+class ParsedStream {
+    constructor(service, username, userId) {
+        /** @type {PicartoProcessor|TwitchProcessor|PiczelProcessor|SmashcastProcessor} */
         this.service = service;
-        this.channel = channel || null;
-        this.name = name || null;
+        /** @type {string} */
+        this.username = username || null;
+        /** @type {string} */
         this.userId = userId || null;
-        this._id = _id || null;
     }
 }
 
-module.exports = Config;
+module.exports = ParsedStream;

@@ -18,8 +18,10 @@ const log = require("../../../log").namespace("alert cmd");
 const config = require("../../../config");
 
 const Processor = require("./Processor");
-const Config = require("../Config");
-const OnlineChannel = require("../OnlineChannel");
+const ParsedStream = require("../stream/ParsedStream");
+const OnlineStream = require("../stream/OnlineStream");
+// eslint-disable-next-line no-unused-vars
+const Stream = require("../stream/Stream");
 
 const TwitchClient = require("twitch").default;
 
@@ -27,84 +29,94 @@ class TwitchProcessor extends Processor {
     constructor(manager) {
         super(manager);
 
-        return new Promise(async resolve => {
-            this.twitch = await TwitchClient.withCredentials(config.get("twitch.client_id"));
+        TwitchClient.withCredentials(config.get("twitch.client_id"))
+            .then(twitch => {
+                /** @type {TwitchClient} */
+                this.twitch = twitch;
 
-            setInterval(() => this.checkChanges(), 60 * 1000);
-            this.checkChanges();
-
-            resolve(this);
-        });
+                setInterval(() => this.checkChanges(), 60 * 1000);
+                this.checkChanges();
+            });
     }
 
     testURL(url) {
         return /^(http:\/\/|https:\/\/)?(www\.twitch\.tv|twitch\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
     }
 
-    async getChannel(channel, url) {
+    async parseStreamer(url) {
         const regexp = /^(?:http:\/\/|https:\/\/)?(?:www\.twitch\.tv|twitch\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,})\b/;
 
         const [, channel_name] = regexp.exec(url) || [];
 
-        if (!channel_name) return new Config(this, channel);
+        if (!channel_name) return new ParsedStream(this);
 
         const user = await this.twitch.helix.users.getUserByName(channel_name);
-        if (!user) return new Config(this, channel, channel_name);
+        if (!user) return new ParsedStream(this, channel_name);
 
         const user_id = user.id;
-        const name = user.displayName;
+        const username = user.displayName;
 
-        const savedConfig = await this.getDBEntry(channel.guild, user_id);
-        if (savedConfig) return new Config(this, channel, name, user_id, savedConfig._id);
-
-        return new Config(this, channel, name, user_id);
+        return new ParsedStream(this, username, user_id);
     }
 
-    formatURL(channel, fat = false) {
-        if (fat) return this.url + "/**" + channel.name + "**";
-        else return "https://" + this.url + "/" + channel.name;
+    formatURL(stream, fat = false) {
+        if (fat) return this.url + "/**" + stream.username + "**";
+        else return "https://" + this.url + "/" + stream.username;
     }
 
     async checkChanges() {
-        const channels = await this.manager.getConfigs(this).toArray();
-        if (channels.length === 0) return;
+        const streams = await this.manager.getServiceConfigsStream(this).toArray();
+        if (streams.length === 0) return;
 
-        const set = new Set(channels.map(c => c.userId));
+        const set = new Set(streams.map(c => c.userId));
 
-        const online_channels = await this.twitch.kraken.streams.getStreams(Array.from(set));
+        const online_streams = await this.twitch.kraken.streams.getStreams(Array.from(set));
 
-        for (let config of channels) await this.checkChange(config, online_channels).catch(err => log.error(err));
+        for (let config of streams) await this.checkChange(config, online_streams).catch(err => log.error(err));
     }
 
-    async checkChange(config, online_channels) {
-        const oldChannel = this.online.find(oldChannel =>
-            config.userId === oldChannel.userId &&
-            config.channel.guild.id === oldChannel.channel.guild.id);
+    /**
+     * @param {Stream} savedConfig
+     * @param {any[]} online_streams
+     */
+    async checkChange(savedConfig, online_streams) {
+        const oldStream = this.online.find(oldStream =>
+            savedConfig.userId === oldStream.userId &&
+            savedConfig.guild.id === oldStream.guild.id);
 
-        const channelPage = online_channels.find(channelPage => config.userId === channelPage.channel.id.toString());
-        if (!channelPage) {
+        const streamPage = online_streams.find(streamPage => savedConfig.userId === streamPage.channel.id.toString());
+        if (!streamPage) {
+            if (!savedConfig.messageId && !oldStream) return;
             // remove the channel from the recently online list
-            if (config.messageId || oldChannel) this.emit("offline", oldChannel || config);
+            this.emit("offline", oldStream || savedConfig);
+        } else if (oldStream && !oldStream.curr_channel.equals(savedConfig.getChannel(streamPage.channel.isMature))) { // channel changed adult state and
+            if (!savedConfig.getSendable(streamPage.channel.isMature)) this.emit("offline", oldStream);
+
+            this.emit("change", new OnlineStream(savedConfig, this.serializeRaw(streamPage)));
         } else {
+            // channel changed and last message still posted
+            if (!oldStream && savedConfig.lastChannelId && !savedConfig.lastChannel.equals(savedConfig.getChannel(streamPage.channel.isMature)))
+                await savedConfig.delete();
+
             // if the channel was not recently online, set it online
-            if (oldChannel || config.messageId) return;
+            if (oldStream || savedConfig.messageId) return;
+            if (!savedConfig.getSendable(streamPage.channel.isMature)) return;
 
-            const stream = await this.twitch.helix.streams.getStreamByUserId(config.userId);
-            if (!stream) return;
-
-            const onlineChannel = new OnlineChannel(config, {
-                title: stream.title,
-                followers: channelPage.channel.followers,
-                totalviews: channelPage.channel.views,
-                avatar: channelPage.channel.logo,
-                game: channelPage.game,
-                thumbnail: channelPage.getPreviewUrl("large"),
-                language: stream.language,
-                nsfw: channelPage.channel.isMature,
-            });
-
-            this.emit("online", onlineChannel);
+            this.emit("online", new OnlineStream(savedConfig, this.serializeRaw(streamPage)));
         }
+    }
+
+    serializeRaw(streamPage) {
+        return {
+            title: streamPage.status.title,
+            followers: streamPage.channel.followers,
+            totalviews: streamPage.channel.views,
+            avatar: streamPage.channel.logo,
+            game: streamPage.game,
+            thumbnail: streamPage.preview.large,
+            language: streamPage.channel.language,
+            nsfw: streamPage.channel.isMature,
+        };
     }
 
     get url() { return "twitch.tv"; }

@@ -18,8 +18,10 @@ const fetch = require("node-fetch");
 const log = require("../../../log").namespace("alert cmd");
 
 const Processor = require("./Processor");
-const Config = require("../Config");
-const OnlineChannel = require("../OnlineChannel");
+const ParsedStream = require("../stream/ParsedStream");
+const OnlineStream = require("../stream/OnlineStream");
+// eslint-disable-next-line no-unused-vars
+const Stream = require("../stream/Stream");
 
 class PicartoProcessor extends Processor {
     constructor(manager) {
@@ -33,32 +35,29 @@ class PicartoProcessor extends Processor {
         return /^(http:\/\/|https:\/\/)?(www\.picarto\.tv|picarto\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,25}\b/.test(url);
     }
 
-    async getChannel(channel, url) {
+    async parseStreamer(url) {
         const regexp = /^(?:http:\/\/|https:\/\/)?(?:www\.picarto\.tv|picarto\.tv)\/([-a-zA-Z0-9@:%_+.~]{2,25})\b/;
 
-        const [, channel_name] = regexp.exec(url) || [];
+        const [, username] = regexp.exec(url) || [];
 
-        if (!channel_name) return new Config(this, channel);
+        if (!username) return new ParsedStream(this);
 
-        let channelPage;
         try {
-            channelPage = await this.request("channel/name/" + channel_name);
+            const streamPage = await this.request("channel/name/" + username);
+
+            const userid = streamPage.user_id.toString();
+            return new ParsedStream(this, username, userid);
         } catch (err) {
-            return new Config(this, channel, channel_name);
+            return new ParsedStream(this, username);
         }
-
-        const user_id = channelPage.user_id.toString();
-
-        const savedConfig = await this.getDBEntry(channel.guild, user_id);
-        if (savedConfig) return new Config(this, channel, channel_name, user_id, savedConfig._id);
-
-        return new Config(this, channel, channel_name, user_id);
     }
 
-    formatURL(channel, fat = false) {
-        if (fat) return this.url + "/**" + channel.name + "**";
-        else return "https://" + this.url + "/" + channel.name;
+    formatURL(stream, fat = false) {
+        if (fat) return this.url + "/**" + stream.username + "**";
+        else return "https://" + this.url + "/" + stream.username;
     }
+
+    // All private methods
 
     async request(api) {
         const r = await fetch(this.base + api);
@@ -71,48 +70,63 @@ class PicartoProcessor extends Processor {
             /** @type {any[]} */
             const picartoOnline = await this.request("online?adult=true");
 
-            const stream = this.manager.getConfigs(this);
+            const db_stream = this.manager.getServiceConfigsStream(this);
 
-            stream.addListener("data", config => this.checkChange(picartoOnline, config));
-            stream.once("end", () => { /* Do nothing */ });
-            stream.once("error", err => { log(err); });
+            db_stream.addListener("data", config => this.checkChange(picartoOnline, config));
+            db_stream.once("end", () => { /* Do nothing */ });
+            db_stream.once("error", err => { log(err); });
         } catch (_) { _; } // Picarto is down
     }
 
     /**
      * @param {any[]} picartoOnline
-     * @param {Channel} savedConfig
+     * @param {Stream} newStream
      */
-    async checkChange(picartoOnline, savedConfig) {
-        const oldChannel = this.online.find(oldChannel =>
-            savedConfig.userId === oldChannel.userId &&
-            savedConfig.channel.guild.id === oldChannel.channel.guild.id);
+    async checkChange(picartoOnline, newStream) {
+        const oldStream = this.online.find(oldStream =>
+            newStream.userId === oldStream.userId &&
+            newStream.guild.id === oldStream.guild.id);
 
-        let channelPage = picartoOnline.find(channelPage => savedConfig.userId === channelPage.user_id.toString());
-        if (!channelPage) {
+        let streamPage = picartoOnline.find(streamPage => newStream.userId === streamPage.user_id.toString());
+        if (!streamPage) {
+            if (!newStream.messageId && !oldStream) return;
             // remove the channel from the recently online list
-            if (savedConfig.messageId || oldChannel) this.emit("offline", oldChannel || savedConfig);
-        } else {
-            // if the channel was not recently online, set it online
-            if (oldChannel || savedConfig.messageId) return;
+            this.emit("offline", oldStream || newStream);
+        } else if (oldStream && !oldStream.curr_channel.equals(newStream.getChannel(streamPage.adult))) {
+            // channel changed adult state and
+            if (!newStream.getSendable(streamPage.adult)) this.emit("offline", oldStream);
 
             try {
-                channelPage = await this.request("channel/id/" + channelPage.user_id);
+                this.emit("change", new OnlineStream(oldStream, await this.serializeRaw(streamPage)));
+            } catch (_) { _; } // Picarto is down
+        } else {
+            // channel changed and last message still posted
+            if (!oldStream && newStream.lastChannelId && !newStream.lastChannel.equals(newStream.getChannel(streamPage.adult)))
+                await newStream.delete();
 
-                const onlineChannel = new OnlineChannel(savedConfig, {
-                    title: channelPage.title,
-                    followers: channelPage.followers,
-                    totalviews: channelPage.viewers_total,
-                    avatar: channelPage.avatar,
-                    nsfw: channelPage.adult,
-                    category: channelPage.category,
-                    tags: channelPage.tags,
-                    thumbnail: channelPage.thumbnails.web_large,
-                });
+            // if the channel was not recently online, set it online
+            if (oldStream || newStream.messageId) return;
+            if (!newStream.getSendable(streamPage.adult)) return;
 
-                this.emit("online", onlineChannel);
+            try {
+                this.emit("online", new OnlineStream(newStream, await this.serializeRaw(streamPage)));
             } catch (_) { _; } // Picarto is down
         }
+    }
+
+    async serializeRaw(raw) {
+        raw = await this.request("channel/id/" + raw.user_id);
+
+        return {
+            title: raw.title,
+            followers: raw.followers,
+            totalviews: raw.viewers_total,
+            avatar: raw.avatar,
+            nsfw: raw.adult,
+            category: raw.category,
+            tags: raw.tags,
+            thumbnail: raw.thumbnails.web_large,
+        };
     }
 
     get base() { return "https://api.picarto.tv/v1/"; }

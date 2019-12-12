@@ -14,13 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Channel = require("./Channel");
-const Config = require("./Config");
+const Stream = require("./stream/Stream");
+const StreamConfig = require("./stream/StreamConfig");
 
-class ChannelQueryCursor {
-    constructor(db_cursor, manager, service) {
+class StreamQueryCursor {
+    constructor(db_cursor, manager) {
         this.manager = manager;
-        this.service = service;
         this._cursor = db_cursor;
     }
 
@@ -43,8 +42,8 @@ class ChannelQueryCursor {
     once(scope, handler) {
         switch (scope) {
             case "data":
-                this._cursor.once("data", config => {
-                    const channel = this.process(config);
+                this._cursor.once("data", raw => {
+                    const channel = this.process(raw);
                     if (!channel) return;
 
                     handler(channel);
@@ -57,7 +56,7 @@ class ChannelQueryCursor {
     }
 
     /**
-     * @returns {Channel[]}
+     * @returns {Promise<Stream[]>}
      */
     async toArray() {
         const arr = await this._cursor.toArray();
@@ -65,30 +64,33 @@ class ChannelQueryCursor {
     }
 
     /**
-     * @param {any} config
-     * @returns {Channel}
+     * @param {any} raw
+     * @returns {Stream}
      */
-    process(config) {
-        const guild = this.manager.client.guilds.get(config.guildId);
-        if (!guild) {
-            return null;
-        }
-        if (!guild.available) return null;
+    process(raw) {
+        const service = this.manager.services_mapped[raw.service];
+        if (!service) return;
 
-        const g_channel = guild.channels.get(config.channelId);
-        if (!g_channel) {
-            this.manager.removeChannel(new Config(this.service, null, config.name, config.userId, config._id));
-            return null;
+        const guild = this.manager.client.guilds.get(raw.guildId);
+        if (!guild) return;
+        if (!guild.available) return;
+
+        const def_channel = guild.channels.get(raw.channelId);
+        const nsfw_channel = guild.channels.get(raw.nsfwChannelId);
+        const sfw_channel = guild.channels.get(raw.sfwChannelId);
+        if (!def_channel && !nsfw_channel && !sfw_channel) {
+            this.manager.removeChannel(new StreamConfig(service, null, null, null, raw));
+            return;
         }
 
         const online = this.manager.online.find(online =>
-            online.service === this.service.name &&
-            online.channel.id === g_channel.id &&
-            online.userId === config.userId);
+            online.service.name === service.name &&
+            online.guild.id === guild.id &&
+            online.userId === raw.userId);
         if (online) return online;
 
-        return new Channel(this.manager, this.service, g_channel, config);
+        return new Stream(this.manager, service, def_channel, nsfw_channel, sfw_channel, raw);
     }
 }
 
-module.exports = ChannelQueryCursor;
+module.exports = StreamQueryCursor;

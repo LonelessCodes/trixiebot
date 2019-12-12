@@ -15,11 +15,12 @@
  */
 
 const { EventEmitter } = require("events");
-const Channel = require("../Channel");
 // eslint-disable-next-line no-unused-vars
-const OnlineChannel = require("../OnlineChannel");
+const OnlineStream = require("../stream/OnlineStream");
 // eslint-disable-next-line no-unused-vars
-const Config = require("../Config");
+const StreamConfig = require("../stream/StreamConfig");
+// eslint-disable-next-line no-unused-vars
+const ParsedStream = require("../stream/ParsedStream");
 
 class StreamProcessor extends EventEmitter {
     /**
@@ -31,45 +32,62 @@ class StreamProcessor extends EventEmitter {
         this.database = manager.database;
         this.client = manager.client;
 
-        /** @type {OnlineChannel[]} */
+        /** @type {OnlineStream[]} */
         this.online = [];
 
-        this.on("online", channel => this.online.push(channel));
-        this.on("offline", channel => this.removeChannel(channel));
+        this.on("online", stream => this.online.push(stream));
+        this.on("change", stream => {
+            const old = this.online.findIndex(old => old.userId === stream.userId && old.guild.id === stream.guild.id);
+            if (old >= 0) this.online.splice(old, 1);
+            this.online.push(stream);
+        });
+        this.on("offline", stream => this.removeStream(stream));
     }
 
     testURL() {
         return false;
     }
 
-    async getDBEntry(guild, userId) {
-        return await this.database.findOne({
-            service: this.name,
-            guildId: guild.id,
-            userId: userId,
-        });
+    /**
+     * @param {string} url
+     * @returns {Promise<ParsedStream>}
+     */
+    // eslint-disable-next-line require-await
+    async getStreamer(url) {
+        url;
     }
 
     formatURL() { return ""; }
 
-    addChannel(config) {
-        return new Channel(this.manager, this, config.channel, config);
+    /**
+     * @param {StreamConfig} config
+     */
+    addStreamConfig(config) {
+        config;
+        /* Do nothing */
     }
 
     /**
-     * @param {Config|Channel} config
+     * @param {StreamConfig} config
      */
-    removeChannel(config) {
-        if (config.channel) {
-            const oldChannel = this.online.findIndex(oldChannel =>
-                oldChannel.channel.guild.id === config.channel.guild.id &&
-                oldChannel.userId === config.userId);
-            if (oldChannel >= 0)
-                this.online.splice(oldChannel, 1);
+    removeStreamConfig(config) {
+        this.removeStream(config);
+    }
+
+    /**
+     * @param {StreamConfig} config
+     */
+    removeStream(config) {
+        if (config.guild) {
+            const oldStream = this.online.findIndex(oldStream =>
+                oldStream.guild.id === config.guild.id &&
+                oldStream.userId === config.userId);
+            if (oldStream >= 0)
+                this.online.splice(oldStream, 1);
         } else if (config._id) {
-            const oldChannel = this.online.findIndex(oldChannel => oldChannel._id === config._id);
-            if (oldChannel >= 0)
-                this.online.splice(oldChannel, 1);
+            const oldStream = this.online.findIndex(oldStream => oldStream._id === config._id);
+            if (oldStream >= 0)
+                this.online.splice(oldStream, 1);
         }
     }
 }

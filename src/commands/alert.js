@@ -27,6 +27,7 @@ const Category = require("../util/commands/Category");
 const CommandPermission = require("../util/commands/CommandPermission");
 
 const Translation = require("../modules/i18n/Translation");
+const Resolvable = require("../modules/i18n/Resolvable");
 
 const AlertManager = require("../modules/alert/AlertManager");
 const PicartoProcessor = require("../modules/alert/processor/PicartoProcessor");
@@ -34,9 +35,12 @@ const PiczelProcessor = require("../modules/alert/processor/PiczelProcessor");
 const SmashcastProcessor = require("../modules/alert/processor/SmashcastProcessor");
 const TwitchProcessor = require("../modules/alert/processor/TwitchProcessor");
 
+const { findChannels } = require("../modules/alert/helpers");
+const StreamConfig = require("../modules/alert/stream/StreamConfig");
+
 const URL_REGEX = /^(https?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/;
 
-module.exports = async function install(cr, { client, locale, db }) {
+module.exports = function install(cr, { client, locale, db }) {
     const services = [
         PicartoProcessor,
         PiczelProcessor,
@@ -45,7 +49,7 @@ module.exports = async function install(cr, { client, locale, db }) {
     if (config.has("twitch.client_id")) services.push(TwitchProcessor);
     else log.namespace("config", "Found no API client ID for Twitch - Disabled alerting Twitch streams");
 
-    const manager = await new AlertManager(db, locale, client, services);
+    const manager = new AlertManager(db, locale, client, services);
 
     const alertCommand = cr.registerCommand("alert", new TreeCommand)
         .setHelp(new HelpContent()
@@ -61,23 +65,33 @@ module.exports = async function install(cr, { client, locale, db }) {
      */
 
     const list_command = new SimpleCommand(async message => {
-        const s_channels = await manager.getChannels(message.guild);
+        const streams = await manager.getStreamConfigs(message.guild);
 
-        if (s_channels.length === 0) {
+        if (streams.length === 0) {
             return new Translation("alert.empty", "Hehe, nothing here lol. Time to add some.");
         }
 
         /** @type {Map<any, Channel>} */
         const sorted_by_channels = new Map;
-        for (const s_channel of s_channels)
-            sorted_by_channels.set(s_channel.channel, [...sorted_by_channels.get(s_channel.channel) || [], s_channel]);
+        for (const stream of streams) {
+            if (stream.channel) {
+                sorted_by_channels.set(stream.channel, [...sorted_by_channels.get(stream.channel) || [], stream.getURL(true)]);
+            } else {
+                if (stream.nsfwChannel) {
+                    sorted_by_channels.set(stream.nsfwChannel, [...sorted_by_channels.get(stream.nsfwChannel) || [], stream.getURL(true) + " (NSFW)"]);
+                }
+                if (stream.sfwChannel) {
+                    sorted_by_channels.set(stream.sfwChannel, [...sorted_by_channels.get(stream.sfwChannel) || [], stream.getURL(true) + " (SFW)"]);
+                }
+            }
+        }
 
         const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
-        for (const [g_channel, s_channels] of sorted_by_channels) {
+        for (const [channel, streams] of sorted_by_channels) {
             let str = "";
-            for (const s_channel of s_channels) str += s_channel.getURL(true) + "\n";
+            for (const stream of streams) str += stream + "\n";
 
-            embed.addField("#" + g_channel.name, str);
+            embed.addField("#" + channel.name, str);
         }
 
         return embed;
@@ -89,13 +103,9 @@ module.exports = async function install(cr, { client, locale, db }) {
     alertCommand.registerDefaultCommand(new OverloadCommand)
         .registerOverload("0", list_command)
         .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
-            const g_channel = message.mentions.channels.first() || message.channel;
+            const [first, ...args_arr] = content.trim().split(/\s+/);
 
-            const url = content
-                .replace(new RegExp(g_channel.toString(), "g"), "")
-                .replace(/<.*>/, str => str.slice(1, str.length - 1)) // clean links
-                .trim();
-
+            const url = first.replace(/<.*>/, str => str.slice(1, str.length - 1)); // clean links
             if (url === "") {
                 return new Translation("alert.url_missing", "`page url` should be a vaid url! Instead I got nothing");
             }
@@ -103,24 +113,35 @@ module.exports = async function install(cr, { client, locale, db }) {
                 return new Translation("alert.invalid_url", "`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", { url });
             }
 
-            const config = await manager.parseConfig(g_channel, url);
-            if (!config) {
+            const service = manager.getService(url);
+            if (!service) {
                 return new Translation("alert.unknown_service", "MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
             }
-            if (!config.name) {
+
+            const parsed = await service.parseStreamer(url);
+            if (!parsed.username) {
                 return new Translation("alert.page_missing", "You should also give me your channel page in the url instead of just the site!");
             }
-            if (!config.userId) {
+            if (!parsed.userId) {
                 return new Translation("alert.no_exist", "That user does not exist!");
             }
-            if (config._id) {
+
+            const savedConfig = await manager.getStreamConfig(message.guild, parsed);
+            if (savedConfig) {
                 return new Translation("alert.already_subscribed", "This server is already subscribed to this streamer.");
             }
 
-            await manager.addChannel(config);
+            const final_channels = findChannels(message, args_arr);
+            if (final_channels instanceof Resolvable) {
+                return final_channels;
+            }
+
+            await manager.addStreamConfig(new StreamConfig(
+                service, final_channels.def, final_channels.nsfw, final_channels.sfw, parsed
+            ));
 
             return new Translation("alert.success", "Will be alerting y'all there when {{name}} goes online!", {
-                name: config.name,
+                name: parsed.username,
             });
         }));
 
@@ -134,21 +155,25 @@ module.exports = async function install(cr, { client, locale, db }) {
                 return new Translation("alert.invalid_url", "`page url` should be a vaid url! Instead I got a lousy \"{{url}}\"", { url });
             }
 
-            const config = await manager.parseConfig(message.channel, url);
-            if (!config) {
+            const service = manager.getService(url);
+            if (!service) {
                 return new Translation("alert.unknown_service", "MMMMMMMMMMMMHHHHHHHH I don't know this website :c");
             }
-            if (!config.name) {
+
+            const parsed = await service.parseStreamer(url);
+            if (!parsed.username) {
                 return new Translation("alert.page_missing", "You should also give me your channel page in the url instead of just the site!");
             }
-            if (!config.userId || !config._id) {
+
+            const savedConfig = await manager.getStreamConfig(message.guild, parsed);
+            if (!savedConfig) {
                 return new Translation("alert.not_subscribed", "I was not subscribed to this streamer.");
             }
 
-            await manager.removeChannel(config);
+            await manager.removeStreamConfig(savedConfig);
 
             return new Translation("alert.remove_success", "Stopped alerting for {{name}}", {
-                name: config.name,
+                name: parsed.username,
             });
         }))
         .setHelp(new HelpContent().setUsage("<page url>", "unsubscribe Trixie from a Picarto channel"));

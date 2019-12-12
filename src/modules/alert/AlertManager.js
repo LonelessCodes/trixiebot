@@ -21,9 +21,10 @@ const { EventEmitter } = require("events");
 const LocaleManager = require("../../core/managers/LocaleManager");
 const Translation = require("../i18n/Translation");
 
-const Config = require("./Config");
-const Channel = require("./Channel");
-const ChannelQueryCursor = require("./ChannelQueryCursor");
+// eslint-disable-next-line no-unused-vars
+const StreamConfig = require("./stream/StreamConfig");
+const Stream = require("./stream/Stream");
+const StreamQueryCursor = require("./StreamQueryCursor");
 
 class AlertManager extends EventEmitter {
     /**
@@ -47,141 +48,193 @@ class AlertManager extends EventEmitter {
         this.services = [];
         this.services_mapped = {};
 
-        return new Promise(async resolve => {
-            for (let Service of services) {
-                const service = await new Service(this);
-                service.on("offline", async oldChannel => {
-                    if (!oldChannel) return;
+        for (let Service of services) {
+            const service = new Service(this);
+            service.on("offline", async oldStream => {
+                if (!oldStream) return;
 
-                    this.online.splice(this.online.indexOf(oldChannel), 1);
+                this.online.splice(this.online.indexOf(oldStream), 1);
 
-                    await this.database.updateOne({
-                        _id: oldChannel._id,
-                    }, { $set: { messageId: null } });
+                await this.database.updateOne({
+                    _id: oldStream._id,
+                }, { $set: { messageId: null, lastChannelId: null } });
 
-                    if (await this.isCleanup(oldChannel.channel.guild))
-                        await oldChannel.delete();
+                if (await this.isCleanup(oldStream.guild))
+                    await oldStream.delete();
+            });
+            service.on("change", async stream => {
+                const old = this.online.findIndex(old =>
+                    old.service === stream.service &&
+                    old.userId === stream.userId &&
+                    old.guild.id === stream.guild.id);
+                if (old >= 0) {
+                    const oldStream = this.online[old];
+                    this.online.splice(old, 1);
+                    if (await this.isCleanup(oldStream.guild))
+                        oldStream.delete();
+                }
+
+                const channel = stream.curr_channel;
+                if (!channel) return;
+
+                if (channel.deleted) {
+                    await this.removeStreamConfig(stream);
+                    return;
+                }
+                if (!channel.permissionsFor(channel.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES)) return;
+
+                const embed = await stream.getEmbed();
+
+                const onlineMessage = await this.locale.send(
+                    channel,
+                    new Translation("alert.announcement", "{{user}} is live on {{service}}!", {
+                        user: stream.username,
+                        service: stream.service.display_name,
+                    }),
+                    { embed }
+                );
+
+                stream.setMessage(onlineMessage);
+
+                this.online.push(stream);
+
+                await this.database.updateOne({
+                    _id: stream._id,
+                }, {
+                    $set: {
+                        name: stream.username,
+                        messageId: onlineMessage.id,
+                        lastChannelId: onlineMessage.channel.id,
+                    },
                 });
-                service.on("online", async channel => {
-                    if (channel.channel.deleted) {
-                        await this.removeChannel(channel);
-                        return;
-                    }
-                    if (!channel.channel.permissionsFor(channel.channel.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES)) return;
+            });
+            service.on("online", async stream => {
+                const channel = stream.curr_channel;
+                if (!channel) return;
 
-                    const embed = await channel.getEmbed();
+                if (channel.deleted) {
+                    await this.removeStreamConfig(stream);
+                    return;
+                }
+                if (!channel.permissionsFor(channel.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES)) return;
 
-                    const onlineMessage = await this.locale.send(
-                        channel.channel,
-                        new Translation("alert.announcement", "{{user}} is live on {{service}}!", {
-                            user: channel.name,
-                            service: channel.service.display_name,
-                        }),
-                        { embed }
-                    );
+                const embed = await stream.getEmbed();
 
-                    channel.setMessage(onlineMessage);
+                const onlineMessage = await this.locale.send(
+                    channel,
+                    new Translation("alert.announcement", "{{user}} is live on {{service}}!", {
+                        user: stream.username,
+                        service: stream.service.display_name,
+                    }),
+                    { embed }
+                );
 
-                    this.online.push(channel);
+                stream.setMessage(onlineMessage);
 
-                    await this.database.updateOne({
-                        _id: channel._id,
-                    }, {
-                        $set: {
-                            name: channel.name,
-                            messageId: onlineMessage.id,
-                        },
-                    });
+                this.online.push(stream);
+
+                await this.database.updateOne({
+                    _id: stream._id,
+                }, {
+                    $set: {
+                        name: stream.username,
+                        messageId: onlineMessage.id,
+                        lastChannelId: onlineMessage.channel.id,
+                    },
                 });
-                this.services.push(service);
-                this.services_mapped[service.name] = service;
-            }
-
-            resolve(this);
-        });
-    }
-
-    getConfigs(service) {
-        const stream = this.database.find({ service: service.name });
-
-        return new ChannelQueryCursor(stream, this, service);
-    }
-
-    /**
-     * @param {Discord.TextChannel} channel
-     * @param {string} url
-     * @returns {Config}
-     */
-    async parseConfig(channel, url) {
-        for (let service of this.services) {
-            if (!service.testURL(url)) continue;
-
-            return await service.getChannel(channel, url);
+            });
+            this.services.push(service);
+            this.services_mapped[service.name] = service;
         }
+    }
 
-        return null;
+    getServiceConfigsStream(service) {
+        const db_stream = this.database.find({ service: service.name });
+
+        return new StreamQueryCursor(db_stream, this, service);
     }
 
     /**
-     * @param {Config} config
+     * @param {string} url
+     * @returns {Processor}
      */
-    async addChannel(config) {
+    getService(url) {
+        for (let service of this.services)
+            if (service.testURL(url))
+                return service;
+    }
+
+    /**
+     * @param {StreamConfig} config
+     */
+    async addStreamConfig(config) {
         for (let service of this.services) {
             if (service.name !== config.service.name) continue;
 
             await this.database.insertOne({
                 service: config.service.name,
-                guildId: config.channel.guild.id,
-                channelId: config.channel.id,
+                guildId: config.guild.id,
+                channelId: config.channel && config.channel.id,
+                nsfwChannelId: config.nsfwChannel && config.nsfwChannel.id,
+                sfwChannelId: config.sfwChannel && config.sfwChannel.id,
                 userId: config.userId,
-                name: config.name,
+                name: config.username,
                 messageId: null,
+                lastChannelId: null,
             });
 
-            return await service.addChannel(config);
+            await service.addStreamConfig(config);
+
+            return new Stream(this, service, config.channel, config.nsfwChannel, config.sfwChannel, {
+                ...config, messageId: null, lastChannelId: null,
+            });
         }
     }
 
     /**
-     * @param {Config} config
+     * @param {StreamConfig} config
      */
-    async removeChannel(config) {
+    async removeStreamConfig(config) {
         for (let service of this.services) {
             if (service.name !== config.service.name) continue;
 
             await this.database.deleteOne({ _id: config._id });
 
-            await service.removeChannel(config);
+            await service.removeStreamConfig(config);
 
             return;
         }
     }
 
-    async getChannels(guild) {
-        const configs = await this.database.find({
+    /**
+     * @param {Discord.Guild} guild
+     * @param {ParsedStream} parsed
+     * @returns {Promise<Stream>}
+     */
+    async getStreamConfig(guild, parsed) {
+        const raw = await this.database.findOne({
+            service: parsed.service.name,
             guildId: guild.id,
-        }).toArray();
+            userId: parsed.userId,
+        });
+        if (!raw) return;
 
-        const channels = [];
-        for (let config of configs) {
-            const service = this.services_mapped[config.service];
-            if (!service) continue;
+        const def = guild.channels.get(raw.channelId);
+        const nsfw = guild.channels.get(raw.nsfwChannelId);
+        const sfw = guild.channels.get(raw.sfwChannelId);
 
-            const channel = guild.channels.get(config.channelId);
-            if (!channel) {
-                await this.removeChannel(new Config(service, channel, config.name, config.userId, config._id));
-                continue;
-            }
-
-            channels.push(new Channel(this, service, channel, config));
-        }
-
-        return channels;
+        return new Stream(this, this.services_mapped[raw.service], def, nsfw, sfw, raw);
     }
 
-    getOnlineChannels(guild) {
-        return this.online.filter(online => online.channel.guild.id === guild.id);
+    getStreamConfigs(guild) {
+        return new StreamQueryCursor(this.database.find({ guildId: guild.id }), this).toArray();
     }
+
+    getOnlineStreams(guild) {
+        return this.online.filter(online => online.guild.id === guild.id);
+    }
+
+    // Config stuff
 
     async isCompact(guild) {
         return !!await this.db_config.findOne({ guildId: guild.id, compact: true });

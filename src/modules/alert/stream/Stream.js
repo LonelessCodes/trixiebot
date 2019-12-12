@@ -14,22 +14,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line no-unused-vars
-const Discord = require("discord.js");
+const StreamConfig = require("./StreamConfig");
 
-class Channel {
-    constructor(manager, service, channel, conf = {}) {
+class Stream extends StreamConfig {
+    constructor(manager, service, channel, nsfwChannel, sfwChannel, conf = {}) {
+        super(service, channel, nsfwChannel, sfwChannel, conf);
+
         /** @type {AlertManager} */
         this.manager = manager;
-        /** @type {PicartoProcessor|TwitchProcessor|PiczelProcessor|SmashcastProcessor} */
-        this.service = service;
-        /** @type {Discord.TextChannel} */
-        this.channel = channel;
 
-        this.userId = conf.userId;
-        this.name = conf.name;
+        /** @type {string} */
         this.messageId = conf.messageId;
-        this._id = conf._id;
+        /** @type {string} */
+        this.lastChannelId = conf.lastChannelId;
     }
 
     get url() {
@@ -43,12 +40,27 @@ class Channel {
     async delete() {
         if (!this.messageId) return;
 
-        const onlineMessage = await this.channel.fetchMessage(this.messageId).catch(() => { /* Do nothing */ });
+        const onlineMessage = await this.fetch();
         this.messageId = null;
+        this.lastChannelId = null;
         if (!onlineMessage || !(onlineMessage.deletable && !onlineMessage.deleted)) return;
 
         await onlineMessage.delete().catch(() => { /* Do nothing */ });
     }
+
+    get lastChannel() {
+        if (!this.guild) return;
+        return this.guild.channels.get(this.lastChannelId);
+    }
+
+    async fetch() {
+        if (!this.messageId) return;
+
+        const channel = this.lastChannel;
+        if (!channel) return;
+
+        return await channel.fetchMessage(this.messageId).catch(() => { /* Do nothing */ });
+    }
 }
 
-module.exports = Channel;
+module.exports = Stream;

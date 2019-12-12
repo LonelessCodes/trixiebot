@@ -15,16 +15,16 @@
  */
 
 const fetch = require("node-fetch");
-const CONST = require("../../const");
+const CONST = require("../../../const");
 const Discord = require("discord.js");
 const gm = require("gm");
 
-const Translation = require("../i18n/Translation");
-const TranslationMerge = require("../i18n/TranslationMerge");
-const TranslationEmbed = require("../i18n/TranslationEmbed");
-const NumberFormat = require("../i18n/NumberFormat");
+const Translation = require("../../i18n/Translation");
+const TranslationMerge = require("../../i18n/TranslationMerge");
+const TranslationEmbed = require("../../i18n/TranslationEmbed");
+const NumberFormat = require("../../i18n/NumberFormat");
 
-const Channel = require("./Channel");
+const Stream = require("./Stream");
 
 async function nsfwThumb(url) {
     const response = await fetch(url, { method: "GET" });
@@ -54,13 +54,13 @@ async function nsfwThumb(url) {
     });
 }
 
-class OnlineChannel extends Channel {
-    constructor(manager, service, channel, conf = {}) {
-        if (manager instanceof Channel && arguments.length === 2) {
+class OnlineStream extends Stream {
+    constructor(manager, service, channel, nsfwChannel, sfwChannel, conf = {}) {
+        if (manager instanceof Stream && arguments.length === 2) {
             conf = service;
-            super(manager.manager, manager.service, manager.channel, manager);
+            super(manager.manager, manager.service, manager.channel, manager.nsfwChannel, manager.sfwChannel, manager);
         } else {
-            super(manager, service, channel, conf);
+            super(manager, service, channel, nsfwChannel, sfwChannel, conf);
         }
 
         this.title = conf.title;
@@ -77,14 +77,24 @@ class OnlineChannel extends Channel {
         this.message = null;
     }
 
+    get curr_channel() {
+        return this.getChannel(this.nsfw);
+    }
+
+    get sendable() {
+        return this.getSendable(this.nsfw);
+    }
+
     setMessage(m) {
         this.message = m;
+        return this;
     }
 
     async delete() {
         if (this.messageId && !this.message) {
-            const onlineMessage = await this.channel.fetchMessage(this.messageId).catch(() => { /* Do nothing */ });
+            const onlineMessage = await this.fetch();
             this.messageId = null;
+            this.lastChannelId = null;
             if (!onlineMessage) return;
             this.message = onlineMessage;
         }
@@ -93,10 +103,13 @@ class OnlineChannel extends Channel {
             await this.message.delete().catch(() => { /* Do nothing */ });
 
         this.messageId = null;
+        this.lastChannelId = null;
         this.message = null;
     }
 
     async getEmbed() {
+        if (!this.sendable) return;
+
         const footer = new TranslationMerge().separator(" | ");
         if (this.nsfw) footer.push(new Translation("alert.embed.nsfw", "NSFW"));
         if (this.category) footer.push(new TranslationMerge(new Translation("alert.embed.category", "Category:"), this.category));
@@ -104,7 +117,7 @@ class OnlineChannel extends Channel {
         if (this.tags && this.tags.length > 0) footer.push(new TranslationMerge(new Translation("alert.embed.tags", "Tags:"), this.tags.join(", ")));
 
         const blur = this.thumbnail ?
-            !this.channel.nsfw ?
+            !this.curr_channel.nsfw ?
                 this.nsfw :
                 false :
             false;
@@ -113,9 +126,7 @@ class OnlineChannel extends Channel {
         let attachment;
         try {
             attachment = new Discord.Attachment(await nsfwThumb(this.thumbnail), "thumb.jpg");
-        } catch (_) {
-            _;
-        }
+        } catch (_) { /* Do nothing */ }
 
         const can_use_blur = blur && attachment;
         const thumbnail = can_use_blur ?
@@ -127,8 +138,8 @@ class OnlineChannel extends Channel {
             .setColor(this.service.color || CONST.COLOR.PRIMARY)
             .setURL(this.url);
 
-        if (await this.manager.isCompact(this.channel.guild)) {
-            embed.setAuthor(this.name, this.avatar, this.url);
+        if (await this.manager.isCompact(this.guild)) {
+            embed.setAuthor(this.username, this.avatar, this.url);
             if (thumbnail) {
                 if (can_use_blur) embed.attachFile(attachment);
                 embed.setImage(thumbnail);
@@ -137,7 +148,7 @@ class OnlineChannel extends Channel {
 
             return embed;
         } else {
-            embed.setAuthor(this.name)
+            embed.setAuthor(this.username)
                 .setTitle(this.title)
                 .setThumbnail(this.avatar);
             if (this.followers != null) embed.addField(new Translation("alert.embed.followers", "Followers"), new NumberFormat(this.followers), true);
@@ -153,4 +164,4 @@ class OnlineChannel extends Channel {
     }
 }
 
-module.exports = OnlineChannel;
+module.exports = OnlineStream;

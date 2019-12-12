@@ -54,9 +54,11 @@ module.exports = function install(cr, { client, locale, db }) {
     const alertCommand = cr.registerCommand("alert", new TreeCommand)
         .setHelp(new HelpContent()
             .setDescription("Make Trixie announce streamers when they go live.\nSupported are Picarto, Piczel, Twitch and Smashcast.")
-            .setUsage("<page url> <?channel>", "Subscribe Trixie to a streaming channel!")
-            .addParameter("page url", "copy the url of the stream page and paste it in here")
-            .addParameterOptional("channel", "the channel to post the alert to later. If omitted will be this channel"))
+            .addUsage("<stream url>", "Subscribe Trixie to a streaming channel!")
+            .addUsage("<stream url> <#channel>", "Post to a given channel")
+            .addUsage("<stream url> sfw:<#channel>", "Post only SFW streams to the given channel")
+            .addUsage("<stream url> nsfw:<#channel>", "Post only NSFW streams to the given channel")
+            .addUsage("<stream url> sfw:<#ch> nsfw:<#ch>", "Post SFW and NSFW streams into seperate channels"))
         .setCategory(Category.UTIL)
         .setPermissions(new CommandPermission([Discord.Permissions.FLAGS.MANAGE_CHANNELS]));
 

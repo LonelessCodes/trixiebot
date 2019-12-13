@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.2"></a>
+## [3.4.2](https://github.com/LonelessCodes/trixiebot/compare/v3.4.1...v3.4.2) (2019-12-13)
+
+
+### Bug Fixes
+
+* **alert:** fixed twitch stream serializing ([b52bdf8](https://github.com/LonelessCodes/trixiebot/commit/b52bdf8))
+
+
+
 <a name="3.4.1"></a>
 ## [3.4.1](https://github.com/LonelessCodes/trixiebot/compare/v3.4.0...v3.4.1) (2019-12-13)
 

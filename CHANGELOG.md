@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.1"></a>
+## [3.4.1](https://github.com/LonelessCodes/trixiebot/compare/v3.4.0...v3.4.1) (2019-12-13)
+
+
+### Bug Fixes
+
+* **mute cmd:** fixed getting muted words from cache ([cf65699](https://github.com/LonelessCodes/trixiebot/commit/cf65699))
+
+
+
 <a name="3.4.0"></a>
 # [3.4.0](https://github.com/LonelessCodes/trixiebot/compare/v3.3.2...v3.4.0) (2019-12-12)
 

@@ -14,16 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const getNextSequence = require("../../modules/db/getNextSequence");
 // eslint-disable-next-line no-unused-vars
 const { Message } = require("discord.js");
 
 class ErrorCaseManager {
-    constructor(client, db) {
-        this.client = client;
-
-        this.db = db;
-        this.db_error_cases = this.db.collection("error_cases");
+    constructor(db) {
+        this.db = db.error_cases;
     }
 
     /**
@@ -38,44 +34,31 @@ class ErrorCaseManager {
             stack: err.stack,
         };
 
-        const guild_id = message.guild && message.guild.id;
-        const guild_large = message.guild ? message.guild.large : false;
-
-        const doc = {
-            _id: "#" + await getNextSequence(this.db, "error_cases"),
-            ts: new Date,
-
+        return await this.db.addError({
             err: err_clean,
             message_id: message.id,
             content: message.content,
-            guild_id,
-            guild_large,
+            guild_id: message.guild && message.guild.id,
+            guild_large: message.guild ? message.guild.large : false,
             channel_type: message.channel.type,
             channel_id: message.channel.id,
             user_id: message.author.id,
 
             memory_usage: process.memoryUsage(),
             uptime: process.uptime(),
-
-            reported: false,
-            acknowledged: false,
-        };
-
-        await this.db_error_cases.insertOne(doc);
-
-        return doc._id;
+        });
     }
 
     async reportError(caseId) {
-        await this.db_error_cases.updateOne({ _id: caseId }, { $set: { reported: true } });
+        await this.db.reportError(caseId);
     }
 
     async acknowledgeError(caseId) {
-        await this.db_error_cases.updateOne({ _id: caseId }, { $set: { acknowledged: true } });
+        await this.db.acknowledgeError(caseId);
     }
 
     async getErrors() {
-        return await this.db_error_cases.find({ reported: true, acknowledged: false }).toArray();
+        return await this.db.getErrors();
     }
 }
 

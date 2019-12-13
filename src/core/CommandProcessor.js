@@ -46,7 +46,7 @@ class CommandProcessor {
         this.locale = locale;
         this.db = db;
 
-        this.error_cases = new ErrorCaseManager(this.client, this.db);
+        this.error_cases = new ErrorCaseManager(this.db);
 
         this.REGISTRY = new CommandRegistry(client, this.db);
         this.DISPATCHER = new CommandDispatcher(client, this.db, this.REGISTRY);

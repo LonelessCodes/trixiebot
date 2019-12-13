@@ -16,27 +16,39 @@
 
 // eslint-disable-next-line no-unused-vars
 const Mongo = require("mongodb");
+const getNextSequence = require("../../../modules/db/getNextSequence");
 
-class DatabaseManager {
+class ErrorCasesDatabase {
     /**
      * @param {Mongo.Db} db
      */
     constructor(db) {
-        this.db = db;
-
-        this.slots = new (require("./database/SlotsDatabase"))(db);
-        this.error_cases = new (require("./database/ErrorCasesDatabase"))(db);
+        this.db_client = db;
+        this.db = this.db_client.collection("error_cases");
     }
 
-    collection(name) {
-        return this.db.collection(name);
+    async addError(doc) {
+        const _id = "#" + await getNextSequence(this.db_client, "error_cases");
+        await this.db.insertOne({
+            ts: new Date, ...doc, _id,
+
+            reported: false,
+            acknowledged: false,
+        });
+        return _id;
     }
 
-    async getUser(user) {
-        return {
-            slots: await this.slots.getUser(user),
-        };
+    async reportError(caseId) {
+        await this.db.updateOne({ _id: caseId }, { $set: { reported: true } });
+    }
+
+    async acknowledgeError(caseId) {
+        await this.db.updateOne({ _id: caseId }, { $set: { acknowledged: true } });
+    }
+
+    async getErrors() {
+        return await this.db.find({ reported: true, acknowledged: false }).toArray();
     }
 }
 
-module.exports = DatabaseManager;
+module.exports = ErrorCasesDatabase;

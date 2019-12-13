@@ -67,6 +67,7 @@ module.exports = async function install(cr, { db }) {
 
             await database.deleteOne({ guildId: message.guild.id, word });
             const set = muted_words.get(message.guild.id);
+            if (!set) return new Translation("mute.removed_not_found", "That word has not been muted");
             if (set.size <= 1) muted_words.delete(message.guild.id);
             else set.delete(word);
 
@@ -105,7 +106,7 @@ module.exports = async function install(cr, { db }) {
         .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const word = content.trim().toLowerCase();
 
-            if (muted_words.has(word)) {
+            if (muted_words.has(message.guild.id) && muted_words.get(message.guild.id).has(word)) {
                 return new Translation("mute.exists", "Already got this muted");
             }
 

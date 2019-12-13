@@ -108,12 +108,12 @@ class TwitchProcessor extends Processor {
 
     serializeRaw(streamPage) {
         return {
-            title: streamPage.status.title,
+            title: streamPage.channel.status,
             followers: streamPage.channel.followers,
             totalviews: streamPage.channel.views,
             avatar: streamPage.channel.logo,
             game: streamPage.game,
-            thumbnail: streamPage.preview.large,
+            thumbnail: streamPage._data.preview.large,
             language: streamPage.channel.language,
             nsfw: streamPage.channel.isMature,
         };

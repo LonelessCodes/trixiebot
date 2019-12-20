@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.3"></a>
+## [3.4.3](https://github.com/LonelessCodes/trixiebot/compare/v3.4.2...v3.4.3) (2019-12-20)
+
+
+### Bug Fixes
+
+* **alert:** fixed announcing users who changed username ([08ffd16](https://github.com/LonelessCodes/trixiebot/commit/08ffd16))
+
+
+
 <a name="3.4.2"></a>
 ## [3.4.2](https://github.com/LonelessCodes/trixiebot/compare/v3.4.1...v3.4.2) (2019-12-13)
 

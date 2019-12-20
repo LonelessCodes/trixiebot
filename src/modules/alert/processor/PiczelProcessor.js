@@ -115,12 +115,13 @@ class PiczelProcessor extends Processor {
 
     serializeRaw(raw) {
         return {
+            username: raw.user.username,
             title: raw.title,
             followers: raw.follower_count,
             avatar: raw.user.avatar ? raw.user.avatar.avatar.url : null,
             nsfw: raw.adult,
             tags: raw.tags,
-            thumbnail: `https://piczel.tv/static/thumbnail/stream_${raw.id}.jpg`,
+            thumbnail: `https://piczel.tv/static/screenshots/stream_${raw.id}.jpg`,
         };
     }
 

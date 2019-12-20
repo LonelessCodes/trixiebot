@@ -63,6 +63,8 @@ class OnlineStream extends Stream {
             super(manager, service, channel, nsfwChannel, sfwChannel, conf);
         }
 
+        this.username = conf.username || this.username;
+
         this.title = conf.title;
         this.totalviews = conf.totalviews;
         this.followers = conf.followers;

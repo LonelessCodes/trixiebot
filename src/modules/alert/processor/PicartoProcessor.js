@@ -118,6 +118,7 @@ class PicartoProcessor extends Processor {
         raw = await this.request("channel/id/" + raw.user_id);
 
         return {
+            username: raw.name,
             title: raw.title,
             followers: raw.followers,
             totalviews: raw.viewers_total,

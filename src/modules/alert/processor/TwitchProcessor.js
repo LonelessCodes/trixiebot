@@ -108,6 +108,7 @@ class TwitchProcessor extends Processor {
 
     serializeRaw(streamPage) {
         return {
+            username: streamPage.channel.name,
             title: streamPage.channel.status,
             followers: streamPage.channel.followers,
             totalviews: streamPage.channel.views,

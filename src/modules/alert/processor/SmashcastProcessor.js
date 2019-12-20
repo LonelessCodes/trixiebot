@@ -119,6 +119,7 @@ class SmashcastProcessor extends Processor {
         const media_base = "https://edge.sf.hitbox.tv";
 
         return {
+            username: stream.user_name,
             totalviews: views.total_live_views ? parseInt(views.total_live_views) : 0,
             title: stream.media_status || stream.media_title,
             avatar: media_base + stream.channel.user_logo,

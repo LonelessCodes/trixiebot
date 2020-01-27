@@ -17,7 +17,7 @@
 const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
-const { promisify } = require("util");
+const { promisify, format } = require("util");
 const { findDefaultChannel } = require("../../util/util");
 const { resolveStdout } = require("../../util/string");
 const { splitArgs } = require("../../util/string");
@@ -41,14 +41,16 @@ async function sendLargeText(channel, str, lang = "") {
     let quit = false;
     collector.once("collect", () => quit = true);
 
-    while (str.length > 0) {
+    do {
         if (quit) break;
 
         let lastIndex = str.substring(0, 2000 - (2 * 4) - lang.length).lastIndexOf("\n");
+        if (lastIndex === -1) lastIndex = 2000 - (2 * 4) - lang.length;
+
         const result = str.substring(0, lastIndex).replace(/`/g, "´");
         await channel.send("```" + lang + "\n" + result + "\n```");
         str = str.substring(lastIndex + 1); // + 1 because of the last \n
-    }
+    } while (str.length > 0);
 
     collector.stop();
 }
@@ -98,7 +100,7 @@ module.exports = function install(cr, { client, config, locale, db }) {
     // eslint-disable-next-line no-unused-vars
     cr.registerCommand("eval", new SimpleCommand(async ({ message, ctx, content }) => {
         const result = await eval(`(async () => {${content}})()`);
-        await sendLargeText(message.channel, String(result));
+        await sendLargeText(message.channel, format(result));
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);

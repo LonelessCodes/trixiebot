@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.5.0"></a>
+# [3.5.0](https://github.com/LonelessCodes/trixiebot/compare/v3.4.3...v3.5.0) (2020-01-27)
+
+
+### Bug Fixes
+
+* **alert:** fixed auto-removing streams ([5c65e33](https://github.com/LonelessCodes/trixiebot/commit/5c65e33))
+* **animal cmds:** add reconnect timeout ([5228356](https://github.com/LonelessCodes/trixiebot/commit/5228356))
+* **owner cmds:** fixed sending responses ([664f181](https://github.com/LonelessCodes/trixiebot/commit/664f181))
+
+
+### Features
+
+* add possum command ([6ef4f57](https://github.com/LonelessCodes/trixiebot/commit/6ef4f57))
+
+
+
 <a name="3.4.3"></a>
 ## [3.4.3](https://github.com/LonelessCodes/trixiebot/compare/v3.4.2...v3.4.3) (2019-12-20)
 

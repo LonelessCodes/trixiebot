@@ -79,7 +79,7 @@ class StreamQueryCursor {
         const nsfw_channel = guild.channels.get(raw.nsfwChannelId);
         const sfw_channel = guild.channels.get(raw.sfwChannelId);
         if (!def_channel && !nsfw_channel && !sfw_channel) {
-            this.manager.removeChannel(new StreamConfig(service, null, null, null, raw));
+            this.manager.removeStreamConfig(new StreamConfig(service, null, null, null, raw));
             return;
         }
 

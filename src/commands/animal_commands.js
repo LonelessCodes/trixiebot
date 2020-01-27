@@ -18,7 +18,12 @@ const fetch = require("node-fetch");
 const catFace = require("cat-ascii-faces");
 const dogFace = require("dog-ascii-faces");
 
+const { promisify } = require("util");
 const { timeout } = require("../util/promises");
+const { lastItem, randomItem } = require("../util/array");
+const log = require("../log");
+const twitter = require("../modules/twitter");
+
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
@@ -121,4 +126,53 @@ module.exports = function install(cr) {
     cr.registerAlias("bird", "birb");
     cr.registerAlias("bird", "borb");
     cr.registerAlias("bird", "birbo");
+
+    // POSSUMS~~~<3
+    if (!twitter) return log.namespace("config", "Found no API credentials for Twitter - Disabled possum command");
+
+    const get = promisify(twitter.get).bind(twitter);
+
+    /** @type {Promise<Set<string>>} */
+    const possums = new Promise(async resolve => {
+        const possums = new Set();
+
+        let tweets_available = true;
+        let smallest_id = null;
+        let newest_id = null;
+        while (tweets_available) {
+            const data = await get("statuses/user_timeline", {
+                screen_name: "PossumEveryHour",
+                count: 200,
+                include_rts: false,
+                exclude_replies: true,
+                trim_user: true,
+                max_id: smallest_id || undefined,
+            });
+            if (!newest_id) newest_id = data[0].id_str;
+            if (data.length <= 1) tweets_available = false;
+            else {
+                smallest_id = lastItem(data).id_str;
+                data.filter(tweet => tweet.entities.media && tweet.entities.media[0])
+                    .forEach(tweet => possums.add(tweet.entities.media[0].media_url_https));
+            }
+            resolve(possums); // indicates that the set now has a few values, and then just continue fetching more
+            await timeout(60000 * 15 / 900); // care about rate limits
+        }
+
+        log.namespace("possum cmd")("Possums loaded:", possums.size);
+    }).catch(log);
+
+    async function randomPossum() {
+        return await randomItem([...await possums]);
+    }
+
+    cr.registerCommand("possum", new SimpleCommand(async () =>
+        new TranslationMerge("<:possum:671445107781795851>", await randomPossum())
+    ))
+        .setHelp(new HelpContent().setUsage("", "Gets random Opossum image~. Gets images from <https://twitter.com/PossumEveryHour>"))
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL, true);
+
+    cr.registerAlias("possum", "opossum");
+    cr.registerAlias("possum", "poss");
 };

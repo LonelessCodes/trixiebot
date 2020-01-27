@@ -17,9 +17,8 @@
 const { promisify } = require("util");
 const { timeout } = require("../util/promises");
 const { lastItem, randomItem } = require("../util/array");
-const config = require("../config");
 const log = require("../log");
-const Twit = require("twit");
+const twitter = require("../modules/twitter");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
@@ -27,9 +26,8 @@ const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
 module.exports = function install(cr) {
-    if (!config.has("twitter")) return log.namespace("config", "Found no API credentials for Twitter - Disabled fact command");
+    if (!twitter) return log.namespace("config", "Found no API credentials for Twitter - Disabled fact command");
 
-    const twitter = new Twit(config.get("twitter"));
     const get = promisify(twitter.get).bind(twitter);
 
     const facts = new Promise(async resolve => {

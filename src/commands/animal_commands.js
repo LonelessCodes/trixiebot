@@ -18,6 +18,7 @@ const fetch = require("node-fetch");
 const catFace = require("cat-ascii-faces");
 const dogFace = require("dog-ascii-faces");
 
+const { timeout } = require("../util/promises");
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
@@ -26,46 +27,50 @@ const CommandScope = require("../util/commands/CommandScope");
 const Translation = require("../modules/i18n/Translation");
 const TranslationMerge = require("../modules/i18n/TranslationMerge");
 
-async function randomCat(reconnectTries = 0) {
-    let file;
-    try {
-        const response = await fetch("http://aws.random.cat/meow");
-        const result = await response.json();
-        file = result.file;
-    } catch (err) {
-        reconnectTries++;
-        if (reconnectTries > 5) throw err;
-        file = await randomCat(reconnectTries);
-    }
+/**
+ * @param {fetch.RequestInfo} url
+ * @param {fetch.RequestInit} [init]
+ * @returns {Promise<fetch.Response>}
+ */
+function reconnectFetch(url, init) {
+    const reconnect = async (reconnectTries = 0) => {
+        const time_wait = reconnectTries * reconnectTries * 1000;
+        if (time_wait > 0) await timeout(time_wait);
+        try {
+            const response = await fetch(url, init);
+            return await response.json();
+        } catch (err) {
+            reconnectTries++;
+            if (reconnectTries > 3) throw err;
+            return await reconnect(reconnectTries);
+        }
+    };
 
-    return file;
+    return reconnect();
+}
+
+async function randomCat() {
+    const result = await reconnectFetch("http://aws.random.cat/meow");
+    return result.file;
 }
 
 async function randomDog() {
-    const response = await fetch("https://random.dog/woof.json");
-    const result = await response.json();
-
+    const result = await reconnectFetch("https://random.dog/woof.json");
     return result.url;
 }
 
 async function randomFox() {
-    const response = await fetch("https://randomfox.ca/floof");
-    const result = await response.json();
-
+    const result = await reconnectFetch("https://randomfox.ca/floof");
     return result.image;
 }
 
 async function randomShibe() {
-    const response = await fetch("http://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true");
-    const result = await response.json();
-
+    const result = await reconnectFetch("http://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true");
     return result[0];
 }
 
 async function randomBird() {
-    const response = await fetch("http://shibe.online/api/birds?count=1&urls=true&httpsUrls=true");
-    const result = await response.json();
-
+    const result = await reconnectFetch("http://shibe.online/api/birds?count=1&urls=true&httpsUrls=true");
     return result[0];
 }
 

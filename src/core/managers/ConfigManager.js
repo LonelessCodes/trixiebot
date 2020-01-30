@@ -183,7 +183,7 @@ class ConfigManager {
             index(config, key, values[key]);
         }
 
-        this._cache.set(guildId, Object.assign({}, this.default_config, config, { guildId }));
+        await this._cache.set(guildId, Object.assign({}, this.default_config, config));
     }
 }
 

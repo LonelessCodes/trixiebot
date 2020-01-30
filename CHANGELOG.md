@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.5.1"></a>
+## [3.5.1](https://github.com/LonelessCodes/trixiebot/compare/v3.5.0...v3.5.1) (2020-01-30)
+
+
+### Bug Fixes
+
+* **dispatcher:** fixed permission check for config commands ([c4a98eb](https://github.com/LonelessCodes/trixiebot/commit/c4a98eb))
+* **DocumentMapCache:** replace whole document with .set() ([955933b](https://github.com/LonelessCodes/trixiebot/commit/955933b))
+
+
+
 <a name="3.5.0"></a>
 # [3.5.0](https://github.com/LonelessCodes/trixiebot/compare/v3.4.3...v3.5.0) (2020-01-27)
 

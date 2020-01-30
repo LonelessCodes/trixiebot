@@ -186,7 +186,9 @@ class CommandDispatcher {
         // user is a mod
         const is_mod = is_guild && Category.MODERATION.permissions.test(context.member);
         // command is moderation and user got perms for it
-        const is_mod_cmd = command && is_guild && command.category === Category.MODERATION && command.permissions.test(context.member);
+        // we check for the perms of the category, because there are now two moderator categories: Config and Moderation
+        // that use CommandPermissions.ADMIN
+        const is_mod_cmd = command && is_guild && command.category.permissions === Category.MODERATION.permissions && command.permissions.test(context.member);
 
         if (!is_owner_cmd) {
             if (await this.blacklisted_users.has(context.author.id)) {

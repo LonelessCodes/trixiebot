@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.6.0"></a>
+# [3.6.0](https://github.com/LonelessCodes/trixiebot/compare/v3.5.1...v3.6.0) (2020-02-01)
+
+
+### Features
+
+* **e621 cmd:** cleanup and API interpretation fixes ([6cf6dcf](https://github.com/LonelessCodes/trixiebot/commit/6cf6dcf))
+
+
+
 <a name="3.5.1"></a>
 ## [3.5.1](https://github.com/LonelessCodes/trixiebot/compare/v3.5.0...v3.5.1) (2020-01-30)
 

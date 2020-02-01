@@ -15,7 +15,7 @@
  */
 
 const { splitArgs } = require("../util/string");
-const { randomItem, findAndRemove } = require("../util/array");
+const { findAndRemove } = require("../util/array");
 const fetch = require("node-fetch");
 const INFO = require("../info");
 
@@ -92,137 +92,47 @@ async function process(message, msg, type) {
     }
 
     // filter tags that are not allowed by the discord community guidelines
-    let warning = null;
-    if (filter_tags.some(tag => tags.includes(tag))) {
-        for (const tag of filter_tags)
-            findAndRemove(tags, tag);
-        warning = new Translation("derpi.warning", "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly");
-    }
+    const length_before = tags.length;
+    for (const tag of filter_tags) findAndRemove(tags, tag);
 
-    if (type === "top") tags.push("order:score");
+    let warning = null;
+    if (length_before > tags.length) warning = new Translation("derpi.warning", "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly");
+
+    switch (type) {
+        case "random": tags.push("order:random"); break; // sort randomly
+        case "first": tags.push("order:id"); break; // sort by id, ascending
+        case "top": tags.push("order:score"); break; // sort by score, descending (why the same syntax has different behaviours? idk man)
+    }
 
     // join to a query string
     const query = tags.join(" ");
 
     const results = [];
-    let whileBreak = 100;
     let result;
-    switch (type) {
-        case "random":
-            try {
-                result = await fetchImages({
-                    tags: encodeURIComponent(query),
-                    sf: "id",
-                    sd: "desc",
-                    limit: 300,
-                });
-            } catch (_) {
-                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
-            }
-            for (let i = 0; i < Math.min(amount, result.length); i++) {
-                if (whileBreak <= 0) break;
-                whileBreak--;
+    try {
+        result = await fetchImages({
+            tags: encodeURIComponent(query),
+            // we fetch a few more than we actually need, because we can't filter unwanted content
+            // on the request level, as e621 doesn't allow more than 6 tags at once (wtf man), so
+            // we need some buffer when filtering them post response
+            limit: amount * 2,
+        });
+    } catch (_) {
+        return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
+    }
+    for (let i = 0; i < Math.min(amount * 2, result.length); i++) {
+        if (results.length === amount) break;
 
-                const image = await randomItem(result);
-                const tags = image.tags.split(/\s+/g);
-                if (filter_tags.some(tag => tags.includes(tag))) {
-                    i--;
-                    continue;
-                }
-                results.push({
-                    image_url: image.file_url,
-                    id: image.id,
-                    artist: image.artist,
-                });
-            }
-            break;
-        case "latest":
-            try {
-                result = await fetchImages({
-                    tags: encodeURIComponent(query),
-                    sf: "id",
-                    sd: "desc",
-                    limit: amount,
-                });
-            } catch (_) {
-                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
-            }
-            for (let i = 0; i < Math.min(amount, result.length); i++) {
-                if (whileBreak <= 0) break;
-                whileBreak--;
+        const image = result[i];
 
-                const image = result[i];
-                if (!image) break;
+        const tags = image.tags.split(/\s+/g);
+        if (filter_tags.some(tag => tags.includes(tag))) continue;
 
-                const tags = image.tags.split(/\s+/g);
-                if (filter_tags.some(tag => tags.includes(tag))) {
-                    i--;
-                    continue;
-                }
-                results.push({
-                    image_url: image.file_url,
-                    id: image.id,
-                    artist: image.artist,
-                });
-            }
-            break;
-        case "popular":
-            try {
-                result = await fetchImages({
-                    scope: "popular_by_" + popular_order,
-                    tags: encodeURIComponent(query),
-                    limit: amount,
-                });
-            } catch (_) {
-                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
-            }
-            for (let i = 0; i < Math.min(amount, result.length); i++) {
-                if (whileBreak <= 0) break;
-                whileBreak--;
-
-                const image = result[i];
-                if (!image) break;
-
-                const tags = image.tags.split(/\s+/g);
-                if (filter_tags.some(tag => tags.includes(tag))) {
-                    i--;
-                    continue;
-                }
-                results.push({
-                    image_url: image.file_url,
-                    id: image.id,
-                    artist: image.artist,
-                });
-            }
-            break;
-        case "top":
-            try {
-                result = await fetchImages({
-                    tags: encodeURIComponent(query),
-                    limit: amount,
-                });
-            } catch (_) {
-                return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
-            }
-            for (let i = 0; i < Math.min(amount, result.length); i++) {
-                if (whileBreak <= 0) break;
-                whileBreak--;
-
-                const image = result[i];
-                if (!image) break;
-
-                const tags = image.tags.split(/\s+/g);
-                if (filter_tags.some(tag => tags.includes(tag))) {
-                    i--;
-                    continue;
-                }
-                results.push({
-                    image_url: image.file_url,
-                    id: image.id,
-                    artist: image.artist,
-                });
-            }
-            break;
+        results.push({
+            image_url: image.file_url,
+            id: image.id,
+            artist: image.artist,
+        });
     }
 
     if (results.length === 0) {
@@ -262,6 +172,11 @@ module.exports = function install(cr) {
 
     e621Command.registerSubCommand("latest", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "latest")))
+        .setHelp(new HelpContent()
+            .setUsage("<?amount> <query>"));
+
+    e621Command.registerSubCommand("first", new OverloadCommand)
+        .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "first")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
 
@@ -342,4 +257,6 @@ module.exports = function install(cr) {
             .addParameterOptional("timerange", "Popular by 'day', 'week' or 'month'. Default: 'week'"));
 
     e621Command.registerSubCommandAlias("random", "*");
+
+    cr.registerAlias("e621", "e");
 };

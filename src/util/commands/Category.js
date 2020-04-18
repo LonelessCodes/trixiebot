@@ -52,5 +52,7 @@ module.exports = Object.freeze({
     TRIXIE: new Category("trixie", CommandPermission.USER, new Translation("category.trixie", "Trixie")),
     OWNER: new Category("owner", CommandPermission.OWNER, new Translation("category.owner", "Owner")),
 
+    KEYWORD: new Category("keyword", CommandPermission.USER, new Translation("category.keyword", "Keyword")),
+
     Category,
 });

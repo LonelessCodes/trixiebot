@@ -20,6 +20,7 @@ const AliasCommand = require("./commands/AliasCommand");
 const CCManager = require("./managers/CCManager");
 // eslint-disable-next-line no-unused-vars
 const CommandScope = require("../util/commands/CommandScope");
+const Category = require("../util/commands/Category");
 
 class CommandRegistry {
     constructor(client, database) {
@@ -94,6 +95,7 @@ class CommandRegistry {
     registerKeyword(match, command) {
         if (this.keywords.has(match)) throw new Error("Keyword name already exists");
 
+        command.setCategory(Category.KEYWORD);
         this.keywords.set(match, command);
         return command;
     }
@@ -117,6 +119,10 @@ class CommandRegistry {
         }
 
         for (let [regex, command] of this.keywords) {
+            // There appears to be a bug where "@someone" is only a match
+            // every second time. Setting lastIndex to 0 before a test solves that
+            regex.lastIndex = 0;
+
             if (regex.test(message.content)) return {
                 type: CommandRegistry.TYPE.KEYWORD,
                 trigger: regex,

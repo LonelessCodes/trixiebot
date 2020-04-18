@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const log = require("../log").namespace("e621");
 const { splitArgs } = require("../util/string");
 const { findAndRemove } = require("../util/array");
 const fetch = require("node-fetch");
@@ -32,15 +33,11 @@ const TranslationMerge = require("../modules/i18n/TranslationMerge");
 const filter_tags = ["shota", "cub", "self_harm", "suicide", "animal_abuse", "gore", "child_abuse"];
 
 async function fetchImages(params) {
-    const scope = params.scope || "index";
-    delete params.scope;
-
     let string = [];
     for (const key in params)
         string.push(key + "=" + params[key]);
-    string = string.join("&");
 
-    const url = `https://e621.net/post/${scope}.json?${string}`;
+    const url = `https://e621.net/posts.json?${string.join("&")}`;
 
     const response = await fetch(url, {
         timeout: 10000,
@@ -55,13 +52,6 @@ async function fetchImages(params) {
 async function process(message, msg, type) {
     let args = splitArgs(msg, 2);
 
-    let popular_order = "week";
-
-    if (/day|week|month/i.test(popular_order) && type === "popular") {
-        popular_order = args[0].toLowerCase();
-        args = splitArgs(args[1], 2);
-    }
-
     let amount = 1;
     try {
         const numParse = parseInt(args[0]);
@@ -71,8 +61,7 @@ async function process(message, msg, type) {
             }
             amount = numParse;
         } else throw new Error("NaN Error"); // go catch
-    } catch (err) {
-        err;
+    } catch (_) {
         amount = 1;
         args[1] = args[0] + " " + args[1];
         args[0] = "";
@@ -108,30 +97,30 @@ async function process(message, msg, type) {
     const query = tags.join(" ");
 
     const results = [];
-    let result;
+    let response;
     try {
-        result = await fetchImages({
+        response = await fetchImages({
             tags: encodeURIComponent(query),
             // we fetch a few more than we actually need, because we can't filter unwanted content
             // on the request level, as e621 doesn't allow more than 6 tags at once (wtf man), so
             // we need some buffer when filtering them post response
             limit: amount * 2,
         });
-    } catch (_) {
+    } catch (err) {
+        log.error("Request failed: tags:" + query, err);
         return new Translation("e621.error", "❌ There's been an error talking to e621 :'c");
     }
-    for (let i = 0; i < Math.min(amount * 2, result.length); i++) {
+    for (let i = 0; i < Math.min(amount * 2, response.posts.length); i++) {
         if (results.length === amount) break;
 
-        const image = result[i];
-
-        const tags = image.tags.split(/\s+/g);
+        const image = response.posts[i];
+        const tags = [...image.tags.general, ...image.tags.species];
         if (filter_tags.some(tag => tags.includes(tag))) continue;
 
         results.push({
-            image_url: image.file_url,
+            image_url: image.file.url,
             id: image.id,
-            artist: image.artist,
+            artists: image.tags.artist,
         });
     }
 
@@ -144,8 +133,8 @@ async function process(message, msg, type) {
         warning,
         results.map(result => {
             let str = "";
-            if (result.artist) str += `**${result.artist.join(", ")}** `;
-            str += `*<https://e621.net/post/show/${result.id}>* `;
+            if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
+            str += `*<https://e621.net/posts/${result.id}>* `;
             str += result.image_url;
             return str;
         }).join("\n")
@@ -184,77 +173,6 @@ module.exports = function install(cr) {
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "top")))
         .setHelp(new HelpContent()
             .setUsage("<?amount> <query>"));
-
-    e621Command.registerSubCommand("popular", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
-            let popular_order = "week";
-
-            if (/^day|week|month/i.test(content)) {
-                const args = splitArgs(content, 2);
-                popular_order = args[0].toLowerCase();
-                content = args[1];
-            }
-
-            let amount = 1;
-            try {
-                const numParse = parseInt(content);
-                if (typeof numParse === "number" && !Number.isNaN(numParse)) {
-                    if (numParse < 1 || numParse > 5) {
-                        return new Translation("derpi.amount_out_range", "`amount` cannot be smaller than 1 or greater than 5!");
-                    }
-                    amount = numParse;
-                } else throw new Error("NaN Error"); // go catch
-            } catch (err) {
-                err;
-                amount = 1;
-            }
-
-            const result = await fetchImages({
-                scope: "popular_by_" + popular_order,
-                limit: 100,
-            });
-
-            let whileBreak = 100;
-            const results = [];
-            for (let i = 0; i < Math.min(amount, result.length); i++) {
-                if (whileBreak <= 0) break;
-                whileBreak--;
-
-                const image = result[i];
-                if (!image) break;
-
-                if (!message.channel.nsfw && image.rating !== "s") {
-                    i--;
-                    continue;
-                }
-
-                const tags = image.tags.split(/\s+/g);
-                if (filter_tags.some(tag => tags.includes(tag))) {
-                    i--;
-                    continue;
-                }
-                results.push({
-                    image_url: image.file_url,
-                    id: image.id,
-                    artist: image.artist,
-                });
-            }
-
-            if (results.length === 0) {
-                return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
-            }
-
-            return results.map(result => {
-                let str = "";
-                if (result.artist) str += `**${result.artist.join(", ")}** `;
-                str += `*<https://e621.net/post/show/${result.id}>* `;
-                str += result.image_url;
-                return str;
-            }).join("\n");
-        })).setHelp(new HelpContent()
-            .setDescription("Returns the current most popular images by day, week or month.")
-            .setUsage("<?timerange> <?amount>")
-            .addParameterOptional("timerange", "Popular by 'day', 'week' or 'month'. Default: 'week'"));
 
     e621Command.registerSubCommandAlias("random", "*");
 

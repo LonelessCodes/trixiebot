@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const nanoid = require("nanoid/generate");
+const { customAlphabet } = require("nanoid");
 
 class SampleID {
     /**
@@ -27,12 +27,13 @@ class SampleID {
     }
 
     static generate() {
-        return SampleID.PREFIX + nanoid(SampleID.CHARSET, SampleID.LENGTH);
+        return SampleID.PREFIX + SampleID.nanoid();
     }
 }
 SampleID.PREFIX = "i";
 SampleID.CHARSET = "0123456789abcdefghijklmnopqrstuvwxyz";
 SampleID.LENGTH = 6;
 SampleID.REGEX = new RegExp(`^${SampleID.PREFIX}[${SampleID.CHARSET}]{${SampleID.LENGTH}}$`);
+SampleID.nanoid = customAlphabet(SampleID.CHARSET, SampleID.LENGTH);
 
 module.exports = SampleID;

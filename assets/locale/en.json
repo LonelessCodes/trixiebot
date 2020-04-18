@@ -169,7 +169,7 @@
     "doesnt_exist": "❌ That sample doesn't exist"
   },
   "autoban": {
-    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userID|username#0000|glob>`",
+    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userID/username#0000/glob>`",
     "not_valid_id": "`{{id}}` is not a valid user ID. User IDs contain only digits. U dumbo",
     "added_id": ":police_car: Added `{{id}}` as an ID",
     "added_name": ":police_car: Added `{{name}}`",
@@ -238,7 +238,8 @@
     "bet": "Your bet:",
     "invalid": "`{{bet}}` isn't a valid side of le coin. `heads` or `tails`?!",
     "pending": "The coin flips into the air...",
-    "success": "Whew! The coin landed on {{result}}."
+    "success": "Whew! The coin landed on {{result}}.",
+    "busted": "Sorry! The coin landed on {{result}}."
   },
   "role": {
     "all_roles": "Here's a list of available roles:",
@@ -255,7 +256,8 @@
     "cannot_add_other_users": "You cannot add roles to other users with Manage Roles permission.",
     "already_have": "You already have this role! Yay?",
     "no_role": "Hmm... I couldn't really find your role.",
-    "no_roles": "This server doesn't have any publicly available roles :/"
+    "no_roles": "This server doesn't have any publicly available roles :/",
+    "added": "Role added! /)"
   },
   "audio": {
     "error": "Some error happened and caused some whoopsies",
@@ -433,5 +435,8 @@
     "util": "Utility",
     "trixie": "Trixie",
     "owner": "Owner"
+  },
+  "e621": {
+    "error": "❌ There's been an error talking to e621 :'c"
   }
 }

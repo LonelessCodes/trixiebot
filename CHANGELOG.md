@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.7.0"></a>
+# [3.7.0](https://github.com/LonelessCodes/trixiebot/compare/v3.6.0...v3.7.0) (2020-04-18)
+
+
+### Bug Fixes
+
+* **alert:** fixed caching bug where removing and re-adding stream would send alerts to wrong channel ([a48f94c](https://github.com/LonelessCodes/trixiebot/commit/a48f94c))
+* **CCManager.test:** fixed return type ([351070c](https://github.com/LonelessCodes/trixiebot/commit/351070c))
+* **derpi cmd:** fixed code after Derpibooru API update ([5ae5f8c](https://github.com/LonelessCodes/trixiebot/commit/5ae5f8c))
+* **e621:** fixed code after e621 API update ([878d962](https://github.com/LonelessCodes/trixiebot/commit/878d962))
+* **expand dong:** added missing category ([e4372be](https://github.com/LonelessCodes/trixiebot/commit/e4372be))
+* **soundboard sample id:** fixed code after nanoid update ([3356d18](https://github.com/LonelessCodes/trixiebot/commit/3356d18))
+* **twitch alerts:** fixed code after twitch package update ([8594039](https://github.com/LonelessCodes/trixiebot/commit/8594039))
+* add Keyword category to keyword commands ([d460b34](https://github.com/LonelessCodes/trixiebot/commit/d460b34))
+
+
+### Features
+
+* **ascii cmd:** update filetype code ([a92e3b1](https://github.com/LonelessCodes/trixiebot/commit/a92e3b1))
+* **boobs cmd:** Deprecate boobs command ([33a1cd0](https://github.com/LonelessCodes/trixiebot/commit/33a1cd0))
+* update TrixieBot to use Discord.js@12 ([09efcc0](https://github.com/LonelessCodes/trixiebot/commit/09efcc0))
+
+
+
 <a name="3.6.0"></a>
 # [3.6.0](https://github.com/LonelessCodes/trixiebot/compare/v3.5.1...v3.6.0) (2020-02-01)
 

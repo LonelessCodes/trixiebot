@@ -60,12 +60,18 @@ module.exports = function install(cr) {
 
                 return res.buffer();
             })
-            .then(body => {
-                const type = filetype(body.slice(0, filetype.minimumBytes));
+            .then(async body => {
+                const minimumBytes = 4100;
+                const type = await filetype.fromBuffer(body.slice(0, minimumBytes));
                 if (!type || !/jpg|png|gif/.test(type.ext)) throw new Translation("ascii.invalid_type", "The image must be JPG, PNG or GIF");
-
-                return asciiPromise(body, options)
-                    .catch(() => { throw new Translation("ascii.error", "Soooooooooooooooooooooooooomething went wrong"); });
+                return body;
+            })
+            .then(async body => {
+                try {
+                    return await asciiPromise(body, options);
+                } catch (e) {
+                    throw new Translation("ascii.error", "Soooooooooooooooooooooooooomething went wrong");
+                }
             })
             .then(ascii => "```\n" + ascii + "\n```")
             .catch(err => {

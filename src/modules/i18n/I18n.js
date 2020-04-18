@@ -30,7 +30,7 @@ const I18nLocale = require("./I18nLocale");
 const events = require("events");
 
 // support for OwO language
-plurals["owo"] = plurals["en"];
+Object.defineProperty(plurals, "owo", { value: plurals["en"] });
 
 const PluralsForLocale = {};
 

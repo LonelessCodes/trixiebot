@@ -29,14 +29,10 @@ class TwitchProcessor extends Processor {
     constructor(manager) {
         super(manager);
 
-        TwitchClient.withCredentials(config.get("twitch.client_id"))
-            .then(twitch => {
-                /** @type {TwitchClient} */
-                this.twitch = twitch;
+        this.twitch = TwitchClient.withCredentials(config.get("twitch.client_id"));
 
-                setInterval(() => this.checkChanges(), 60 * 1000);
-                this.checkChanges();
-            });
+        setInterval(() => this.checkChanges(), 60 * 1000);
+        this.checkChanges();
     }
 
     testURL(url) {

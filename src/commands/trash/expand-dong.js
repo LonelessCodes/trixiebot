@@ -19,12 +19,14 @@ const { timeout } = require("../../util/promises");
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
 const CommandScope = require("../../util/commands/CommandScope");
+const Category = require("../../util/commands/Category");
 
 module.exports = function install(cr) {
     // expand dong
     cr.registerCommand("expand", new TreeCommand)
         .dontList()
         .setScope(CommandScope.All)
+        .setCategory(Category.FUN)
         .registerSubCommand("dong", new SimpleCommand(async message => {
             let progress = 3;
             const dick = await message.channel.send(`8${new Array(progress).fill("=").join("")}D`);

@@ -23,19 +23,21 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
+const Translation = require("../modules/i18n/Translation");
+
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "gore", "foal abuse"];
 
 const tags = ["pony", "vulva", "-penis", "nudity", "-photo", ...filter_tags.map(tag => "-" + tag), "upvotes.gte:150"];
 
 async function process(key) {
-    const search = await Derpibooru.fetch(key, "search", tags, { random_image: true });
-    const image = await Derpibooru.fetch(key, search.id);
+    const image = await Derpibooru.random(key, tags);
+    if (!image) return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
     const artists = Derpibooru.getArtists(image.tags);
 
     let str = "";
     if (artists.length) str += artists.map(a => `**${a}**`).join(", ") + " ";
-    str += `*<https://derpibooru.org/${image.id}>* `;
-    str += `https:${image.representations.large}`;
+    str += `*<https://derpibooru.org/images/${image.id}>* `;
+    str += image.representations.full;
 
     return str;
 }

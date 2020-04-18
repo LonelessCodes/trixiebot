@@ -16,6 +16,7 @@
 
 const config = require("../config");
 const log = require("../log");
+const random = require("../modules/random/secureRandom");
 const { splitArgs } = require("../util/string");
 const { findAndRemove } = require("../util/array");
 const Derpibooru = require("../modules/Derpibooru");
@@ -39,16 +40,16 @@ async function getEm(key, type, amount, tags) {
     const results = [];
     switch (type) {
         case "first": {
-            const result = await derpi.fetch("search", tags, {
+            const result = await derpi.search(tags, {
                 sf: "id",
                 sd: "asc",
-                perpage: amount,
+                per_page: amount,
             });
-            if (!result.search) break;
-            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                const image = result.search[i];
+            if (!result.images) break;
+            for (let i = 0; i < Math.min(amount, result.images.length); i++) {
+                const image = result.images[i];
                 results.push({
-                    image_url: image.representations.large,
+                    image_url: image.representations.full,
                     id: image.id,
                     artists: Derpibooru.getArtists(image.tags),
                 });
@@ -56,16 +57,16 @@ async function getEm(key, type, amount, tags) {
             break;
         }
         case "latest": {
-            const result = await derpi.fetch("search", tags, {
+            const result = await derpi.search(tags, {
                 sf: "id",
                 sd: "desc",
-                perpage: amount,
+                per_page: amount,
             });
-            if (!result.search) break;
-            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                const image = result.search[i];
+            if (!result.images) break;
+            for (let i = 0; i < Math.min(amount, result.images.length); i++) {
+                const image = result.images[i];
                 results.push({
-                    image_url: image.representations.large,
+                    image_url: image.representations.full,
                     id: image.id,
                     artists: Derpibooru.getArtists(image.tags),
                 });
@@ -73,16 +74,16 @@ async function getEm(key, type, amount, tags) {
             break;
         }
         case "top": {
-            const result = await derpi.fetch("search", tags, {
+            const result = await derpi.search(tags, {
                 sf: "score",
                 sd: "desc",
-                perpage: amount,
+                per_page: amount,
             });
-            if (!result.search) break;
-            for (let i = 0; i < Math.min(amount, result.search.length); i++) {
-                const image = result.search[i];
+            if (!result.images) break;
+            for (let i = 0; i < Math.min(amount, result.images.length); i++) {
+                const image = result.images[i];
                 results.push({
-                    image_url: image.representations.large,
+                    image_url: image.representations.full,
                     id: image.id,
                     artists: Derpibooru.getArtists(image.tags),
                 });
@@ -90,20 +91,32 @@ async function getEm(key, type, amount, tags) {
             break;
         }
         case "random": {
-            const result = await derpi.fetch("search", tags);
+            const result = await derpi.search(tags, { per_page: 1 });
             if (!result.total) break;
+
+            const random_values = [];
 
             const promises = [];
             for (let i = 0; i < Math.min(amount, result.total); i++) {
-                const promise = derpi.fetch("search", tags, {
-                    random_image: true,
-                }).then(response => derpi.fetch(response.id));
+                // the random_image parameter was removed, so we'll just make
+                // our own random function by n times visiting a random search page
+                let page;
+                do page = await random(result.total);
+                while (random_values.includes(page));
+                random_values.push(page);
+
+                const promise = derpi.search(tags, {
+                    page: page,
+                    per_page: 1,
+                });
                 promises.push(promise);
             }
 
-            for (const image of await Promise.all(promises)) {
+            for (const response of await Promise.all(promises)) {
+                const image = response.images && response.images[0];
+                if (!image) continue;
                 results.push({
-                    image_url: image.representations.large,
+                    image_url: image.representations.full,
                     id: image.id,
                     artists: Derpibooru.getArtists(image.tags),
                 });
@@ -180,8 +193,8 @@ async function process(key, message, msg, type) {
         results.map(result => {
             let str = "";
             if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
-            str += `*<https://derpibooru.org/${result.id}>* `;
-            str += `https:${result.image_url}`;
+            str += `*<https://derpibooru.org/images/${result.id}>* `;
+            str += result.image_url;
             return str;
         }).join("\n")
     ).separator("\n");

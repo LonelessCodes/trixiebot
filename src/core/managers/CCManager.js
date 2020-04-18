@@ -70,7 +70,7 @@ class Trigger {
                 if (this.case_sensitive) return raw_content.includes(this.trigger);
                 else return raw_content.toLowerCase().includes(this.trigger.toLowerCase());
             case TYPE.REGEX:
-                if (this.case_sensitive) return new RegExp(this.trigger, "").exec(raw_content);
+                if (this.case_sensitive) return new RegExp(this.trigger, "").test(raw_content);
                 else return new RegExp(this.trigger, "gi").test(raw_content);
             case TYPE.EXACT_MATCH:
                 if (this.case_sensitive) return raw_content === this.trigger;

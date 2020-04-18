@@ -22,6 +22,8 @@ const LocaleManager = require("../../core/managers/LocaleManager");
 const Translation = require("../i18n/Translation");
 
 // eslint-disable-next-line no-unused-vars
+const OnlineStream = require("./stream/OnlineStream");
+// eslint-disable-next-line no-unused-vars
 const StreamConfig = require("./stream/StreamConfig");
 const Stream = require("./stream/Stream");
 const StreamQueryCursor = require("./StreamQueryCursor");
@@ -36,7 +38,7 @@ class AlertManager extends EventEmitter {
     constructor(db, locale, client, services) {
         super();
 
-        /** @type {OnlineChannel[]} */
+        /** @type {OnlineStream[]} */
         this.online = [];
 
         this.database = db.collection("alert");
@@ -195,6 +197,14 @@ class AlertManager extends EventEmitter {
      * @param {StreamConfig} config
      */
     async removeStreamConfig(config) {
+        // Remove from online streams
+        const index = this.online.findIndex(stream => stream._id.valueOf() === config._id.valueOf());
+        if (index > -1) {
+            const stream = this.online[index];
+            await stream.delete().catch(() => { /* Do nothing */ });
+            this.online.splice(index, 1);
+        }
+
         for (let service of this.services) {
             if (service.name !== config.service.name) continue;
 

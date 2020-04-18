@@ -27,19 +27,40 @@ module.exports = function install(cr) {
     cr.registerCommand("whois", new SimpleCommand(({ message, mentions }) => {
         const member = mentions.members.first() || message.member;
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
 
-        embed.setAuthor(userToString(member, true), member.user.avatarURL);
-        embed.setThumbnail(member.user.avatarURL);
+        embed.setAuthor(userToString(member, true), member.user.avatarURL({ size: 32, dynamic: true }));
+        embed.setThumbnail(member.user.avatarURL({ size: 256, dynamic: true }));
 
         if (member.user.bot) embed.addField("Is Bot", "✅");
         embed.addField("ID", member.user.id, true);
         if (member.nickname) embed.addField("Nickname", member.nickname, true);
-        embed.addField("Status", member.user.presence.status, true);
-        if (member.user.presence.game) embed.addField("Game", member.user.presence.game, true);
+        embed.addField("Status", member.presence.status, true);
+        if (member.presence.activities.length) embed.addField("Activity", member.presence.activities.map(a => {
+            // 'PLAYING' | 'STREAMING' | 'LISTENING' | 'WATCHING' | 'CUSTOM_STATUS'
+            let str = "";
+            if (a.type === "CUSTOM_STATUS") {
+                str = "**Custom**: ";
+                if (a.emoji) str += a.emoji.toString() + " ";
+                if (a.state) str += a.state + " ";
+                return str;
+            }
+
+            switch (a.type) {
+                case "PLAYING": str = "**Playing**: "; break;
+                case "STREAMING": str = "**Streaming**: "; break;
+                case "LISTENING": str = "**Listening**: "; break;
+                case "WATCHING": str = "**Watching**: "; break;
+            }
+            if (a.name) str += `${a.name} `;
+            if (a.details) str += "\n  " + a.details + " ";
+            if (a.state) str += "\n  " + a.state + " ";
+            if (a.url) str += "\n  " + a.url;
+            return str;
+        }).join("\n"), true);
         embed.addField("Registered", member.user.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
         embed.addField("Joined", member.joinedAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
-        if (member.highestRole) embed.addField("Highest Role", member.highestRole, true);
+        if (member.roles.highest) embed.addField("Highest Role", member.roles.highest.toString(), true);
 
         return { embed };
     }))

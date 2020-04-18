@@ -23,7 +23,7 @@ const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 const MessageMentions = require("../../util/commands/MessageMentions");
 
-const { Attachment } = require("discord.js");
+const { MessageAttachment } = require("discord.js");
 const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
 const Translation = require("../../modules/i18n/Translation");
 
@@ -56,7 +56,7 @@ class ImageActionCommand extends BaseCommand {
             new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount }) :
             userToString(mention);
 
-        const attachment = new Attachment(this.image);
+        const attachment = new MessageAttachment(this.image);
 
         await context.send(new TranslationFormatter(phrase, { user }), attachment);
     }

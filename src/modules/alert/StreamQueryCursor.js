@@ -71,13 +71,13 @@ class StreamQueryCursor {
         const service = this.manager.services_mapped[raw.service];
         if (!service) return;
 
-        const guild = this.manager.client.guilds.get(raw.guildId);
+        const guild = this.manager.client.guilds.cache.get(raw.guildId);
         if (!guild) return;
         if (!guild.available) return;
 
-        const def_channel = guild.channels.get(raw.channelId);
-        const nsfw_channel = guild.channels.get(raw.nsfwChannelId);
-        const sfw_channel = guild.channels.get(raw.sfwChannelId);
+        const def_channel = guild.channels.cache.get(raw.channelId);
+        const nsfw_channel = guild.channels.cache.get(raw.nsfwChannelId);
+        const sfw_channel = guild.channels.cache.get(raw.sfwChannelId);
         if (!def_channel && !nsfw_channel && !sfw_channel) {
             this.manager.removeStreamConfig(new StreamConfig(service, null, null, null, raw));
             return;

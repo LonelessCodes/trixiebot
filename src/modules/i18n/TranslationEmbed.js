@@ -14,9 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { Attachment, MessageEmbed, RichEmbed } = require("discord.js");
+const { MessageAttachment, MessageEmbed, Util } = require("discord.js");
 const Resolvable = require("./Resolvable");
-let ClientDataResolver;
+
+// TODO: extend MessageEmbed and implement Interface Resolvable
 
 /**
  * A rich embed to be sent with a message with a fluent interface for creation.
@@ -87,14 +88,8 @@ class TranslationEmbed extends Resolvable {
         this.footer = data.footer;
 
         /**
-         * File to upload alongside this Embed
-         * @type {FileOptions|string|Attachment}
-         */
-        this.file = data.file;
-
-        /**
          * The files to upload alongside this Embed
-         * @type {Array<FileOptions|string|Attachment>}
+         * @type {Array<FileOptions|string|MessageAttachment>}
          */
         this.files = [];
     }
@@ -135,8 +130,7 @@ class TranslationEmbed extends Resolvable {
      * @returns {TranslationEmbed} This embed
      */
     setColor(color) {
-        if (!ClientDataResolver) ClientDataResolver = require("discord.js/src/client/ClientDataResolver");
-        this.color = ClientDataResolver.resolveColor(color);
+        this.color = Util.resolveColor(color);
         return this;
     }
 
@@ -171,13 +165,13 @@ class TranslationEmbed extends Resolvable {
      * @returns {TranslationEmbed} This embed
      */
     addField(name, value, inline = false) {
-        if (this.fields.length >= 25) throw new RangeError("RichEmbeds may not exceed 25 fields.");
+        if (this.fields.length >= 25) throw new RangeError("MessageEmbeds may not exceed 25 fields.");
         this.fields.push({ name, value, inline });
         return this;
     }
 
     /**
-     * Convenience function for `<RichEmbed>.addField('\u200B', '\u200B', inline)`.
+     * Convenience function for `<MessageEmbed>.addField('\u200B', '\u200B', inline)`.
      * @param {boolean} [inline=false] Set the field to display inline
      * @returns {TranslationEmbed} This embed
      */
@@ -217,33 +211,20 @@ class TranslationEmbed extends Resolvable {
     }
 
     /**
-     * Sets the file to upload alongside the embed. This file can be accessed via `attachment://fileName.extension` when
-     * setting an embed image or author/footer icons. Only one file may be attached.
-     * @param {FileOptions|string|Attachment} file Local path or URL to the file to attach,
-     * or valid FileOptions for a file to attach
-     * @returns {TranslationEmbed} This embed
-     */
-    attachFile(file) {
-        if (this.file) throw new RangeError("You may not upload more than one file at once.");
-        if (file instanceof Attachment) file = file.file;
-        this.file = file;
-        return this;
-    }
-
-    /**
      * Sets the files to upload alongside the embed. A file can be accessed via `attachment://fileName.extension` when
      * setting an embed image or author/footer icons. Multiple files can be attached.
-     * @param {Array<FileOptions|string|Attachment>} files Files to attach
+     * @param {Array<FileOptions|string|MessageAttachment>} files Files to attach
      * @returns {TranslationEmbed}
      */
     attachFiles(files) {
-        files = files.map(file => file instanceof Attachment ? file.file : file);
+        if (!Array.isArray(files)) files = [files];
+        files = files.map(file => file instanceof MessageAttachment ? file.file : file);
         this.files = this.files.concat(files);
         return this;
     }
 
     resolve(i18n) {
-        return new RichEmbed({
+        return new MessageEmbed({
             title: this.title && Resolvable.resolve(this.title, i18n),
             description: this.description && Resolvable.resolve(this.description, i18n),
             url: this.url,
@@ -251,7 +232,7 @@ class TranslationEmbed extends Resolvable {
             author: this.author ? {
                 name: Resolvable.resolve(this.author.name, i18n),
                 url: this.author.url,
-                icon_url: this.author instanceof MessageEmbed.Author ? this.author.iconURL : this.author.icon_url,
+                icon_url: this.author.iconURL || this.author.icon_url,
             } : null,
             timestamp: this.timestamp ? new Date(this.timestamp) : null,
             fields: this.fields ? this.fields.map(field => ({
@@ -263,9 +244,8 @@ class TranslationEmbed extends Resolvable {
             image: this.image,
             footer: this.footer ? {
                 text: Resolvable.resolve(this.footer.text, i18n),
-                icon_url: this.footer instanceof MessageEmbed.Footer ? this.footer.iconURL : this.footer.icon_url,
+                icon_url: this.footer.iconURL || this.footer.icon_url,
             } : null,
-            file: this.file,
         }).attachFiles(this.files || []);
     }
 }

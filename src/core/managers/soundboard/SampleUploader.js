@@ -130,7 +130,7 @@ class SampleUploader extends Events {
                 break;
         }
 
-        const extname = path.extname(attachment.filename);
+        const extname = path.extname(attachment.name);
         if (!SampleUploader.isSupportedExt(extname)) {
             throw new Translation(
                 "sb.error.unsupported",
@@ -139,14 +139,14 @@ class SampleUploader extends Events {
             );
         }
 
-        if (attachment.filesize > 1000 * 1000 * 4) {
+        if (attachment.size > 1000 * 1000 * 4) {
             throw new Translation("sb.error.too_big", "The file is too big! Please try to keep it below 4 MB. Even WAV can do that");
         }
 
         this._setStatus(new Translation("sb.downloading", "Downloading file..."));
 
         const tmp_file = await new Promise((res, rej) => tmp.file({
-            prefix: "sample_download_", tries: 3, postfix: path.extname(attachment.filename),
+            prefix: "sample_download_", tries: 3, postfix: path.extname(attachment.name),
         }, (err, path, fd, cleanupCallback) => {
             if (err) return rej(err);
             res({ path, fd, cleanupCallback });
@@ -224,7 +224,7 @@ class SampleUploader extends Events {
                 sample = new UserSample(this.manager, {
                     id,
                     name,
-                    filename: attachment.filename,
+                    filename: attachment.name,
                     creator: this.user.id,
                     owners: [this.user.id],
                     guilds: [],
@@ -236,7 +236,7 @@ class SampleUploader extends Events {
                 sample = new GuildSample(this.manager, {
                     id,
                     name,
-                    filename: attachment.filename,
+                    filename: attachment.name,
                     guild: this.guild.id,
                     owners: [],
                     guilds: [this.guild.id],
@@ -248,7 +248,7 @@ class SampleUploader extends Events {
         } else {
             sample = new PredefinedSample(this.manager, {
                 name,
-                filename: attachment.filename,
+                filename: attachment.name,
                 plays: 0,
                 created_at: new Date,
                 modified_at: new Date,

@@ -59,7 +59,7 @@ class MessageMentions {
         this.users = new Collection();
         let matches = content.match(MessageMentions.USERS_PATTERN) || [];
         for (const id of matches) {
-            const user = guild.client.users.get(id.replace(/<@!?/, "").replace(">", ""));
+            const user = guild.client.users.cache.get(id.replace(/<@!?/, "").replace(">", ""));
             if (user) this.users.set(user.id, user);
         }
 
@@ -71,7 +71,7 @@ class MessageMentions {
             for (let match of matches) {
                 match = match.trim();
                 if (match === "") continue;
-                const user = guild.client.users.find(user => user.tag === match);
+                const user = guild.client.users.cache.find(user => user.tag === match);
                 if (user) this.users.set(user.id, user);
             }
 
@@ -79,15 +79,15 @@ class MessageMentions {
                 displayName = displayName.trim();
                 if (displayName === "") continue;
 
-                const member = guild.members.find(member => member.displayName.startsWith(displayName));
+                const member = guild.members.cache.find(member => member.displayName.startsWith(displayName));
                 if (member) this.users.set(member.user.id, member.user);
                 else {
                     const displayNameLowercase = displayName.toLowerCase();
-                    const member = guild.members.find(member =>
+                    const member = guild.members.cache.find(member =>
                         member.displayName.toLowerCase().startsWith(displayNameLowercase));
                     if (member) this.users.set(member.user.id, member.user);
                     else {
-                        const member = guild.members.find(member =>
+                        const member = guild.members.cache.find(member =>
                             member.user.username.toLowerCase().startsWith(displayNameLowercase));
                         if (member) this.users.set(member.user.id, member.user);
                     }
@@ -102,7 +102,7 @@ class MessageMentions {
         // this.roles = new Collection();
         // matches = content.match(MessageMentions.ROLES_PATTERN) || [];
         // for (const id of matches) {
-        //     const role = guild.roles.get(id);
+        //     const role = guild.roles.cache.get(id);
         //     if (role) this.roles.set(role.id, role);
         // }
 

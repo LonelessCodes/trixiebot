@@ -15,6 +15,7 @@
  */
 
 const log = require("../log");
+const logtts = log.namespace("tts cmd");
 const config = require("../config");
 const fetch = require("node-fetch");
 const AudioManager = require("../core/managers/AudioManager");
@@ -29,8 +30,6 @@ const Translation = require("../modules/i18n/Translation");
 
 module.exports = function install(cr) {
     if (!config.has("voicerss.key")) return log.namespace("config", "Found no API token for voicerss - Disabled tts command");
-
-    const logtts = log.namespace("tts cmd");
 
     cr.registerCommand("tts", new OverloadCommand)
         .registerOverload("1+", new SimpleCommand(async ({ message, content, ctx }) => {
@@ -64,12 +63,13 @@ module.exports = function install(cr) {
 
                 const stream = request.body;
 
-                const dispatcher = connection.playStream(stream);
+                const dispatcher = connection.play(stream, { volume: false });
                 dispatcher.once("start", () => {
                     connection.player.streamingData.pausedTime = 0;
                 });
-                stream.once("end", () => connection.setSpeaking(false));
-                stream.once("error", () => connection.setSpeaking(false));
+                dispatcher.once("finish", () => connection.setSpeaking(0));
+                dispatcher.once("error", () => connection.setSpeaking(0));
+                stream.once("error", () => connection.setSpeaking(0));
 
                 await message.react("👍");
             } catch (err) {

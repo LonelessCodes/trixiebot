@@ -48,7 +48,7 @@ module.exports = function install(cr, { client, db }) {
         const date = today.date();
         const leap_year = today.isLeapYear();
 
-        for (let [, guild] of client.guilds) {
+        for (let [, guild] of client.guilds.cache) {
             // find config
             const config = configs.find(c => c.guildId === guild.id);
             if (!config) continue;
@@ -56,7 +56,7 @@ module.exports = function install(cr, { client, db }) {
             // has set role id?
             if (!config.roleId) continue;
             // role exists??
-            const role = guild.roles.get(config.roleId);
+            const role = guild.roles.cache.get(config.roleId);
             if (!role) {
                 await database_config.updateOne({ guildId: guild.id }, { $set: { roleId: null } });
                 continue;
@@ -68,7 +68,7 @@ module.exports = function install(cr, { client, db }) {
                 if (!member) continue;
 
                 // does member have the role?
-                const has_role = member.roles.has(role.id);
+                const has_role = member.roles.cache.has(role.id);
                 let is_birthday = user.month === month && user.date === date;
                 // fallback to a 28th Feb in a non-leap-year if user was born on 29th Feb
                 if (!leap_year && user.month === 1 && user.date === 29 && month === 1 && date === 28) {
@@ -76,9 +76,9 @@ module.exports = function install(cr, { client, db }) {
                 }
 
                 // if member has role and it's not their birthday or is disabled
-                if ((!is_birthday || !config.enabled) && has_role) member.removeRole(role).catch(() => { /* Do nothing */ });
+                if ((!is_birthday || !config.enabled) && has_role) member.roles.remove(role).catch(() => { /* Do nothing */ });
                 // if member doesn't have role and it's their birthday
-                else if (is_birthday && !has_role) member.addRole(role).catch(() => { /* Do nothing */ });
+                else if (is_birthday && !has_role) member.roles.add(role).catch(() => { /* Do nothing */ });
             }
         }
     };
@@ -213,16 +213,16 @@ module.exports = function install(cr, { client, db }) {
             }
 
             const role_lowercase = role_str.trim().toLowerCase();
-            const role = guild.roles.find(r => r.name.toLowerCase() === role_lowercase);
+            const role = guild.roles.cache.find(r => r.name.toLowerCase() === role_lowercase);
             if (!role) {
                 return "The server doesn't have this role :c";
             }
 
-            if (me.highestRole.comparePositionTo(role) <= 0) {
+            if (me.roles.highest.comparePositionTo(role) <= 0) {
                 return "That role is higher than me, so I can't manage it!";
             }
             if (!message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR) &&
-                message.member.highestRole.comparePositionTo(role) <= 0) {
+                message.member.roles.highest.comparePositionTo(role) <= 0) {
                 return "That role is higher than you!";
             }
 
@@ -254,7 +254,7 @@ module.exports = function install(cr, { client, db }) {
                 .addField("Role", "none", true);
         }
 
-        const role = context.guild.roles.get(config.roleId);
+        const role = context.guild.roles.cache.get(config.roleId);
         if (!role) {
             return basicEmbed("Birthday Config", context.guild)
                 .addField("Enabled", !!config.enabled, true)

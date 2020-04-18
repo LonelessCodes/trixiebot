@@ -56,7 +56,7 @@ module.exports = function install(cr, { db }) {
             guildId: message.guild.id,
         }, {
             $addToSet: {
-                channels: { $each: channels.array().map(c => c.id) },
+                channels: { $each: channels.map(c => c.id) },
             },
         }, { upsert: true });
 

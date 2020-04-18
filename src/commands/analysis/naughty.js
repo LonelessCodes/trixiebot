@@ -49,7 +49,7 @@ module.exports = function install(cr, { db }) {
         queue.push(async () => {
             const user = message.author;
 
-            const channels = message.guild.channels.array().filter(c => c.type === "text" &&
+            const channels = message.guild.channels.cache.array().filter(c => c.type === "text" &&
                 c.permissionsFor(message.guild.me).has(Discord.Permissions.FLAGS.VIEW_CHANNEL));
 
             const step = 1 / channels.length;
@@ -66,7 +66,7 @@ module.exports = function install(cr, { db }) {
                 let j = 0;
                 let lastID = null;
                 while (messages < limit) {
-                    const m = await channel.fetchMessages({ limit: 100, before: lastID });
+                    const m = await channel.messages.fetch({ limit: 100, before: lastID });
                     if (!m.size) break;
 
                     m.forEach(message => {
@@ -100,7 +100,7 @@ module.exports = function install(cr, { db }) {
 
             const naughty_percent = Math.min(bad_words / total * 45, 1);
 
-            const embed = new Discord.RichEmbed;
+            const embed = new Discord.MessageEmbed();
 
             const number = (await figlet(`${Math.round(naughty_percent * 100)}%`, "univers")).split("\n");
             let str = "```\n" + number.slice(0, number.length - 1).join("\n") + "  Naughty\n```\n";

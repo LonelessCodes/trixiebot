@@ -49,9 +49,9 @@ module.exports = function install(cr, { locale: locale_manager }) {
 
             const channels = locale.channels || {};
             for (const channelId in channels) {
-                if (message.guild.channels.has(channelId)) {
+                if (message.guild.channels.cache.has(channelId)) {
                     const name = LocaleManager.getLocaleInfo(channels[channelId]);
-                    embed.addField("#" + message.guild.channels.get(channelId).name, name.name_en, true);
+                    embed.addField("#" + message.guild.channels.cache.get(channelId).name, name.name_en, true);
                 }
             }
             return embed;

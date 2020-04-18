@@ -17,7 +17,7 @@
 const { findArgs } = require("../../util/string");
 const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 // eslint-disable-next-line no-unused-vars
 const MessageContext = require("../../util/commands/MessageContext");
 const BSON = require("bson");
@@ -113,7 +113,7 @@ class CustomCommand extends BaseCommand {
                 id: guild.id,
                 name: guild.name,
                 createdAt: guild.createdTimestamp,
-                icon: guild.iconURL,
+                icon: guild.iconURL({ size: 1024, dynamic: true }),
                 memberCount: guild.memberCount,
                 ownerId: guild.ownerID,
             },
@@ -144,7 +144,7 @@ class CustomCommand extends BaseCommand {
         }
 
         if (embed || cont) {
-            await context.channel.send(embed ? new RichEmbed(embed) : cont.toString());
+            await context.channel.send(embed ? new MessageEmbed(embed) : cont.toString());
         }
     }
 }

@@ -219,9 +219,9 @@ class AlertManager extends EventEmitter {
         });
         if (!raw) return;
 
-        const def = guild.channels.get(raw.channelId);
-        const nsfw = guild.channels.get(raw.nsfwChannelId);
-        const sfw = guild.channels.get(raw.sfwChannelId);
+        const def = guild.channels.cache.get(raw.channelId);
+        const nsfw = guild.channels.cache.get(raw.nsfwChannelId);
+        const sfw = guild.channels.cache.get(raw.sfwChannelId);
 
         return new Stream(this, this.services_mapped[raw.service], def, nsfw, sfw, raw);
     }

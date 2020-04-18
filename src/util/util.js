@@ -29,10 +29,10 @@ module.exports = new class Utils {
     }
 
     findDefaultChannel(guild) {
-        return guild.channels.find(c => new RegExp("general", "g").test(c.name) && c.type === "text") ||
-            guild.channels
+        return guild.channels.cache.find(c => new RegExp("general", "g").test(c.name) && c.type === "text") ||
+            guild.channels.cache
                 .filter(c => c.type === "text" && c.send && typeof c.send === "function")
-                .sort((a, b) => a.position - b.position)
+                .sort((a, b) => a.rawPosition - b.rawPosition)
                 .find(c => c.permissionsFor(guild.me).has("SEND_MESSAGES"));
     }
 
@@ -49,23 +49,23 @@ module.exports = new class Utils {
     }
 
     basicEmbed(title, user, color = CONST.COLOR.PRIMARY) {
-        if (user instanceof Discord.Guild) return new Discord.RichEmbed()
+        if (user instanceof Discord.Guild) return new Discord.MessageEmbed()
             .setColor(color)
-            .setAuthor(`${user.name} | ${title}`, user.iconURL);
+            .setAuthor(`${user.name} | ${title}`, user.iconURL({ size: 32, dynamic: true }));
         if (user instanceof Discord.GuildMember) user = user.user;
-        return new Discord.RichEmbed()
+        return new Discord.MessageEmbed()
             .setColor(color)
-            .setAuthor(`${module.exports.userToString(user, true)} | ${title}`, user.avatarURL);
+            .setAuthor(`${module.exports.userToString(user, true)} | ${title}`, user.avatarURL({ size: 32, dynamic: true }));
     }
 
     basicTEmbed(title, user, color = CONST.COLOR.PRIMARY) {
         if (user instanceof Discord.Guild) return new TranslationEmbed()
             .setColor(color)
-            .setAuthor(new TranslationMerge(user.name, "|", title), user.iconURL);
+            .setAuthor(new TranslationMerge(user.name, "|", title), user.iconURL({ size: 32, dynamic: true }));
         if (user instanceof Discord.GuildMember) user = user.user;
         return new TranslationEmbed()
             .setColor(color)
-            .setAuthor(new TranslationMerge(module.exports.userToString(user, true), "|", title), user.avatarURL);
+            .setAuthor(new TranslationMerge(module.exports.userToString(user, true), "|", title), user.avatarURL({ size: 32, dynamic: true }));
     }
 
     progressBar(v, length, a, b) {
@@ -85,7 +85,7 @@ module.exports = new class Utils {
      * @returns {Promise<Discord.GuildMember>}
      */
     async fetchMember(guild, user, cache = true) {
-        return await guild.fetchMember(user, cache).catch(() => null);
+        return await guild.members.fetch(user, cache).catch(() => null);
     }
 
     debounce(func, wait, immediate) {

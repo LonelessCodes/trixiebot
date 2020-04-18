@@ -26,6 +26,11 @@ const Discord = require("discord.js");
 const database = require("./modules/db/database");
 const Core = require("./core/Core");
 
+// Why must you delete this method, Discord.js devs...
+Discord.MessageEmbed.prototype.addBlankField = function addBlankField(inline = false) {
+    return this.addField("\u200b", "\u200b", inline);
+};
+
 // Indicate a new app lifecycle
 bannerPrinter(info.DEV, info.VERSION, Discord.version);
 
@@ -52,6 +57,14 @@ const client = new Discord.Client({
     messageCacheMaxSize: 200,
     messageCacheLifetime: 60 * 10,
     messageSweepInterval: 60 * 10,
+
+    presence: {
+        status: "dnd",
+        activity: {
+            name: "!trixie | Booting...",
+            type: "PLAYING",
+        },
+    },
 });
 
 // Attach listeners
@@ -66,23 +79,21 @@ client.addListener("error", error => djs_log.error(
 
 client.addListener("ready", () => djs_log("Ready"));
 
-client.addListener("disconnect", closeEvent => djs_log(closeEvent));
+client.addListener("shardDisconnected", (closeEvent, shardId) => djs_log("Disconnected ID:" + shardId, closeEvent));
 
-client.addListener("reconnecting", () => djs_log("Reconnecting"));
+client.addListener("shardReconnecting", shardId => djs_log("Reconnecting ID:" + shardId));
 
-client.addListener("resume", replayed => djs_log(`Replayed ${replayed} events`));
+client.addListener("shardResumed", (replayed, shardId) => djs_log(`Replayed ${replayed} events ID:${shardId}`));
 
 // Initialize Bot
 initialize(client)
     .then(() => {
-        log.namespace("app", "Ready uwu.", `bootup_time:${(nanoTimer.diff(bootup_timer) / nanoTimer.NS_PER_SEC).toFixed(3)}s`);
-
         // tell pm2 that we are now ready
         if (typeof process.send === "function") process.send("ready");
     })
-    .catch(async err => {
+    .catch(err => {
         log.error("Failed to log in", err);
-        await exit(1); // 1 - Uncaught Fatal Exception
+        exit(1); // 1 - Uncaught Fatal Exception
     });
 
 async function initialize(client) {
@@ -91,22 +102,26 @@ async function initialize(client) {
     const db = await database();
     log.namespace("db", "Connected");
 
-    await new Promise(resolve => {
+    await loginClient(client);
+
+    const core = new Core(client, db);
+    await core.startMainComponents("commands");
+    log.namespace("app", "Ready uwu.", `bootup_time:${(nanoTimer.diff(bootup_timer) / nanoTimer.NS_PER_SEC).toFixed(3)}s`);
+}
+
+function loginClient(client) {
+    return new Promise(resolve => {
         client.once("ready", () => resolve());
 
         djs_log("Connecting...");
         client.login(config.get("discord.token"));
     });
-
-    const core = new Core(client, db);
-
-    await core.startMainComponents("commands");
 }
 
-async function exit(code = 0) {
+function exit(code = 0) {
     log("Gracefully exiting...");
 
-    await client.destroy();
+    client.destroy();
     process.exit(code);
 }
 

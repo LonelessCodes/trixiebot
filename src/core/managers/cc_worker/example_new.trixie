@@ -6,7 +6,7 @@ for (ch, i of $guild.channels) {
 }
 
 ch = Channel($msg.mentions.channels[0]);
-embed = RichEmbed().setTitle("Embed OWOWOWOWO");
+embed = Embed().setTitle("Embed OWOWOWOWO");
 msg, err = ch.send("owo", embed);
 if (err != null) {
     reply;

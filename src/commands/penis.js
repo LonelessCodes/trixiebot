@@ -105,8 +105,8 @@ module.exports = function install(cr, { client, db }) {
         const uom = config.uom;
         const r = uom === "cm" ? 2.54 : 1;
 
-        await message.guild.fetchMembers();
-        const penises = await database.find({ $or: message.guild.members.array().map(member => ({ userId: member.user.id })) }).toArray();
+        const members = await message.guild.members.fetch();
+        const penises = await database.find({ $or: members.map(member => ({ userId: member.user.id })) }).toArray();
         const sorted = penises.sort((a, b) => b.length - a.length);
 
         const items = [];

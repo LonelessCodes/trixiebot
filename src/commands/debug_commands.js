@@ -77,11 +77,11 @@ const PaginatorAction = require("../modules/actions/PaginatorAction");
 
 module.exports = function install(cr, { client, error_cases }) {
     cr.registerCommand("info", new SimpleCommand(async () => {
-        const guilds = client.guilds;
+        const guilds = client.guilds.cache;
         const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
-        const channels = client.channels;
+        const channels = client.channels.cache;
 
-        const embed = new Discord.RichEmbed()
+        const embed = new Discord.MessageEmbed()
             .setColor(CONST.COLOR.PRIMARY)
 
             .addField("Commands", cr.commands.size.toLocaleString("en"))
@@ -124,7 +124,7 @@ module.exports = function install(cr, { client, error_cases }) {
             "```" +
             `⏱ Real Latency:     ${ping}ms\n` +
             `⏱ Internal Latency: ${internal_ping.toFixed(1)}ms\n` +
-            `💓 API Latency:      ${Math.round(client.ping)}ms\n` +
+            `💓 API Latency:      ${Math.round(client.ws.ping)}ms\n` +
             "```"
         );
     }))
@@ -137,7 +137,7 @@ module.exports = function install(cr, { client, error_cases }) {
         const logs = await getChangelog();
 
         const latest = logs[0];
-        const embed = new Discord.RichEmbed()
+        const embed = new Discord.MessageEmbed()
             .setColor(CONST.COLOR.PRIMARY);
 
         embed.setTitle("v" + latest.version);
@@ -158,7 +158,7 @@ module.exports = function install(cr, { client, error_cases }) {
 
         embed.addField("Full Changelog:", INFO.WEBSITE + "/changelog");
 
-        embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL);
+        embed.setFooter("TrixieBot - Released " + latest.date, client.user.avatarURL({ size: 32, dynamic: true }));
 
         return { embed };
     }))

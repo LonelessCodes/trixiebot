@@ -19,18 +19,18 @@ const ScopeCommand = require("../../core/commands/ScopedCommand");
 const AliasCommand = require("../../core/commands/AliasCommand");
 const CommandPermission = require("./CommandPermission");
 const Category = require("./Category");
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const { ucFirst, format } = require("../string");
 const CONST = require("../../const");
 
-class HelpBuilder extends RichEmbed {
+class HelpBuilder extends MessageEmbed {
     constructor(message, name, command) {
         super();
 
         const prefix = message.channel.type === "text" ? message.prefix : "";
 
         this.setColor(CONST.COLOR.PRIMARY);
-        this.setAuthor(`${ucFirst(name)} command`, message.client.user.avatarURL);
+        this.setAuthor(`${ucFirst(name)} command`, message.client.user.avatarURL({ size: 32, dynamic: true }));
 
         if (command.help.description) this.setDescription(command.help.description);
         if (command.permissions && command.permissions !== CommandPermission.USER)

@@ -108,7 +108,7 @@ module.exports = function install(cr, { client, db: database }) {
                 categories.get(command.category).set(name, command);
             }
 
-            const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+            const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
 
             if (custom_commands.length > 0) {
                 embed.addField("Custom Commands", custom_commands.map(c => c.trigger)
@@ -123,7 +123,7 @@ module.exports = function install(cr, { client, db: database }) {
                 }
             }
 
-            embed.setAuthor("TrixieBot Help", client.user.avatarURL);
+            embed.setAuthor("TrixieBot Help", client.user.avatarURL({ size: 32, dynamic: true }));
             embed.setDescription(
                 "**Command list**\n" +
                 "Required Argument: `<arg>`\n" +
@@ -132,7 +132,7 @@ module.exports = function install(cr, { client, db: database }) {
                     `\`${prefix}whois @Loneless#0893 / Loneless#0893 / Lone\`\n` : "") +
                 `To check command usage, type \`${prefix}help <command>\``
             );
-            embed.setFooter(`TrixieBot v${INFO.VERSION} | Commands: ${cr.commands.size}`, client.user.avatarURL);
+            embed.setFooter(`TrixieBot v${INFO.VERSION} | Commands: ${cr.commands.size}`, client.user.avatarURL({ size: 32, dynamic: true }));
 
             return { embed };
         }))

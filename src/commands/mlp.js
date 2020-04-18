@@ -99,7 +99,7 @@ module.exports = function install(cr) {
                 title = abstract.title;
             }
 
-            const embed = new Discord.RichEmbed()
+            const embed = new Discord.MessageEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
                 .setTitle(title)
                 .setDescription(abstract.abstract

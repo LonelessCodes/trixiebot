@@ -88,7 +88,7 @@ module.exports = function install(cr, { client, locale, db }) {
             }
         }
 
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
         for (const [channel, streams] of sorted_by_channels) {
             let str = "";
             for (const stream of streams) str += stream + "\n";

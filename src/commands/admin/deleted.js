@@ -46,7 +46,7 @@ module.exports = function install(cr, { client, db }) {
                 channelId: message.channel.id,
                 userId: message.author.id,
                 name: message.author.tag,
-                attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
+                attachments: message.attachments.map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
                 createdAt: message.createdAt,
                 deletedAt: new Date,
                 deleted: true,
@@ -121,14 +121,14 @@ module.exports = function install(cr, { client, db }) {
         const items = [];
         for (const deleted_message of messages.sort((a, b) => b.deletedAt - a.deletedAt)) {
             let str = "";
-            const channel = context.guild.channels.get(deleted_message.channelId);
+            const channel = context.guild.channels.cache.get(deleted_message.channelId);
             if (channel) str += `# **${channel.name}**`;
             else str += "# **deleted channel**";
 
             const timestamp = deleted_message.deletedAt.toLocaleString().slice(0, -3);
             str += ` | ${timestamp} | `;
 
-            const member = client.users.get(deleted_message.userId);
+            const member = await client.users.fetch(deleted_message.userId);
             if (member) str += `${userToString(member)}: `;
             else str += `**${deleted_message.name}**: `;
 

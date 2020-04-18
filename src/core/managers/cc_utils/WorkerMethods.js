@@ -67,52 +67,54 @@ class WorkerMethods {
         // METHODS
 
         this.cpc.answer("emoji.get", ({ emojiId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-            if (!guild.emojis.has(emojiId)) return;
-            return new Emoji(guild.emojis.get(emojiId));
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
+            if (!guild.emojis.cache.has(emojiId)) return;
+            return new Emoji(guild.emojis.cache.get(emojiId));
         });
 
         this.cpc.answer("emoji.addRole", async ({ emojiId, guildId, roles }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-            if (!guild.emojis.has(emojiId)) return;
-            let emoji = guild.emojis.get(emojiId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
+            if (!guild.emojis.cache.has(emojiId)) return;
+            let emoji = guild.emojis.cache.get(emojiId);
 
-            roles = roles.filter(role => guild.roles.has(role)).map(role => guild.roles.get(role));
-            emoji = await convertError(emoji.addRestrictedRoles(roles));
+            roles = roles.filter(role => guild.roles.cache.has(role)).map(role => guild.roles.cache.get(role));
+            emoji = await convertError(emoji.roles.add(roles));
 
             return new Emoji(emoji);
         });
 
         this.cpc.answer("emoji.removeRole", async ({ emojiId, guildId, roles }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
-            if (!guild.emojis.has(emojiId)) return;
-            let emoji = guild.emojis.get(emojiId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
+            if (!guild.emojis.cache.has(emojiId)) return;
+            let emoji = guild.emojis.cache.get(emojiId);
 
-            roles = roles.filter(role => guild.roles.has(role)).map(role => guild.roles.get(role));
-            emoji = await convertError(emoji.removeRestrictedRole(roles));
+            roles = roles.filter(role => guild.roles.cache.has(role)).map(role => guild.roles.cache.get(role));
+            emoji = await convertError(emoji.roles.remove(roles));
 
             return new Emoji(emoji);
         });
 
         this.cpc.answer("reaction.getMembers", async ({ messageId, reactionId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = await convertError(this.client.guilds.get(guildId).fetchMembers());
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
+            await convertError(guild.members.fetch());
 
             const m = await convertError(this.getMessage(guild, messageId));
             if (!m) return [];
 
-            if (!m.reactions.has(reactionId)) return [];
-            const members = m.reactions.get(reactionId).members.array();
+            if (!m.reactions.cache.has(reactionId)) return [];
+            const users = await m.reactions.cache.get(reactionId).users.fetch();
+            const members = await convertError(Promise.all(users.cache.map(u => guild.members.fetch(u))));
 
-            return members.map(m => new Member(m));
+            return members.filter(m => !!m).map(m => new Member(m));
         });
 
         this.cpc.answer("message.get", async ({ messageId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
             const m = await convertError(this.getMessage(guild, messageId));
             if (!m) return;
@@ -121,8 +123,8 @@ class WorkerMethods {
         });
 
         this.cpc.answer("message.delete", async ({ messageId, guildId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
             const m = await convertError(this.getMessage(guild, messageId));
             if (!m) return;
@@ -132,8 +134,8 @@ class WorkerMethods {
         });
 
         this.cpc.answer("message.edit", async ({ messageId, guildId, embed, content }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
             const m = await convertError(this.getMessage(guild, messageId));
             if (!m) return;
@@ -142,9 +144,9 @@ class WorkerMethods {
 
             let message;
             if (embed && content) {
-                message = await convertError(m.edit(content, { embed: new Discord.RichEmbed(embed) }));
+                message = await convertError(m.edit(content, { embed: new Discord.MessageEmbed(embed) }));
             } else if (embed) {
-                message = await convertError(m.edit({ embed: new Discord.RichEmbed(embed) }));
+                message = await convertError(m.edit({ embed: new Discord.MessageEmbed(embed) }));
             } else if (content) {
                 message = await convertError(m.edit(content));
             } else message = m;
@@ -155,15 +157,15 @@ class WorkerMethods {
         });
 
         this.cpc.answer("message.react", async ({ messageId, guildId, emojis }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
             const m = await convertError(this.getMessage(guild, messageId));
             if (!m) return;
 
             for (let emoji of emojis) {
-                if (guild.emojis.has(emoji)) {
-                    await m.react(guild.emojis.get(emoji)).catch(() => { /* Do nothing */ });
+                if (guild.emojis.cache.has(emoji)) {
+                    await m.react(guild.emojis.cache.get(emoji)).catch(() => { /* Do nothing */ });
                 } else {
                     const e = toEmoji.get(emoji);
                     if (e) await m.react(e).catch(() => { /* Do nothing */ });
@@ -173,83 +175,82 @@ class WorkerMethods {
         });
 
         this.cpc.answer("role.get", ({ guildId, roleId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
-            if (!guild.roles.has(roleId)) return;
-            return new Role(guild.roles.get(roleId));
+            if (!guild.roles.cache.has(roleId)) return;
+            return new Role(guild.roles.cache.get(roleId));
         });
 
         this.cpc.answer("role.getMembers", async ({ guildId, roleId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = await convertError(this.client.guilds.get(guildId).fetchMembers());
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
+            await convertError(guild.members.fetch());
 
-            if (!guild.roles.has(roleId)) return [];
-            const role = guild.roles.get(roleId);
-            const members = role.members.array();
+            if (!guild.roles.cache.has(roleId)) return [];
+            const role = guild.roles.cache.get(roleId);
 
-            return members.map(m => new Member(m));
+            return role.members.map(m => new Member(m));
         });
 
         this.cpc.answer("member.get", async ({ guildId, memberId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
             try {
-                const member = await guild.fetchMember(memberId);
+                const member = await guild.members.fetch(memberId);
                 return new Member(member);
             } catch (_) { /* Do nothing */ }
         });
 
         this.cpc.answer("member.getRoles", async ({ guildId, memberId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
 
-            const member = await convertError(guild.fetchMember(memberId));
-            const roles = member.roles.array();
+            const member = await convertError(guild.members.fetch(memberId));
 
-            return roles.map(m => new Role(m));
+            return member.roles.cache.map(m => new Role(m));
         });
 
         // it's already being checked on the worker if roles are allowed or disallowed!
         this.cpc.answer("member.addRole", async ({ guildId, memberId, roles }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
 
-            const member = await convertError(guild.fetchMember(memberId));
+            const member = await convertError(guild.members.fetch(memberId));
 
             return new Member(
-                await convertError(member.addRoles(roles.filter(r => guild.roles.has(r))))
+                await convertError(member.roles.add(roles.filter(r => guild.roles.cache.has(r))))
             );
         });
 
         this.cpc.answer("member.removeRole", async ({ guildId, memberId, roles }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
 
-            const member = await convertError(guild.fetchMember(memberId));
+            const member = await convertError(guild.member.fetch(memberId));
 
             return new Member(
-                await convertError(member.removeRoles(roles.filter(r => guild.roles.has(r))))
+                await convertError(member.roles.remove(roles.filter(r => guild.roles.cache.has(r))))
             );
         });
 
         this.cpc.answer("channel.get", ({ guildId, channelId }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
-            if (!guild.channels.has(channelId)) return;
-            const channel = guild.channels.get(channelId);
+            if (!guild.channels.cache.has(channelId)) return;
+            const channel = guild.channels.cache.get(channelId);
 
             return new Channel(channel);
         });
 
         this.cpc.answer("channel.createInvite", async ({ guildId, channelId, options }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
-            if (!guild.channels.has(channelId)) return;
-            const channel = guild.channels.get(channelId);
+            if (!guild.channels.cache.has(channelId)) return;
+            const channel = guild.channels.cache.get(channelId);
 
             if (!channel.permissionsFor(guild.me).has(Discord.Permissions.FLAGS.CREATE_INSTANT_INVITE))
                 return;
@@ -261,17 +262,17 @@ class WorkerMethods {
         });
 
         this.cpc.answer("channel.send", async ({ guildId, channelId, content, embed }) => {
-            if (!this.client.guilds.has(guildId)) return;
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return;
+            const guild = this.client.guilds.cache.get(guildId);
 
-            if (!guild.channels.has(channelId)) return;
-            const channel = guild.channels.get(channelId);
+            if (!guild.channels.cache.has(channelId)) return;
+            const channel = guild.channels.cache.get(channelId);
 
             let message;
             if (embed && content) {
-                message = await convertError(channel.send(content, { embed: new Discord.RichEmbed(embed) }));
+                message = await convertError(channel.send(content, { embed: new Discord.MessageEmbed(embed) }));
             } else if (embed) {
-                message = await convertError(channel.send({ embed: new Discord.RichEmbed(embed) }));
+                message = await convertError(channel.send({ embed: new Discord.MessageEmbed(embed) }));
             } else if (content) {
                 message = await convertError(channel.send(content));
             }
@@ -283,38 +284,34 @@ class WorkerMethods {
         });
 
         this.cpc.answer("guild.getMembers", async ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = await convertError(this.client.guilds.get(guildId).fetchMembers());
-            const members = guild.members.array();
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
+            await convertError(guild.members.fetch());
 
-            return members.map(m => new Member(m));
+            return guild.members.cache.map(m => new Member(m));
         });
 
         this.cpc.answer("guild.getRoles", ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
 
-            const roles = guild.roles.array();
-
-            return roles.map(m => new Role(m));
+            return guild.roles.cache.map(m => new Role(m));
         });
 
         this.cpc.answer("guild.getChannels", ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
 
-            const channels = guild.channels.array().filter(c => c.type === "text");
+            const channels = guild.channels.cache.array().filter(c => c.type === "text");
 
             return channels.map(m => new Channel(m));
         });
 
         this.cpc.answer("guild.getEmojis", ({ guildId }) => {
-            if (!this.client.guilds.has(guildId)) return [];
-            const guild = this.client.guilds.get(guildId);
+            if (!this.client.guilds.cache.has(guildId)) return [];
+            const guild = this.client.guilds.cache.get(guildId);
 
-            const emojis = guild.emojis.array();
-
-            return emojis.map(m => new Emoji(m));
+            return guild.emojis.cache.map(m => new Emoji(m));
         });
     }
 
@@ -329,9 +326,9 @@ class WorkerMethods {
             return this.message_cache.get(guild.id).get(messageId);
         }
 
-        let channels = guild.channels.filter(c => c.type == "text").array();
+        const channels = guild.channels.cache.array().filter(c => c.type == "text");
         for (let current of channels) {
-            let target = await current.fetchMessage(messageId);
+            let target = await current.messages.fetch(messageId);
             if (target) {
                 this.setMessage(target);
                 return target;

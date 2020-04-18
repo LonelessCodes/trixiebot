@@ -68,7 +68,7 @@ async function byName(database, message, name) {
             .setDescription(new Translation("autoban.added_name", ":police_car: Added `{{name}}`", { name }));
     }
 
-    const user = message.client.users.find(user => user.username === match[1] && user.discriminator === match[2]);
+    const user = message.client.users.cache.find(user => user.username === match[1] && user.discriminator === match[2]);
     if (!user) {
         await database.insertOne({ guildId: message.guild.id, action: "ban", type: "tag", content: name });
 
@@ -157,11 +157,11 @@ module.exports = function install(cr, { client, db }) {
              * LIST ALL BAN AND KICK CONFIGS
              */
             const conditions = await database.find({ guildId: context.guild.id }).toArray();
-            if (!conditions.length) {
+            if (conditions.length === 0) {
                 return basicTEmbed("Autobans", context.guild)
                     .setDescription(new Translation(
                         "autoban.no_configs",
-                        "No autoban configs yet. Add some by using `{{prefix}}autoban <userID\\|username#0000\\|glob>`",
+                        "No autoban configs yet. Add some by using `{{prefix}}autoban <userID/username#0000/glob>`",
                         { prefix: context.prefix }
                     ));
             }

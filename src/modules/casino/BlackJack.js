@@ -274,7 +274,7 @@ class BlackJack {
             const msg = await ctx.send(await game.render(channel.guild, author));
 
             const options = game.doubledown_able ? /hit|stand|double/i : /hit|stand/i;
-            const msgs = await channel.awaitMessages(m => m.author.equals(author) && options.test(m.content), { maxMatches: 1, time: 30000 });
+            const msgs = await channel.awaitMessages(m => m.author.equals(author) && options.test(m.content), { max: 1, time: 30000 });
 
             if (msg.deletable) msg.delete().catch(() => { /* Do nothing */ });
 

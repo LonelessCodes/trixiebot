@@ -34,13 +34,13 @@ const emoticons = [
 
 module.exports = function install(cr) {
     cr.registerKeyword(/@someone\b/gi, new SimpleCommand(async message => {
-        const array = message.guild.members.array();
+        const array = message.guild.members.cache.array();
         const member = await secureRandom(array);
         await message.channel.send(`${await secureRandom(emoticons)} ***(${member.displayName})***`);
     }));
 
     cr.registerKeyword(/lone pone\b/gi, new SimpleCommand(async message => {
-        const attachment = new Discord.Attachment("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
+        const attachment = new Discord.MessageAttachment("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
 
         await message.channel.send(attachment);
     }));

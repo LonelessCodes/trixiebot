@@ -153,8 +153,8 @@ class SampleList extends events.EventEmitter {
         const collector = message.createReactionCollector(
             (reaction, user) => {
                 if (user.bot) return false;
-                if (this.guild.me.voiceChannelID &&
-                    this.guild.me.voiceChannelID !== this.guild.member(user).voiceChannelID) return false;
+                if (this.guild.me.voice.channelID &&
+                    this.guild.me.voice.channelID !== this.guild.member(user).voice.channelID) return false;
                 return this.map.has(reaction.emoji.name);
             },
             { time: this.timeout, max: 1 }
@@ -180,7 +180,7 @@ class SampleList extends events.EventEmitter {
 
         try {
             if (message.channel.permissionsFor(this.guild.me).has(Permissions.FLAGS.MANAGE_MESSAGES))
-                reaction.remove(this.user);
+                reaction.users.remove(this.user);
         } catch (_) { _; }
 
         this.pagination(message);
@@ -190,7 +190,7 @@ class SampleList extends events.EventEmitter {
      * @param {Message} message
      */
     async end(message) {
-        await message.clearReactions().catch(() => { /* Do nothing */ });
+        await message.reactions.removeAll().catch(() => { /* Do nothing */ });
         await message.edit(this.renderEmbed(false));
         this.emit("end", message);
     }

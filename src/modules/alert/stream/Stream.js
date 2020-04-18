@@ -50,7 +50,7 @@ class Stream extends StreamConfig {
 
     get lastChannel() {
         if (!this.guild) return;
-        return this.guild.channels.get(this.lastChannelId);
+        return this.guild.channels.cache.get(this.lastChannelId);
     }
 
     async fetch() {
@@ -59,7 +59,7 @@ class Stream extends StreamConfig {
         const channel = this.lastChannel;
         if (!channel) return;
 
-        return await channel.fetchMessage(this.messageId).catch(() => { /* Do nothing */ });
+        return await channel.messages.fetch(this.messageId).catch(() => { /* Do nothing */ });
     }
 }
 

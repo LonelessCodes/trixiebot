@@ -37,7 +37,7 @@ class MemberLog {
         this.user_count = guild_stats.registerHistogram("users");
         // this.online_user_count = await guild_stats.registerHistogram("online_users");
 
-        for (const [guildId, guild] of client.guilds)
+        for (const [guildId, guild] of client.guilds.cache)
             this.user_count.set(new Date, guildId, null, guild.memberCount);
 
         this.updateGuildStatistics();
@@ -55,10 +55,10 @@ class MemberLog {
     }
 
     async updateGuildStatistics() {
-        (await this.TOTAL_SERVERS).set(this.client.guilds.size);
-        (await this.LARGE_SERVERS).set(this.client.guilds.filter(guild => !!guild.large).size);
-        (await this.TOTAL_USERS).set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
-        (await this.TEXT_CHANNELS).set(this.client.channels.filter(guild => guild.type === "text").size);
+        (await this.TOTAL_SERVERS).set(this.client.guilds.cache.size);
+        (await this.LARGE_SERVERS).set(this.client.guilds.cache.filter(guild => !!guild.large).size);
+        (await this.TOTAL_USERS).set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
+        (await this.TEXT_CHANNELS).set(this.client.channels.cache.filter(guild => guild.type === "text").size);
     }
 
     async guildCreate(guild) {
@@ -77,7 +77,7 @@ class MemberLog {
             "custom commands, soundboards, to even a full web dashboard and so much more!\n" +
             "Just call `!trixie` if you need my help"
         );
-        log.debug("added", `id:${guild.id} name:${JSON.stringify(guild.name)} channels:${guild.channels.size} members:${guild.memberCount}`);
+        log.debug("added", `id:${guild.id} name:${JSON.stringify(guild.name)} channels:${guild.channels.cache.size} members:${guild.memberCount}`);
         this.updateGuildStatistics();
     }
 
@@ -89,7 +89,7 @@ class MemberLog {
     async guildMemberAdd(member) {
         const guild = member.guild;
 
-        stats.bot.get("TOTAL_USERS").set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        stats.bot.get("TOTAL_USERS").set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
         this.user_count.set(new Date, guild.id, null, guild.memberCount);
 
         const guild_config = await this.config.get(guild.id);
@@ -97,7 +97,7 @@ class MemberLog {
         if (!guild_config.welcome.enabled) return;
         if (member.bot && !guild_config.announce.bots) return;
 
-        const channel = guild.channels.get(guild_config.announce.channel);
+        const channel = guild.channels.cache.get(guild_config.announce.channel);
         if (!channel) return;
 
         const str = format(guild_config.welcome.text ||
@@ -111,7 +111,7 @@ class MemberLog {
     async guildMemberRemove(member) {
         const guild = member.guild;
 
-        stats.bot.get("TOTAL_USERS").set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        stats.bot.get("TOTAL_USERS").set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
         this.user_count.set(new Date, guild.id, null, guild.memberCount);
 
         const guild_config = await this.config.get(guild.id);
@@ -119,7 +119,7 @@ class MemberLog {
         if (!guild_config.leave.enabled) return;
         if (member.bot && !guild_config.announce.bots) return;
 
-        const channel = guild.channels.get(guild_config.announce.channel);
+        const channel = guild.channels.cache.get(guild_config.announce.channel);
         if (!channel) return;
 
         const str = format(guild_config.leave.text ||
@@ -131,7 +131,7 @@ class MemberLog {
     }
 
     async guildBanAdd(guild, user) {
-        stats.bot.get("TOTAL_USERS").set(this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0));
+        stats.bot.get("TOTAL_USERS").set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
         this.user_count.set(new Date, guild.id, null, guild.memberCount);
 
         const guild_config = await this.config.get(guild.id);
@@ -139,7 +139,7 @@ class MemberLog {
         if (!guild_config.ban.enabled) return;
         if (user.bot && !guild_config.announce.bots) return;
 
-        const channel = guild.channels.get(guild_config.announce.channel);
+        const channel = guild.channels.cache.get(guild_config.announce.channel);
         if (!channel) return;
 
         const str = format(guild_config.ban.text ||

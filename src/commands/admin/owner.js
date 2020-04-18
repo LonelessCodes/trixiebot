@@ -37,7 +37,7 @@ const extnames = {
 };
 
 async function sendLargeText(channel, str, lang = "") {
-    const collector = channel.createMessageCollector(m => m.content.toLowerCase() === "quit!", { maxMatches: 1 });
+    const collector = channel.createMessageCollector(m => m.content.toLowerCase() === "quit!", { max: 1 });
     let quit = false;
     collector.once("collect", () => quit = true);
 
@@ -107,9 +107,9 @@ module.exports = function install(cr, { client, config, locale, db }) {
 
     cr.registerCommand("send", new SimpleCommand(async ({ content }) => {
         const s = splitArgs(content, 2);
-        const guild = client.guilds.get(s[0]);
+        const guild = client.guilds.cache.get(s[0]);
         if (!guild) {
-            const channel = client.channels.get(s[0]);
+            const channel = await client.channels.fetch(s[0]);
             if (!channel) return "Channel doesn't exist";
             await channel.send(s[1]);
         } else {

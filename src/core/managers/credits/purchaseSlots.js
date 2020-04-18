@@ -35,7 +35,7 @@ async function purchaseSlots(context, activeList, cooldown, cost, success, handl
 
     try {
         const messages = await context.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === context.author.id, {
-            maxMatches: 1, time: 60000, errors: ["time"],
+            max: 1, time: 60000, errors: ["time"],
         });
 
         const m = messages.first();

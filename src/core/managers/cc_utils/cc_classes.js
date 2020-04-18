@@ -18,8 +18,8 @@ class Attachment {
     constructor(attach) {
         return {
             id: attach.id,
-            filename: attach.filename,
-            filesize: attach.filesize,
+            filename: attach.name,
+            filesize: attach.size,
             height: attach.height,
             width: attach.width,
             url: attach.url,
@@ -43,7 +43,7 @@ class Message {
                 everyone: message.mentions.everyone,
             },
             pinned: message.pinned,
-            reactions: Array.from(message.reactions.entries()).map(r => new Reaction({ ...r[1], id: r[0] })),
+            reactions: message.reactions.cache.map(r => new Reaction({ ...r[1], id: r[0] })),
             attachments: message.attachments.array().map(a => new Attachment(a)),
         };
     }
@@ -51,21 +51,21 @@ class Message {
 
 class Member {
     constructor(member) {
-        const highestRole = member.highestRole;
+        const highestRole = member.roles.highest;
         return {
             id: member.id,
             nickname: member.displayName,
             highestRole: {
                 id: highestRole.id,
                 permissions: highestRole.permissions,
-                position: highestRole.position,
+                position: highestRole.rawPosition,
                 color: highestRole.color,
                 createdAt: highestRole.createdTimestamp,
                 mentionable: highestRole.mentionable,
                 name: highestRole.name,
             },
             joinedAt: member.joinedTimestamp,
-            avatar: member.user.displayAvatarURL,
+            avatar: member.user.displayAvatarURL({ size: 1024, dynamic: true }),
             bot: member.user.bot,
             createdAt: member.user.createdTimestamp,
             username: member.user.username,
@@ -81,7 +81,7 @@ class Channel {
             id: channel.id,
             name: channel.name,
             createdAt: channel.createdTimestamp,
-            position: channel.position,
+            position: channel.rawPosition,
             nsfw: channel.nsfw,
             topic: channel.topic,
         };
@@ -92,7 +92,7 @@ class Role {
     constructor(role) {
         return {
             id: role.id,
-            position: role.position,
+            position: role.rawPosition,
             color: role.color,
             createdAt: role.createdTimestamp,
             mentionable: role.mentionable,

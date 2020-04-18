@@ -15,24 +15,11 @@
  */
 
 // eslint-disable-next-line no-unused-vars
-const { Guild, GuildMember, Collection, VoiceChannel, VoiceConnection } = require("discord.js");
+const { Guild, GuildMember, VoiceState, Collection } = require("discord.js");
 const EventEmitter = require("events");
 const Translation = require("../../modules/i18n/Translation");
 // eslint-disable-next-line no-unused-vars
 const Resolvable = require("../../modules/i18n/Resolvable");
-
-/**
- * @param {VoiceConnection} connection
- */
-async function disconnect(connection) {
-    await connection.disconnect();
-    if (connection.client.voiceConnections.get(connection.channel.guild.id)) {
-        await connection.client.voiceConnections.get(connection.channel.guild.id).disconnect();
-        if (connection.client.voiceConnections.get(connection.channel.guild.id))
-            await connection.client.voiceConnections.get(connection.channel.guild.id)._destroy();
-        await connection.client.voiceConnections.delete(connection.channel.guild.id);
-    }
-}
 
 class ConnectError {
     /**
@@ -43,113 +30,106 @@ class ConnectError {
     }
 }
 
-class VCGuild extends EventEmitter {
+class AudioGuild extends EventEmitter {
     /**
      * @param {Guild} guild
      */
     constructor(guild) {
         super();
 
+        this.voiceStateUpdate = this.voiceStateUpdate.bind(this);
         this.client = guild.client;
         this.guild = guild;
-        /**
-         * @type {VoiceChannel}
-         */
-        this.vc = null;
+    }
 
-        this.voiceStateUpdate = this.voiceStateUpdate.bind(this);
+    _removeListener() {
+        this.client.removeListener("voiceStateUpdate", this.voiceStateUpdate);
+    }
+    _attachListener() {
+        this._removeListener();
         this.client.addListener("voiceStateUpdate", this.voiceStateUpdate);
     }
 
-    get connected() {
-        if (!this.vc) return false;
-        if (!this.vc.connection) return false;
-        return true;
+    get voice() {
+        return this.guild.voice;
+    }
+    get connection() {
+        return this.voice && this.voice.connection;
+    }
+    get channel() {
+        return this.voice && this.voice.channel;
     }
 
+    get connected() {
+        if (!this.channel) return false;
+        if (!this.connection) return false;
+        return true;
+    }
     get playing() {
-        if (!this.vc) return false;
-        if (!this.vc.connection) return false;
-        return this.vc.connection.speaking;
+        if (!this.connected) return false;
+        return !!this.connection.player.dispatcher;
     }
 
     /**
      * @param {GuildMember} member
      */
     async connect(member) {
-        if (!this.vc) {
-            if (!member.voiceChannel) throw new ConnectError(new Translation("audio.join_ch", "You need to join a voice channel first!"));
+        if (this.connection) return this.connection;
 
-            const vc = member.voiceChannel;
+        // There can be bugs where bot is still part of channel, but lost connection
+        if (this.channel) {
+            await this.channel.join();
+        } else {
+            if (!member.voice.channelID) throw new ConnectError(new Translation("audio.join_ch", "You need to join a voice channel first!"));
+
+            const vc = member.voice.channel;
 
             if (vc.full) throw new ConnectError(new Translation("audio.ch_full", "The voice channel you're in is full!"));
             if (!vc.joinable) throw new ConnectError(new Translation("audio.no_perms_join", "Trixie doesn't have permissions to join the vc you're in"));
             if (!vc.speakable) throw new ConnectError(new Translation("audio.no_perms_speak", "Trixie doesn't have permissions to speak in the vc you're in"));
 
-            this.vc = vc;
+            await vc.join();
         }
 
-        if (!this.vc.connection) {
-            await this.vc.join();
+        this._attachListener();
 
-            this.vc.connection.once("disconnect", () => this.leave());
-        }
+        this.connection.once("disconnect", () => this.leave());
+        this.connection.setSpeaking(0);
 
-        this.emit("connected", this.vc.connection);
+        this.emit("connected", this.connection);
 
-        return this.vc.connection;
-    }
-
-    async leave() {
-        if (!this.vc) return;
-
-        if (this.vc.connection) {
-            this.stop();
-            if (this.vc && this.vc.connection) await disconnect(this.vc.connection);
-        }
-        // disconnect could trigger vc.connection.on("disconnect"), which will call leave
-        // and set vc to null before we can do it here, therefore trigger VCGuild#leave twice
-        if (!this.vc) return;
-
-        this.vc.leave();
-        this.vc = null;
-
-        this.emit("leave");
+        return this.connection;
     }
 
     stop() {
-        if (!this.connected) return;
-        if (!this.vc.connection.dispatcher) return;
-        this.vc.connection.dispatcher.end();
-
-        this.emit("end");
+        if (!this.playing) return;
+        this.connection.player.destroy();
     }
 
-    async destroy() {
-        await this.leave();
-        this.client.removeListener("voiceStateUpdate", this.voiceStateUpdate);
-        this.emit("destroy");
-        this.removeAllListeners();
+    leave() {
+        this._removeListener();
+
+        if (!this.channel) return;
+        this.channel.leave();
+        this.emit("leave");
     }
 
     /**
-     * @param {GuildMember} oldMember
-     * @param {GuildMember} newMember
+     * @param {VoiceState} oldState
+     * @param {VoiceState} newState
      * @returns {void}
      */
-    voiceStateUpdate(oldMember, newMember) {
+    voiceStateUpdate(oldState, newState) {
         if (!this.connected) return;
 
-        if (oldMember.user.id === this.client.user.id) {
-            if (oldMember.voiceChannel && !newMember.voiceChannel) return this.destroy();
-            this.vc = newMember.voiceChannel;
+        if (oldState.member.user.id === this.client.user.id) {
+            if (oldState.channelID && !newState.channelID) return this.leave();
         } else {
-            if (!oldMember.voiceChannel) return;
-            if (oldMember.voiceChannel.id !== this.vc.id) return;
+            if (!oldState.channelID) return;
+            if (oldState.channelID !== this.channel.id) return;
         }
 
-        // TODO: Error: Cannot read property 'members' of undefined
-        if (this.vc.members.filter(m => !m.user.bot).size > 0) return;
+        if (this.channel.members.filter(m => !m.user.bot).size > 0) return;
 
         this.leave();
     }
@@ -157,29 +137,47 @@ class VCGuild extends EventEmitter {
 
 class AudioManager {
     constructor() {
-        /**
-         * @type {Collection<string, VCGuild>}
-         */
-        this.guilds = new Collection;
+        this.holds = AudioGuild;
+
+        /** @type {Collection<string, AudioGuild>} */
+        this.cache = new Collection;
     }
 
     /**
      * @param {Guild} guild
-     * @returns {VCGuild}
+     * @returns {AudioGuild}
      */
     getGuild(guild) {
-        if (this.guilds.has(guild.id)) return this.guilds.get(guild.id);
-        const g = new VCGuild(guild).once("destroy", () => this.guilds.delete(guild.id));
-        this.guilds.set(guild.id, g);
+        if (this.cache.has(guild.id)) return this.cache.get(guild.id);
+        const g = new AudioGuild(guild);
+        this.cache.set(guild.id, g);
         return g;
     }
 
     /**
-     * @param {Guild} guild
-     * @returns {boolean}
+     * Resolves a data entry to a data Object.
+     * @param {string|Object} idOrInstance The id or instance of something in this Manager
+     * @returns {?Object} An instance from this Manager
      */
-    hasGuild(guild) {
-        return this.guilds.has(guild.id);
+    resolve(idOrInstance) {
+        if (idOrInstance instanceof this.holds) return idOrInstance;
+        if (typeof idOrInstance === "string") return this.cache.get(idOrInstance) || null;
+        return null;
+    }
+
+    /**
+     * Resolves a data entry to a instance ID.
+     * @param {string|Object} idOrInstance The id or instance of something in this Manager
+     * @returns {?Snowflake}
+     */
+    resolveID(idOrInstance) {
+        if (idOrInstance instanceof this.holds) return idOrInstance.id;
+        if (typeof idOrInstance === "string") return idOrInstance;
+        return null;
+    }
+
+    valueOf() {
+        return this.cache;
     }
 }
 

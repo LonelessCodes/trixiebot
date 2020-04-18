@@ -31,11 +31,11 @@ const TranslationMerge = require("../modules/i18n/TranslationMerge");
 
 function findRoleInServer(guild, role) {
     const role_lower_case = role.toLowerCase();
-    return guild.roles.find(role_obj => role_obj.name.toLowerCase() === role_lower_case);
+    return guild.roles.cache.find(role_obj => role_obj.name.toLowerCase() === role_lower_case);
 }
 
 async function rolesMessage(guild, channel, db) {
-    await guild.fetchMembers();
+    await guild.members.fetch();
 
     const roles = await db.find({
         guildId: guild.id,
@@ -43,7 +43,7 @@ async function rolesMessage(guild, channel, db) {
 
     const available_roles = new Map;
     for (const role of roles) {
-        let role_obj = guild.roles.get(role.roleId);
+        let role_obj = guild.roles.cache.get(role.roleId);
         if (!role_obj) continue;
 
         role.category = role.category || "Other";
@@ -127,7 +127,7 @@ module.exports = function install(cr, { db }) {
                 }
 
                 for (const member of members) {
-                    member.removeRole(role_obj);
+                    member.roles.remove(role_obj);
                 }
             } else if (permission) {
                 const role_obj = findRoleInServer(message.guild, content);
@@ -135,11 +135,11 @@ module.exports = function install(cr, { db }) {
                     return new Translation("role.not_available", "Uh apparently this server doesn't have this role available right now.");
                 }
 
-                if (!message.member.roles.has(role_obj.id)) {
+                if (!message.member.roles.cache.has(role_obj.id)) {
                     return new Translation("role.cant_remove", "Can't remove a role without having it first.");
                 }
 
-                await message.member.removeRole(role_obj);
+                await message.member.roles.remove(role_obj);
             } else {
                 const role_obj = findRoleInServer(message.guild, content);
                 if (!role_obj) {
@@ -161,11 +161,11 @@ module.exports = function install(cr, { db }) {
                     );
                 }
 
-                if (!message.member.roles.has(role_obj.id)) {
+                if (!message.member.roles.cache.has(role_obj.id)) {
                     return new Translation("role.cant_remove", "Can't remove a role without having it first.");
                 }
 
-                await message.member.removeRole(role_obj);
+                await message.member.roles.remove(role_obj);
             }
 
             return new Translation("role.removed", "Role removed.");
@@ -198,7 +198,7 @@ module.exports = function install(cr, { db }) {
             return new Translation("role.not_available", "Uh apparently this server doesn't have this role available right now.");
         }
 
-        const compare = role_obj.comparePositionTo(message.member.highestRole);
+        const compare = role_obj.comparePositionTo(message.member.roles.highest);
         if (compare > 0) {
             return new Translation("role.add_perms_conflict", "Sorry, you can't add a role to the config that is more powerful than your owns.");
         }
@@ -221,12 +221,12 @@ module.exports = function install(cr, { db }) {
         const args = findArgs(content);
         const role = args[0];
 
-        const role_obj = message.guild.roles.find(r => r.name === role);
+        const role_obj = message.guild.roles.cache.find(r => r.name === role);
         if (!role_obj) {
             return new Translation("role.not_available", "Uh apparently this server doesn't have this role available right now.");
         }
 
-        const compare = role_obj.comparePositionTo(message.member.highestRole);
+        const compare = role_obj.comparePositionTo(message.member.roles.highest);
         if (compare > 0) {
             return new Translation("role.remove_perms_conflict", "Sorry, you can't remove a role to the config that is more powerful than your owns.");
         }
@@ -277,7 +277,7 @@ module.exports = function install(cr, { db }) {
 
                 // add the role
                 for (const member of members) {
-                    await member.addRole(role_obj);
+                    await member.roles.add(role_obj);
                 }
             } else if (permission) {
                 const role_obj = findRoleInServer(message.guild, content);
@@ -285,11 +285,11 @@ module.exports = function install(cr, { db }) {
                     return new Translation("role.not_available", "Uh apparently this server doesn't have this role available right now.");
                 }
 
-                if (message.member.roles.has(role_obj.id)) {
+                if (message.member.roles.cache.has(role_obj.id)) {
                     return new Translation("role.already_have", "You already have this role! Yay?");
                 }
 
-                await message.member.addRole(role_obj);
+                await message.member.roles.add(role_obj);
             } else {
                 const role_obj = findRoleInServer(message.guild, content);
                 if (!role_obj) {
@@ -311,11 +311,11 @@ module.exports = function install(cr, { db }) {
                     );
                 }
 
-                if (message.member.roles.has(role_obj.id)) {
+                if (message.member.roles.cache.has(role_obj.id)) {
                     return new Translation("role.already_have", "You already have this role! Yay?");
                 }
 
-                await message.member.addRole(role_obj);
+                await message.member.roles.add(role_obj);
             }
 
             return new Translation("role.added", "Role added! /)");

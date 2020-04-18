@@ -50,7 +50,7 @@ module.exports = function install(cr, { config }) {
         .registerOverload("0", new SimpleCommand(({ message, prefix }) => {
             const embed = new TranslationEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setTitle(message.guild.name);
-            embed.setThumbnail(message.guild.iconURL);
+            embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
             embed.setDescription(new Translation(
                 "config.description", "Use the command format !config <option> to view more info about an option."
             ));
@@ -134,7 +134,7 @@ module.exports = function install(cr, { config }) {
             embed.setDescription(new Translation("config.no_parameter", "No such parameter. *shrugs*"));
         } else {
             embed.setColor(CONST.COLOR.PRIMARY);
-            embed.setThumbnail(message.guild.iconURL);
+            embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
             embed.setTitle(parameter.humanName);
 
             const value = await config.get(message.guild.id, parameter.name);

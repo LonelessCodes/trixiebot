@@ -138,7 +138,7 @@ module.exports = function install(cr, { db }) {
 
         return new TranslationEmbed()
             .setColor(CONST.COLOR.PRIMARY)
-            .setAuthor(new Translation("waifu.claim.success", "Successful claim!!! Deep snug with {{user}} incoming!", { user: userToString(mentioned_member, true) }), mentioned_member.user.avatarURL);
+            .setAuthor(new Translation("waifu.claim.success", "Successful claim!!! Deep snug with {{user}} incoming!", { user: userToString(mentioned_member, true) }), mentioned_member.user.avatarURL({ size: 32, dynamic: true }));
     })).setHelp(new HelpContent().setUsage("<@mention>", "Claim the person you mentioned if not already claimed."));
 
     waifuCommand.registerSubCommand("unclaim", new SimpleCommand(async ({ message, content }) => {
@@ -198,7 +198,7 @@ module.exports = function install(cr, { db }) {
                 const random = await secureRandom(all_waifus);
                 if (random.waifuId !== message.author.id &&
                     random.ownerId !== message.author.id &&
-                    message.guild.members.has(random.waifuId))
+                    message.guild.members.cache.has(random.waifuId))
                     waifu = random;
             }
         } else {
@@ -209,7 +209,7 @@ module.exports = function install(cr, { db }) {
             const w = await database.findOne({ waifuId: mentioned_member.user.id, guildId: message.guild.id });
 
             if (w) {
-                const owner_member = await message.guild.fetchMember(w.ownerId);
+                const owner_member = await message.guild.members.fetch(w.ownerId);
                 if (owner_member) {
                     waifu = w;
                 } else {
@@ -251,7 +251,7 @@ module.exports = function install(cr, { db }) {
             });
             await ctx.edit(m2, "... ***ATTACC***", new TranslationEmbed()
                 .setColor(CONST.COLOR.PRIMARY)
-                .setAuthor(new Translation("waifu.steal.success", "Successful steal!!! {{user}} now belongs to you!", { user: userToString(waifuUser, true) }), waifuUser.user.avatarURL)
+                .setAuthor(new Translation("waifu.steal.success", "Successful steal!!! {{user}} now belongs to you!", { user: userToString(waifuUser, true) }), waifuUser.user.avatarURL({ size: 32, dynamic: true }))
             );
             await timeout(60000);
             await m1.delete().catch(() => { /* Do nothing */ });
@@ -305,7 +305,7 @@ module.exports = function install(cr, { db }) {
                 new TranslationMerge("... ***ATTACC***", new Translation("waifu.escape.success1", "The leash tore and you are dashing off in the free world")).separator("\n"),
                 new TranslationEmbed()
                     .setColor(CONST.COLOR.PRIMARY)
-                    .setAuthor(new Translation("waifu.escape.success2", "Successful escape!!! {{user}} is now free!", { user: userToString(message.member, true) }), message.author.avatarURL)
+                    .setAuthor(new Translation("waifu.escape.success2", "Successful escape!!! {{user}} is now free!", { user: userToString(message.member, true) }), message.author.avatarURL({ size: 32, dynamic: true }))
             );
             await timeout(60000);
             await m1.delete().catch(() => { /* Do nothing */ });
@@ -383,7 +383,7 @@ module.exports = function install(cr, { db }) {
         } = await getData(message, null, database, databaseSlots);
 
         const embed = new TranslationEmbed().setColor(CONST.COLOR.PRIMARY);
-        embed.setThumbnail(message.author.avatarURL);
+        embed.setThumbnail(message.author.avatarURL({ size: 256, dynamic: true }));
         embed.setTitle(new Translation("waifu.your_waifus", "Your Waifus"));
 
         if (!owner_waifus.length) {

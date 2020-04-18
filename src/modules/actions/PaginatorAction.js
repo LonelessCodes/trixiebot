@@ -176,7 +176,7 @@ class PaginatorAction extends events.EventEmitter {
 
         try {
             if (message.channel.permissionsFor(message.guild.me).has(Permissions.FLAGS.MANAGE_MESSAGES))
-                reaction.remove(this.user);
+                reaction.users.remove(this.user);
         } catch (_) { _; }
 
         const msg = this.renderPage(new_page_num).map(elem => Resolvable.resolve(elem, translator));
@@ -185,7 +185,7 @@ class PaginatorAction extends events.EventEmitter {
 
     renderHeader() {
         const user_header = userToString(this.user, true);
-        const author_icon = this.user.avatarURL;
+        const author_icon = this.user.avatarURL({ size: 32, dynamic: true });
         if (this.title && this.title !== "") {
             return [new TranslationMerge(user_header, "|", this.title), author_icon];
         } else {
@@ -227,7 +227,7 @@ class PaginatorAction extends events.EventEmitter {
      * @param {Message} message
      */
     async end(message) {
-        await message.clearReactions().catch(() => { /* Do nothing */ });
+        await message.reactions.removeAll().catch(() => { /* Do nothing */ });
         this.emit("end", message);
     }
 }

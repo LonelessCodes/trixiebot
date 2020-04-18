@@ -81,7 +81,7 @@ class Parameter {
     human(value) {
         if (this.allowEmpty && !value) return "none";
         if (this.types.includes(TextChannel)) {
-            return "#" + (this.client.channels.get(value) || { name: "deleted-channel" }).name;
+            return "#" + (this.client.channels.cache.get(value) || { name: "deleted-channel" }).name;
         }
 
         return String(value);

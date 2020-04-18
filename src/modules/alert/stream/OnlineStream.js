@@ -123,11 +123,11 @@ class OnlineStream extends Stream {
                 this.nsfw :
                 false :
             false;
-        /** @type {Discord.Attachment} */
+        /** @type {Discord.MessageAttachment} */
 
         let attachment;
         try {
-            attachment = new Discord.Attachment(await nsfwThumb(this.thumbnail), "thumb.jpg");
+            attachment = new Discord.MessageAttachment(await nsfwThumb(this.thumbnail), "thumb.jpg");
         } catch (_) { /* Do nothing */ }
 
         const can_use_blur = blur && attachment;
@@ -143,7 +143,7 @@ class OnlineStream extends Stream {
         if (await this.manager.isCompact(this.guild)) {
             embed.setAuthor(this.username, this.avatar, this.url);
             if (thumbnail) {
-                if (can_use_blur) embed.attachFile(attachment);
+                if (can_use_blur) embed.attachFiles(attachment);
                 embed.setImage(thumbnail);
             }
             embed.setFooter(footer);
@@ -156,7 +156,7 @@ class OnlineStream extends Stream {
             if (this.followers != null) embed.addField(new Translation("alert.embed.followers", "Followers"), new NumberFormat(this.followers), true);
             if (this.totalviews != null) embed.addField(new Translation("alert.embed.viewers", "Total Viewers"), new NumberFormat(this.totalviews), true);
             if (thumbnail) {
-                if (can_use_blur) embed.attachFile(attachment);
+                if (can_use_blur) embed.attachFiles(attachment);
                 embed.setImage(thumbnail);
             }
             embed.setFooter(footer);

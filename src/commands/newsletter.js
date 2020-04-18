@@ -23,7 +23,7 @@ const CommandScope = require("../util/commands/CommandScope");
 
 const Discord = require("discord.js");
 
-module.exports = function install(cr, { db }) {
+module.exports = function install(cr, { client, db }) {
     const database = db.collection("newsletter");
 
     cr.registerCommand("subscribe", new SimpleCommand(async context => {
@@ -55,18 +55,21 @@ module.exports = function install(cr, { db }) {
     cr.registerCommand("newsletter", new SimpleCommand(async ({ message, content }) => {
         const subscribed = await database.find({}).toArray();
 
-        const embed = new Discord.RichEmbed()
+        const embed = new Discord.MessageEmbed()
             .setColor(CONST.COLOR.PRIMARY)
-            .setAuthor(`TrixieBot Newsletter | ${new Date().toLocaleDateString("en")}`, message.client.user.avatarURL)
+            .setAuthor(`TrixieBot Newsletter | ${new Date().toLocaleDateString("en")}`, client.user.avatarURL({ size: 32, dynamic: true }))
             .setDescription(content)
             .setFooter("Unsubscribe from this newsletter via 'unsubscribe'");
 
-        for (let { userId } of subscribed) {
+        const attachment = message.attachments.find(a => typeof a.width === "number" && a.width > 0);
+        if (attachment) embed.setImage(attachment.url);
+
+        for (const { userId } of subscribed) {
             try {
-                const user = await message.client.fetchUser(userId, false);
+                const user = await client.users.fetch(userId, false);
                 if (!user) continue;
                 const channel = await user.createDM();
-                channel.send({ embed }).catch(() => { /* Do nothing */ });
+                await channel.send({ embed });
             } catch (_) { /* Do nothing */ }
         }
 

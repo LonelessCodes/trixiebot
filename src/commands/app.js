@@ -28,7 +28,7 @@ const TranslationMerge = require("../modules/i18n/TranslationMerge");
 const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
 
 module.exports = function install(cr, { client }) {
-    cr.registerCommand("donate", new TextCommand("https://paypal.me/loneless ❤"))
+    cr.registerCommand("donate", new TextCommand("https://ko-fi.com/loneless ❤"))
         .setHelp(new HelpContent().setDescription("**TrixieBot costs $12 a month and a lot of time to maintain.**\nIf you like this bot, please consider giving the devs a little tip ❤"))
         .setCategory(Category.TRIXIE)
         .setScope(CommandScope.ALL);
@@ -67,7 +67,7 @@ module.exports = function install(cr, { client }) {
 
         return new TranslationEmbed()
             .setColor(CONST.COLOR.PRIMARY)
-            .setAuthor("TrixieBot", client.user.avatarURL, INFO.WEBSITE)
+            .setAuthor("TrixieBot", client.user.avatarURL({ size: 32, dynamic: true }), INFO.WEBSITE)
             .setDescription(desc.separator(""))
             .setFooter(`TrixieBot v${INFO.VERSION}`);
     }))

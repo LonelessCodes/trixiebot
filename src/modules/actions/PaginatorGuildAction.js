@@ -42,7 +42,7 @@ class PaginatorGuildAction extends PaginatorAction {
 
     renderHeader() {
         const guild_header = this.guild.name;
-        const author_icon = this.guild.iconURL;
+        const author_icon = this.guild.iconURL({ size: 32, dynamic: true });
         if (this.title && this.title !== "") {
             return [new TranslationMerge(guild_header, "|", this.title), author_icon];
         } else {

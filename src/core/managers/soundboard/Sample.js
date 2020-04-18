@@ -16,7 +16,6 @@
 
 const path = require("path");
 const fs = require("fs-extra");
-const prism = require("prism-media");
 // eslint-disable-next-line no-unused-vars
 const { User, Guild, VoiceConnection, StreamDispatcher } = require("discord.js");
 
@@ -64,9 +63,9 @@ class Sample {
         */
         return new Promise((res, rej) => {
             try {
-                const dispatcher = connection.playOpusStream(
-                    fs.createReadStream(this.file)
-                        .pipe(new prism.opus.OggDemuxer())
+                const dispatcher = connection.play(
+                    fs.createReadStream(this.file),
+                    { type: "ogg/opus", volume: false }
                 );
                 dispatcher.once("start", () => {
                     connection.player.streamingData.pausedTime = 0;

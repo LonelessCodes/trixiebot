@@ -22,26 +22,27 @@ const LocaleManager = require("./LocaleManager");
 const AliasCommand = require("../commands/AliasCommand");
 const Category = require("../../util/commands/Category");
 
+// TODO: use .fetch instead of .get
 function cleanContent(str, guild) {
     return str
         .replace(/@(everyone|here)/g, "@\u200b$1")
         .replace(/<@!?[0-9]+>/g, input => {
             const id = input.replace(/<|!|>|@/g, "");
 
-            const member = guild.members.get(id);
+            const member = guild.members.cache.get(id);
             if (member) {
                 return `@${member.displayName}`;
             } else {
-                const user = guild.client.users.get(id);
+                const user = guild.client.users.cache.get(id);
                 return user ? `@${user.username}` : input;
             }
         })
         .replace(/<#[0-9]+>/g, input => {
-            const channel = guild.client.channels.get(input.replace(/<|#|>/g, ""));
+            const channel = guild.client.channels.cache.get(input.replace(/<|#|>/g, ""));
             return channel ? `#${channel.name}` : input;
         })
         .replace(/<@&[0-9]+>/g, input => {
-            const role = guild.roles.get(input.replace(/<|@|>|&/g, ""));
+            const role = guild.roles.cache.get(input.replace(/<|@|>|&/g, ""));
             return role ? `@${role.name}` : input;
         });
 }
@@ -66,7 +67,7 @@ class WebsiteManager {
     }
 
     initializeIPC() {
-        ipc.answer("checkGuilds", guildIds => guildIds.filter(guildId => this.client.guilds.has(guildId)));
+        ipc.answer("checkGuilds", guildIds => guildIds.filter(guildId => this.client.guilds.cache.has(guildId)));
 
         ipc.answer("overview", async guildId => {
             const month = new Date;
@@ -112,24 +113,31 @@ class WebsiteManager {
             };
         });
 
-        const getChannels = guildId =>
-            this.client.guilds.get(guildId).channels.array().sort((a, b) => a.position - b.position)
+        const getChannels = guildId => {
+            const guild = this.client.guilds.cache.get(guildId);
+            return guild.channels.cache.array()
                 .filter(c => c.type === "text")
+                .sort((a, b) => a.rawPosition - b.rawPosition)
                 .map(c => ({
                     id: c.id,
                     name: c.name,
                 }));
+        };
 
-        const getRoles = guildId =>
-            this.client.guilds.get(guildId).roles.array().filter(r => r.name !== "@everyone").sort((a, b) => b.position - a.position)
+        const getRoles = guildId => {
+            const guild = this.client.guilds.cache.get(guildId);
+            return guild.roles.cache.array()
+                .filter(r => r.name !== "@everyone")
+                .sort((a, b) => b.rawPosition - a.rawPosition)
                 .map(c => ({
                     id: c.id,
                     color: c.color === 0 ? null : c.hexColor,
                     name: c.name,
                 }));
+        };
 
         ipc.answer("commands", async guildId => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             const disabledCommands = await this.db.collection("disabled_commands").findOne({
@@ -167,7 +175,7 @@ class WebsiteManager {
         });
 
         ipc.answer("commandUpdate", async ({ guildId, commandName, enabled, disabled_channels }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             if (!this.REGISTRY.commands.has(commandName))
@@ -202,7 +210,7 @@ class WebsiteManager {
          */
 
         ipc.answer("cc:get", async guildId => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             const commands = await this.REGISTRY.CC.getCommandsForWeb(guildId);
@@ -221,7 +229,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:updateSettings", async ({ guildId, allowed_roles }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             const settings = await this.REGISTRY.CC.updateSettings(guildId, { allowed_roles });
@@ -233,7 +241,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:new", async ({ guildId, type, trigger, case_sensitive, code, disabled_channels }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             try {
@@ -250,7 +258,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:update", async ({ guildId, commandId, type, trigger, case_sensitive, code, disabled_channels }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
@@ -270,7 +278,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:enabled", async ({ guildId, commandId, enabled }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
@@ -287,7 +295,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:delete", async ({ guildId, commandId }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
@@ -304,7 +312,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:geterrors", async ({ guildId, commandId }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { errors: [], success: false };
 
             if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
@@ -333,19 +341,19 @@ class WebsiteManager {
         });
 
         ipc.answer("deleted", async guildId => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             const database = this.db.collection("deleted_messages");
             const deleted_raw = await database.find({ guildId }).toArray();
 
-            const guild = this.client.guilds.get(guildId);
+            const guild = this.client.guilds.cache.get(guildId);
 
             const deleted = [];
 
             for (const row of deleted_raw.filter(m => "deletedAt" in m)) {
-                const channel = guild.channels.get(row.channelId);
-                const user = this.client.users.get(row.userId);
+                const channel = guild.channels.cache.get(row.channelId);
+                const user = await this.client.users.fetch(row.userId);
                 deleted.push({
                     user: user ? userToString(user, true) : row.name, // "unknown-user" for backwards compatability support
                     channel: {
@@ -365,7 +373,7 @@ class WebsiteManager {
         });
 
         ipc.answer("deletedClear", async guildId => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             const database = this.db.collection("deleted_messages");
@@ -378,20 +386,22 @@ class WebsiteManager {
         });
 
         ipc.answer("settings", async guildId => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             const config = await this.config.get(guildId);
             const locale = await this.locale.get(guildId);
 
+            const guild = this.client.guilds.cache.get(guildId);
+
             const channels = [];
             for (const key in locale.channels) {
-                if (!this.client.channels.has(key)) continue;
-                const channel = this.client.channels.get(key);
+                if (!guild.channels.cache.has(key)) continue;
+                const channel = guild.channels.cache.get(key);
                 channels.push({
                     id: channel.id,
                     name: channel.name,
-                    position: channel.position,
+                    position: channel.rawPosition,
                     locale: locale.channels[key],
                 });
             }
@@ -406,7 +416,7 @@ class WebsiteManager {
                 locale: {
                     global: locale.global,
                     channels: channels
-                        .sort((a, b) => a.position - b.position)
+                        .sort((a, b) => a.rawPosition - b.rawPosition)
                         .map(c => ({
                             id: c.id,
                             name: c.name,
@@ -414,8 +424,8 @@ class WebsiteManager {
                         })),
                 },
                 disabled: disabled_channels ? disabled_channels.channels : [],
-                channels: this.client.guilds.get(guildId).channels.array()
-                    .sort((a, b) => a.position - b.position)
+                channels: guild.channels.cache.array()
+                    .sort((a, b) => a.rawPosition - b.rawPosition)
                     .filter(c => c.type === "text")
                     .map(c => ({
                         id: c.id,
@@ -426,7 +436,7 @@ class WebsiteManager {
         });
 
         ipc.answer("settingsUpdate", async ({ guildId, settings, locale, disabled }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             // Locale
@@ -446,7 +456,8 @@ class WebsiteManager {
             // Disabled
             const disabledTrue = [];
             for (const channelId of disabled) {
-                if (this.client.guilds.get(guildId).channels.has(channelId)) {
+                if (this.client.guilds.cache.get(guildId)
+                    .channels.cache.has(channelId)) {
                     disabledTrue.push(channelId);
                 }
             }
@@ -461,12 +472,12 @@ class WebsiteManager {
 
             const channels = [];
             for (const key in locale.channels) {
-                if (!this.client.channels.has(key)) continue;
-                const channel = this.client.channels.get(key);
+                if (!this.client.channels.cache.has(key)) continue;
+                const channel = this.client.channels.cache.get(key);
                 channels.push({
                     id: channel.id,
                     name: channel.name,
-                    position: channel.position,
+                    position: channel.rawPosition,
                     locale: locale.channels[key],
                 });
             }
@@ -477,7 +488,7 @@ class WebsiteManager {
                 locale: {
                     global: locale.global,
                     channels: channels
-                        .sort((a, b) => a.position - b.position)
+                        .sort((a, b) => a.rawPosition - b.rawPosition)
                         .map(c => ({
                             id: c.id,
                             name: c.name,
@@ -489,7 +500,7 @@ class WebsiteManager {
         });
 
         ipc.answer("settingsReset", async ({ guildId }) => {
-            if (!this.client.guilds.has(guildId))
+            if (!this.client.guilds.cache.has(guildId))
                 return { success: false };
 
             await this.config.set(guildId, this.config.default_config);
@@ -512,12 +523,12 @@ class WebsiteManager {
 
             const channels = [];
             for (const key in locale.channels) {
-                if (!this.client.channels.has(key)) continue;
-                const channel = this.client.channels.get(key);
+                if (!this.client.channels.cache.has(key)) continue;
+                const channel = this.client.channels.cache.get(key);
                 channels.push({
                     id: channel.id,
                     name: channel.name,
-                    position: channel.position,
+                    position: channel.rawPosition,
                     locale: locale.channels[key],
                 });
             }
@@ -528,7 +539,7 @@ class WebsiteManager {
                 locale: {
                     global: locale.global,
                     channels: channels
-                        .sort((a, b) => a.position - b.position)
+                        .sort((a, b) => a.rawPosition - b.rawPosition)
                         .map(c => ({
                             id: c.id,
                             name: c.name,
@@ -541,8 +552,8 @@ class WebsiteManager {
 
         // ADMIN
 
-        ipc.answer("admin:isadmin", userId => {
-            const user = this.client.users.get(userId);
+        ipc.answer("admin:isadmin", async userId => {
+            const user = await this.client.users.fetch(userId);
             if (!user) return false;
 
             const isAdmin = isOwner(user);

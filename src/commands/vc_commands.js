@@ -26,14 +26,8 @@ const Translation = require("../modules/i18n/Translation");
 
 module.exports = function install(cr) {
     cr.registerCommand("leavevc", new SimpleCommand(async ({ message, audio }) => {
-        try {
-            await audio.destroy();
-            await message.react("👍");
-        } catch (err) {
-            await message.react("❌");
-            log.namespace("leave", err);
-            return new Translation("audio.error", "Some error happened and caused some whoopsies");
-        }
+        audio.leave();
+        await message.react("👍").catch(() => { /* Do nothing */ });
     }))
         .setHelp(new HelpContent().setUsage("", "Make Trixie leave the voice channel!"))
         .setCategory(Category.AUDIO);
@@ -42,14 +36,8 @@ module.exports = function install(cr) {
     cr.registerAlias("leavevc", "begone");
 
     cr.registerCommand("stopvc", new SimpleCommand(async ({ message, audio }) => {
-        try {
-            audio.stop();
-            await message.react("👍");
-        } catch (err) {
-            await message.react("❌");
-            log.namespace("stop", err);
-            return new Translation("audio.error", "Some error happened and caused some whoopsies");
-        }
+        audio.stop();
+        await message.react("👍").catch(() => { /* Do nothing */ });
     }))
         .setHelp(new HelpContent().setUsage("", "Stop whatever Trixie is saying in VC"))
         .setCategory(Category.AUDIO);

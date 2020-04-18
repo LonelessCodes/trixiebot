@@ -101,10 +101,7 @@ class Core {
     }
 
     async startMainComponents(commands_package) {
-        for (const voice of this.client.voiceConnections.array()) voice.disconnect();
-
-        await this.client.user.setStatus("dnd");
-        await this.client.user.setActivity("!trixie | Booting...", { type: "PLAYING" });
+        for (const [, voice] of this.client.voice.connections) voice.disconnect();
 
         await this.loadCommands(commands_package);
         await this.attachListeners();
@@ -191,7 +188,7 @@ class Core {
 
             // Server count
 
-            this.client.user.setActivity(`!trixie | ${this.client.guilds.size.toLocaleString("en")} servers`, { type: "WATCHING" });
+            this.client.user.setActivity(`!trixie | ${this.client.guilds.cache.size.toLocaleString("en")} servers`, { type: "WATCHING" });
 
             await timeout(60000);
 
@@ -230,7 +227,7 @@ class Core {
 
     async updateStatistics() {
         const id = this.client.user.id;
-        const server_count = this.client.guilds.size;
+        const server_count = this.client.guilds.cache.size;
 
         const promises = [];
 
@@ -278,8 +275,8 @@ class Core {
             promises.push(fetchPost(`https://discordbotlist.com/api/bots/${id}/stats`, {
                 json: {
                     guilds: server_count,
-                    users: this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0),
-                    voice_connections: this.client.voiceConnections.size,
+                    users: this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0),
+                    voice_connections: this.client.voice.connections.size,
                 },
                 headers: {
                     Authorization: "Bot " + config.get("botlists.discordbotlist_com"),

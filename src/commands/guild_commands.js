@@ -196,16 +196,16 @@ module.exports = function install(cr) {
         .setCategory(Category.INFO);
 
     cr.registerCommand("serverinfo", new SimpleCommand(async message => {
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
         embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
-        embed.setThumbnail(message.guild.iconURL);
+        embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
 
         if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
         embed.addField("ID", message.guild.id, true);
         embed.addField("User Count", message.guild.memberCount, true);
         embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
-        embed.addField("Channel Count", message.guild.channels.filter(c => c.type === "text").size, true);
-        embed.addField("Emoji Count", message.guild.emojis.size, true);
+        embed.addField("Channel Count", message.guild.channels.cache.filter(c => c.type === "text").size, true);
+        embed.addField("Emoji Count", message.guild.emojis.cache.size, true);
         embed.addField("Region", message.guild.region, true);
 
         return { embed };

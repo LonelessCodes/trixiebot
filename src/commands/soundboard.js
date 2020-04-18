@@ -120,7 +120,7 @@ module.exports = function install(cr, { locale }) {
             .on("statusChange", status => m.edit(new TranslationMerge(":arrows_counterclockwise:", status)))
             .upload(message.attachments.first(), name.toLowerCase())
             .then(sample => {
-                const embed = cb(new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY), sample);
+                const embed = cb(new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY), sample);
                 m.edit(new TranslationMerge("✅", new Translation("sb.success", "Successfully added!")), { embed });
             })
             .catch(err => {
@@ -140,7 +140,7 @@ module.exports = function install(cr, { locale }) {
             }
 
             return await uploadSample(message, message.author, name, (embed, sample) => {
-                embed.setAuthor(userToString(message.author, true) + " | " + sample.name, message.author.avatarURL);
+                embed.setAuthor(userToString(message.author, true) + " | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
 
                 embed.addField("Name", sample.name, true);
                 embed.addField("ID", sample.id, true);
@@ -155,7 +155,7 @@ module.exports = function install(cr, { locale }) {
             }
 
             return await uploadSample(message, message.guild, name, (embed, sample) => {
-                embed.setAuthor(message.guild.name + " | " + sample.name, message.guild.iconURL);
+                embed.setAuthor(message.guild.name + " | " + sample.name, message.guild.iconURL({ size: 32, dynamic: true }));
 
                 embed.addField("Name", sample.name, true);
                 embed.addField("ID", sample.id, true);
@@ -164,7 +164,7 @@ module.exports = function install(cr, { locale }) {
         }
         async pre({ message, content: name }) {
             return await uploadSample(message, null, name, (embed, sample) => {
-                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL);
+                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
 
                 embed.addField("Name", sample.name, true);
                 return embed;
@@ -211,7 +211,7 @@ module.exports = function install(cr, { locale }) {
 
         await soundboard.importSample(user, sample);
 
-        const embed = cb(new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY), sample);
+        const embed = cb(new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY), sample);
 
         return [new Translation("sb.success_import", "✅ Successfully imported!"), { embed }];
     }
@@ -225,7 +225,7 @@ module.exports = function install(cr, { locale }) {
             }
 
             return await importSample("user", prefix, message.author, id, (embed, sample) => {
-                embed.setAuthor(userToString(message.author, true) + " | " + sample.name, message.author.avatarURL);
+                embed.setAuthor(userToString(message.author, true) + " | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
 
                 embed.addField("Name", sample.name, true);
                 embed.addField("ID", sample.id, true);
@@ -240,7 +240,7 @@ module.exports = function install(cr, { locale }) {
             }
 
             return await importSample("guild", prefix, message.guild, id, (embed, sample) => {
-                embed.setAuthor(message.guild.name + " | " + sample.name, message.guild.iconURL);
+                embed.setAuthor(message.guild.name + " | " + sample.name, message.guild.iconURL({ size: 32, dynamic: true }));
 
                 embed.addField("Name", sample.name, true);
                 embed.addField("ID", sample.id, true);
@@ -249,7 +249,7 @@ module.exports = function install(cr, { locale }) {
         }
         async pre({ message, prefix, content: id }) {
             return await importSample("predefined", prefix, null, id, (embed, sample) => {
-                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL);
+                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
 
                 embed.addField("Name", sample.name, true);
                 return embed;
@@ -297,12 +297,12 @@ module.exports = function install(cr, { locale }) {
     sbCmd.registerSubCommandAlias("delete", "d");
 
     function makeInfoEmbed(user, sample) {
-        const embed = new Discord.RichEmbed().setColor(CONST.COLOR.PRIMARY);
+        const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
 
         if (user instanceof User) {
-            embed.setAuthor(userToString(user, true) + "'s Samples | " + sample.name, user.avatarURL);
+            embed.setAuthor(userToString(user, true) + "'s Samples | " + sample.name, user.avatarURL({ size: 32, dynamic: true }));
         } else if (user instanceof Guild) {
-            embed.setAuthor(user.name + "'s Samples | " + sample.name, user.iconURL);
+            embed.setAuthor(user.name + "'s Samples | " + sample.name, user.iconURL({ size: 32, dynamic: true }));
         }
 
         embed.addField("Name", sample.name, true);
@@ -389,7 +389,7 @@ module.exports = function install(cr, { locale }) {
 
         active.add(isUser ? user.id : guild.id);
 
-        context.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === context.author.id, { maxMatches: 1, time: 60000, errors: ["time"] })
+        context.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === context.author.id, { max: 1, time: 60000, errors: ["time"] })
             .then(async messages => {
                 const m = messages.first();
                 if (/^buy$/i.test(m.content)) {

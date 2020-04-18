@@ -17,7 +17,7 @@
 const path = require("path");
 const { isPlainObject } = require("../../util/util");
 // eslint-disable-next-line no-unused-vars
-const { TextChannel, Attachment, RichEmbed, Message } = require("discord.js");
+const { TextChannel, MessageAttachment, MessageEmbed, Message } = require("discord.js");
 const I18n = require("../../modules/i18n/I18n");
 const DocumentMapCache = require("../../modules/db/DocumentMapCache");
 const Resolvable = require("../../modules/i18n/Resolvable");
@@ -118,8 +118,8 @@ class LocaleManager {
         }
 
         const { reply } = options;
-        if (options instanceof Attachment) options = { files: [options.file] };
-        if (options instanceof RichEmbed || options instanceof TranslationEmbed) options = { embed: options };
+        if (options instanceof MessageAttachment) options = { files: [options] };
+        if (options instanceof MessageEmbed || options instanceof TranslationEmbed) options = { embed: options };
         options.reply = reply;
 
         let translator;

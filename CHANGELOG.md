@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.7.1"></a>
+## [3.7.1](https://github.com/LonelessCodes/trixiebot/compare/v3.7.0...v3.7.1) (2020-04-19)
+
+
+### Bug Fixes
+
+* **database:** moved unknown performance bottleneck outside initialization phase ([d1ee3a5](https://github.com/LonelessCodes/trixiebot/commit/d1ee3a5))
+
+
+
 <a name="3.7.0"></a>
 # [3.7.0](https://github.com/LonelessCodes/trixiebot/compare/v3.6.0...v3.7.0) (2020-04-18)
 

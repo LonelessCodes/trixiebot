@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const log = require("../../log").namespace("mute");
+const nanoTimer = require("../../modules/timer");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
@@ -28,17 +30,24 @@ const Translation = require("../../modules/i18n/Translation");
 const TranslationMerge = require("../../modules/i18n/TranslationMerge");
 const ListFormat = require("../../modules/i18n/ListFormat");
 
-module.exports = async function install(cr, { db }) {
+module.exports = function install(cr, { db }) {
     const database = db.collection("mute");
 
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
+    // TODO: fix performance issue
+    // Even a minimally small collection of 50 documents takes
+    // anywhere up to 80 seconds to get
+
     /** @type {Map<string, Set<string>>} */
     const muted_words = new Map;
-    for (let { word, guildId } of await database.find({}).toArray()) {
-        if (muted_words.has(guildId)) muted_words.get(guildId).add(word);
-        else muted_words.set(guildId, new Set([word]));
-    }
+    const timer = nanoTimer();
+    database.find({}).stream()
+        .on("data", ({ word, guildId }) => {
+            if (muted_words.has(guildId)) muted_words.get(guildId).add(word);
+            else muted_words.set(guildId, new Set([word]));
+        })
+        .once("end", () => log(`loaded all words. time:${nanoTimer.diffMs(timer)}ms`));
 
     cr.registerProcessedHandler(new CommandScope(CommandScope.FLAGS.GUILD), true, async ({ message, content }) => {
         if (!muted_words.has(message.guild.id)) return;

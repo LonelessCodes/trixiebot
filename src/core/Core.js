@@ -124,9 +124,12 @@ class Core {
             client: this.client,
             config: this.config, locale: this.locale, db: this.db, error_cases: this.processor.error_cases,
         };
-        await Promise.all(files.map(file => {
-            const install = require(path.resolve(`../${commands_package}`, file));
-            return install(this.processor.REGISTRY, install_opts);
+        await Promise.all(files.map(async file => {
+            log.debug(file, "installing...");
+            const time = nanoTimer();
+            const install = require(file);
+            await install(this.processor.REGISTRY, install_opts);
+            log.debug(file, "installed.", nanoTimer.diffMs(time).toFixed(3), "ms");
         }));
 
         const install_time = nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC;

@@ -23,5 +23,8 @@ timer.typeof = "bigint";
 timer.diff = function diff(start) {
     return Number(timer() - start);
 };
+timer.diffMs = function diffMs(start) {
+    return Number(timer() - start) / timer.NS_PER_MS;
+};
 
 module.exports = timer;

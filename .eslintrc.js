@@ -1,7 +1,12 @@
-{
-    "extends": "eslint:recommended",
+module.exports = {
+    "parser": "@typescript-eslint/parser", // Specifies the ESLint parser
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended" // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    ],
     "parserOptions": {
-        "ecmaVersion": 2018
+        "ecmaVersion": 2020,
+        "sourceType": "module"
     },
     "env": {
         "node": true,
@@ -219,6 +224,43 @@
         "no-control-regex": "off",
 
         "no-console": "off",
-        "no-async-promise-executor": "off"
+        "no-async-promise-executor": "off",
+
+        "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "default",
+                "format": ["camelCase"],
+                "leadingUnderscore": 'allow',
+            },
+            {
+                "selector": "variable",
+                "format": ["snake_case", "UPPER_CASE"],
+                "leadingUnderscore": 'allow',
+            },
+            {
+                "selector": "parameter",
+                "format": ["snake_case"],
+                "leadingUnderscore": "allow"
+            }, {
+                "selector": "function",
+                "format": ["camelCase"],
+                "leadingUnderscore": 'allow',
+            }, {
+                "selector": "method",
+                "format": ["camelCase"],
+                "leadingUnderscore": 'allow',
+            }, {
+                "selector": "class",
+                "format": ["PascalCase"],
+            },
+
+            {
+                "selector": "memberLike",
+                "modifiers": ["private"],
+                "leadingUnderscore": "require"
+            }
+        ]
     }
-}
+};

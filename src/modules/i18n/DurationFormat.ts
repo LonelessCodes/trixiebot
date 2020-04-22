@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Resolvable = require("./Resolvable");
-const { toHumanTime } = require("../../util/time");
-const moment = require("moment");
+import { toHumanTime } from "../../util/time";
+import { ResolvableObject } from "./Resolvable";
+import moment from "moment";
+import I18nLocale from "./I18nLocale";
 
-class DurationFormat extends Resolvable {
-    /**
-     * @param {number|moment.Duration} duration
-     * @param {Object} [opts]
-     * @param {"long"|"short"} [opts.style]
-     */
-    constructor(duration, opts = {}) {
-        super();
-        this.duration = moment.duration(duration);
-        this.opts = Object.assign({ style: "short" }, opts);
-    }
-
-    resolve(i18n) {
-        if (this.opts.style === "long") return this.duration.locale(i18n.locale).humanize(false);
-        else return toHumanTime(this.duration.asMilliseconds());
-    }
+export interface DurationFormatOptions {
+    style?: "long" | "short";
 }
 
-module.exports = DurationFormat;
+export type DurationResolvable = moment.Duration | string | number;
+
+export default class DurationFormat extends ResolvableObject<string> {
+    duration: moment.Duration;
+    opts: Required<DurationFormatOptions>;
+
+    constructor(duration: DurationResolvable, opts: DurationFormatOptions = {}) {
+        super();
+        this.duration = moment.duration(duration);
+        this.opts = { style: "short", ...opts };
+    }
+
+    resolve(i18n: I18nLocale) {
+        if (this.opts.style === "long") return this.duration.locale(i18n.locale).humanize(false);
+        return toHumanTime(this.duration.asMilliseconds());
+    }
+}

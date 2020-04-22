@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Resolvable = require("./Resolvable");
+import { ResolvableObject } from "./Resolvable";
+import I18nLocale from "./I18nLocale";
 
-class NumberFormat extends Resolvable {
-    /**
-     * @param {number} num
-     * @param {Intl.NumberFormatOptions} opts
-     */
-    constructor(num, opts = {}) {
+export default class NumberFormat extends ResolvableObject<string> {
+    constructor(public num: number, public opts: Intl.NumberFormatOptions = {}) {
         super();
-        this.num = num;
-        this.opts = opts;
     }
 
-    resolve(i18n) {
+    resolve(i18n: I18nLocale) {
         return this.num.toLocaleString([i18n.locale, "en"], this.opts);
     }
 }
-
-module.exports = NumberFormat;

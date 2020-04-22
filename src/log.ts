@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Future implementation:
 
 // const path = require("path");
-// const INFO = require("./info");
+// const INFO = require("./info").default;
 // const Logger = require("./util/logger/Logger");
 // const LEVEL = require("./util/logger/LEVEL");
 // const Terminal = require("./util/logger/Terminal");
@@ -31,5 +31,5 @@
 //     ],
 // });
 
-const Logger = require("./modules/logger/Logger");
-module.exports = new Logger();
+import Logger from "./modules/logger/Logger";
+export default new Logger();

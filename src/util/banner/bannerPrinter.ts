@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,10 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs-extra";
+import path from "path";
 
-module.exports = function bannerPrinter(dev, trixie, discord) {
+export default function bannerPrinter(dev: boolean, trixie_v: string, discord_v: string) {
     const txt = fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "text", "banner.txt"), "utf8");
-    console.log(txt, trixie, dev ? " dev" : "", discord);
-};
+    console.log(txt, trixie_v, dev ? " dev" : "", discord_v);
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const path = require("path");
+import path from "path";
 process.env["NODE_CONFIG_DIR"] = path.join(__dirname, "..", "config");
-const config = require("config");
+import config from "config";
 
-module.exports = config;
+export default config;

@@ -15,7 +15,7 @@
  */
 
 const TextActionCommand = require("../core/commands/TextActionCommand");
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 const hugs = [
     "(っ´▽｀)っ{{user}}",

@@ -15,7 +15,7 @@
  */
 
 const fetch = require("node-fetch");
-const log = require("../../../log").namespace("alert cmd");
+const log = require("../../../log").default.namespace("alert cmd");
 
 const Processor = require("./Processor");
 const ParsedStream = require("../stream/ParsedStream");

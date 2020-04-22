@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const CONST = require("../../const");
+const CONST = require("../../const").default;
 const { basicTEmbed } = require("../../modules/i18n/TranslationEmbed");
 const { splitArgs } = require("../../util/string");
 
@@ -26,9 +26,9 @@ const Category = require("../../util/commands/Category");
 
 const LocaleManager = require("../../core/managers/LocaleManager");
 
-const Translation = require("../../modules/i18n/Translation");
-const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
-const ListFormat = require("../../modules/i18n/ListFormat");
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;
+const ListFormat = require("../../modules/i18n/ListFormat").default;
 
 module.exports = function install(cr, { locale: locale_manager }) {
     cr.registerCommand("locale", new OverloadCommand)

@@ -19,7 +19,7 @@ const { EventEmitter } = require("events");
 
 // eslint-disable-next-line no-unused-vars
 const LocaleManager = require("../../core/managers/LocaleManager");
-const Translation = require("../i18n/Translation");
+const Translation = require("../i18n/Translation").default;
 
 // eslint-disable-next-line no-unused-vars
 const OnlineStream = require("./stream/OnlineStream");

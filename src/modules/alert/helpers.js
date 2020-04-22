@@ -15,7 +15,7 @@
  */
 /* eslint-disable brace-style */
 
-const Translation = require("../i18n/Translation");
+const Translation = require("../i18n/Translation").default;
 
 /**
  * @param {string} str

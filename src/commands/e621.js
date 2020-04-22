@@ -14,11 +14,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../log").namespace("e621");
+const log = require("../log").default.namespace("e621");
 const { splitArgs } = require("../util/string");
 const { findAndRemove } = require("../util/array");
 const fetch = require("node-fetch");
-const INFO = require("../info");
+const INFO = require("../info").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
@@ -27,8 +27,8 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 const filter_tags = ["shota", "cub", "self_harm", "suicide", "animal_abuse", "gore", "child_abuse"];
 

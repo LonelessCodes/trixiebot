@@ -26,15 +26,15 @@ const moment = require("moment");
 const { userToString } = require("../util/util");
 const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
 const { splitArgs } = require("../util/string");
-const { toHumanTime } = require("../util/time");
+const { toHumanTime } = require("../util/time").default;
 const { timeout } = require("../util/promises");
 const PaginatorAction = require("../modules/actions/PaginatorAction");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
-const TranslationFormatter = require("../modules/i18n/TranslationFormatter");
-const NumberFormat = require("../modules/i18n/NumberFormat");
-const Resolvable = require("../modules/i18n/Resolvable");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
+const TranslationFormatter = require("../modules/i18n/TranslationFormatter").default;
+const NumberFormat = require("../modules/i18n/NumberFormat").default;
+const { ResolvableObject: Resolvable } = require("../modules/i18n/Resolvable");
 
 module.exports = function install(cr) {
     const bankCmd = cr.registerCommand("bank", new TreeCommand)

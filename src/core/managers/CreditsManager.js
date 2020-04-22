@@ -19,8 +19,8 @@ const moment = require("moment");
 // eslint-disable-next-line no-unused-vars
 const { GuildMember, User, Guild } = require("discord.js");
 
-const TranslationMerge = require("../../modules/i18n/TranslationMerge");
-const NumberFormat = require("../../modules/i18n/NumberFormat");
+const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
+const NumberFormat = require("../../modules/i18n/NumberFormat").default;
 
 class CreditsManager {
     constructor() {

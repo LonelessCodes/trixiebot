@@ -14,9 +14,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../log");
+const log = require("../log").default;
 const logtts = log.namespace("tts cmd");
-const config = require("../config");
+const config = require("../config").default;
 const fetch = require("node-fetch");
 const AudioManager = require("../core/managers/AudioManager");
 const { ConnectError } = AudioManager;
@@ -26,7 +26,7 @@ const OverloadCommand = require("../core/commands/OverloadCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 module.exports = function install(cr) {
     if (!config.has("voicerss.key")) return log.namespace("config", "Found no API token for voicerss - Disabled tts command");

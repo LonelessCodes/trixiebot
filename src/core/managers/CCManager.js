@@ -16,8 +16,8 @@
 
 const cpc = require("trixie-ipc/cpc");
 const respawn = require("trixie-ipc/respawn");
-const nanoTimer = require("../../modules/timer");
-const log = require("../../log").namespace("cc manager");
+const nanoTimer = require("../../modules/timer").default;
+const log = require("../../log").default.namespace("cc manager");
 const path = require("path");
 const uuid = require("uuid/v1");
 const BSON = require("bson");

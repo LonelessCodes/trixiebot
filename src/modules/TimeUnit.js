@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const TranslationPlural = require("./i18n/TranslationPlural");
 const { format } = require("../util/string");
+const TranslationPlural = require("./i18n/TranslationPlural").default;
 
 class TimeUnit {
     /**

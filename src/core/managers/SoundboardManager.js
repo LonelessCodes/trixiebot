@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { FILES_BASE } = require("../../info");
+const { FILES_BASE } = require("../../info").default;
 const path = require("path");
 const fs = require("fs-extra");
 const database = require("../../modules/db/database");

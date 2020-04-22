@@ -16,7 +16,7 @@
 
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
-const CONST = require("../const");
+const CONST = require("../const").default;
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");

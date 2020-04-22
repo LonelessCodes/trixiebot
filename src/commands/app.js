@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const INFO = require("../info");
-const CONST = require("../const");
+const INFO = require("../info").default;
+const CONST = require("../const").default;
 
 const TextCommand = require("../core/commands/TextCommand");
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -23,9 +23,9 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
-const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
+const TranslationEmbed = require("../modules/i18n/TranslationEmbed").default;
 
 module.exports = function install(cr, { client }) {
     cr.registerCommand("donate", new TextCommand("https://ko-fi.com/loneless ❤"))

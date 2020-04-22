@@ -16,16 +16,16 @@
 
 const BaseCommand = require("./BaseCommand");
 const { userToString } = require("../../util/util");
-const secureRandom = require("../../modules/random/secureRandom");
 const RateLimiter = require("../../util/commands/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 const MessageMentions = require("../../util/commands/MessageMentions");
+const secureRandom = require("../../modules/random/secureRandom").default;
 
 const { MessageAttachment } = require("discord.js");
-const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
-const Translation = require("../../modules/i18n/Translation");
+const TranslationFormatter = require("../../modules/i18n/TranslationFormatter").default;
+const Translation = require("../../modules/i18n/Translation").default;
 
 class ImageActionCommand extends BaseCommand {
     constructor(image, content, noMentionMessage) {

@@ -26,8 +26,8 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandPermission = require("../util/commands/CommandPermission");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 function findRoleInServer(guild, role) {
     const role_lower_case = role.toLowerCase();

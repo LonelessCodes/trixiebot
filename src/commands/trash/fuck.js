@@ -24,7 +24,7 @@ const Category = require("../../util/commands/Category");
 const RateLimiter = require("../../util/commands/RateLimiter");
 const TimeUnit = require("../../modules/TimeUnit");
 
-const Translation = require("../../modules/i18n/Translation");
+const Translation = require("../../modules/i18n/Translation").default;
 
 // Maybe remove translations again because fucks can be any random
 // language when people of other languages add phrases

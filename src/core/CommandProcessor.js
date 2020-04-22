@@ -14,9 +14,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../log").namespace("processor");
-const INFO = require("../info");
-const { splitArgs } = require("../util/string");
+const log = require("../log").default.namespace("processor");
+const INFO = require("../info").default;
+const { splitArgs } = require("../util/string").default;
 const stats = require("../modules/stats");
 const guild_stats = require("./managers/GuildStatsManager");
 const ErrorCaseManager = require("./managers/ErrorCaseManager");
@@ -27,11 +27,11 @@ const ConfigManager = require("./managers/ConfigManager");
 // eslint-disable-next-line no-unused-vars
 const LocaleManager = require("./managers/LocaleManager");
 const MessageContext = require("../util/commands/MessageContext");
-const timer = require("../modules/timer");
+const timer = require("../modules/timer").default;
 const Discord = require("discord.js");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 class CommandProcessor {
     /**

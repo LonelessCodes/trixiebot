@@ -22,7 +22,7 @@ const Category = require("../util/commands/Category");
 const credits = require("../core/managers/CreditsManager");
 const BlackJack = require("../modules/casino/BlackJack");
 
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 module.exports = function install(cr) {
     cr.registerCommand("blackjack", new OverloadCommand)

@@ -20,8 +20,8 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const log = require("../log");
-const config = require("../config");
+const log = require("../log").default;
+const config = require("../config").default;
 const typing = require("../modules/typing");
 
 const fetch = require("node-fetch");

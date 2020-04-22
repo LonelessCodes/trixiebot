@@ -17,8 +17,8 @@
 const EventEmitter = require("events");
 const http = require("http");
 const querystring = require("querystring");
-const log = require("../../log").namespace("upvotes manager");
-const config = require("../../config");
+const log = require("../../log").default.namespace("upvotes manager");
+const config = require("../../config").default;
 
 class UpvotesManager extends EventEmitter {
     constructor(client, db) {

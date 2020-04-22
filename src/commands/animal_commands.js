@@ -21,7 +21,7 @@ const dogFace = require("dog-ascii-faces");
 const { promisify } = require("util");
 const { timeout } = require("../util/promises");
 const { lastItem, randomItem } = require("../util/array");
-const log = require("../log");
+const log = require("../log").default;
 const twitter = require("../modules/twitter");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -29,8 +29,8 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 /**
  * @param {fetch.RequestInfo} url

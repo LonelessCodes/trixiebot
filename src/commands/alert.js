@@ -14,9 +14,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../log").namespace("alert cmd");
-const CONST = require("../const");
-const config = require("../config");
+const log = require("../log").default.namespace("alert cmd");
+const CONST = require("../const").default;
+const config = require("../config").default;
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -26,8 +26,8 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandPermission = require("../util/commands/CommandPermission");
 
-const Translation = require("../modules/i18n/Translation");
-const Resolvable = require("../modules/i18n/Resolvable");
+const Translation = require("../modules/i18n/Translation").default;
+const { ResolvableObject: Resolvable } = require("../modules/i18n/Resolvable");
 
 const AlertManager = require("../modules/alert/AlertManager");
 const PicartoProcessor = require("../modules/alert/processor/PicartoProcessor");

@@ -15,8 +15,8 @@
  */
 
 const credits = require("../CreditsManager");
-const Translation = require("../../../modules/i18n/Translation");
-const TranslationMerge = require("../../../modules/i18n/TranslationMerge");
+const Translation = require("../../../modules/i18n/Translation").default;
+const TranslationMerge = require("../../../modules/i18n/TranslationMerge").default;
 
 async function purchaseSlots(context, activeList, cooldown, cost, success, handler = async () => { /* Do nothing */ }) {
     const name = await credits.getName(context.guild);

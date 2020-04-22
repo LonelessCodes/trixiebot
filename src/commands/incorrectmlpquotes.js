@@ -14,10 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const config = require("../config");
+const config = require("../config").default;
 const getTumblrBlog = require("../modules/getTumblrBlog");
-const secureRandom = require("../modules/random/secureRandom");
-const log = require("../log");
+const secureRandom = require("../modules/random/secureRandom").default;
+const log = require("../log").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");

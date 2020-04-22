@@ -32,15 +32,15 @@ const AudioManager = require("../core/managers/AudioManager");
 const credits = require("../core/managers/CreditsManager");
 const moment = require("moment");
 const { userToString } = require("../util/util");
-const { toHumanTime } = require("../util/time");
-const log = require("../log").namespace("sb cmd");
-const CONST = require("../const");
+const { toHumanTime } = require("../util/time").default;
+const log = require("../log").default.namespace("sb cmd");
+const CONST = require("../const").default;
 const Discord = require("discord.js");
 const { Guild, User } = Discord;
 
-const Resolvable = require("../modules/i18n/Resolvable");
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const { ResolvableObject: Resolvable } = require("../modules/i18n/Resolvable");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 class ChooseCommand extends TreeCommand {
     constructor() {

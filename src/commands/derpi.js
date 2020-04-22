@@ -14,9 +14,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const config = require("../config");
-const log = require("../log");
-const random = require("../modules/random/secureRandom");
+const config = require("../config").default;
+const log = require("../log").default;
+const random = require("../modules/random/secureRandom").default;
 const { splitArgs } = require("../util/string");
 const { findAndRemove } = require("../util/array");
 const Derpibooru = require("../modules/Derpibooru");
@@ -28,8 +28,8 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 //                                                                                               no real gore, but candy gore is allowed
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "(gore AND -candy gore)", "foal abuse"];

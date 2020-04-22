@@ -19,9 +19,9 @@ const { isPlainObject } = require("../../util/util");
 const { Db } = require("mongodb");
 // eslint-disable-next-line no-unused-vars
 const { Client, TextChannel } = require("discord.js");
-const DocumentMapCache = require("../../modules/db/DocumentMapCache");
+const DocumentMapCache = require("../../modules/db/DocumentMapCache").default;
 // eslint-disable-next-line no-unused-vars
-const Resolvable = require("../../modules/i18n/Resolvable");
+const { Resolvable } = require("../../modules/i18n/Resolvable");
 
 function index(obj, is, value) {
     if (typeof is == "string")

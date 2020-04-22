@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../log").namespace("registry");
+const log = require("../log").default.namespace("registry");
 const { splitArgs } = require("../util/string");
 // eslint-disable-next-line no-unused-vars
 const BaseCommand = require("./commands/BaseCommand");
@@ -26,7 +26,7 @@ const CommandScope = require("../util/commands/CommandScope");
 const HelpBuilder = require("../util/commands/HelpBuilder");
 const RateLimiter = require("../util/commands/RateLimiter");
 const TimeUnit = require("../modules/TimeUnit");
-const DocumentMapCache = require("../modules/db/DocumentMapCache");
+const DocumentMapCache = require("../modules/db/DocumentMapCache").default;
 // eslint-disable-next-line no-unused-vars
 const MessageContext = require("../util/commands/MessageContext");
 // eslint-disable-next-line no-unused-vars
@@ -35,9 +35,9 @@ const Discord = require("discord.js");
 const Mongo = require("mongodb");
 const CommandRegistry = require("./CommandRegistry");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationPlural = require("../modules/i18n/TranslationPlural");
-const DurationFormat = require("../modules/i18n/DurationFormat");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationPlural = require("../modules/i18n/TranslationPlural").default;
+const DurationFormat = require("../modules/i18n/DurationFormat").default;
 
 /**
  * @param {string} command_name

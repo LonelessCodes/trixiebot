@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../../../log").namespace("alert cmd");
-const config = require("../../../config");
+const log = require("../../../log").default.namespace("alert cmd");
+const config = require("../../../config").default;
 
 const Processor = require("./Processor");
 const ParsedStream = require("../stream/ParsedStream");

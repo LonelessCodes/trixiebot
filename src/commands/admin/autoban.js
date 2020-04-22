@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const CONST = require("../../const");
+const CONST = require("../../const").default;
 const globToRegExp = require("glob-to-regexp");
 const Discord = require("discord.js");
 
@@ -28,8 +28,8 @@ const Category = require("../../util/commands/Category");
 const PaginatorGuildAction = require("../../modules/actions/PaginatorGuildAction");
 const { basicTEmbed } = require("../../modules/i18n/TranslationEmbed");
 
-const Translation = require("../../modules/i18n/Translation");
-const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;
 
 /**
  * {

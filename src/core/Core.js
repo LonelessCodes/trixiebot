@@ -18,12 +18,12 @@ const fetch = require("node-fetch");
 const fs = require("fs-extra");
 const path = require("path");
 
-const log = require("../log").namespace("core");
-const config = require("../config");
+const log = require("../log").default.namespace("core");
+const config = require("../config").default;
 const { walk } = require("../util/files");
 const { timeout } = require("../util/promises");
 const helpToJSON = require("../util/commands/helpToJSON");
-const nanoTimer = require("../modules/timer");
+const nanoTimer = require("../modules/timer").default;
 const random = require("../modules/random/random");
 const calendar_events = require("../modules/calendar_events");
 
@@ -40,7 +40,7 @@ const Discord = require("discord.js");
 
 const CommandScope = require("../util/commands/CommandScope");
 const AliasCommand = require("./commands/AliasCommand");
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 function fetchPost(url, opts) {
     if (opts.json) {

@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Translation = require("../../modules/i18n/Translation");
+const Translation = require("../../modules/i18n/Translation").default;
 
 class RateLimit {
     constructor(triesLeft, cooldown) {
@@ -38,8 +38,7 @@ class RateLimit {
     test() {
         if (this.triesLeft > 0) return false;
 
-        if (this.isCooldownOver())
-            this.timestamp = Date.now();
+        if (this.isCooldownOver()) this.timestamp = Date.now();
 
         return true;
     }
@@ -49,8 +48,7 @@ class RateLimit {
 
         this.decTries();
 
-        if (this.isCooldownOver())
-            this.timestamp = Date.now();
+        if (this.isCooldownOver()) this.timestamp = Date.now();
 
         return true;
     }
@@ -84,7 +82,7 @@ class RateLimiter {
         this.timeNum = cooldown;
         this.cooldown = timeUnit.toMillis(cooldown);
         /** @type {Map<string, RateLimit} */
-        this.rateLimitedUsers = new Map;
+        this.rateLimitedUsers = new Map();
     }
 
     test(key) {
@@ -135,7 +133,10 @@ class RateLimiter {
 
     toTranslation() {
         if (this.max > 1) {
-            return new Translation("time.x_times_in", "{{x}} times in {{timeframe}}", { x: this.max, timeframe: this.timeUnit.toTranslation(this.timeNum) });
+            return new Translation("time.x_times_in", "{{x}} times in {{timeframe}}", {
+                x: this.max,
+                timeframe: this.timeUnit.toTranslation(this.timeNum),
+            });
         } else {
             return this.timeUnit.toTranslation(this.timeNum);
         }
@@ -143,8 +144,7 @@ class RateLimiter {
 
     tryAgainIn(key) {
         const rateLimit = this.rateLimitedUsers.get(key);
-        if (!rateLimit)
-            return 0;
+        if (!rateLimit) return 0;
 
         return rateLimit.timeLeft();
     }

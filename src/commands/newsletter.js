@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const CONST = require("../const");
+const CONST = require("../const").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");

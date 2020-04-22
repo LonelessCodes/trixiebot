@@ -53,7 +53,7 @@ const getExcerpt = (txt, pos) => {
     };
 };
 
-const log = require("../../../log").namespace("cc worker");
+const log = require("../../../log").default.namespace("cc worker");
 
 module.exports = {
     getExcerpt,

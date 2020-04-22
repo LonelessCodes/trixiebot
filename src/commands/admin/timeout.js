@@ -32,9 +32,9 @@ const MessageMentions = require("../../util/commands/MessageMentions");
 /** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
 const timeout_notices = {};
 
-const Translation = require("../../modules/i18n/Translation");
-const TranslationPlural = require("../../modules/i18n/TranslationPlural");
-const ListFormat = require("../../modules/i18n/ListFormat");
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationPlural = require("../../modules/i18n/TranslationPlural").default;
+const ListFormat = require("../../modules/i18n/ListFormat").default;
 
 // eslint-disable-next-line no-warning-comments
 // TODO: proper redo of the timeout commands and system

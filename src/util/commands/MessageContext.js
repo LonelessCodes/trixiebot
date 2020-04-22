@@ -22,9 +22,9 @@ const AudioManager = require("../../core/managers/AudioManager");
 // eslint-disable-next-line no-unused-vars
 const LocaleManager = require("../../core/managers/LocaleManager");
 // eslint-disable-next-line no-unused-vars
-const I18nLocale = require("../../modules/i18n/I18nLocale");
+const { I18nLocale } = require("../../modules/i18n/I18n");
 // eslint-disable-next-line no-unused-vars
-const Resolvable = require("../../modules/i18n/Resolvable");
+const { Resolvable } = require("../../modules/i18n/Resolvable");
 
 class MessageContext {
     /**

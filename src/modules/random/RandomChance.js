@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const secureRandom = require("../random/secureRandom");
+const secureRandom = require("../random/secureRandom").default;
 
 class RandomChance {
     constructor() {

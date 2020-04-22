@@ -15,7 +15,7 @@
  */
 
 const BaseCommand = require("./BaseCommand");
-const secureRandom = require("../../modules/random/secureRandom");
+const secureRandom = require("../../modules/random/secureRandom").default;
 
 class TextCommand extends BaseCommand {
     constructor(content) {

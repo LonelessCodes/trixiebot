@@ -17,7 +17,7 @@
 const { promisify } = require("util");
 const { timeout } = require("../util/promises");
 const { lastItem, randomItem } = require("../util/array");
-const log = require("../log");
+const log = require("../log").default;
 const twitter = require("../modules/twitter");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");

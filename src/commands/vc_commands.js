@@ -14,15 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../log").namespace("vc cmds");
 const AudioManager = require("../core/managers/AudioManager");
 const { ConnectError } = AudioManager;
+const log = require("../log").default.namespace("vc cmds");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 module.exports = function install(cr) {
     cr.registerCommand("leavevc", new SimpleCommand(async ({ message, audio }) => {

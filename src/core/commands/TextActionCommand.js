@@ -16,12 +16,12 @@
 
 const { userToString } = require("../../util/util");
 const BaseCommand = require("./BaseCommand");
-const secureRandom = require("../../modules/random/secureRandom");
 const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
+const secureRandom = require("../../modules/random/secureRandom").default;
 
-const TranslationFormatter = require("../../modules/i18n/TranslationFormatter");
-const Translation = require("../../modules/i18n/Translation");
+const TranslationFormatter = require("../../modules/i18n/TranslationFormatter").default;
+const Translation = require("../../modules/i18n/Translation").default;
 
 class TextActionCommand extends BaseCommand {
     constructor(description, content, noMentionMessage) {

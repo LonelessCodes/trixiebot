@@ -15,8 +15,8 @@
  */
 
 const giphy_api = require("giphy-api");
-const config = require("../config");
-const log = require("../log");
+const config = require("../config").default;
+const log = require("../log").default;
 const { randomItem } = require("../util/array");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -26,7 +26,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 module.exports = function install(cr) {
     if (!config.has("giphy.key")) return log.namespace("config", "Found no API token for Giphy - Disabled gif command");

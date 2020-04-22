@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const log = require("../../log").namespace("mute");
-const nanoTimer = require("../../modules/timer");
+const log = require("../../log").default.namespace("mute");
+const nanoTimer = require("../../modules/timer").default;
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
@@ -26,9 +26,9 @@ const CommandPermission = require("../../util/commands/CommandPermission");
 const CommandScope = require("../../util/commands/CommandScope");
 const Category = require("../../util/commands/Category");
 
-const Translation = require("../../modules/i18n/Translation");
-const TranslationMerge = require("../../modules/i18n/TranslationMerge");
-const ListFormat = require("../../modules/i18n/ListFormat");
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
+const ListFormat = require("../../modules/i18n/ListFormat").default;
 
 module.exports = function install(cr, { db }) {
     const database = db.collection("mute");

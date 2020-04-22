@@ -15,7 +15,7 @@
  */
 
 const CommandPermission = require("./CommandPermission");
-const Translation = require("../../modules/i18n/Translation");
+const Translation = require("../../modules/i18n/Translation").default;
 
 class Category {
     /**

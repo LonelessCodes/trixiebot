@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const info = require("../../info");
-const log = require("../../log").namespace("ipc");
+const info = require("../../info").default;
+const log = require("../../log").default.namespace("ipc");
 const ipc = require("node-ipc");
 const cpc = require("trixie-ipc/cpc");
 const IPCServerAdapter = require("trixie-ipc/IPCServerAdapter");

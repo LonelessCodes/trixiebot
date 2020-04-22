@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const CONST = require("../const");
 const Discord = require("discord.js");
+const CONST = require("../const").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent");
@@ -24,9 +24,9 @@ const Category = require("../util/commands/Category");
 const guild_stats = require("../core/managers/GuildStatsManager");
 const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationPlural = require("../modules/i18n/TranslationPlural");
-const ListFormat = require("../modules/i18n/ListFormat");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationPlural = require("../modules/i18n/TranslationPlural").default;
+const ListFormat = require("../modules/i18n/ListFormat").default;
 
 function sort(data) {
     return data.map(entry => {

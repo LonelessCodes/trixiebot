@@ -21,7 +21,7 @@ const CommandPermission = require("./CommandPermission");
 const Category = require("./Category");
 const { MessageEmbed } = require("discord.js");
 const { ucFirst, format } = require("../string");
-const CONST = require("../../const");
+const CONST = require("../../const").default;
 
 class HelpBuilder extends MessageEmbed {
     constructor(message, name, command) {

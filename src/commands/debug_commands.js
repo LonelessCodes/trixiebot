@@ -16,12 +16,12 @@
 
 const stats = require("../modules/stats");
 const os = require("os");
-const { toHumanTime } = require("../util/time");
+const { toHumanTime } = require("../util/time").default;
 const { timeout } = require("../util/promises");
 const getChangelog = require("../modules/getChangelog");
-const INFO = require("../info");
-const CONST = require("../const");
-const nanoTimer = require("../modules/timer");
+const INFO = require("../info").default;
+const CONST = require("../const").default;
+const nanoTimer = require("../modules/timer").default;
 const Discord = require("discord.js");
 
 async function getCPUUsage() {

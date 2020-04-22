@@ -15,8 +15,8 @@
  */
 
 const Discord = require("discord.js");
-const INFO = require("../info");
-const CONST = require("../const");
+const INFO = require("../info").default;
+const CONST = require("../const").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");

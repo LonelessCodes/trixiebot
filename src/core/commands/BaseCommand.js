@@ -27,14 +27,14 @@ const RateLimiter = require("../../util/commands/RateLimiter");
 const CalendarRange = require("../../modules/CalendarRange");
 const TimeUnit = require("../../modules/TimeUnit");
 
-const Translation = require("../../modules/i18n/Translation");
-const TranslationMerge = require("../../modules/i18n/TranslationMerge");
-const TranslationPlural = require("../../modules/i18n/TranslationPlural");
 
 // provide a fallback for old .translate() based commands
 // until they are finally also converted
 Message.prototype.translate = format;
 Channel.prototype.translate = format;
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
+const TranslationPlural = require("../../modules/i18n/TranslationPlural").default;
 
 class BaseCommand {
     constructor() {

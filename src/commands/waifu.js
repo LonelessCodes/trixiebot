@@ -17,11 +17,11 @@
 const { userToString, fetchMember } = require("../util/util");
 const { timeout } = require("../util/promises");
 const { splitArgs } = require("../util/string");
-const { toHumanTime } = require("../util/time");
-const secureRandom = require("../modules/random/secureRandom");
+const { toHumanTime } = require("../util/time").default;
+const secureRandom = require("../modules/random/secureRandom").default;
 const credits = require("../core/managers/CreditsManager");
 const purchaseSlots = require("../core/managers/credits/purchaseSlots");
-const CONST = require("../const");
+const CONST = require("../const").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
@@ -31,9 +31,9 @@ const RateLimiter = require("../util/commands/RateLimiter");
 const MessageMentions = require("../util/commands/MessageMentions");
 const TimeUnit = require("../modules/TimeUnit");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
-const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
+const TranslationEmbed = require("../modules/i18n/TranslationEmbed").default;
 
 async function getData(message, content, database, databaseSlots) {
     const mentions = content ? new MessageMentions(content, message.guild) : null;

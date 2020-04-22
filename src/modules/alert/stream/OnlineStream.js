@@ -15,14 +15,14 @@
  */
 
 const fetch = require("node-fetch");
-const CONST = require("../../../const");
+const CONST = require("../../../const").default;
 const Discord = require("discord.js");
 const gm = require("gm");
 
-const Translation = require("../../i18n/Translation");
-const TranslationMerge = require("../../i18n/TranslationMerge");
-const TranslationEmbed = require("../../i18n/TranslationEmbed");
-const NumberFormat = require("../../i18n/NumberFormat");
+const Translation = require("../../i18n/Translation").default;
+const TranslationMerge = require("../../i18n/TranslationMerge").default;
+const TranslationEmbed = require("../../i18n/TranslationEmbed").default;
+const NumberFormat = require("../../i18n/NumberFormat").default;
 
 const Stream = require("./Stream");
 

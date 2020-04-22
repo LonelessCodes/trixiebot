@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const INFO = require("../../../info");
+const INFO = require("../../../info").default;
 const { Parser, EOF, tokenMatcher, tokenName, tokenLabel } = require("chevrotain");
 const { ALL_TOKENS, tokens: t } = require("./lexer/tokens");
 

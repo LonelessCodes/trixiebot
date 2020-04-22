@@ -15,14 +15,14 @@
  */
 
 const { userToString } = require("../../util/util");
-const CONST = require("../../const");
+const CONST = require("../../const").default;
 const events = require("events");
 // eslint-disable-next-line no-unused-vars
-const I18nLocale = require("../../modules/i18n/I18nLocale");
-const Resolvable = require("../../modules/i18n/Resolvable");
-const Translation = require("../../modules/i18n/Translation");
-const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
-const TranslationMerge = require("../../modules/i18n/TranslationMerge");
+const I18nLocale = require("../../modules/i18n/I18nLocale").default;
+const { ResolvableObject: Resolvable } = require("../../modules/i18n/Resolvable");
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;
+const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
 // eslint-disable-next-line no-unused-vars
 const { User, TextChannel, Message, MessageReaction, Permissions } = require("discord.js");
 

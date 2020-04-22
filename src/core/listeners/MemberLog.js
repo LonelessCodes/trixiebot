@@ -16,12 +16,12 @@
 
 const { userToString, findDefaultChannel } = require("../../util/util");
 const { immediate } = require("../../util/promises");
-const log = require("../../log").namespace("member log");
+const log = require("../../log").default.namespace("member log");
 const stats = require("../../modules/stats");
 const guild_stats = require("../managers/GuildStatsManager");
 const { format } = require("../../util/string");
 
-const Translation = require("../../modules/i18n/Translation");
+const Translation = require("../../modules/i18n/Translation").default;
 
 class MemberLog {
     constructor(client, config, locale) {

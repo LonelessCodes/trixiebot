@@ -32,7 +32,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 module.exports = function install(cr) {
     const ascii_cmd = new SimpleCommand(async ({ message, content, ctx }, command_name) => {

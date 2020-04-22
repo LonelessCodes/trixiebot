@@ -17,7 +17,7 @@
 // eslint-disable-next-line no-unused-vars
 const { Guild } = require("discord.js");
 const PaginatorAction = require("./PaginatorAction");
-const TranslationMerge = require("../../modules/i18n/TranslationMerge");
+const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
 
 class PaginatorGuildAction extends PaginatorAction {
     /**

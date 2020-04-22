@@ -14,12 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const Translation = require("../../modules/i18n/Translation").default;
 // eslint-disable-next-line no-unused-vars
 const { Guild, GuildMember, VoiceState, Collection } = require("discord.js");
 const EventEmitter = require("events");
-const Translation = require("../../modules/i18n/Translation");
 // eslint-disable-next-line no-unused-vars
-const Resolvable = require("../../modules/i18n/Resolvable");
+const { Resolvable } = require("../../modules/i18n/Resolvable");
 
 class ConnectError {
     /**

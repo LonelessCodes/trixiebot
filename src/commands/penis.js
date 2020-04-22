@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const secureRandom = require("../modules/random/secureRandom");
+const secureRandom = require("../modules/random/secureRandom").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
@@ -23,8 +23,8 @@ const Category = require("../util/commands/Category");
 
 const PaginatorGuildAction = require("../modules/actions/PaginatorGuildAction");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 function graph(uom, r, length, girth) {
     return new TranslationMerge(

@@ -36,8 +36,8 @@ const SampleID = require("./SampleID");
 // eslint-disable-next-line no-unused-vars
 const { Sample, UserSample, GuildSample, PredefinedSample } = require("./Sample");
 
-const Translation = require("../../../modules/i18n/Translation");
-const ListFormat = require("../../../modules/i18n/ListFormat");
+const Translation = require("../../../modules/i18n/Translation").default;
+const ListFormat = require("../../../modules/i18n/ListFormat").default;
 
 tmp.setGracefulCleanup();
 

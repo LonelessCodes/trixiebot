@@ -21,10 +21,10 @@ const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 const CategoryClass = Category.Category;
 
-const Translation = require("../../modules/i18n/Translation");
-const TranslationPlural = require("../../modules/i18n/TranslationPlural");
-const ListFormat = require("../../modules/i18n/ListFormat");
-const Resolvable = require("../../modules/i18n/Resolvable");
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationPlural = require("../../modules/i18n/TranslationPlural").default;
+const ListFormat = require("../../modules/i18n/ListFormat").default;
+const { ResolvableObject } = require("../../modules/i18n/Resolvable");
 
 // disabled channels
 // disabled commands

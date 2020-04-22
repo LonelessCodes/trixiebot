@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const CONST = require("../const");
+const CONST = require("../const").default;
 const RandomChance = require("../modules/random/RandomChance");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -23,9 +23,9 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
-const TranslationEmbed = require("../modules/i18n/TranslationEmbed");
-const TranslationMerge = require("../modules/i18n/TranslationMerge");
+const Translation = require("../modules/i18n/Translation").default;
+const TranslationEmbed = require("../modules/i18n/TranslationEmbed").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 const replies = new RandomChance();
 replies.add({

@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const CONST = require("../const");
+const CONST = require("../const").default;
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");

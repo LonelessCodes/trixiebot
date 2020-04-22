@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const config = require("../config");
-const log = require("../log");
+const config = require("../config").default;
+const log = require("../log").default;
 const Derpibooru = require("../modules/Derpibooru");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -23,7 +23,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const CommandScope = require("../util/commands/CommandScope");
 
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 
 const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "gore", "foal abuse"];
 

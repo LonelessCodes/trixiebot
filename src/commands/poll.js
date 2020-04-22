@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Translation = require("../modules/i18n/Translation");
+const Translation = require("../modules/i18n/Translation").default;
 const DeprecationCommand = require("../core/commands/DeprecationCommand");
 
 module.exports = function install(cr) {

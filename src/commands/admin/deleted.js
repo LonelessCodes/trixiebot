@@ -24,7 +24,7 @@ const Category = require("../../util/commands/Category");
 
 const PaginatorGuildAction = require("../../modules/actions/PaginatorGuildAction");
 
-const Translation = require("../../modules/i18n/Translation");
+const Translation = require("../../modules/i18n/Translation").default;
 
 module.exports = function install(cr, { client, db }) {
     const database = db.collection("deleted_messages");

@@ -18,8 +18,8 @@ const random = require("../random/random");
 const credits = require("../../core/managers/CreditsManager");
 const { basicTEmbed } = require("../i18n/TranslationEmbed");
 
-const Translation = require("../i18n/Translation");
-const TranslationMerge = require("../i18n/TranslationMerge");
+const Translation = require("../i18n/Translation").default;
+const TranslationMerge = require("../i18n/TranslationMerge").default;
 
 class Card {
     /**

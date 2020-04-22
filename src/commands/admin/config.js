@@ -15,7 +15,7 @@
  */
 
 const { splitArgs, findArgs } = require("../../util/string");
-const CONST = require("../../const");
+const CONST = require("../../const").default;
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
@@ -24,10 +24,10 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
-const Translation = require("../../modules/i18n/Translation");
-const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");
-const TranslationMerge = require("../../modules/i18n/TranslationMerge");
-const ListFormat = require("../../modules/i18n/ListFormat");
+const Translation = require("../../modules/i18n/Translation").default;
+const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;
+const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
+const ListFormat = require("../../modules/i18n/ListFormat").default;
 
 const types_human = new Map([
     [String, new Translation("config.type.text", "Text")],

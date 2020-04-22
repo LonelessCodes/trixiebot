@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const INFO = require("../info");
-const random = require("../modules/random/secureRandom");
+const INFO = require("../info").default;
+const random = require("../modules/random/secureRandom").default;
 const qs = require("querystring");
 const fetch = require("node-fetch");
 

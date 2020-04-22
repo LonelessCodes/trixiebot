@@ -17,7 +17,7 @@
 import { toHumanTime } from "../../util/time";
 import { ResolvableObject } from "./Resolvable";
 import moment from "moment";
-import I18nLocale from "./I18nLocale";
+import { I18nLocale } from "./I18n";
 
 export interface DurationFormatOptions {
     style?: "long" | "short";

@@ -16,7 +16,7 @@
 
 import moment from "moment";
 import { ResolvableObject } from "./Resolvable";
-import I18nLocale from "./I18nLocale";
+import { I18nLocale } from "./I18n";
 
 export interface RelativeTimeFormatOptions {
     style?: "long" | "short";

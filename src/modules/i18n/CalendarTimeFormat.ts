@@ -15,7 +15,7 @@
  */
 
 import { ResolvableObject } from "./Resolvable";
-import I18nLocale from "./I18nLocale";
+import { I18nLocale } from "./I18n";
 import moment from "moment";
 
 export type DateResolvable = moment.Moment | Date | string | number;

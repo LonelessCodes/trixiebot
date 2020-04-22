@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18nLocale from "./I18nLocale";
+import { I18nLocale } from "./I18n";
 
 export class ResolvableObject<T> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -15,7 +15,7 @@
  */
 
 import { ResolvableObject, Resolvable } from "./Resolvable";
-import I18nLocale from "./I18nLocale";
+import { I18nLocale } from "./I18n";
 
 interface ListFormatOptions {
     type?: "and" | "or";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,18 +14,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const path = require("path");
-const config = require("./config");
-const packageFile = require("../package.json");
+import { PackageJson } from "type-fest";
+
+import path from "path";
+import config from "./config";
+import fs from "fs-extra";
+
+const package_file: PackageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
 
 const dev = process.env.NODE_ENV === "development";
 
 if (!config.has("user_files_dir")) throw new Error("No user files dir specified in config");
 
-module.exports = Object.freeze({
-    WEBSITE: config.has("website_url") ? config.get("website_url") : null,
-    INVITE: config.has("invite_url") ? config.get("invite_url") : null,
-    VERSION: packageFile.version,
+export default Object.freeze({
+    WEBSITE: config.has("website_url") ? (config.get("website_url") as string) : null,
+    INVITE: config.has("invite_url") ? (config.get("invite_url") as string) : null,
+    VERSION: package_file.version as string,
     DEV: dev,
     FILES_BASE: path.resolve(path.join(__dirname, "..", "..", config.get("user_files_dir"))),
     ROOT: path.resolve(path.join(__dirname, "..")),

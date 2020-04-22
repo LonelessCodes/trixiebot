@@ -1,5 +1,7 @@
+// @ts-nocheck
+
 const fs = require("fs-extra");
-const { walk } = require("./util/files");
+const { walk } = require("./src/util/files");
 
 const t = /new Translation\(\s*("[\w.]+"),\s*("[\w\s:.,!?|"\\{}`'()#<>-]+")(?!\s*\+)/g;
 const tp = /new TranslationPlural\(\s*("[\w.]+"),\s*\[\s*("[\w\s:.,!?|"\\{}`'()#<>-]+"),\s*("[\w\s:.,!?|"\\{}`'()#<>-]+")\]/g;
@@ -9,17 +11,17 @@ walk("./src/").then(files => {
     for (let file of files) {
         const cont = fs.readFileSync(file, "utf8");
         let match;
-        while (match = t.exec(cont)) {
+        while ((match = t.exec(cont))) {
             const id = JSON.parse(match[1]);
             let phrase = match[2];
             const regex = /((?<!\\)")/g;
-            while (match = regex.exec(phrase.slice(1, -1))) {
+            while ((match = regex.exec(phrase.slice(1, -1)))) {
                 phrase = phrase.slice(0, match.index + 2);
                 break;
             }
             arr.push({ id: id, phrase: JSON.parse(phrase) });
         }
-        while (match = tp.exec(cont)) {
+        while ((match = tp.exec(cont))) {
             arr.push({ id: JSON.parse(match[1]), phrase: { one: JSON.parse(match[2]), other: JSON.parse(match[3]) } });
         }
     }
@@ -34,9 +36,7 @@ walk("./src/").then(files => {
             return obj[index];
         }, tree);
 
-        if (val &&
-            val.one && val.one === item.phrase.one &&
-            val.other && val.other === item.phrase.other) continue;
+        if (val && val.one && val.one === item.phrase.one && val.other && val.other === item.phrase.other) continue;
         if (val && val === item.phrase) continue;
 
         // Split the provided term and run the callback for each subterm.

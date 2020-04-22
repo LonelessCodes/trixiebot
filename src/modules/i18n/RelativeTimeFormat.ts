@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,24 +14,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Resolvable = require("./Resolvable");
-const moment = require("moment");
+import moment from "moment";
+import { ResolvableObject } from "./Resolvable";
+import I18nLocale from "./I18nLocale";
 
-class RelativeTimeFormat extends Resolvable {
-    /**
-     * @param {Date|moment} date
-     * @param {Object} [opts]
-     * @param {"long"|"short"} [opts.style]
-     */
-    constructor(date, opts = {}) {
+export interface RelativeTimeFormatOptions {
+    style?: "long" | "short";
+}
+
+export type RelativeTimeResolvable = Date | moment.Moment | string | number;
+
+export default class RelativeTimeFormat extends ResolvableObject<string> {
+    moment: moment.Moment;
+    opts: Required<RelativeTimeFormatOptions>;
+
+    constructor(date: RelativeTimeResolvable, opts: RelativeTimeFormatOptions = {}) {
         super();
         this.moment = moment(date);
-        this.opts = Object.assign({ style: "long" }, opts);
+        this.opts = { style: "long", ...opts };
     }
 
-    resolve(i18n) {
+    resolve(i18n: I18nLocale): string {
         return this.moment.locale(i18n.locale).fromNow(this.opts.style === "short");
     }
 }
-
-module.exports = RelativeTimeFormat;

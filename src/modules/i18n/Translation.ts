@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,20 +14,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Resolvable = require("./Resolvable");
-const { formatter } = require("./i18n_utils");
+import { formatter, FormatArguments } from "./utils";
+import { ResolvableObject } from "./Resolvable";
+import { I18nLocale } from "./I18n";
 
-class Translation extends Resolvable {
-    constructor(id, phrase, args = {}) {
+export default class Translation extends ResolvableObject<string> {
+    constructor(public id: string, public phrase: string, public args: FormatArguments = {}) {
         super();
-        this.id = id;
-        this.phrase = phrase;
-        this.args = args;
     }
 
-    resolve(i18n) {
+    resolve(i18n: I18nLocale) {
         return formatter(i18n, i18n.translate(this.id, this.phrase), this.args);
     }
 }
-
-module.exports = Translation;

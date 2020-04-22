@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,28 +14,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Resolvable = require("./Resolvable");
+import { Primitive } from "type-fest";
+import { Resolvable, ResolvableObject } from "./Resolvable";
+import { escapeRegExp } from "../../util/string";
+import { I18nLocale } from "./I18n";
 
-class TranslationMerge extends Resolvable {
-    constructor(...arr) {
-        super();
-        /** @type {(Resolvable|string|number)[]} */
-        this.arr = arr;
-        this.sep = " ";
-    }
-
-    separator(sep = " ") {
-        this.sep = sep;
-        return this;
-    }
-
-    push(...items) {
-        this.arr = this.arr.concat(items);
-    }
-
-    resolve(i18n) {
-        return this.arr.filter(i => i !== null && i !== undefined).map(trans => Resolvable.resolve(trans, i18n)).join(this.sep);
-    }
+export interface FormatArguments {
+    [arg: string]: Resolvable<Primitive>;
 }
 
-module.exports = TranslationMerge;
+export function formatter(i18n: I18nLocale, msg: string, args: FormatArguments = {}) {
+    for (const f in args) {
+        msg = msg.replace(new RegExp(`{{\\s*${escapeRegExp(f)}\\s*}}`, "g"), String(ResolvableObject.resolve(args[f], i18n)));
+    }
+    return msg;
+}

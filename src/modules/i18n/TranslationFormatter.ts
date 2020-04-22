@@ -14,19 +14,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { formatter } = require("./i18n_utils");
-const Resolvable = require("./Resolvable");
+import { formatter, FormatArguments } from "./utils";
+import { ResolvableObject, Resolvable } from "./Resolvable";
+import { I18nLocale } from "./I18n";
 
-class TranslationFormatter extends Resolvable {
-    constructor(id, args = {}) {
+export default class TranslationFormatter extends ResolvableObject<string> {
+    constructor(public msg: Resolvable<string>, public args: FormatArguments = {}) {
         super();
-        this.id = id;
-        this.args = args;
     }
 
-    resolve(i18n) {
-        return formatter(i18n, Resolvable.resolve(this.id, i18n), this.args);
+    resolve(i18n: I18nLocale): string {
+        return formatter(i18n, ResolvableObject.resolve(this.msg, i18n), this.args);
     }
 }
-
-module.exports = TranslationFormatter;

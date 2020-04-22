@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@ function timer() {
 timer.NS_PER_SEC = 1e9;
 timer.NS_PER_MS = 1e6;
 timer.typeof = "bigint";
-timer.diff = function diff(start) {
+timer.diff = function diff(start: bigint) {
     return Number(timer() - start);
 };
-timer.diffMs = function diffMs(start) {
+timer.diffMs = function diffMs(start: bigint) {
     return Number(timer() - start) / timer.NS_PER_MS;
 };
 
-module.exports = timer;
+export default timer;

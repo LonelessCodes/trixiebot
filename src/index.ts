@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const nanoTimer = require("./modules/timer");
-const bootup_timer = nanoTimer();
+import timer from "./modules/timer";
+const bootup_timer = timer();
 
-const config = require("./config");
-const log = require("./log");
+import config from "./config";
+import log from "./log";
 const djs_log = log.namespace("discord.js");
-const bannerPrinter = require("./util/banner/bannerPrinter");
-const info = require("./info");
-const Discord = require("discord.js");
-const database = require("./modules/db/database");
-const Core = require("./core/Core");
-
-// Why must you delete this method, Discord.js devs...
-Discord.MessageEmbed.prototype.addBlankField = function addBlankField(inline = false) {
-    return this.addField("\u200b", "\u200b", inline);
-};
+import bannerPrinter from "./util/banner/bannerPrinter";
+import info from "./info";
+import database from "./modules/db/database";
+import Core from "./core/Core";
+import Discord from "discord.js";
 
 // Indicate a new app lifecycle
 bannerPrinter(info.DEV, info.VERSION, Discord.version);
@@ -37,7 +32,7 @@ bannerPrinter(info.DEV, info.VERSION, Discord.version);
 // Catch exceptions
 process.addListener("uncaughtException", error => {
     log.error("UncaughtException:", error.stack || error);
-    process.exit();
+    process.exit(1);
 });
 
 process.addListener("unhandledRejection", (reason, p) => {
@@ -53,7 +48,6 @@ process.addListener("warning", warning => {
  */
 
 const client = new Discord.Client({
-    autoReconnect: true,
     messageCacheMaxSize: 200,
     messageCacheLifetime: 60 * 10,
     messageSweepInterval: 60 * 10,
@@ -70,20 +64,49 @@ const client = new Discord.Client({
 // Attach listeners
 client.addListener("warn", warn => djs_log.warn(warn));
 
-client.addListener("error", error => djs_log.error(
-    error.stack ||
-        error.error ?
-        error.error.stack || error.error :
-        error
-));
+client.addListener("error", error => djs_log.error(error.stack || error.error ? error.error.stack || error.error : error));
 
 client.addListener("ready", () => djs_log("Ready"));
 
-client.addListener("shardDisconnected", (closeEvent, shardId) => djs_log("Disconnected ID:" + shardId, closeEvent));
+client.addListener("shardDisconnected", (close_event, shard_id) => djs_log(`Disconnected ID:${shard_id}`, close_event));
 
-client.addListener("shardReconnecting", shardId => djs_log("Reconnecting ID:" + shardId));
+client.addListener("shardReconnecting", shard_id => djs_log(`Reconnecting ID:${shard_id}`));
 
-client.addListener("shardResumed", (replayed, shardId) => djs_log(`Replayed ${replayed} events ID:${shardId}`));
+client.addListener("shardResumed", (replayed, shard_id) => djs_log(`Replayed ${replayed} events ID:${shard_id}`));
+
+function loginClient(client: Discord.Client) {
+    return new Promise(async (resolve, reject) => {
+        client.once("ready", () => resolve());
+
+        try {
+            djs_log("Logging in...");
+            await client.login(config.get("discord.token"));
+            djs_log("Login success");
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+async function initialize(client: Discord.Client) {
+    if (!config.has("discord.token")) throw new Error("No Discord API Token specified in config files");
+
+    const db = await database();
+    log.namespace("db", "Connected");
+
+    await loginClient(client);
+
+    const core = new Core(client, db);
+    await core.startMainComponents("commands");
+    log.namespace("app", "Ready uwu.", `bootup_time:${(timer.diff(bootup_timer) / timer.NS_PER_SEC).toFixed(3)}s`);
+}
+
+function exit(code = 0) {
+    log("Gracefully exiting...");
+
+    client.destroy();
+    process.exit(code);
+}
 
 // Initialize Bot
 initialize(client)
@@ -96,34 +119,5 @@ initialize(client)
         exit(1); // 1 - Uncaught Fatal Exception
     });
 
-async function initialize(client) {
-    if (!config.has("discord.token")) throw new Error("No Discord API Token specified in config files");
-
-    const db = await database();
-    log.namespace("db", "Connected");
-
-    await loginClient(client);
-
-    const core = new Core(client, db);
-    await core.startMainComponents("commands");
-    log.namespace("app", "Ready uwu.", `bootup_time:${(nanoTimer.diff(bootup_timer) / nanoTimer.NS_PER_SEC).toFixed(3)}s`);
-}
-
-function loginClient(client) {
-    return new Promise(resolve => {
-        client.once("ready", () => resolve());
-
-        djs_log("Connecting...");
-        client.login(config.get("discord.token"));
-    });
-}
-
-function exit(code = 0) {
-    log("Gracefully exiting...");
-
-    client.destroy();
-    process.exit(code);
-}
-
-process.once("SIGTERM", exit);
-process.once("SIGINT", exit);
+process.once("SIGTERM", () => exit());
+process.once("SIGINT", () => exit());

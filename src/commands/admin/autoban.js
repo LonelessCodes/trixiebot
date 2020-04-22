@@ -26,7 +26,7 @@ const CommandPermission = require("../../util/commands/CommandPermission");
 const Category = require("../../util/commands/Category");
 
 const PaginatorGuildAction = require("../../modules/actions/PaginatorGuildAction");
-const { basicTEmbed } = require("../../util/util");
+const { basicTEmbed } = require("../../modules/i18n/TranslationEmbed");
 
 const Translation = require("../../modules/i18n/Translation");
 const TranslationEmbed = require("../../modules/i18n/TranslationEmbed");

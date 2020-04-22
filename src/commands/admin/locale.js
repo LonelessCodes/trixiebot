@@ -15,7 +15,7 @@
  */
 
 const CONST = require("../../const");
-const { basicTEmbed } = require("../../util/util");
+const { basicTEmbed } = require("../../modules/i18n/TranslationEmbed");
 const { splitArgs } = require("../../util/string");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");

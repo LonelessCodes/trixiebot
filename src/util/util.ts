@@ -17,9 +17,6 @@
 import config from "../config";
 import CONST from "../const";
 import Discord from "discord.js";
-import TranslationEmbed from "../modules/i18n/TranslationEmbed";
-import TranslationMerge from "../modules/i18n/TranslationMerge";
-import { Resolvable } from "../modules/i18n/Resolvable";
 
 if (!config.has("owner_id")) throw new Error("No owner_id specified in the config");
 const owner_id = config.get("owner_id") as string;
@@ -74,27 +71,6 @@ export function basicEmbed(title: string, user: UserResolvable | Discord.Guild, 
     return new Discord.MessageEmbed()
         .setColor(color)
         .setAuthor(`${userToString(user, true)} | ${title}`, user.avatarURL({ size: 32, dynamic: true }) || undefined);
-}
-
-export function basicTEmbed(title: Resolvable<string>, user: UserResolvable, color: number): TranslationEmbed;
-export function basicTEmbed(title: Resolvable<string>, user: Discord.Guild, color: number): TranslationEmbed;
-export function basicTEmbed(
-    title: Resolvable<string>,
-    user: UserResolvable | Discord.Guild,
-    color = CONST.COLOR.PRIMARY
-): TranslationEmbed {
-    if (user instanceof Discord.Guild)
-        return new TranslationEmbed()
-            .setColor(color)
-            .setAuthor(new TranslationMerge(user.name, "|", title), user.iconURL({ size: 32, dynamic: true }) || undefined);
-
-    user = resolveUser(user);
-    return new TranslationEmbed()
-        .setColor(color)
-        .setAuthor(
-            new TranslationMerge(userToString(user, true), "|", title),
-            user.avatarURL({ size: 32, dynamic: true }) || undefined
-        );
 }
 
 export function progressBar(v: number, length: number, a: string, b: string) {

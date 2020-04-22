@@ -22,7 +22,7 @@ const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 
 const guild_stats = require("../core/managers/GuildStatsManager");
-const { basicTEmbed } = require("../util/util");
+const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
 
 const Translation = require("../modules/i18n/Translation");
 const TranslationPlural = require("../modules/i18n/TranslationPlural");

@@ -15,6 +15,9 @@
  */
 
 import Discord from "discord.js";
+import CONST from "../../const";
+import { UserResolvable, resolveUser, userToString } from "../../util/util";
+import TranslationMerge from "./TranslationMerge";
 import { ResolvableObject, Resolvable } from "./Resolvable";
 import { I18nLocale } from "./I18n";
 
@@ -312,4 +315,25 @@ export default class TranslationEmbed extends ResolvableObject<Discord.MessageEm
                 )
             );
     }
+}
+
+export function basicTEmbed(title: Resolvable<string>, user: UserResolvable, color: number): TranslationEmbed;
+export function basicTEmbed(title: Resolvable<string>, user: Discord.Guild, color: number): TranslationEmbed;
+export function basicTEmbed(
+    title: Resolvable<string>,
+    user: UserResolvable | Discord.Guild,
+    color = CONST.COLOR.PRIMARY
+): TranslationEmbed {
+    if (user instanceof Discord.Guild)
+        return new TranslationEmbed()
+            .setColor(color)
+            .setAuthor(new TranslationMerge(user.name, "|", title), user.iconURL({ size: 32, dynamic: true }) || undefined);
+
+    user = resolveUser(user);
+    return new TranslationEmbed()
+        .setColor(color)
+        .setAuthor(
+            new TranslationMerge(userToString(user, true), "|", title),
+            user.avatarURL({ size: 32, dynamic: true }) || undefined
+        );
 }

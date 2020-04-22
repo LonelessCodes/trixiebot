@@ -23,7 +23,8 @@ const CommandPermissions = require("../util/commands/CommandPermission");
 
 const credits = require("../core/managers/CreditsManager");
 const moment = require("moment");
-const { userToString, basicTEmbed } = require("../util/util");
+const { userToString } = require("../util/util");
+const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
 const { splitArgs } = require("../util/string");
 const { toHumanTime } = require("../util/time");
 const { timeout } = require("../util/promises");

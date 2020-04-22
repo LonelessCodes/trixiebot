@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = new class PromisesUtils {
-    /**
-     * @param {number} ms Delay in milliseconds
-     * @returns {Promise<void>}
-     */
-    timeout(ms) {
-        return new Promise(res => setTimeout(res, ms));
-    }
+export function timeout(ms: number): Promise<void> {
+    return new Promise(res => setTimeout(res, ms));
+}
 
-    /**
-     * @returns {Promise<void>}
-     */
-    immediate() {
-        return new Promise(res => setImmediate(res));
-    }
+export function immediate(): Promise<void> {
+    return new Promise(res => setImmediate(res));
+}
 
-    /**
-     * @returns {Promise<void>}
-     */
-    tick() {
-        return new Promise(res => process.nextTick(res));
-    }
-};
+export function tick(): Promise<void> {
+    return new Promise(res => process.nextTick(res));
+}

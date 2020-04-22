@@ -7,3 +7,6 @@ node_modules/
 # ignore all config files (REALLY IMPORTANT), except template file
 config/*
 !config/template.yaml
+
+# ignore compiled files
+dist/

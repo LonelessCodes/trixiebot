@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,44 +14,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Resolvable = require("./Resolvable");
+import { ResolvableObject, Resolvable } from "./Resolvable";
+import I18nLocale from "./I18nLocale";
 
-class ListFormat extends Resolvable {
-    /**
-     * @param {(string|Resolvable)[]} arr
-     * @param {Object} [opts]
-     * @param {"and" | "or"} [opts.type]
-     * @param {"long" | "short"} [opts.style]
-     */
-    constructor(arr = [], opts = {}) {
+interface ListFormatOptions {
+    type?: "and" | "or";
+    style?: "long" | "short";
+}
+
+export default class ListFormat extends ResolvableObject<string> {
+    arr: Resolvable<string>[];
+    opts: Required<ListFormatOptions>;
+
+    constructor(arr: Resolvable<string>[] = [], opts: ListFormatOptions = {}) {
         super();
         this.arr = arr;
 
-        opts = Object.assign({ type: "and", style: "long" }, opts);
-        this.type = opts.type;
-        this.style = opts.style;
+        this.opts = { type: "and", style: "long", ...opts };
     }
 
-    push(...args) {
+    push(...args: Resolvable<string>[]) {
         this.arr = this.arr.concat(args);
     }
 
-    resolve(i18n) {
+    resolve(i18n: I18nLocale) {
         if (this.arr.length === 0) return "";
-        const arr = this.arr.map(item => Resolvable.resolve(item, i18n));
+
+        const arr = this.arr.map(item => ResolvableObject.resolve(item, i18n));
 
         if (arr.length === 1) return arr[0];
 
-        if (this.style === "long") {
+        if (this.opts.style === "long") {
             let sep;
-            if (this.type === "and") sep = i18n.translate("format.and", "and");
-            else if (this.type === "or") sep = i18n.translate("format.or", "or");
+            if (this.opts.type === "and") sep = i18n.translate("format.and", "and");
+            else if (this.opts.type === "or") sep = i18n.translate("format.or", "or");
 
             return `${arr.slice(0, -1).join(", ")} ${sep} ${arr[arr.length - 1]}`;
-        } else {
-            return arr.join(", ");
         }
+
+        return arr.join(", ");
     }
 }
-
-module.exports = ListFormat;

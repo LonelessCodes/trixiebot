@@ -24,7 +24,7 @@ const CategoryClass = Category.Category;
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationPlural = require("../../modules/i18n/TranslationPlural").default;
 const ListFormat = require("../../modules/i18n/ListFormat").default;
-const { ResolvableObject } = require("../../modules/i18n/Resolvable");
+const { ResolvableObject: Resolvable } = require("../../modules/i18n/Resolvable");
 
 // disabled channels
 // disabled commands

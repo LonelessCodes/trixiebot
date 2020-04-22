@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,21 +14,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Resolvable = require("./Resolvable");
-const moment = require("moment");
+import { ResolvableObject } from "./Resolvable";
+import I18nLocale from "./I18nLocale";
+import moment from "moment";
 
-class CalendarTimeFormat extends Resolvable {
-    /**
-     * @param {Date|moment} date
-     */
-    constructor(date) {
+export type DateResolvable = moment.Moment | Date | string | number;
+
+export default class CalendarTimeFormat extends ResolvableObject<string> {
+    date: moment.Moment;
+
+    constructor(date: DateResolvable) {
         super();
         this.date = moment(date);
     }
 
-    resolve(i18n) {
+    resolve(i18n: I18nLocale) {
         return this.date.locale(i18n.locale).calendar();
     }
 }
-
-module.exports = CalendarTimeFormat;

@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const database = require("../../modules/db/database");
+const database = require("../../modules/db/database").default;
 
 class Base {
     constructor(id, db) {

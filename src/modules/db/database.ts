@@ -14,22 +14,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const config = require("../../config").default;
+import { Db, MongoClient } from "mongodb";
+import config from "../../config";
 
 if (!config.has("database.host") || !config.has("database.port"))
     throw new Error("No DB connection details (host, port) were specified in the configs");
 if (!config.has("database.db")) throw new Error("No db name was specified in the configs");
 
-const promise = require("mongodb").MongoClient.connect(
-    `mongodb://${config.get("database.host")}:${config.get("database.port")}/`,
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        auth: config.has("database.auth") && config.get("database.auth"),
-    }
-);
+const promise = MongoClient.connect(`mongodb://${config.get("database.host")}:${config.get("database.port")}/`, {
+    useNewUrlParser: true,
+    autoReconnect: true,
+    useUnifiedTopology: true,
+    auth: config.has("database.auth")
+        ? (config.get("database.auth") as {
+              user: string;
+              password: string;
+          })
+        : undefined,
+});
 
-module.exports = async function db(name = config.get("database.db")) {
+export default async function db(name: string = config.get("database.db")): Promise<Db> {
     const client = await promise;
     return client.db(name);
-};
+}

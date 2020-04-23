@@ -26,11 +26,11 @@ import log from "./log";
 const djs_log = log.namespace("discord.js");
 
 import config from "./config";
-import bannerPrinter from "./util/banner/bannerPrinter";
 import info from "./info";
 import database from "./modules/db/database";
-import Core from "./core/Core";
 import Discord from "discord.js";
+import Core from "./core/Core";
+import bannerPrinter from "./util/banner/bannerPrinter";
 
 // Indicate a new app lifecycle
 bannerPrinter(info.DEV, info.VERSION, Discord.version);

@@ -16,7 +16,7 @@
 
 const ipc = require("./concurrency/ipc");
 const EventEmitter = require("events");
-const database = require("./db/database");
+const database = require("./db/database").default;
 
 class Stat extends EventEmitter {
     /**

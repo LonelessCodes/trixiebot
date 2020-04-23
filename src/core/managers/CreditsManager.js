@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const database = require("../../modules/db/database");
+const database = require("../../modules/db/database").default;
 const moment = require("moment");
 // eslint-disable-next-line no-unused-vars
 const { GuildMember, User, Guild } = require("discord.js");

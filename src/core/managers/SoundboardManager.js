@@ -17,7 +17,7 @@
 const { FILES_BASE } = require("../../info").default;
 const path = require("path");
 const fs = require("fs-extra");
-const database = require("../../modules/db/database");
+const database = require("../../modules/db/database").default;
 // eslint-disable-next-line no-unused-vars
 const { User, Guild } = require("discord.js");
 

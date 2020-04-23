@@ -19,7 +19,8 @@ const { parseHumanTime: _parseHumanTime, toHumanTime: _toHumanTime } = require("
 const Context = require("./Context");
 const c = require("./classes");
 const moment = require("moment");
-const database = require("../../../../modules/db/database")()
+const database = require("../../../../modules/db/database")
+    .default()
     .then(client => client.collection("cc_storage"))
     .catch(err => {
         _log.error(err);

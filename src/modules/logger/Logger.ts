@@ -81,7 +81,7 @@ class Logger {
 
     namespace(ns: string, ...param: any[]): Logger {
         const logger = new Logger([...this._ns, ns]);
-        if (param.length > 0) logger(param, ...param.slice(1));
+        if (param.length > 0) logger(param[0], ...param.slice(1));
         return logger;
     }
 }

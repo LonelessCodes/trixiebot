@@ -16,13 +16,12 @@
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 const log = require("../log").default;
 const config = require("../config").default;
-const typing = require("../modules/typing");
 
 const fetch = require("node-fetch");
 const base_url = "https://cleverbot.io/1.0/";
@@ -116,30 +115,30 @@ class Cleverbot {
 }
 
 module.exports = function install(cr) {
-    if (!config.has("cleverbot.user") || !config.has("cleverbot.key")) return log.namespace("config", "Found no API credentials for Cleverbot.io - Disabled chat command");
+    if (!config.has("cleverbot.user") || !config.has("cleverbot.key"))
+        return log.namespace("config", "Found no API credentials for Cleverbot.io - Disabled chat command");
 
     const bot = new Cleverbot(config.get("cleverbot.user"), config.get("cleverbot.key"));
 
-    cr.registerCommand("chat", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async ({ message, content: input }) => {
-            await typing.startTyping(message.channel);
+    cr.registerCommand("chat", new OverloadCommand())
+        .registerOverload(
+            "1+",
+            new SimpleCommand(async ({ message, content: input }) => {
+                await message.channel.startTyping();
 
-            try {
-                const session = await bot.create(message.author.id);
+                try {
+                    const session = await bot.create(message.author.id);
 
-                const reply = await session.ask(input);
+                    const reply = await session.ask(input);
 
-                await typing.stopTyping(message.channel);
-                if (message.channel.type === "text")
-                    await message.channel.send(`${message.member.toString()} ${reply}`);
-                else
-                    await message.channel.send(`${message.author.toString()} ${reply}`);
-            } catch (_) {
-                await typing.stopTyping(message.channel);
-            }
-        }))
-        .setHelp(new HelpContent()
-            .setUsage("<text>", "Talk with Trixie1!!! (using a cleverbot integration)"))
+                    if (message.channel.type === "text") await message.channel.send(`${message.member.toString()} ${reply}`);
+                    else await message.channel.send(`${message.author.toString()} ${reply}`);
+                } finally {
+                    await message.channel.stopTyping();
+                }
+            })
+        )
+        .setHelp(new HelpContent().setUsage("<text>", "Talk with Trixie1!!! (using a cleverbot integration)"))
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 

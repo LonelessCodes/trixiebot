@@ -14,12 +14,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+require("source-map-support").install({
+    environment: "node",
+    handleUncaughtExceptions: false,
+});
+
 import timer from "./modules/timer";
 const bootup_timer = timer();
 
-import config from "./config";
 import log from "./log";
 const djs_log = log.namespace("discord.js");
+
+import config from "./config";
 import bannerPrinter from "./util/banner/bannerPrinter";
 import info from "./info";
 import database from "./modules/db/database";

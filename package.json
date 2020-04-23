@@ -50,6 +50,7 @@
         "prism-media": "^1.2.1",
         "random-number-csprng": "^1.0.2",
         "read-chunk": "^3.2.0",
+        "source-map-support": "^0.5.18",
         "tiny-text": "^1.0.1",
         "tmp": "^0.1.0",
         "trixie-ipc": "github:lonelesscodes/trixie-ipc",

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,21 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { timeout } = require("../util/promises");
-const fetch = require("node-fetch");
+import { timeout } from "../util/promises";
+import fetch from "node-fetch";
 
-/**
- * @param {string} key
- * @param {string} url
- * @returns {Promise<Object[]>}
- */
-async function getPosts(key, url) {
-    const { response } = await fetch("https://api.tumblr.com" + url + "&api_key=" + key)
-        .then(r => r.json());
+async function getPosts(key: string, url: string): Promise<any[]> {
+    const { response } = await fetch("https://api.tumblr.com" + url + "&api_key=" + key).then(r => r.json());
 
     await timeout(100);
 
-    const p = response._links ? response._links.next ? await getPosts(key, response._links.next.href) : [] : [];
+    const p = response._links ? (response._links.next ? await getPosts(key, response._links.next.href) : []) : [];
 
     const posts = [...response.posts, ...p];
 
@@ -38,8 +32,8 @@ async function getPosts(key, url) {
 /**
  * @param {string} key The API key
  * @param {string} blog_url The URL of the blog
- * @returns {Promise<Object[]>}
+ * @returns {Promise<any[]>}
  */
-module.exports = function getTumblrBlog(key, blog_url) {
+export default function getTumblrBlog(key: string, blog_url: string): Promise<any[]> {
     return getPosts(key, `/v2/blog/${blog_url}/posts/text?limit=20&filter=text`);
-};
+}

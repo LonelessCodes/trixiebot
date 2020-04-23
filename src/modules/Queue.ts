@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,19 +14,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Queue {
-    constructor() {
-        this.running = false;
-        this.queue = [];
-    }
+type QueueFunction<T> = () => Promise<T>;
 
-    push(func) {
+export default class Queue {
+    running: boolean = false;
+    queue: (() => void)[] = [];
+
+    push<T>(func: QueueFunction<T>): Promise<T> {
         return new Promise(resolve => {
             // Add callback to the queue
-            this.queue.push(() => func().then(result => {
-                resolve(result);
-                this.next();
-            }));
+            this.queue.push(() =>
+                func().then(result => {
+                    resolve(result);
+                    this.next();
+                })
+            );
 
             if (!this.running) {
                 // If nothing is running, then start the engines!
@@ -45,5 +47,3 @@ class Queue {
         }
     }
 }
-
-module.exports = Queue;

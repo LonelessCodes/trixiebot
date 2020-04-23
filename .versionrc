@@ -1,0 +1,49 @@
+{
+    "header": "Changelog",
+    "types": [
+        {
+            "type": "feat",
+            "section": "Features"
+        },
+        {
+            "type": "change",
+            "section": "Changes"
+        },
+        {
+            "type": "fix",
+            "section": "Bug Fixes"
+        },
+        {
+            "type": "improvement",
+            "section": "Improvements"
+        },
+        {
+            "type": "deprecation",
+            "section": "Deprecations"
+        },
+        {
+            "type": "chore",
+            "hidden": true
+        },
+        {
+            "type": "docs",
+            "hidden": true
+        },
+        {
+            "type": "style",
+            "hidden": true
+        },
+        {
+            "type": "refactor",
+            "hidden": true
+        },
+        {
+            "type": "test",
+            "hidden": true
+        }
+    ],
+    "commitUrlFormat": "https://github.com/LonelessCodes/trixiebot/commit/{{hash}}",
+    "compareUrlFormat": "https://github.com/LonelessCodes/trixiebot/compare/{{previousTag}}...{{currentTag}}",
+    "issueUrlFormat": "https://github.com/LonelessCodes/trixiebot/issues/{{id}}",
+    "userUrlFormat": "https://github.com/LonelessCodes"
+}

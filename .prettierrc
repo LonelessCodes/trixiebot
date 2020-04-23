@@ -1,8 +1,8 @@
 {
-  "semi": true,
-  "singleQuote": false,
-  "printWidth": 130,
-  "tabWidth": 4,
-  "arrowParens": "avoid",
-  "endOfLine": "crlf"
+    "semi": true,
+    "singleQuote": false,
+    "printWidth": 130,
+    "tabWidth": 4,
+    "arrowParens": "avoid",
+    "endOfLine": "crlf"
 }

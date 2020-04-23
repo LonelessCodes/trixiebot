@@ -2,7 +2,7 @@
     "apps": [
         {
             "name": "trixiebot",
-            "script": "./index.js",
+            "script": "./dist/index.js",
             "env": {
                 "NODE_ENV": "production"
             },

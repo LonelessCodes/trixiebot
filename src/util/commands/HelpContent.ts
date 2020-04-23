@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,16 +14,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class HelpContent {
-    constructor(description = null, parameters = new Map, options = null, usage = null, related = []) {
-        this.title = null;
-        this.description = description;
-        this.parameters = parameters;
-        this.usage = Array.isArray(options) ? options : (options || usage) ? [{ options, usage }] : [];
-        this.related = related;
+export interface HelpParameter {
+    content: string;
+    optional?: boolean;
+}
+
+export interface HelpUsage {
+    options: string | null;
+    usage: string | null;
+}
+
+export interface HelpContentOptions {
+    title?: string | null;
+    description?: string | null;
+    parameters?: Map<string, HelpParameter>;
+    usage?: HelpUsage[];
+    related?: string[];
+}
+
+export default class HelpContent {
+    title: string | null;
+    description: string | null;
+    parameters: Map<string, HelpParameter>;
+    usage: HelpUsage[];
+    related: string[];
+
+    constructor(opts: HelpContentOptions = {}) {
+        this.title = opts.title || null;
+        this.description = opts.description || null;
+        this.parameters = opts.parameters || new Map();
+        this.usage = opts.usage || [];
+        this.related = opts.related || [];
     }
 
-    setUsageTitle(title) {
+    setUsageTitle(title: string): HelpContent {
         this.title = title;
         return this;
     }
@@ -35,12 +59,12 @@ class HelpContent {
      * @param {string} description
      * @returns {HelpContent}
      */
-    setDescription(description) {
+    setDescription(description: string): HelpContent {
         this.description = description;
         return this;
     }
 
-    addParameter(parameter_name, content) {
+    addParameter(parameter_name: string, content: string): HelpContent {
         this.parameters.set(parameter_name, {
             content,
             optional: false,
@@ -48,7 +72,7 @@ class HelpContent {
         return this;
     }
 
-    addParameterOptional(parameter_name, content) {
+    addParameterOptional(parameter_name: string, content: string): HelpContent {
         this.parameters.set(parameter_name, {
             content,
             optional: true,
@@ -56,20 +80,18 @@ class HelpContent {
         return this;
     }
 
-    setUsage(options, usage) {
+    setUsage(options: HelpUsage[] | string | null, usage: string | null = null): HelpContent {
         this.usage = Array.isArray(options) ? options : [{ options, usage }];
         return this;
     }
 
-    addUsage(options, usage) {
+    addUsage(options: string | null, usage: string | null = null): HelpContent {
         this.usage.push({ options, usage });
         return this;
     }
 
-    setRelated(related) {
+    setRelated(related: string[]): HelpContent {
         this.related = related;
         return this;
     }
 }
-
-module.exports = HelpContent;

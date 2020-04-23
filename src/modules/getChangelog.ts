@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
@@ -15,21 +14,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs-extra");
-const path = require("path");
+import fs from "fs-extra";
+import path from "path";
 
-module.exports = async function getChangelog() {
+interface ChangelogVersion {
+    body: string;
+    version: string;
+    date: string;
+}
+
+export default async function getChangelog() {
     const p = path.join(__dirname, "..", "..", "CHANGELOG.md");
-    if (!(await fs.exists(p))) return [];
-
     const file = await fs.readFile(p, "utf8");
 
-    const releases = [];
+    const releases: ChangelogVersion[] = [];
 
-    /** @type {RegExpExecArray} */
-    let match;
-    let version;
-    let date;
+    let match: RegExpExecArray | null;
+    let version: string | undefined;
+    let date: string | undefined;
     let body = "";
 
     for (const line of file.split(/\r?\n/g)) {
@@ -50,4 +52,4 @@ module.exports = async function getChangelog() {
     }
 
     return releases;
-};
+}

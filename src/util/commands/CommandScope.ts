@@ -15,9 +15,8 @@
  */
 
 import Discord from "discord.js";
-import Bitfield from "../../modules/Bitfield";
 
-export default class CommandScope extends Bitfield {
+export default class CommandScope extends Discord.BitField<"GUILD" | "DM"> {
     static hasScope(scope: CommandScope, channel: Discord.Channel): boolean {
         if (!scope.has(CommandScope.FLAGS.GUILD) && channel.type === "text") return false;
         if (!scope.has(CommandScope.FLAGS.DM) && channel.type === "dm") return false;

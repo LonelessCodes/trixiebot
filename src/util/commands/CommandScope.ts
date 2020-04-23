@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,36 +14,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Bitfield = require("../../modules/Bitfield");
+import Discord from "discord.js";
+import Bitfield from "../../modules/Bitfield";
 
-class CommandScope extends Bitfield {
-    /**
-     * @param {CommandScope} scope
-     * @param {*} channel
-     * @returns {boolean}
-     */
-    static hasScope(scope, channel) {
+export default class CommandScope extends Bitfield {
+    static hasScope(scope: CommandScope, channel: Discord.Channel): boolean {
         if (!scope.has(CommandScope.FLAGS.GUILD) && channel.type === "text") return false;
         if (!scope.has(CommandScope.FLAGS.DM) && channel.type === "dm") return false;
         return true;
     }
+
+    static FLAGS = {
+        GUILD: 1 << 0,
+        DM: 1 << 1,
+    };
+
+    /**
+     * Bitfield representing every scope combined
+     */
+    static ALL = CommandScope.FLAGS.DM | CommandScope.FLAGS.GUILD;
+
+    /**
+     * Bitfield representing the default scope
+     */
+    static DEFAULT = CommandScope.FLAGS.GUILD;
 }
-
-CommandScope.FLAGS = {
-    GUILD: 1 << 0,
-    DM: 1 << 1,
-};
-
-/**
- * Bitfield representing every scope combined
- * @type {number}
- */
-CommandScope.ALL = CommandScope.FLAGS.DM | CommandScope.FLAGS.GUILD;
-
-/**
- * Bitfield representing the default scope
- * @type {number}
- */
-CommandScope.DEFAULT = CommandScope.FLAGS.GUILD;
-
-module.exports = CommandScope;

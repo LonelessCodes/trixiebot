@@ -160,7 +160,7 @@ export default class DocumentMapCache<
             if (doc) this._setInternal(key, doc);
         }
 
-        return { ...doc };
+        return doc ? { ...doc } : null;
     }
 
     async has(key: KeyType) {

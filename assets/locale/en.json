@@ -169,7 +169,7 @@
     "doesnt_exist": "❌ That sample doesn't exist"
   },
   "autoban": {
-    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userID/username#0000/glob>`",
+    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userI\\|username#0000\\|glob>`",
     "not_valid_id": "`{{id}}` is not a valid user ID. User IDs contain only digits. U dumbo",
     "added_id": ":police_car: Added `{{id}}` as an ID",
     "added_name": ":police_car: Added `{{name}}`",

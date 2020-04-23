@@ -25,10 +25,10 @@ const bootup_timer = timer();
 import log from "./log";
 const djs_log = log.namespace("discord.js");
 
+import Discord from "discord.js";
 import config from "./config";
 import info from "./info";
 import database from "./modules/db/database";
-import Discord from "discord.js";
 import Core from "./core/Core";
 import bannerPrinter from "./util/banner/bannerPrinter";
 

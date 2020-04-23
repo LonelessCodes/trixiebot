@@ -23,7 +23,7 @@ const IPCServerAdapter = require("trixie-ipc/IPCServerAdapter");
 ipc.config.silent = true;
 ipc.config.id = info.DEV ? "trixiedev" : "trixiebot";
 ipc.config.retry = 1000;
-ipc.config.logger = log.bind(log);
+ipc.config.logger = log;
 
 ipc.serve();
 

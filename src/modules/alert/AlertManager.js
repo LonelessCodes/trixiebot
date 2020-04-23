@@ -18,7 +18,7 @@ const Discord = require("discord.js");
 const { EventEmitter } = require("events");
 
 // eslint-disable-next-line no-unused-vars
-const LocaleManager = require("../../core/managers/LocaleManager");
+const LocaleManager = require("../../core/managers/LocaleManager").default;
 const Translation = require("../i18n/Translation").default;
 
 // eslint-disable-next-line no-unused-vars

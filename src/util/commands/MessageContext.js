@@ -20,7 +20,7 @@ const { TextChannel, Message } = require("discord.js");
 const MessageMentions = require("./MessageMentions");
 const AudioManager = require("../../core/managers/AudioManager");
 // eslint-disable-next-line no-unused-vars
-const LocaleManager = require("../../core/managers/LocaleManager");
+const LocaleManager = require("../../core/managers/LocaleManager").default;
 // eslint-disable-next-line no-unused-vars
 const { I18nLocale } = require("../../modules/i18n/I18n");
 // eslint-disable-next-line no-unused-vars

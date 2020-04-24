@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,10 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const CalendarRange = require("./CalendarRange");
-const CalendarStatus = require("./CalendarStatus");
+import CalendarRange from "./CalendarRange";
+import CalendarStatus from "./CalendarStatus";
 
-module.exports = [
+export default [
     // 0-24 Oct. 31th
     new CalendarStatus(new CalendarRange("0 0 0  31 9  *", "0 0 0 1 10  *"), "Happy Halloween!"),
     // 0:00 25th - 24:00 26th Dec

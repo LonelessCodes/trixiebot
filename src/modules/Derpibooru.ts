@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,40 +14,91 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const INFO = require("../info").default;
-const random = require("../modules/random/secureRandom").default;
-const qs = require("querystring");
-const fetch = require("node-fetch");
+import INFO from "../info";
+import random from "./random/secureRandom";
+import { stringify } from "querystring";
+import fetch from "node-fetch";
 
-class Derpibooru {
-    constructor(key) {
+interface Params {
+    [key: string]: string | number | boolean | undefined;
+}
+
+interface ImageResponse {
+    images: Image[];
+    interactions: any[];
+    total: number;
+}
+
+interface Image {
+    aspect_ratio: number;
+    comment_count: number;
+    created_at: string;
+    deletion_reason: string | null;
+    description: string;
+    downvotes: number;
+    duplicate_of: number | null;
+    faves: number;
+    first_seen_at: string;
+    format: string;
+    height: number;
+    hidden_from_users: boolean;
+    id: number;
+    intensities: { ne: number; nw: number; se: number; sw: number } | null;
+    mime_type: "image/gif" | "image/jpeg" | "image/png" | "image/svg+xml" | "video/webm";
+    name: string;
+    orig_sha512_hash: string;
+    processed: boolean;
+    representations: {
+        [Key in "full" | "large" | "medium" | "small" | "tall" | "thumb" | "thumb_small" | "thumb_tiny"]: string;
+    };
+    score: number;
+    sha512_hash: string;
+    source_url: string;
+    spoilered: boolean;
+    tag_count: number;
+    tag_ids: number[];
+    tags: string[];
+    thumbnails_generated: boolean;
+    updated_at: string;
+    uploader: string | null;
+    uploader_id: number | null;
+    upvotes: number;
+    view_url: string;
+    width: number;
+    wilson_score: number;
+}
+
+export default class Derpibooru {
+    public key: string;
+
+    constructor(key: string) {
         this.key = key;
     }
 
-    random(tags) {
+    random(tags: string[]) {
         return Derpibooru.random(this.key, tags);
     }
 
-    search(tags, params = {}) {
+    search(tags: string[], params: Params = {}) {
         return Derpibooru.search(this.key, tags, params);
     }
 
-    fetch(scope, params) {
+    fetch(scope: string, params: Params) {
         return Derpibooru.fetch(this.key, scope, params);
     }
 
-    searchAll(tags, params = {}) {
+    searchAll(tags: string[], params: Params = {}) {
         return this.fetchAll("search/images", {
             q: Derpibooru.encodeTags(tags),
             ...params,
         });
     }
 
-    fetchAll(scope, params) {
+    fetchAll(scope: string, params: Params) {
         return Derpibooru.fetchAll(this.key, scope, params);
     }
 
-    static async random(key, tags) {
+    static async random(key: string, tags: string[]) {
         const result = await Derpibooru.search(key, tags, { per_page: 1 });
         if (!result.total) return;
 
@@ -63,14 +114,14 @@ class Derpibooru {
         return response.images && response.images[0];
     }
 
-    static search(key, tags, params = {}) {
+    static search(key: string, tags: string[], params: Params = {}) {
         return Derpibooru.fetch(key, "search/images", {
             q: Derpibooru.encodeTags(tags),
             ...params,
-        });
+        }) as Promise<ImageResponse>;
     }
 
-    static async fetch(key, scope, params = {}) {
+    static async fetch(key: string, scope: string, params: Params = {}) {
         const path = scope.replace(/:([\w_]+)/, (s, name) => {
             if (typeof params[name] !== "undefined") {
                 const val = String(params[name]);
@@ -79,7 +130,7 @@ class Derpibooru {
             }
             return s;
         });
-        const url = `${Derpibooru.BASE}${path}?${qs.stringify({ key, ...params })}`;
+        const url = `${Derpibooru.BASE}${path}?${stringify({ key, ...params })}`;
 
         return await fetch(url, {
             timeout: 10000,
@@ -89,7 +140,7 @@ class Derpibooru {
         }).then(request => request.json());
     }
 
-    static async fetchAll(key, scope, params = {}) {
+    static async fetchAll(key: string, scope: string, params: Params & { sf?: string; sd?: "asc" | "desc" } = {}) {
         if (scope !== "search/images") throw new Error("Scope of other than 'search' is not supported");
         if (!params["q"]) throw new Error("Search criteria must be specified");
         if (typeof params["start_at"] !== "string") throw new TypeError("params.start_at must be set!");
@@ -98,10 +149,10 @@ class Derpibooru {
         let last_val = params["start_at"];
         delete params["start_at"];
 
-        const sf = params.sf;
-        const sd = params.sd;
+        const sf = params.sf || "id";
+        const sd = params.sd || "asc";
 
-        let results = [];
+        let results: Image[] = [];
         let total = 0;
 
         do {
@@ -114,7 +165,8 @@ class Derpibooru {
             if (result.images.length === 0) break;
 
             if (sd === "asc") {
-                if (!(sf in result.images[result.images.length - 1])) throw new Error("param.sf '" + sf + "' does not exist on image object");
+                if (!(sf in result.images[result.images.length - 1]))
+                    throw new Error("param.sf '" + sf + "' does not exist on image object");
 
                 last_val = String(result.images[result.images.length - 1][sf]);
             } else {
@@ -129,11 +181,11 @@ class Derpibooru {
         return results;
     }
 
-    static encodeTags(tags) {
+    static encodeTags(tags: string[]) {
         return tags.join(",");
     }
 
-    static getArtists(tags) {
+    static getArtists(tags: string | string[]) {
         const artists = [];
         const arr = typeof tags === "string" ? tags.split(/,\s*/g) : tags;
         for (const tag of arr) {
@@ -143,7 +195,6 @@ class Derpibooru {
         }
         return artists;
     }
-}
-Derpibooru.BASE = "https://derpibooru.org/api/v1/json/";
 
-module.exports = Derpibooru;
+    static BASE = "https://derpibooru.org/api/v1/json/";
+}

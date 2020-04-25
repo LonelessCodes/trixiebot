@@ -77,6 +77,6 @@ If you're going to edit the code, make sure you're using a proper IDE for code e
 
 TrixieBot is licensed under the [GNU General Public License v3.0](LICENSE)
 
-Copyright (C) 2018-2019 Christian Schäfer / Loneless
+Copyright (C) 2018-2020 Christian Schäfer / Loneless
 
 `Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.`

@@ -25,3 +25,8 @@ export function immediate(): Promise<void> {
 export function tick(): Promise<void> {
     return new Promise(res => process.nextTick(res));
 }
+
+// a function to better deal with Promise.catch() of errors we don't care about
+export function doNothing() {
+    // Do nothing
+}

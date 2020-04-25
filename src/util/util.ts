@@ -59,8 +59,8 @@ export function userToString(user: UserResolvable, plain_text = false) {
     return plain_text ? `${user.username}#${user.discriminator}` : `**${user.username}** #${user.discriminator}`;
 }
 
-export function basicEmbed(title: string, user: UserResolvable, color: number): Discord.MessageEmbed;
-export function basicEmbed(title: string, user: Discord.Guild, color: number): Discord.MessageEmbed;
+export function basicEmbed(title: string, user: UserResolvable, color?: number): Discord.MessageEmbed;
+export function basicEmbed(title: string, user: Discord.Guild, color?: number): Discord.MessageEmbed;
 export function basicEmbed(title: string, user: UserResolvable | Discord.Guild, color = CONST.COLOR.PRIMARY) {
     if (user instanceof Discord.Guild)
         return new Discord.MessageEmbed()

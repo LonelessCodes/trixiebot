@@ -16,35 +16,59 @@
 
 const credits = require("../CreditsManager");
 const Translation = require("../../../modules/i18n/Translation").default;
-const TranslationMerge = require("../../../modules/i18n/TranslationMerge").default;
+const TranslationMerge = require("../../../modules/i18n/TranslationMerge.ts").default;
 
-async function purchaseSlots(context, activeList, cooldown, cost, success, handler = async () => { /* Do nothing */ }) {
+async function purchaseSlots(
+    context,
+    activeList,
+    cooldown,
+    cost,
+    success,
+    handler = async () => {
+        /* Do nothing */
+    }
+) {
     const name = await credits.getName(context.guild);
 
-    if (!await credits.canPurchase(context.author, cost)) {
-        return new Translation("bank.not_enough", ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**.", {
-            name, money: credits.getBalanceTrans(cost, name),
-        });
+    if (!(await credits.canPurchase(context.author, cost))) {
+        return new Translation(
+            "bank.not_enough",
+            ":atm: You don't have enough {{name}} to buy more slots! You need **{{money}}**.",
+            {
+                name,
+                money: credits.getBalanceTrans(cost, name),
+            }
+        );
     }
 
-    await context.send(new Translation("bank.action", ":atm: The new slot will cost you **{{money}}**. Type either `buy` or `cancel`", {
-        money: credits.getBalanceTrans(cost, name),
-    }));
+    await context.send(
+        new Translation("bank.action", ":atm: The new slot will cost you **{{money}}**. Type either `buy` or `cancel`", {
+            money: credits.getBalanceTrans(cost, name),
+        })
+    );
 
     activeList.add(context.author.id);
 
     try {
-        const messages = await context.channel.awaitMessages(m => /^(buy|cancel)$/i.test(m.content) && m.author.id === context.author.id, {
-            max: 1, time: 60000, errors: ["time"],
-        });
+        const messages = await context.channel.awaitMessages(
+            m => /^(buy|cancel)$/i.test(m.content) && m.author.id === context.author.id,
+            {
+                max: 1,
+                time: 60000,
+                errors: ["time"],
+            }
+        );
 
         const m = messages.first();
         if (/^buy$/i.test(m.content)) {
             cooldown.testAndAdd(context.author.id);
 
-            if (!await credits.canPurchase(context.author, cost)) {
+            if (!(await credits.canPurchase(context.author, cost))) {
                 activeList.delete(context.author.id);
-                return new Translation("bank.unexpected_drop", ":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/");
+                return new Translation(
+                    "bank.unexpected_drop",
+                    ":atm: Somehow your balance went down during the wait to a level where you cannot aford this anymore :/"
+                );
             }
 
             const new_balance = await handler(cost);
@@ -52,7 +76,9 @@ async function purchaseSlots(context, activeList, cooldown, cost, success, handl
             activeList.delete(context.author.id);
             return new TranslationMerge(
                 success || new Translation("bank.payment_success", ":atm: 'Aight! There you go."),
-                new Translation("bank.payment_new_balance", "(:yen: new account balance: **{{money}}**)", { money: credits.getBalanceTrans(new_balance, name) })
+                new Translation("bank.payment_new_balance", "(:yen: new account balance: **{{money}}**)", {
+                    money: credits.getBalanceTrans(new_balance, name),
+                })
             );
         }
 

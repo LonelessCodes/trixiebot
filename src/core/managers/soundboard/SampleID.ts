@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { customAlphabet } = require("nanoid");
+import { customAlphabet } from "nanoid";
 
-class SampleID {
+export default class SampleID {
     /**
      * Checks if a string is a valid SampleID string
      * @param {string} id
      * @returns {boolean}
      */
-    static isId(id) {
+    static isId(id: string): boolean {
         return SampleID.REGEX.test(id);
     }
 
     static generate() {
         return SampleID.PREFIX + SampleID.nanoid();
     }
-}
-SampleID.PREFIX = "i";
-SampleID.CHARSET = "0123456789abcdefghijklmnopqrstuvwxyz";
-SampleID.LENGTH = 6;
-SampleID.REGEX = new RegExp(`^${SampleID.PREFIX}[${SampleID.CHARSET}]{${SampleID.LENGTH}}$`);
-SampleID.nanoid = customAlphabet(SampleID.CHARSET, SampleID.LENGTH);
 
-module.exports = SampleID;
+    static PREFIX = "i";
+    static CHARSET = "0123456789abcdefghijklmnopqrstuvwxyz";
+    static LENGTH = 6;
+    static REGEX = new RegExp(`^${SampleID.PREFIX}[${SampleID.CHARSET}]{${SampleID.LENGTH}}$`);
+    static nanoid = customAlphabet(SampleID.CHARSET, SampleID.LENGTH);
+}

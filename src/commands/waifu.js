@@ -28,15 +28,15 @@ const TreeCommand = require("../core/commands/TreeCommand");
 const HelpContent = require("../util/commands/HelpContent");
 const Category = require("../util/commands/Category");
 const RateLimiter = require("../util/commands/RateLimiter");
-const MessageMentions = require("../util/commands/MessageMentions");
 const TimeUnit = require("../modules/TimeUnit");
+const MessageMentions = require("../util/discord/MessageMentions").default;
 
 const Translation = require("../modules/i18n/Translation").default;
 const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 const TranslationEmbed = require("../modules/i18n/TranslationEmbed").default;
 
 async function getData(message, content, database, databaseSlots) {
-    const mentions = content ? new MessageMentions(content, message.guild) : null;
+    const mentions = content ? new MessageMentions(content, message) : null;
     const mentioned_member = mentions ? mentions.members.first() : null;
 
     const all_waifus = await database.find({ guildId: message.guild.id }).toArray();

@@ -27,7 +27,7 @@ const HelpContent = require("../../util/commands/HelpContent");
 const CommandPermission = require("../../util/commands/CommandPermission");
 const CommandScope = require("../../util/commands/CommandScope");
 const Category = require("../../util/commands/Category");
-const MessageMentions = require("../../util/commands/MessageMentions");
+const MessageMentions = require("../../util/discord/MessageMentions").default;
 
 /** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
 const timeout_notices = {};
@@ -204,7 +204,7 @@ module.exports = function install(cr, { db }) {
                 return new Translation("timeout.at_least", "At least two arguments are required: duration and @user");
             }
 
-            let members = new MessageMentions(args[1], message.guild).members;
+            let members = new MessageMentions(args[1], message).members;
 
             if (members.has(message.member.id)) {
                 return new Translation("timeout.not_yourself", "You cannot timeout yourself, dummy!");

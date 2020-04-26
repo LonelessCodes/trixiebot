@@ -16,17 +16,17 @@
 
 const log = require("../log").default.namespace("processor");
 const INFO = require("../info").default;
-const { splitArgs } = require("../util/string").default;
+const { splitArgs } = require("../util/string");
 const stats = require("../modules/stats");
 const guild_stats = require("./managers/GuildStatsManager");
-const ErrorCaseManager = require("./managers/ErrorCaseManager");
+const ErrorCaseManager = require("./managers/ErrorCaseManager").default;
 const CommandRegistry = require("./CommandRegistry");
 const CommandDispatcher = require("./CommandDispatcher");
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("./managers/ConfigManager");
 // eslint-disable-next-line no-unused-vars
-const LocaleManager = require("./managers/LocaleManager");
-const MessageContext = require("../util/commands/MessageContext");
+const LocaleManager = require("./managers/LocaleManager").default;
+const MessageContext = require("../util/commands/MessageContext").default;
 const timer = require("../modules/timer").default;
 const Discord = require("discord.js");
 
@@ -147,7 +147,15 @@ class CommandProcessor {
         const [command_name_raw, content] = prefix_used ? splitArgs(raw_content, 2) : ["", raw_content];
         const command_name = command_name_raw.toLowerCase();
 
-        const ctx = new MessageContext(message, this.locale, config, content, prefix, prefix_used, received_at);
+        const ctx = new MessageContext({
+            message: message,
+            locale: this.locale,
+            config: config,
+            content: content,
+            prefix: prefix,
+            prefix_used: prefix_used,
+            received_at: received_at,
+        });
 
         const executed = await this.DISPATCHER.process(ctx, command_name);
         if (!executed) return;

@@ -17,8 +17,8 @@
 
 // eslint-disable-next-line no-unused-vars
 const { TextChannel, Message } = require("discord.js");
-const AudioManager = require("../../core/managers/AudioManager");
 const MessageMentions = require("./MessageMentions").default;
+const AudioManager = require("../../core/managers/AudioManager").default;
 // eslint-disable-next-line no-unused-vars
 const LocaleManager = require("../../core/managers/LocaleManager").default;
 // eslint-disable-next-line no-unused-vars

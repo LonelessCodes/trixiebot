@@ -61,7 +61,7 @@ export default class SampleUploader extends EventEmitter {
     guild: Discord.Guild | undefined;
     status: Translation;
 
-    constructor(public manager: typeof import("../SoundboardManager"), user?: Discord.User | Discord.Guild | null) {
+    constructor(public manager: import("../SoundboardManager"), user?: Discord.User | Discord.Guild | null) {
         super();
 
         if (user instanceof Discord.User) {
@@ -115,7 +115,7 @@ export default class SampleUploader extends EventEmitter {
 
         switch (this.scope) {
             case "user":
-                if (await this.manager.getSampleUser(this.user, name)) {
+                if (await this.manager.getSampleUser(this.user!, name)) {
                     throw new Translation(
                         "sb.error.user_clip_exists",
                         "You already have a soundclip with that name in your soundboard"
@@ -123,7 +123,7 @@ export default class SampleUploader extends EventEmitter {
                 }
                 break;
             case "guild":
-                if (await this.manager.getSampleGuild(this.guild, name)) {
+                if (await this.manager.getSampleGuild(this.guild!, name)) {
                     throw new Translation(
                         "sb.error.guild_clip_exists",
                         "You already have a soundclip with that name in this server's soundboard"
@@ -238,7 +238,7 @@ export default class SampleUploader extends EventEmitter {
             let pending = 5;
             while (pending-- >= 0) {
                 id = SampleID.generate();
-                const exists = await this.manager.samples.then(db => db.findOne({ id }));
+                const exists = await this.manager.samples.findOne({ id });
                 if (exists) id = undefined;
                 else break;
             }
@@ -342,45 +342,39 @@ export default class SampleUploader extends EventEmitter {
         this._setStatus(new Translation("sb.saving", "Saving to database and finishing up..."));
 
         if (sample instanceof UserSample) {
-            await this.manager.samples.then(db =>
-                db.insertOne({
-                    id: sample.id,
-                    name: sample.name,
-                    filename: sample.filename,
-                    creator: sample.creator,
-                    scope: "user",
-                    owners: sample.owners,
-                    guilds: sample.guilds,
-                    plays: sample.plays,
-                    created_at: sample.created_at,
-                    modified_at: sample.modified_at,
-                })
-            );
+            await this.manager.samples.insertOne({
+                id: sample.id,
+                name: sample.name,
+                filename: sample.filename,
+                creator: sample.creator,
+                scope: "user",
+                owners: sample.owners,
+                guilds: sample.guilds,
+                plays: sample.plays,
+                created_at: sample.created_at,
+                modified_at: sample.modified_at,
+            });
         } else if (sample instanceof GuildSample) {
-            await this.manager.samples.then(db =>
-                db.insertOne({
-                    id: sample.id,
-                    name: sample.name,
-                    filename: sample.filename,
-                    guild: sample.guild,
-                    scope: "guild",
-                    owners: sample.owners,
-                    guilds: sample.guilds,
-                    plays: sample.plays,
-                    created_at: sample.created_at,
-                    modified_at: sample.modified_at,
-                })
-            );
+            await this.manager.samples.insertOne({
+                id: sample.id,
+                name: sample.name,
+                filename: sample.filename,
+                guild: sample.guild,
+                scope: "guild",
+                owners: sample.owners,
+                guilds: sample.guilds,
+                plays: sample.plays,
+                created_at: sample.created_at,
+                modified_at: sample.modified_at,
+            });
         } else {
-            await this.manager.predefined.then(db =>
-                db.insertOne({
-                    name: sample.name,
-                    filename: sample.filename,
-                    plays: sample.plays,
-                    created_at: sample.created_at,
-                    modified_at: sample.modified_at,
-                })
-            );
+            await this.manager.predefined.insertOne({
+                name: sample.name,
+                filename: sample.filename,
+                plays: sample.plays,
+                created_at: sample.created_at,
+                modified_at: sample.modified_at,
+            });
             this.manager.predefined_samples = Promise.resolve([...(await this.manager.predefined_samples), sample]);
         }
 

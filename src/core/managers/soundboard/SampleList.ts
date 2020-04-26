@@ -195,9 +195,11 @@ export default class SampleList extends EventEmitter {
         );
 
         collector.on("end", (collected, reason) => {
-            if (reason === "time" || collected.size === 0) return this.end(message);
+            if (reason === "time") return this.end(message);
+            const reaction = collected.first();
+            if (!reaction) return this.end(message);
 
-            this.handleMessageReactionAddAction(collected.first()!, message);
+            this.handleMessageReactionAddAction(reaction, message);
         });
     }
 

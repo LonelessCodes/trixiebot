@@ -20,19 +20,19 @@
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const RateLimiter = require("../util/commands/RateLimiter");
-const TimeUnit = require("../modules/TimeUnit");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const RateLimiter = require("../util/commands/RateLimiter").default;
+const TimeUnit = require("../modules/TimeUnit").default;
 
-const soundboard = require("../core/managers/SoundboardManager");
-const SampleID = require("../core/managers/soundboard/SampleID");
-const SampleList = require("../core/managers/soundboard/SampleList");
-const AudioManager = require("../core/managers/AudioManager");
+const SoundboardManager = require("../core/managers/SoundboardManager");
+const SampleID = require("../core/managers/soundboard/SampleID").default;
+const SampleList = require("../core/managers/soundboard/SampleList").default;
+const { default: AudioManager, AudioConnectError } = require("../core/managers/AudioManager");
 const credits = require("../core/managers/CreditsManager");
 const moment = require("moment");
 const { userToString } = require("../util/util");
-const { toHumanTime } = require("../util/time").default;
+const { toHumanTime } = require("../util/time");
 const log = require("../log").default.namespace("sb cmd");
 const CONST = require("../const").default;
 const Discord = require("discord.js");
@@ -61,13 +61,19 @@ class ChooseCommand extends TreeCommand {
     pre() { /* Do nothing */ }
 }
 
-module.exports = function install(cr, { locale }) {
-    const sbCmd = cr.registerCommand("sb", new TreeCommand)
-        .setHelp(new HelpContent()
-            .setDescription("Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well.")
-            .setUsage("<?sound name|id>", "Play a soundie of the one's available for you in this server")
-            .addParameterOptional("sound name", "sound name to play. If omitted, shows list of all available soundclips")
-            .addParameterOptional("id", "sound clip id to play instead of sound name"))
+module.exports = function install(cr, { db, locale }) {
+    const soundboard = new SoundboardManager(db);
+    const sbCmd = cr
+        .registerCommand("sb", new TreeCommand())
+        .setHelp(
+            new HelpContent()
+                .setDescription(
+                    "Trixie's own soundboard! OOF. There are user soundboards and server soundboards. Means every server can have a local soundboard and every user their own soundboard with sound clips as well."
+                )
+                .setUsage("<?sound name|id>", "Play a soundie of the one's available for you in this server")
+                .addParameterOptional("sound name", "sound name to play. If omitted, shows list of all available soundclips")
+                .addParameterOptional("id", "sound clip id to play instead of sound name")
+        )
         .setCategory(Category.AUDIO);
 
     sbCmd.registerDefaultCommand(new OverloadCommand)

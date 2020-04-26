@@ -22,27 +22,27 @@ import { Collection } from "mongodb";
 export interface SampleOptions {
     name: string;
     plays: number;
-    filename: string;
+    filename: string | undefined;
     created_at: Date;
     modified_at: Date;
-    last_played_at: Date;
+    last_played_at?: Date | undefined;
 }
 
 export abstract class Sample {
     readonly importable: boolean = false;
 
-    manager: typeof import("../SoundboardManager");
-    db: Promise<Collection>;
+    manager: import("../SoundboardManager");
+    db: Collection;
 
-    id: string | null = null;
+    id: string | undefined;
     name: string;
     plays: number;
-    filename: string;
+    filename: string | undefined;
     created_at: Date;
     modified_at: Date;
-    last_played_at: Date;
+    last_played_at: Date | undefined;
 
-    constructor(manager: typeof import("../SoundboardManager"), doc: SampleOptions) {
+    constructor(manager: import("../SoundboardManager"), doc: SampleOptions) {
         this.manager = manager;
 
         this.db = manager.samples;
@@ -71,7 +71,7 @@ export abstract class Sample {
 export class PredefinedSample extends Sample {
     readonly importable = false;
 
-    constructor(manager: typeof import("../SoundboardManager"), doc: SampleOptions) {
+    constructor(manager: import("../SoundboardManager"), doc: SampleOptions) {
         super(manager, doc);
 
         this.db = manager.predefined;
@@ -83,7 +83,7 @@ export class PredefinedSample extends Sample {
 
     async play(connection: Discord.VoiceConnection) {
         const dispatcher = this._play(connection);
-        await this.db.then(db => db.updateOne({ name: this.name }, { $inc: { plays: 1 }, $set: { last_played_at: new Date() } }));
+        await this.db.updateOne({ name: this.name }, { $inc: { plays: 1 }, $set: { last_played_at: new Date() } });
         return dispatcher;
     }
 
@@ -108,7 +108,7 @@ export abstract class CustomSample extends Sample {
     owners: string[];
     guilds: string[];
 
-    constructor(manager: typeof import("../SoundboardManager"), doc: CustomSampleOptions) {
+    constructor(manager: import("../SoundboardManager"), doc: CustomSampleOptions) {
         super(manager, doc);
 
         this.id = doc.id;
@@ -122,7 +122,7 @@ export abstract class CustomSample extends Sample {
 
     async play(connection: Discord.VoiceConnection) {
         const dispatcher = this._play(connection);
-        await this.db.then(db => db.updateOne({ id: this.id }, { $inc: { plays: 1 }, $set: { last_played_at: new Date() } }));
+        await this.db.updateOne({ id: this.id }, { $inc: { plays: 1 }, $set: { last_played_at: new Date() } });
         return dispatcher;
     }
 
@@ -141,7 +141,7 @@ export interface UserSampleOptions extends CustomSampleOptions {
 export class UserSample extends CustomSample {
     creator: string;
 
-    constructor(manager: typeof import("../SoundboardManager"), doc: UserSampleOptions) {
+    constructor(manager: import("../SoundboardManager"), doc: UserSampleOptions) {
         super(manager, doc);
 
         this.creator = doc.creator;
@@ -159,7 +159,7 @@ export interface GuildSampleOptions extends CustomSampleOptions {
 export class GuildSample extends CustomSample {
     guild: string;
 
-    constructor(manager: typeof import("../SoundboardManager"), doc: GuildSampleOptions) {
+    constructor(manager: import("../SoundboardManager"), doc: GuildSampleOptions) {
         super(manager, doc);
 
         this.guild = doc.guild;

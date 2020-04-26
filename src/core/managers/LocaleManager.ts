@@ -31,7 +31,7 @@ export interface LocaleConfig {
 
 export type ResolvableMessageOptions =
     | Discord.MessageOptions
-    | (Except<Discord.MessageOptions, "content"> & {
+    | (Discord.MessageOptions & {
           embed?: Discord.MessageEmbed | Discord.MessageEmbedOptions | TranslationEmbed;
           content?: Resolvable<string>;
       });
@@ -135,7 +135,7 @@ export default class LocaleManager {
         }
 
         if (options.content) content = options.content;
-        if (content && content instanceof ResolvableObject) {
+        if (content instanceof ResolvableObject) {
             content = content.resolve(translator || (translator = await this.translator(ch)));
         }
 
@@ -157,16 +157,15 @@ export default class LocaleManager {
             | ResolvableMessageEditOptions
             | ResolvableMessageEditAdditions
     ): Promise<Discord.MessageOptions | Discord.MessageEditOptions> {
-        if (typeof options === "undefined") {
-            if (
-                !((content instanceof ResolvableObject && !(content instanceof TranslationEmbed)) || typeof content === "string")
-            ) {
-                options = content;
-                content = undefined;
-            }
-
-            options = {};
+        if (
+            typeof options === "undefined" &&
+            typeof content !== "string" &&
+            !(content instanceof ResolvableObject && !(content instanceof TranslationEmbed))
+        ) {
+            options = content;
+            content = undefined;
         }
+        if (typeof options === "undefined") options = {};
 
         // MessageAdditions
         if (Array.isArray(options)) {

@@ -14,28 +14,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import random from "random-number-csprng";
-
-export default async function secureRandom(): Promise<number>;
-export default async function secureRandom(num: number): Promise<number>;
-export default async function secureRandom<T>(arr: T[]): Promise<T>;
-export default async function secureRandom(from: number, to: number): Promise<number>;
-export default async function secureRandom<T>(...args: T[]): Promise<number | T> {
+export default function random(): number;
+export default function random(num: number): number;
+export default function random<T>(arr: T[]): T;
+export default function random(from: number, to: number): number;
+export default function random<T>(...args: T[]): number | T {
     if (args.length === 0) {
-        return (await random(0, 99)) / 100;
+        return Math.random();
     } else if (args.length === 1) {
         const param = args[0];
         if (typeof param === "number") {
-            return param <= 1 ? 0 : await random(0, param - 1);
+            return param <= 1 ? 0 : Math.random() * param;
         } else if (param instanceof Array) {
-            return param.length <= 1 ? param[0] : param[await random(0, param.length - 1)];
+            return param.length <= 1 ? param[0] : param[Math.floor(Math.random() * param[0].length)];
         }
         throw new TypeError("First argument should be number or Array");
     } else if (args.length === 2) {
         const from = args[0];
         const to = args[1];
         if (args.length === 2 && typeof from === "number" && typeof to === "number") {
-            return from === to || from === to - 1 ? 0 : await random(from, to - 1);
+            // eslint-disable-next-line no-mixed-operators
+            return from === to || from === to - 1 ? 0 : Math.random() * (to - from) + from;
         }
     }
     throw new TypeError("Passed arguments match none of the overloads");

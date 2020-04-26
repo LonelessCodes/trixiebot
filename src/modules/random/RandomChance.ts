@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,29 +14,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const secureRandom = require("../random/secureRandom").default;
+import secureRandom from "./secureRandom";
 
-class RandomChance {
-    constructor() {
-        this.array = [];
-    }
+export default class RandomChance<T> {
+    array: T[] = [];
 
     /**
      * Add items to the chances
      * @param {any} item
      * @param {number} distribution
+     * @returns {RandomChance<T>}
      */
-    add(item, distribution = 1) {
+    add(item: T, distribution: number = 1): this {
         for (let i = 0; i < distribution; i++) this.array.push(item);
+        return this;
     }
 
     /**
      * Pick a random item from the chances list
-     * @returns {Promise<any>}
+     * @returns {Promise<T>}
      */
-    random() {
+    random(): Promise<T> {
         return secureRandom(this.array);
     }
 }
-
-module.exports = RandomChance;

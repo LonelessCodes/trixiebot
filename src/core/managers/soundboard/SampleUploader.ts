@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,38 +14,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { toHumanTime } = require("../../../util/time");
-const { promisify } = require("util");
-const path = require("path");
-const tmp = require("tmp");
-const fs = require("fs-extra");
-// const prism = require("prism-media");
-// const ogg = require("ogg");
-const ffmpeg = require("fluent-ffmpeg");
+import { toHumanTime } from "../../../util/time";
+import { promisify } from "util";
+import path from "path";
+import tmp from "tmp";
+import fs from "fs-extra";
+import ffmpeg from "fluent-ffmpeg";
 const ffprobe = promisify(ffmpeg.ffprobe);
-const mime = require("mime");
-const fetch = require("node-fetch");
-const readChunk = require("read-chunk");
-const fileType = require("file-type");
-const { isEnoughDiskSpace } = require("../../../util/files");
-// eslint-disable-next-line no-unused-vars
-const { User, Guild, MessageAttachment } = require("discord.js");
-const Events = require("events");
+import mime from "mime";
+import fetch from "node-fetch";
+import readChunk from "read-chunk";
+import fileType from "file-type";
+import { isEnoughDiskSpace } from "../../../util/files";
+import Discord from "discord.js";
+import { EventEmitter } from "events";
 
-const SampleID = require("./SampleID");
-// eslint-disable-next-line no-unused-vars
-const { Sample, UserSample, GuildSample, PredefinedSample } = require("./Sample");
+import SampleID from "./SampleID";
+import { UserSample, GuildSample, PredefinedSample } from "./Sample";
 
-const Translation = require("../../../modules/i18n/Translation").default;
-const ListFormat = require("../../../modules/i18n/ListFormat").default;
+import Translation from "../../../modules/i18n/Translation";
+import ListFormat from "../../../modules/i18n/ListFormat";
 
 tmp.setGracefulCleanup();
 
 class Type {
-    /**
-     * @param {string} mime_type
-     */
-    constructor(mime_type) {
+    mime: string | null;
+    ext: string | null;
+
+    constructor(mime_type: string) {
         if (mime_type.split("/").length === 1) {
             this.mime = mime.getType(mime_type);
             this.ext = mime_type;
@@ -55,44 +51,44 @@ class Type {
         }
     }
 
-    matches(extname) {
+    matches(extname: string) {
         return this.mime === mime.getType(extname);
     }
 }
 
-class SampleUploader extends Events {
-    /**
-     * @param {SoundboardManager} manager
-     * @param {User|Guild} user
-     */
-    constructor(manager, user) {
+export default class SampleUploader extends EventEmitter {
+    user: Discord.User | undefined;
+    guild: Discord.Guild | undefined;
+    status: Translation;
+
+    constructor(public manager: typeof import("../SoundboardManager"), user?: Discord.User | Discord.Guild | null) {
         super();
 
-        this.manager = manager;
-        if (user instanceof User) {
+        if (user instanceof Discord.User) {
             this.user = user;
-            this.scope = "user";
-        } else if (user instanceof Guild) {
+        } else if (user instanceof Discord.Guild) {
             this.guild = user;
-            this.scope = "guild";
-        } else if (user == null) {
-            this.scope = "predefined";
         }
         this.status = new Translation("sb.checking", "Checking data...");
     }
 
-    _setStatus(status) {
+    get scope(): "user" | "guild" | "predefined" {
+        if (this.user) return "user";
+        if (this.guild) return "guild";
+        return "predefined";
+    }
+
+    private _setStatus(status: Translation) {
         this.status = status;
         this.emit("statusChange", status);
     }
 
-    /**
-     * @param {MessageAttachment} attachment
-     * @param {string} name
-     */
-    async upload(attachment, name) {
-        if (!await isEnoughDiskSpace()) {
-            throw new Translation("sb.error.out_of_space", "Trixie cannot accept any more uploads, as I'm running out of disk space");
+    async upload(attachment: Discord.MessageAttachment, name: string) {
+        if (!(await isEnoughDiskSpace())) {
+            throw new Translation(
+                "sb.error.out_of_space",
+                "Trixie cannot accept any more uploads, as I'm running out of disk space"
+            );
         }
 
         if (!attachment) {
@@ -104,23 +100,34 @@ class SampleUploader extends Events {
         }
 
         if (name.length < 2 || name.length > 24) {
-            throw new Translation("sb.error.name_out_range", "The name for the soundclip should be between (incl) 2 and 24 characters!");
+            throw new Translation(
+                "sb.error.name_out_range",
+                "The name for the soundclip should be between (incl) 2 and 24 characters!"
+            );
         }
 
-        // eslint-disable-next-line no-useless-escape
-        if (!/^[a-zA-Z0-9 .,_\-]*$/.test(name)) {
-            throw new Translation("sb.error.invalid_name", "Please only use common characters A-Z, 0-9, .,_- in sound sample names ;c;");
+        if (!/^[a-zA-Z0-9 .,_-]*$/.test(name)) {
+            throw new Translation(
+                "sb.error.invalid_name",
+                "Please only use common characters A-Z, 0-9, .,_- in sound sample names ;c;"
+            );
         }
 
         switch (this.scope) {
             case "user":
                 if (await this.manager.getSampleUser(this.user, name)) {
-                    throw new Translation("sb.error.user_clip_exists", "You already have a soundclip with that name in your soundboard");
+                    throw new Translation(
+                        "sb.error.user_clip_exists",
+                        "You already have a soundclip with that name in your soundboard"
+                    );
                 }
                 break;
             case "guild":
                 if (await this.manager.getSampleGuild(this.guild, name)) {
-                    throw new Translation("sb.error.guild_clip_exists", "You already have a soundclip with that name in this server's soundboard");
+                    throw new Translation(
+                        "sb.error.guild_clip_exists",
+                        "You already have a soundclip with that name in this server's soundboard"
+                    );
                 }
                 break;
             case "predefined":
@@ -130,8 +137,8 @@ class SampleUploader extends Events {
                 break;
         }
 
-        const extname = path.extname(attachment.name);
-        if (!SampleUploader.isSupportedExt(extname)) {
+        const extname = attachment.name ? path.extname(attachment.name) : undefined;
+        if (extname && !SampleUploader.isSupportedExt(extname)) {
             throw new Translation(
                 "sb.error.unsupported",
                 "{{extname}} files are not supported at this time. Try uploading {{supported}} files.",
@@ -140,17 +147,27 @@ class SampleUploader extends Events {
         }
 
         if (attachment.size > 1000 * 1000 * 4) {
-            throw new Translation("sb.error.too_big", "The file is too big! Please try to keep it below 4 MB. Even WAV can do that");
+            throw new Translation(
+                "sb.error.too_big",
+                "The file is too big! Please try to keep it below 4 MB. Even WAV can do that"
+            );
         }
 
         this._setStatus(new Translation("sb.downloading", "Downloading file..."));
 
-        const tmp_file = await new Promise((res, rej) => tmp.file({
-            prefix: "sample_download_", tries: 3, postfix: path.extname(attachment.name),
-        }, (err, path, fd, cleanupCallback) => {
-            if (err) return rej(err);
-            res({ path, fd, cleanupCallback });
-        }));
+        const tmp_file: { path: string; fd: number; cleanupCallback(): void } = await new Promise((res, rej) => {
+            tmp.file(
+                {
+                    prefix: "sample_download_",
+                    tries: 3,
+                    postfix: attachment.name ? path.extname(attachment.name) : "",
+                },
+                (err, path, fd, cleanupCallback) => {
+                    if (err) return rej(err);
+                    res({ path, fd, cleanupCallback });
+                }
+            );
+        });
 
         const tmp_file_stream = fs.createWriteStream(tmp_file.path);
 
@@ -158,10 +175,13 @@ class SampleUploader extends Events {
             const req = await fetch(attachment.url);
             await new Promise((resolve, reject) => {
                 if (!req.ok) return reject(new Error("Resource not accessible"));
-                tmp_file_stream.on("finish", () => tmp_file_stream.close(() => resolve()));
+                tmp_file_stream.on("finish", () => {
+                    tmp_file_stream.close();
+                    resolve();
+                });
                 req.body.once("error", err => reject(err)).pipe(tmp_file_stream);
             });
-        } catch (_) {
+        } catch {
             tmp_file.cleanupCallback();
             throw new Translation("sb.error.downloading", "Error downloading the file from Discord's servers");
         }
@@ -169,9 +189,16 @@ class SampleUploader extends Events {
         this._setStatus(new Translation("sb.checking", "Checking file data..."));
 
         try {
-            const fingerprint = await readChunk(tmp_file.path, 0, fileType.minimumBytes);
-            const type = fileType(fingerprint);
+            const minimumBytes = 4100;
+            const fingerprint = await readChunk(tmp_file.path, 0, minimumBytes);
+            const type = await fileType.fromBuffer(fingerprint);
 
+            if (!type) {
+                tmp_file.cleanupCallback();
+                throw new Translation("sb.error.unsupported_unknown", "File type unknown. Try uploading {{supported}} files.", {
+                    supported: SampleUploader.getSupportedFileTypes(),
+                });
+            }
             if (!SampleUploader.isSupportedExt(type.ext)) {
                 tmp_file.cleanupCallback();
                 throw new Translation(
@@ -186,14 +213,16 @@ class SampleUploader extends Events {
         }
 
         try {
-            const data = await ffprobe(tmp_file.path);
+            const data: any = await ffprobe(tmp_file.path);
 
             const duration = parseFloat(data.format.duration);
             if (Number.isNaN(duration)) throw new Error("Couldn't parse duration of the audio input");
 
             if (duration * 1000 > SampleUploader.MAX_DURATION) {
                 tmp_file.cleanupCallback();
-                throw new Translation("sb.error.too_long", "The soundclip cannot be longer than {{time}}", { time: toHumanTime(SampleUploader.MAX_DURATION) });
+                throw new Translation("sb.error.too_long", "The soundclip cannot be longer than {{time}}", {
+                    time: toHumanTime(SampleUploader.MAX_DURATION),
+                });
             }
         } catch (err) {
             tmp_file.cleanupCallback();
@@ -202,16 +231,15 @@ class SampleUploader extends Events {
 
         this._setStatus(new Translation("sb.converting", "Converting and optimizing sound file..."));
 
-        /** @type {Sample} */
-        let sample = null;
+        let sample: UserSample | GuildSample | PredefinedSample;
 
         if (this.scope !== "predefined") {
-            let id = null;
+            let id: string | undefined;
             let pending = 5;
             while (pending-- >= 0) {
                 id = SampleID.generate();
                 const exists = await this.manager.samples.then(db => db.findOne({ id }));
-                if (exists) id = null;
+                if (exists) id = undefined;
                 else break;
             }
 
@@ -225,24 +253,24 @@ class SampleUploader extends Events {
                     id,
                     name,
                     filename: attachment.name,
-                    creator: this.user.id,
-                    owners: [this.user.id],
+                    creator: this.user!.id,
+                    owners: [this.user!.id],
                     guilds: [],
                     plays: 0,
-                    created_at: new Date,
-                    modified_at: new Date,
+                    created_at: new Date(),
+                    modified_at: new Date(),
                 });
-            } else if (this.scope === "guild") {
+            } else {
                 sample = new GuildSample(this.manager, {
                     id,
                     name,
                     filename: attachment.name,
-                    guild: this.guild.id,
+                    guild: this.guild!.id,
                     owners: [],
-                    guilds: [this.guild.id],
+                    guilds: [this.guild!.id],
                     plays: 0,
-                    created_at: new Date,
-                    modified_at: new Date,
+                    created_at: new Date(),
+                    modified_at: new Date(),
                 });
             }
         } else {
@@ -250,8 +278,8 @@ class SampleUploader extends Events {
                 name,
                 filename: attachment.name,
                 plays: 0,
-                created_at: new Date,
-                modified_at: new Date,
+                created_at: new Date(),
+                modified_at: new Date(),
             });
         }
 
@@ -313,9 +341,9 @@ class SampleUploader extends Events {
 
         this._setStatus(new Translation("sb.saving", "Saving to database and finishing up..."));
 
-        switch (this.scope) {
-            case "user":
-                await this.manager.samples.then(db => db.insertOne({
+        if (sample instanceof UserSample) {
+            await this.manager.samples.then(db =>
+                db.insertOne({
                     id: sample.id,
                     name: sample.name,
                     filename: sample.filename,
@@ -326,10 +354,11 @@ class SampleUploader extends Events {
                     plays: sample.plays,
                     created_at: sample.created_at,
                     modified_at: sample.modified_at,
-                }));
-                break;
-            case "guild":
-                await this.manager.samples.then(db => db.insertOne({
+                })
+            );
+        } else if (sample instanceof GuildSample) {
+            await this.manager.samples.then(db =>
+                db.insertOne({
                     id: sample.id,
                     name: sample.name,
                     filename: sample.filename,
@@ -340,35 +369,40 @@ class SampleUploader extends Events {
                     plays: sample.plays,
                     created_at: sample.created_at,
                     modified_at: sample.modified_at,
-                }));
-                break;
-            case "predefined":
-                await this.manager.predefined.then(db => db.insertOne({
+                })
+            );
+        } else {
+            await this.manager.predefined.then(db =>
+                db.insertOne({
                     name: sample.name,
                     filename: sample.filename,
                     plays: sample.plays,
                     created_at: sample.created_at,
                     modified_at: sample.modified_at,
-                }));
-                this.manager.predefined_samples = Promise.resolve([...(await this.manager.predefined_samples), sample]);
-                break;
+                })
+            );
+            this.manager.predefined_samples = Promise.resolve([...(await this.manager.predefined_samples), sample]);
         }
 
         return sample;
     }
 
-    static isSupportedExt(extname) {
+    static isSupportedExt(extname: string) {
         return SampleUploader.SUPPORTED_FILES.some(t => t.matches(extname));
     }
 
     static getSupportedFileTypes() {
-        const arr = SampleUploader.SUPPORTED_FILES.filter(t => t.ext && t.mime).map(t => t.ext);
+        const arr = SampleUploader.SUPPORTED_FILES.filter(t => t.ext && t.mime).map(t => t.ext as string);
         return new ListFormat(arr);
     }
-}
-SampleUploader.MAX_DURATION = 30000;
-SampleUploader.SUPPORTED_FILES = [
-    new Type("mp3"), new Type("audio/x-aiff"), new Type("ogg"), new Type("audio/opus"), new Type("wav"), new Type("flac"),
-];
 
-module.exports = SampleUploader;
+    static MAX_DURATION = 30000;
+    static SUPPORTED_FILES = [
+        new Type("mp3"),
+        new Type("audio/x-aiff"),
+        new Type("ogg"),
+        new Type("audio/opus"),
+        new Type("wav"),
+        new Type("flac"),
+    ];
+}

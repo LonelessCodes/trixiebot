@@ -25,7 +25,7 @@ module.exports = function install(cr) {
     // expand dong
     cr.registerCommand("expand", new TreeCommand)
         .dontList()
-        .setScope(CommandScope.All)
+        .setScope(CommandScope.ALL)
         .setCategory(Category.FUN)
         .registerSubCommand("dong", new SimpleCommand(async message => {
             let progress = 3;

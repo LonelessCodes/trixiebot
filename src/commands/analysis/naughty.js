@@ -28,8 +28,6 @@ const HelpContent = require("../../util/commands/HelpContent");
 const Category = require("../../util/commands/Category");
 const CalendarRange = require("../../modules/CalendarRange");
 
-figlet.parseFont("univers", fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "figlet", "univers.flf"), "utf8"));
-
 const bad_words_array = fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "text", "bad_words.txt"), "utf8").split(",");
 for (let word of bad_words_array) {
     word = word.replace(/-/g, " ");
@@ -102,8 +100,8 @@ module.exports = function install(cr, { db }) {
 
             const embed = new Discord.MessageEmbed();
 
-            const number = (await figlet(`${Math.round(naughty_percent * 100)}%`, "univers")).split("\n");
-            let str = "```\n" + number.slice(0, number.length - 1).join("\n") + "  Naughty\n```\n";
+            const number = (await figlet(`${Math.round(naughty_percent * 100)}%`, "Univers")).split("\n");
+            const str = "```\n" + number.slice(0, number.length - 1).join("\n") + "  Naughty\n```\n";
 
             if (naughty_percent >= 0.5) {
                 embed.setColor(CONST.COLOR.ERROR);

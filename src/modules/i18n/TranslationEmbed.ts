@@ -317,8 +317,8 @@ export default class TranslationEmbed extends ResolvableObject<Discord.MessageEm
     }
 }
 
-export function basicTEmbed(title: Resolvable<string>, user: UserResolvable, color: number): TranslationEmbed;
-export function basicTEmbed(title: Resolvable<string>, user: Discord.Guild, color: number): TranslationEmbed;
+export function basicTEmbed(title: Resolvable<string>, user: UserResolvable, color?: number): TranslationEmbed;
+export function basicTEmbed(title: Resolvable<string>, user: Discord.Guild, color?: number): TranslationEmbed;
 export function basicTEmbed(
     title: Resolvable<string>,
     user: UserResolvable | Discord.Guild,

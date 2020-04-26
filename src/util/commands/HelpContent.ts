@@ -39,7 +39,8 @@ export default class HelpContent {
     usage: HelpUsage[];
     related: string[];
 
-    constructor(opts: HelpContentOptions = {}) {
+    constructor(opts: HelpContentOptions | string = {}) {
+        if (typeof opts === "string") opts = { description: opts };
         this.title = opts.title || null;
         this.description = opts.description || null;
         this.parameters = opts.parameters || new Map();

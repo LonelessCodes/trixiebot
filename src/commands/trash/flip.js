@@ -42,7 +42,7 @@ module.exports = function install(cr) {
             const is_dm = message.channel.type === "dm";
             const mention = !is_dm && mentions.members.first();
             if (!mention) return `${content} ノ( ゜-゜ノ)`;
-            return `${mention.displayName || mention.username} ノ( ゜-゜ノ)`;
+            return `${mention.displayName} ノ( ゜-゜ノ)`;
         }))
         .setHelp(new HelpContent()
             .setDescription("Oh sorry didn't mean to. Lemme just...!\nUn-Flips a text or username like a real good boi who doesn't want you any trouble")

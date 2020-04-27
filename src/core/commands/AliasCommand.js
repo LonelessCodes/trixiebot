@@ -28,10 +28,6 @@ class AliasCommand extends BaseCommand {
         return this.command.category;
     }
 
-    get category() {
-        return null;
-    }
-
     async run(ctx, command_name) {
         await this.command.run(ctx, command_name);
     }

@@ -15,7 +15,7 @@
  */
 
 // eslint-disable-next-line no-unused-vars
-const BaseCommand = require("./BaseCommand");
+const BaseCommand = require("./BaseCommand").default;
 const { Resolvable } = require("../../modules/i18n/Resolvable");
 
 class DeprecationCommand extends BaseCommand {

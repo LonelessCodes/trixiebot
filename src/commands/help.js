@@ -23,7 +23,7 @@ const OverloadCommand = require("../core/commands/OverloadCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
 const AliasCommand = require("../core/commands/AliasCommand");
 // eslint-disable-next-line no-unused-vars
-const BaseCommand = require("../core/commands/BaseCommand");
+const BaseCommand = require("../core/commands/BaseCommand").default;
 const HelpBuilder = require("../util/commands/HelpBuilder").default;
 const HelpContent = require("../util/commands/HelpContent").default;
 const Category = require("../util/commands/Category").default;
@@ -108,7 +108,7 @@ module.exports = function install(cr, { client, db: database }) {
                     if (!command.isInSeason()) continue;
                     if (disabledCommands.commands.includes(name)) continue;
                     if (!message.channel.nsfw && command.explicit) continue;
-                    if (!command.list) continue;
+                    if (!command.listed) continue;
                     if (!command.category) continue;
                     if (command.category === Category.OWNER) continue;
 

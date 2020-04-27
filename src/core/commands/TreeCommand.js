@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BaseCommand = require("./BaseCommand");
+const BaseCommand = require("./BaseCommand").default;
 const AliasCommand = require("./AliasCommand");
 const { splitArgs } = require("../../util/string");
 
@@ -38,8 +38,7 @@ class TreeCommand extends BaseCommand {
             command = this.sub_commands.get("*");
             is_default = true;
         }
-        if (!command)
-            return;
+        if (!command) return;
 
         if (!command.permissions.test(context.member || context.author)) {
             await command.noPermission(context);

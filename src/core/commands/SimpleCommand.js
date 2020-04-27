@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BaseCommand = require("./BaseCommand");
+const BaseCommand = require("./BaseCommand").default;
 
 // eslint-disable-next-line no-unused-vars
 const MessageContext = require("../../util/commands/MessageContext").default;

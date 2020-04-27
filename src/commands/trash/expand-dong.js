@@ -24,7 +24,7 @@ const Category = require("../../util/commands/Category").default;
 module.exports = function install(cr) {
     // expand dong
     cr.registerCommand("expand", new TreeCommand)
-        .dontList()
+        .setListed(false)
         .setScope(CommandScope.ALL)
         .setCategory(Category.FUN)
         .registerSubCommand("dong", new SimpleCommand(async message => {

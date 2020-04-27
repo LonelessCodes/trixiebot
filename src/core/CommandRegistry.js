@@ -15,7 +15,7 @@
  */
 
 // eslint-disable-next-line no-unused-vars
-const BaseCommand = require("./commands/BaseCommand");
+const BaseCommand = require("./commands/BaseCommand").default;
 const AliasCommand = require("./commands/AliasCommand");
 const CCManager = require("./managers/CCManager");
 // eslint-disable-next-line no-unused-vars

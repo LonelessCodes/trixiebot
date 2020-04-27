@@ -15,7 +15,7 @@
  */
 
 const { userToString } = require("../../util/util");
-const BaseCommand = require("./BaseCommand");
+const BaseCommand = require("./BaseCommand").default;
 const HelpContent = require("../../util/commands/HelpContent").default;
 const Category = require("../../util/commands/Category").default;
 const secureRandom = require("../../modules/random/secureRandom").default;

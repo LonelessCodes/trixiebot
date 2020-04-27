@@ -14,13 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BaseCommand = require("./BaseCommand");
+const BaseCommand = require("./BaseCommand").default;
 const { userToString } = require("../../util/util");
 const RateLimiter = require("../../util/commands/RateLimiter").default;
 const TimeUnit = require("../../modules/TimeUnit").default;
 const HelpContent = require("../../util/commands/HelpContent").default;
 const Category = require("../../util/commands/Category").default;
-const MessageMentions = require("../../util/discord/MessageMentions").default;
 const secureRandom = require("../../modules/random/secureRandom").default;
 
 const { MessageAttachment } = require("discord.js");
@@ -46,15 +45,14 @@ class ImageActionCommand extends BaseCommand {
     }
 
     async run(context) {
-        const mentions = new MessageMentions(context.content, context.guild);
-        const mention = mentions.members.first();
-        if (!mention && !mentions.everyone) {
+        const mention = context.mentions.members.first();
+        if (!mention && !context.mentions.everyone) {
             await context.send(new TranslationFormatter(this.noMentionMessage, { user: userToString(context.member) }));
             return;
         }
 
         const phrase = await secureRandom(this.texts);
-        const user = mentions.everyone
+        const user = context.mentions.everyone
             ? new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount })
             : userToString(mention);
 

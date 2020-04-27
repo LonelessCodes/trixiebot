@@ -24,7 +24,7 @@ const { splitArgs } = require("../../util/string");
 const ipc = require("../../modules/concurrency/ipc");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
-const BaseCommand = require("../../core/commands/BaseCommand");
+const BaseCommand = require("../../core/commands/BaseCommand").default;
 const Category = require("../../util/commands/Category").default;
 const CommandScope = require("../../util/commands/CommandScope").default;
 

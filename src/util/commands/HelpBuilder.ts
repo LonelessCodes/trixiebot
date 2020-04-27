@@ -126,7 +126,7 @@ export default class HelpBuilder extends Discord.MessageEmbed {
                     if (!sub_command.isInSeason()) continue;
                     if (sub_cmd_name === "*") continue;
                     if (!nsfw && sub_command.explicit) continue;
-                    if (!sub_command.list) continue;
+                    if (!sub_command.listed) continue;
                     if (sub_command.category === Category.OWNER) continue;
 
                     const sub_name = `${name} ${sub_cmd_name}`;

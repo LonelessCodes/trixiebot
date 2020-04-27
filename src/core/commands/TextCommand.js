@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BaseCommand = require("./BaseCommand");
+const BaseCommand = require("./BaseCommand").default;
 const secureRandom = require("../../modules/random/secureRandom").default;
 
 class TextCommand extends BaseCommand {

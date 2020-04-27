@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BaseCommand = require("./BaseCommand");
+const BaseCommand = require("./BaseCommand").default;
 const HelpBuilder = require("../../util/commands/HelpBuilder").default;
 
 class HelpCommand extends BaseCommand {

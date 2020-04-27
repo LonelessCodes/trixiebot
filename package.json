@@ -69,6 +69,7 @@
         "@types/fluent-ffmpeg": "^2.1.14",
         "@types/fs-extra": "^8.1.0",
         "@types/glob-to-regexp": "^0.4.0",
+        "@types/gm": "^1.18.7",
         "@types/mime": "^2.0.1",
         "@types/mongodb": "^3.5.9",
         "@types/node": "^13.13.2",

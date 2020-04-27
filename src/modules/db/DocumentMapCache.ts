@@ -32,6 +32,9 @@ const DEFAULTS: DocumentMapCacheOptions<"_id"> = {
     indexes: {},
 };
 
+/**
+ * Creates a new manager for caching database documents
+ */
 export default class DocumentMapCache<
     KeyName extends string,
     KeyType extends string | number,
@@ -47,9 +50,6 @@ export default class DocumentMapCache<
     private _documents: Map<KeyType, TSchema> = new Map();
     private _ttl: Map<KeyType, NodeJS.Timeout> = new Map();
 
-    /**
-     * Creates a new manager for caching database documents
-     */
     constructor(collection: Collection<TSchema>, keyName: KeyName, _opts: DocumentMapCacheOptions<keyof TSchema> = {}) {
         const opts = { ...DEFAULTS, ..._opts } as Required<DocumentMapCacheOptions<keyof TSchema>>;
 

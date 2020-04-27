@@ -1,6 +1,33 @@
-# Changelog
+Changelog
+### [3.7.2](https://github.com/LonelessCodes/trixiebot/compare/v3.7.1...v3.7.2) (2020-04-27)
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### Bug Fixes
+
+* **build:** fixed TypeScript compilation target for Node 12 ([bb383ad](https://github.com/LonelessCodes/trixiebot/commit/bb383ad1eb22361b53af30523f18cdc8f2f87f36))
+* **chat cmd:** fixed typing forever ([72425e9](https://github.com/LonelessCodes/trixiebot/commit/72425e9f6e19cb4740a693d8c8aa04775c99d3c6))
+* **database:** remove deprecated autoReconnect option ([63f56fd](https://github.com/LonelessCodes/trixiebot/commit/63f56fd0f468e552da3ff18cb342c6686cc2e7af))
+* **DocumentMapCache:** fixed inproper object cloning ([2aa7f13](https://github.com/LonelessCodes/trixiebot/commit/2aa7f132888f7acd75d3e9afe0ba6dfc651421c8))
+* **expand dong cmd:** fixed typo causing unset scope ([a429555](https://github.com/LonelessCodes/trixiebot/commit/a429555b451fc7dbe9db0885816eea6950ca462a))
+* **logger:** fixed logging arguments as array from namespace() ([77b0243](https://github.com/LonelessCodes/trixiebot/commit/77b024354b148255adc2162437fc7cf551021513))
+* **logger:** removed log.bind(log) to run away from "log.bind is not a function" ([a0f9186](https://github.com/LonelessCodes/trixiebot/commit/a0f9186858066b99cf61281d8eca4fecf1f6f43b))
+* **penis cmd:** fixed leaderboard ([988f838](https://github.com/LonelessCodes/trixiebot/commit/988f83821824a0062bb43bec9acae1a15439d99c))
+* **timeout cmd:** fixed success message ([5ce9fe3](https://github.com/LonelessCodes/trixiebot/commit/5ce9fe3c96c03a8bfb0559b179d0f7f46ba7f291))
+* fix for 4cc93dc ([83ee283](https://github.com/LonelessCodes/trixiebot/commit/83ee283452d08ea311b7bbd100642cdaf1748e35))
+* fixed accidental empty message ([6a2626b](https://github.com/LonelessCodes/trixiebot/commit/6a2626b4abe7c210b04750c236c6c23ad5d2ad35))
+* optionate color in basicTEmbed() ([9d5d45e](https://github.com/LonelessCodes/trixiebot/commit/9d5d45e7c977d933d9f3398c79f642377d566efc))
+* pass right parameters to MessageContext ([f7a103f](https://github.com/LonelessCodes/trixiebot/commit/f7a103f7d9fbe977a13bf1f5d7b9514d0548e39b))
+
+
+### Improvements
+
+* add source map support for errors and stack traces ([94122e2](https://github.com/LonelessCodes/trixiebot/commit/94122e2f47200f6bb19701a0062746d45c1c2740))
+
+
+### Changes
+
+* removed boobs cmd ([37a2e55](https://github.com/LonelessCodes/trixiebot/commit/37a2e5520b8d3b8551a933ea10e4ae0f9bbd8d2e))
+* translate serverinfo cmd and remove all old i18n fallback code ([f8e2e60](https://github.com/LonelessCodes/trixiebot/commit/f8e2e60d77f4f2a59c2fdef5c632ed09768a88ab))
 
 <a name="3.7.1"></a>
 ## [3.7.1](https://github.com/LonelessCodes/trixiebot/compare/v3.7.0...v3.7.1) (2020-04-19)

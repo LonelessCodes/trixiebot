@@ -1,6 +1,6 @@
 {
     "name": "trixiebot",
-    "version": "3.7.1",
+    "version": "3.7.2",
     "description": "Discord Bot to query Derpibooru.org and much much more!",
     "homepage": "https://trixie.loneless.art",
     "author": {
@@ -20,7 +20,7 @@
         "cat-ascii-faces": "^2.0.0",
         "chalk": "^4.0.0",
         "cheerio": "^1.0.0-rc.3",
-        "chevrotain": "^6.5.0",
+        "chevrotain": "^7.0.1",
         "config": "^3.3.1",
         "cron": "^1.8.2",
         "discord.js": "^12.2.0",

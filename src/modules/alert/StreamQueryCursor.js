@@ -26,8 +26,8 @@ class StreamQueryCursor {
     addListener(scope, handler) {
         switch (scope) {
             case "data":
-                this._cursor.addListener("data", config => {
-                    const channel = this.process(config);
+                this._cursor.addListener("data", raw => {
+                    const channel = this.process({ ...raw, username: raw.name });
                     if (!channel) return;
 
                     handler(channel);
@@ -43,7 +43,7 @@ class StreamQueryCursor {
         switch (scope) {
             case "data":
                 this._cursor.once("data", raw => {
-                    const channel = this.process(raw);
+                    const channel = this.process({ ...raw, username: raw.name });
                     if (!channel) return;
 
                     handler(channel);

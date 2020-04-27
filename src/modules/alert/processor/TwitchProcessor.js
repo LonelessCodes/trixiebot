@@ -19,7 +19,7 @@ const config = require("../../../config").default;
 
 const Processor = require("./Processor");
 const ParsedStream = require("../stream/ParsedStream").default;
-const OnlineStream = require("../stream/OnlineStream");
+const OnlineStream = require("../stream/OnlineStream").default;
 // eslint-disable-next-line no-unused-vars
 const Stream = require("../stream/Stream").default;
 

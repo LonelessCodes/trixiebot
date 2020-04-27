@@ -18,10 +18,9 @@ import Discord from "discord.js";
 import { ObjectId } from "mongodb";
 import ParsedStream from "./ParsedStream";
 
-export interface StreamDocument {
+export interface StreamConfigOptions {
     _id?: ObjectId;
     username?: string;
-    name?: string;
     userId?: string;
     messageId?: string;
     lastChannelId?: string;
@@ -32,25 +31,25 @@ export default class StreamConfig extends ParsedStream {
     public nsfwChannel: Discord.TextChannel | null;
     public sfwChannel: Discord.TextChannel | null;
 
-    public _id: ObjectId | null;
+    public _id?: ObjectId;
 
     constructor(
         service: import("../processor/Processor"),
         channel: Discord.TextChannel | null,
         nsfwChannel: Discord.TextChannel | null,
         sfwChannel: Discord.TextChannel | null,
-        conf: StreamDocument = {}
+        conf: StreamConfigOptions = {}
     ) {
-        super(service, conf.username || conf.name, conf.userId);
+        super(service, conf.username, conf.userId);
 
         this.channel = channel;
         this.nsfwChannel = nsfwChannel;
         this.sfwChannel = sfwChannel;
-        this._id = conf._id || null;
+        this._id = conf._id;
     }
 
-    public get guild(): Discord.Guild | null {
-        return (this.channel || this.nsfwChannel || this.sfwChannel || {}).guild || null;
+    public get guild(): Discord.Guild | undefined {
+        return (this.channel || this.nsfwChannel || this.sfwChannel || {}).guild;
     }
 
     public getChannel(nsfw: boolean): Discord.TextChannel | undefined {

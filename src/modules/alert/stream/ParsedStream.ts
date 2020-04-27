@@ -16,12 +16,12 @@
 
 export default class ParsedStream {
     public service: import("../processor/Processor");
-    public username: string | null;
-    public userId: string | null;
+    public username?: string;
+    public userId?: string;
 
     constructor(service: import("../processor/Processor"), username?: string, userId?: string) {
         this.service = service;
-        this.username = username || null;
-        this.userId = userId || null;
+        this.username = username;
+        this.userId = userId;
     }
 }

@@ -16,13 +16,20 @@
 
 import Discord from "discord.js";
 import { doNothing } from "../../../util/util";
-import StreamConfig, { StreamDocument } from "./StreamConfig";
+import StreamConfig, { StreamConfigOptions } from "./StreamConfig";
 
-export default class Stream extends StreamConfig {
+export interface StreamOptions extends StreamConfigOptions {
+    username: string;
+    userId: string;
+}
+
+export default class Stream extends StreamConfig implements StreamOptions {
     public manager: import("../AlertManager");
 
-    public messageId: string | null;
-    public lastChannelId: string | null;
+    public username: string;
+    public userId: string;
+    public messageId?: string;
+    public lastChannelId?: string;
 
     constructor(
         manager: import("../AlertManager"),
@@ -30,14 +37,16 @@ export default class Stream extends StreamConfig {
         channel: Discord.TextChannel | null,
         nsfwChannel: Discord.TextChannel | null,
         sfwChannel: Discord.TextChannel | null,
-        conf: StreamDocument = {}
+        conf: StreamOptions
     ) {
         super(service, channel, nsfwChannel, sfwChannel, conf);
 
         this.manager = manager;
 
-        this.messageId = conf.messageId || null;
-        this.lastChannelId = conf.lastChannelId || null;
+        this.username = conf.username;
+        this.userId = conf.userId;
+        this.messageId = conf.messageId;
+        this.lastChannelId = conf.lastChannelId;
     }
 
     public get url() {
@@ -52,19 +61,19 @@ export default class Stream extends StreamConfig {
         if (!this.messageId) return;
 
         const onlineMessage = await this.fetch();
-        this.messageId = null;
-        this.lastChannelId = null;
+        this.messageId = undefined;
+        this.lastChannelId = undefined;
         if (!onlineMessage || !(onlineMessage.deletable && !onlineMessage.deleted)) return;
 
         await onlineMessage.delete().catch(doNothing);
     }
 
-    public get lastChannel(): Discord.TextChannel | null {
-        if (!this.guild) return null;
-        if (!this.lastChannelId) return null;
+    public get lastChannel(): Discord.TextChannel | undefined {
+        if (!this.guild) return undefined;
+        if (!this.lastChannelId) return undefined;
 
         const channel = this.guild.channels.cache.get(this.lastChannelId);
-        if (!channel) return null;
+        if (!channel) return undefined;
 
         return channel as Discord.TextChannel;
     }

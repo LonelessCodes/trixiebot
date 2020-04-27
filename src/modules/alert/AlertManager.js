@@ -23,7 +23,7 @@ const LocaleManager = require("../../core/managers/LocaleManager").default;
 const Translation = require("../i18n/Translation").default;
 
 // eslint-disable-next-line no-unused-vars
-const OnlineStream = require("./stream/OnlineStream");
+const OnlineStream = require("./stream/OnlineStream").default;
 // eslint-disable-next-line no-unused-vars
 const StreamConfig = require("./stream/StreamConfig").default;
 const Stream = require("./stream/Stream").default;
@@ -234,7 +234,7 @@ class AlertManager extends EventEmitter {
         const nsfw = guild.channels.cache.get(raw.nsfwChannelId);
         const sfw = guild.channels.cache.get(raw.sfwChannelId);
 
-        return new Stream(this, this.services_mapped[raw.service], def, nsfw, sfw, raw);
+        return new Stream(this, this.services_mapped[raw.service], def, nsfw, sfw, { ...raw, username: raw.name });
     }
 
     getStreamConfigs(guild) {

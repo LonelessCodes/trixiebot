@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,31 +14,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { doNothing } = require("../../../util/util");
-const StreamConfig = require("./StreamConfig").default;
+import Discord from "discord.js";
+import { doNothing } from "../../../util/util";
+import StreamConfig, { StreamDocument } from "./StreamConfig";
 
-class Stream extends StreamConfig {
-    constructor(manager, service, channel, nsfwChannel, sfwChannel, conf = {}) {
+export default class Stream extends StreamConfig {
+    public manager: import("../AlertManager");
+
+    public messageId: string | null;
+    public lastChannelId: string | null;
+
+    constructor(
+        manager: import("../AlertManager"),
+        service: import("../processor/Processor"),
+        channel: Discord.TextChannel | null,
+        nsfwChannel: Discord.TextChannel | null,
+        sfwChannel: Discord.TextChannel | null,
+        conf: StreamDocument = {}
+    ) {
         super(service, channel, nsfwChannel, sfwChannel, conf);
 
-        /** @type {AlertManager} */
         this.manager = manager;
 
-        /** @type {string} */
-        this.messageId = conf.messageId;
-        /** @type {string} */
-        this.lastChannelId = conf.lastChannelId;
+        this.messageId = conf.messageId || null;
+        this.lastChannelId = conf.lastChannelId || null;
     }
 
-    get url() {
+    public get url() {
         return this.getURL(false);
     }
 
-    getURL(fat = false) {
+    public getURL(fat = false) {
         return this.service.formatURL(this, fat);
     }
 
-    async delete() {
+    public async delete() {
         if (!this.messageId) return;
 
         const onlineMessage = await this.fetch();
@@ -49,12 +59,17 @@ class Stream extends StreamConfig {
         await onlineMessage.delete().catch(doNothing);
     }
 
-    get lastChannel() {
-        if (!this.guild) return;
-        return this.guild.channels.cache.get(this.lastChannelId);
+    public get lastChannel(): Discord.TextChannel | null {
+        if (!this.guild) return null;
+        if (!this.lastChannelId) return null;
+
+        const channel = this.guild.channels.cache.get(this.lastChannelId);
+        if (!channel) return null;
+
+        return channel as Discord.TextChannel;
     }
 
-    async fetch() {
+    public async fetch() {
         if (!this.messageId) return;
 
         const channel = this.lastChannel;
@@ -63,5 +78,3 @@ class Stream extends StreamConfig {
         return await channel.messages.fetch(this.messageId).catch(doNothing);
     }
 }
-
-module.exports = Stream;

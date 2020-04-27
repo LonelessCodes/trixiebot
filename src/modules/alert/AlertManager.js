@@ -26,7 +26,7 @@ const Translation = require("../i18n/Translation").default;
 const OnlineStream = require("./stream/OnlineStream");
 // eslint-disable-next-line no-unused-vars
 const StreamConfig = require("./stream/StreamConfig").default;
-const Stream = require("./stream/Stream");
+const Stream = require("./stream/Stream").default;
 const StreamQueryCursor = require("./StreamQueryCursor");
 
 class AlertManager extends EventEmitter {

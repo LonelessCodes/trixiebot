@@ -21,7 +21,7 @@ const Processor = require("./Processor");
 const ParsedStream = require("../stream/ParsedStream").default;
 const OnlineStream = require("../stream/OnlineStream");
 // eslint-disable-next-line no-unused-vars
-const Stream = require("../stream/Stream");
+const Stream = require("../stream/Stream").default;
 
 const TwitchClient = require("twitch").default;
 

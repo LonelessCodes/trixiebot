@@ -18,11 +18,13 @@ import Discord from "discord.js";
 import { ObjectId } from "mongodb";
 import ParsedStream from "./ParsedStream";
 
-export interface Document {
+export interface StreamDocument {
     _id?: ObjectId;
     username?: string;
     name?: string;
     userId?: string;
+    messageId?: string;
+    lastChannelId?: string;
 }
 
 export default class StreamConfig extends ParsedStream {
@@ -37,7 +39,7 @@ export default class StreamConfig extends ParsedStream {
         channel: Discord.TextChannel | null,
         nsfwChannel: Discord.TextChannel | null,
         sfwChannel: Discord.TextChannel | null,
-        conf: Document = {}
+        conf: StreamDocument = {}
     ) {
         super(service, conf.username || conf.name, conf.userId);
 

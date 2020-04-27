@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Stream = require("./stream/Stream");
+const Stream = require("./stream/Stream").default;
 const StreamConfig = require("./stream/StreamConfig").default;
 
 class StreamQueryCursor {

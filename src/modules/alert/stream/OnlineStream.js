@@ -25,7 +25,7 @@ const TranslationMerge = require("../../i18n/TranslationMerge").default;
 const TranslationEmbed = require("../../i18n/TranslationEmbed").default;
 const NumberFormat = require("../../i18n/NumberFormat").default;
 
-const Stream = require("./Stream");
+const Stream = require("./Stream").default;
 
 async function nsfwThumb(url) {
     const response = await fetch(url, { method: "GET" });

@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { userToString } = require("../../util/util");
+const { userToString, doNothing } = require("../../util/util");
 const CONST = require("../../const").default;
 const events = require("events");
 // eslint-disable-next-line no-unused-vars
@@ -86,7 +86,7 @@ class PaginatorAction extends events.EventEmitter {
         else if (page_num > this.page_count)
             page_num = this.page_count;
 
-        const page = this.renderPage(page_num).map(elem => Resolvable.resolve(elem, translator));
+        const page = this.renderPage(page_num).map(elem => ResolvableObject.resolve(elem, translator));
         return await this.initialize(await channel.send(...page), translator, page_num);
     }
 
@@ -188,9 +188,8 @@ class PaginatorAction extends events.EventEmitter {
         const author_icon = this.user.avatarURL({ size: 32, dynamic: true });
         if (this.title && this.title !== "") {
             return [new TranslationMerge(user_header, "|", this.title), author_icon];
-        } else {
-            return [user_header, author_icon];
         }
+        return [user_header, author_icon];
     }
 
     renderPage(page_num) {
@@ -213,21 +212,17 @@ class PaginatorAction extends events.EventEmitter {
         rows.push(this.prefix_suffix[1]);
         embed.setDescription(rows.separator("\n"));
 
-        if (this.show_page_numbers) embed.setFooter(new Translation(
-            "paginator.page", "Page {{page}}", { page: `${page_num}/${this.page_count}` }
-        ));
+        if (this.show_page_numbers)
+            embed.setFooter(new Translation("paginator.page", "Page {{page}}", { page: `${page_num}/${this.page_count}` }));
 
-        return [
-            this.content,
-            embed,
-        ];
+        return [this.content, embed];
     }
 
     /**
      * @param {Message} message
      */
     async end(message) {
-        await message.reactions.removeAll().catch(() => { /* Do nothing */ });
+        await message.reactions.removeAll().catch(doNothing);
         this.emit("end", message);
     }
 }

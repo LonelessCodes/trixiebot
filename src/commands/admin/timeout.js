@@ -204,17 +204,17 @@ module.exports = function install(cr, { db }) {
                 return new Translation("timeout.at_least", "At least two arguments are required: duration and @user");
             }
 
-            let members = new MessageMentions(args[1], message).members;
+            const members_orig = new MessageMentions(args[1], message).members;
 
-            if (members.has(message.member.id)) {
+            if (members_orig.has(message.member.id)) {
                 return new Translation("timeout.not_yourself", "You cannot timeout yourself, dummy!");
             }
 
-            if (members.has(message.client.user.id)) {
+            if (members_orig.has(message.client.user.id)) {
                 return new Translation("timeout.not_trixie", "You cannot timeout TrixieBot! I own you.");
             }
 
-            members = members.array();
+            const members = members_orig.array();
 
             for (const member of members) {
                 if (message.channel.permissionsFor(member).has(Discord.Permissions.FLAGS.MANAGE_MESSAGES)) {
@@ -255,7 +255,7 @@ module.exports = function install(cr, { db }) {
                 "timeout.success",
                 ["{{users}} is now timeouted for the next {{timeLeft}}", "{{users}} are now timeouted for the next {{timeLeft}}"],
                 {
-                    count: members.size,
+                    count: members.length,
                     users: new ListFormat(members.map(member => userToString(member))),
                     timeLeft: timestr,
                 }

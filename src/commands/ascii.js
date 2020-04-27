@@ -59,7 +59,10 @@ module.exports = function install(cr) {
             .then(res => {
                 if (!res.ok) throw new Translation("ascii.doesnt_exist", "Image doesn't exist");
 
-                const header = res.headers.get("content-type").split("/")[1];
+                let header = res.headers.get("content-type");
+                if (!header) return res.buffer();
+
+                header = header.split("/")[1];
                 if (!header || !/jpg|jpeg|png|gif/.test(header))
                     throw new Translation("ascii.invalid_type", "The image must be JPG, PNG or GIF");
 

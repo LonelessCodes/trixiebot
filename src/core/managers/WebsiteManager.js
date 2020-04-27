@@ -32,10 +32,9 @@ function cleanContent(str, guild) {
             const member = guild.members.cache.get(id);
             if (member) {
                 return `@${member.displayName}`;
-            } else {
-                const user = guild.client.users.cache.get(id);
-                return user ? `@${user.username}` : input;
             }
+            const user = guild.client.users.cache.get(id);
+            return user ? `@${user.username}` : input;
         })
         .replace(/<#[0-9]+>/g, input => {
             const channel = guild.client.channels.cache.get(input.replace(/<|#|>/g, ""));
@@ -70,10 +69,10 @@ class WebsiteManager {
         ipc.answer("checkGuilds", guildIds => guildIds.filter(guildId => this.client.guilds.cache.has(guildId)));
 
         ipc.answer("overview", async guildId => {
-            const month = new Date;
+            const month = new Date();
             month.setMonth(month.getMonth() - 1);
 
-            const now = new Date;
+            const now = new Date();
 
             const results = await Promise.all([
                 guild_stats.get("commands").getRange(month, now, guildId),
@@ -105,17 +104,20 @@ class WebsiteManager {
                         a.ts = ts(a.ts);
                         return a;
                     }),
-                    before: results[3] ? {
-                        ...results[3],
-                        ts: ts(results[3].ts),
-                    } : undefined,
+                    before: results[3]
+                        ? {
+                              ...results[3],
+                              ts: ts(results[3].ts),
+                          }
+                        : undefined,
                 },
             };
         });
 
         const getChannels = guildId => {
             const guild = this.client.guilds.cache.get(guildId);
-            return guild.channels.cache.array()
+            return guild.channels.cache
+                .array()
                 .filter(c => c.type === "text")
                 .sort((a, b) => a.rawPosition - b.rawPosition)
                 .map(c => ({
@@ -126,7 +128,8 @@ class WebsiteManager {
 
         const getRoles = guildId => {
             const guild = this.client.guilds.cache.get(guildId);
-            return guild.roles.cache.array()
+            return guild.roles.cache
+                .array()
                 .filter(r => r.name !== "@everyone")
                 .sort((a, b) => b.rawPosition - a.rawPosition)
                 .map(c => ({
@@ -137,20 +140,22 @@ class WebsiteManager {
         };
 
         ipc.answer("commands", async guildId => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             const disabledCommands = await this.db.collection("disabled_commands").findOne({
                 guildId,
             });
 
-            const disabledChannels = await this.db.collection("disabled_commands_channels").find({
-                guildId,
-            }).toArray();
+            const disabledChannels = await this.db
+                .collection("disabled_commands_channels")
+                .find({
+                    guildId,
+                })
+                .toArray();
 
             const commands = [];
             const config = await this.config.get(guildId);
-            for (let [name, command] of this.REGISTRY.commands) {
+            for (const [name, command] of this.REGISTRY.commands) {
                 if (command instanceof AliasCommand) continue;
                 if (command.category === Category.OWNER) continue;
                 if (!command.help) continue;
@@ -175,34 +180,42 @@ class WebsiteManager {
         });
 
         ipc.answer("commandUpdate", async ({ guildId, commandName, enabled, disabled_channels }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
-            if (!this.REGISTRY.commands.has(commandName))
-                return { success: false };
+            if (!this.REGISTRY.commands.has(commandName)) return { success: false };
 
             if (!disabled_channels) {
                 return { success: false };
             }
 
-            await this.db.collection("disabled_commands_channels").updateOne({
-                guildId,
-                command: commandName,
-            }, { $set: { channels: disabled_channels } }, { upsert: true });
+            await this.db.collection("disabled_commands_channels").updateOne(
+                {
+                    guildId,
+                    command: commandName,
+                },
+                { $set: { channels: disabled_channels } },
+                { upsert: true }
+            );
 
             if (enabled == undefined) {
                 return { success: false };
             } else if (enabled) {
-                await this.db.collection("disabled_commands").updateOne({
-                    guildId,
-                }, { $pull: { commands: commandName } });
+                await this.db.collection("disabled_commands").updateOne(
+                    {
+                        guildId,
+                    },
+                    { $pull: { commands: commandName } }
+                );
                 return { success: true, enabled: true, disabled_channels };
-            } else {
-                await this.db.collection("disabled_commands").updateOne({
-                    guildId,
-                }, { $addToSet: { commands: commandName } }, { upsert: true });
-                return { success: true, enabled: false, disabled_channels };
             }
+            await this.db.collection("disabled_commands").updateOne(
+                {
+                    guildId,
+                },
+                { $addToSet: { commands: commandName } },
+                { upsert: true }
+            );
+            return { success: true, enabled: false, disabled_channels };
         });
 
         /*
@@ -210,8 +223,7 @@ class WebsiteManager {
          */
 
         ipc.answer("cc:get", async guildId => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             const commands = await this.REGISTRY.CC.getCommandsForWeb(guildId);
             const settings = await this.REGISTRY.CC.getSettings(guildId);
@@ -229,8 +241,7 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:updateSettings", async ({ guildId, allowed_roles }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             const settings = await this.REGISTRY.CC.updateSettings(guildId, { allowed_roles });
 
@@ -241,12 +252,15 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:new", async ({ guildId, type, trigger, case_sensitive, code, disabled_channels }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             try {
                 const command = await this.REGISTRY.CC.addCommand(guildId, {
-                    type, trigger, case_sensitive, code, disabled_channels,
+                    type,
+                    trigger,
+                    case_sensitive,
+                    code,
+                    disabled_channels,
                 });
                 return {
                     command,
@@ -258,15 +272,17 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:update", async ({ guildId, commandId, type, trigger, case_sensitive, code, disabled_channels }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
-            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
-                return { success: false };
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId))) return { success: false };
 
             try {
                 const command = await this.REGISTRY.CC.updateCommand(guildId, commandId, {
-                    type, trigger, case_sensitive, code, disabled_channels,
+                    type,
+                    trigger,
+                    case_sensitive,
+                    code,
+                    disabled_channels,
                 });
                 return {
                     command,
@@ -278,11 +294,9 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:enabled", async ({ guildId, commandId, enabled }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
-            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
-                return { success: false };
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId))) return { success: false };
 
             try {
                 return {
@@ -295,11 +309,9 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:delete", async ({ guildId, commandId }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
-            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
-                return { success: false };
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId))) return { success: false };
 
             try {
                 await this.REGISTRY.CC.removeCommand(guildId, commandId);
@@ -312,11 +324,9 @@ class WebsiteManager {
         });
 
         ipc.answer("cc:geterrors", async ({ guildId, commandId }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { errors: [], success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { errors: [], success: false };
 
-            if (!await this.REGISTRY.CC.hasCommand(guildId, commandId))
-                return { errors: [], success: false };
+            if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId))) return { errors: [], success: false };
 
             try {
                 const errors = await this.REGISTRY.CC.getErrors(guildId, commandId);
@@ -341,8 +351,7 @@ class WebsiteManager {
         });
 
         ipc.answer("deleted", async guildId => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             const database = this.db.collection("deleted_messages");
             const deleted_raw = await database.find({ guildId }).toArray();
@@ -373,8 +382,7 @@ class WebsiteManager {
         });
 
         ipc.answer("deletedClear", async guildId => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             const database = this.db.collection("deleted_messages");
             await database.deleteMany({ guildId });
@@ -386,8 +394,7 @@ class WebsiteManager {
         });
 
         ipc.answer("settings", async guildId => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             const config = await this.config.get(guildId);
             const locale = await this.locale.get(guildId);
@@ -424,7 +431,8 @@ class WebsiteManager {
                         })),
                 },
                 disabled: disabled_channels ? disabled_channels.channels : [],
-                channels: guild.channels.cache.array()
+                channels: guild.channels.cache
+                    .array()
                     .sort((a, b) => a.rawPosition - b.rawPosition)
                     .filter(c => c.type === "text")
                     .map(c => ({
@@ -436,8 +444,7 @@ class WebsiteManager {
         });
 
         ipc.answer("settingsUpdate", async ({ guildId, settings, locale, disabled }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             // Locale
             const locale_json = {};
@@ -456,15 +463,18 @@ class WebsiteManager {
             // Disabled
             const disabledTrue = [];
             for (const channelId of disabled) {
-                if (this.client.guilds.cache.get(guildId)
-                    .channels.cache.has(channelId)) {
+                if (this.client.guilds.cache.get(guildId).channels.cache.has(channelId)) {
                     disabledTrue.push(channelId);
                 }
             }
 
-            await this.db.collection("disabled_channels").updateOne({
-                guildId,
-            }, { $set: { channels: disabledTrue } }, { upsert: true });
+            await this.db.collection("disabled_channels").updateOne(
+                {
+                    guildId,
+                },
+                { $set: { channels: disabledTrue } },
+                { upsert: true }
+            );
 
             // Get values
             settings = await this.config.get(guildId);
@@ -500,8 +510,7 @@ class WebsiteManager {
         });
 
         ipc.answer("settingsReset", async ({ guildId }) => {
-            if (!this.client.guilds.cache.has(guildId))
-                return { success: false };
+            if (!this.client.guilds.cache.has(guildId)) return { success: false };
 
             await this.config.set(guildId, this.config.default_config);
             await this.locale.delete(guildId);
@@ -565,13 +574,16 @@ class WebsiteManager {
             if (req.all == true) {
                 fucks = await this.db.collection("fuck").find({}).toArray();
             } else {
-                fucks = await this.db.collection("fuck").find({
-                    verified: {
-                        $not: {
-                            $eq: true,
+                fucks = await this.db
+                    .collection("fuck")
+                    .find({
+                        verified: {
+                            $not: {
+                                $eq: true,
+                            },
                         },
-                    },
-                }).toArray();
+                    })
+                    .toArray();
             }
 
             return {
@@ -581,9 +593,12 @@ class WebsiteManager {
         });
 
         ipc.answer("admin:verifyFuck", async ({ fuckId, verified }) => {
-            await this.db.collection("fuck").updateOne({
-                _id: fuckId,
-            }, { $set: { verified: !!verified } });
+            await this.db.collection("fuck").updateOne(
+                {
+                    _id: fuckId,
+                },
+                { $set: { verified: !!verified } }
+            );
 
             return { success: true };
         });

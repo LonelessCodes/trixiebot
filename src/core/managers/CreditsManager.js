@@ -27,10 +27,12 @@ class CreditsManager {
         this.accounts = database().then(db => db.collection("credits_accounts"));
         this.config = database().then(db => db.collection("credits_config"));
         this.dailies = database().then(db => db.collection("credits_dailies"));
-        this.transactions = database().then(db => db.collection("credits_transactions")).then(async db => {
-            await db.createIndex({ ts: 1 });
-            return db;
-        });
+        this.transactions = database()
+            .then(db => db.collection("credits_transactions"))
+            .then(async db => {
+                await db.createIndex({ ts: 1 });
+                return db;
+            });
     }
 
     /**
@@ -54,10 +56,11 @@ class CreditsManager {
 
         let account = await this.getAccount(user);
 
-        if (account) return {
-            exists: true,
-            account,
-        };
+        if (account)
+            return {
+                exists: true,
+                account,
+            };
 
         account = await this.accounts.then(db => db.insertOne({ userId: user.id, balance: 0 }));
 
@@ -141,16 +144,18 @@ class CreditsManager {
 
         const balance = await this.incBalance(user, cost);
 
-        const timestamp = new Date;
-        await this.transactions.then(db => db.insertOne({
-            ts: timestamp,
-            guildId: guild.id,
-            userId: user.id,
-            cost,
-            balance,
-            ns: namespace,
-            description,
-        }));
+        const timestamp = new Date();
+        await this.transactions.then(db =>
+            db.insertOne({
+                ts: timestamp,
+                guildId: guild.id,
+                userId: user.id,
+                cost,
+                balance,
+                ns: namespace,
+                description,
+            })
+        );
 
         return balance;
     }
@@ -174,9 +179,9 @@ class CreditsManager {
         };
         if (namespace) query.namespace = namespace;
 
-        let cursor = await this.transactions.then(db => db.find(query)
-            .sort({ ts: -1 })
-            .project({ ts: 1, guildId: 1, cost: 1, balance: 1, ns: 1, description: 1 }));
+        let cursor = await this.transactions.then(db =>
+            db.find(query).sort({ ts: -1 }).project({ ts: 1, guildId: 1, cost: 1, balance: 1, ns: 1, description: 1 })
+        );
         if (amount) cursor = cursor.limit(amount);
 
         return await cursor.toArray();
@@ -189,10 +194,12 @@ class CreditsManager {
     async getDailies(user) {
         if (user instanceof GuildMember) user = user.user;
 
-        /** @type {{ userId: string; lastDaily: Date; streak: number; }} */
-        let lastDaily = await this.dailies.then(db => db.findOne({
-            userId: user.id,
-        }));
+        /** @type {{ userId?: string; lastDaily?: Date; streak?: number; }} */
+        let lastDaily = await this.dailies.then(db =>
+            db.findOne({
+                userId: user.id,
+            })
+        );
 
         /** @type {number} */
         const dailies = 200;
@@ -214,9 +221,14 @@ class CreditsManager {
             }
 
             if (now.isSameOrAfter(end_of_next_day)) {
-                await this.dailies.then(db => db.updateOne({
-                    userId: user.id,
-                }, { $set: { streak: 1, lastDaily: new Date } }));
+                await this.dailies.then(db =>
+                    db.updateOne(
+                        {
+                            userId: user.id,
+                        },
+                        { $set: { streak: 1, lastDaily: new Date() } }
+                    )
+                );
 
                 return {
                     dailies,
@@ -225,15 +237,22 @@ class CreditsManager {
             }
         }
 
-        if (!lastDaily) lastDaily = {
-            streak: 0,
-        };
+        if (!lastDaily)
+            lastDaily = {
+                streak: 0,
+            };
 
         const streak = (lastDaily.streak % CreditsManager.MAX_STREAK) + 1;
 
-        await this.dailies.then(db => db.updateOne({
-            userId: user.id,
-        }, { $set: { streak, lastDaily: new Date } }, { upsert: true }));
+        await this.dailies.then(db =>
+            db.updateOne(
+                {
+                    userId: user.id,
+                },
+                { $set: { streak, lastDaily: new Date() } },
+                { upsert: true }
+            )
+        );
 
         return {
             dailies,
@@ -261,9 +280,15 @@ class CreditsManager {
      * @param {string} name
      */
     async setName(guild, name) {
-        await this.config.then(db => db.updateOne({ guildId: guild.id }, {
-            $set: { name },
-        }, { upsert: true }));
+        await this.config.then(db =>
+            db.updateOne(
+                { guildId: guild.id },
+                {
+                    $set: { name },
+                },
+                { upsert: true }
+            )
+        );
     }
 
     /**
@@ -300,4 +325,4 @@ class CreditsManager {
 
 CreditsManager.MAX_STREAK = 5;
 
-module.exports = new CreditsManager;
+module.exports = new CreditsManager();

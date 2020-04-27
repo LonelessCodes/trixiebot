@@ -28,8 +28,8 @@ class SlotsDatabase {
         this.db = db.collection("slots");
         this.db.createIndex({ userId: 1 }, { unique: true });
 
-        /** @type {Map<string, SlotsDatabase>} */
-        this._slots = new Map;
+        /** @type {Map<string, SlotsCursor>} */
+        this._slots = new Map();
     }
 
     /**

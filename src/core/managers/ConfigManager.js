@@ -64,7 +64,7 @@ class Parameter {
         if (this.allowEmpty && (/empty|none/i.test(value) || value === "" || value === null)) return null;
         if (/default/i.test(value)) return this.defaultValue;
 
-        for (let type of this.types) {
+        for (const type of this.types) {
             if (typeof type === "string" && type.toLowerCase() === value.toLowerCase()) return type;
             if (typeof type === "number" && type === parseFloat(value)) return type;
         }
@@ -123,13 +123,13 @@ class ConfigManager {
         const values = {};
 
         for (let i = 0; i < parameters.length; i++) {
-            let parameter = parameters[i];
+            const parameter = parameters[i];
             parameter.position = i;
             parameter.setClient(this.client);
 
             if (parameter.name instanceof Array) {
                 for (let j = 0; j < parameter.name.length; j++) {
-                    let sub = parameter.name[j];
+                    const sub = parameter.name[j];
                     sub.position = j;
                     sub.setClient(this.client);
 
@@ -149,8 +149,8 @@ class ConfigManager {
         // will fire instantly if loaded already, are wait
         // till all configurations are initially loaded into memory
         let config = await this._cache.get(guildId);
-        if (!config) config = Object.assign({}, this.default_config);
-        else config = Object.assign({}, this.default_config, config);
+        if (!config) config = { ...this.default_config };
+        else config = { ...this.default_config, ...config };
 
         delete config.guildId;
         delete config._id;
@@ -158,11 +158,12 @@ class ConfigManager {
         if (parameter) {
             parameter = parameter.split(".");
             let path = config;
-            for (let param of parameter) {
+            for (const param of parameter) {
                 path = path[param];
             }
             return path;
-        } else return config;
+        }
+        return config;
     }
 
     async set(guildId, values = {}) {
@@ -178,12 +179,12 @@ class ConfigManager {
         };
         func(values);
 
-        const config = await this._cache.get(guildId) || {};
+        const config = (await this._cache.get(guildId)) || {};
         for (const key in values) {
             index(config, key, values[key]);
         }
 
-        await this._cache.set(guildId, Object.assign({}, this.default_config, config));
+        await this._cache.set(guildId, { ...this.default_config, ...config });
     }
 }
 

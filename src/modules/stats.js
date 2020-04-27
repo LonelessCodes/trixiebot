@@ -70,7 +70,7 @@ class BotStats extends EventEmitter {
         this.db = database().then(db => db.collection("bot_stats"));
 
         /** @type {Map<string, Stat>} */
-        this._map = new Map;
+        this._map = new Map();
 
         this.broadcastStats();
     }
@@ -132,10 +132,10 @@ class WebStats extends EventEmitter {
         });
 
         /** @type {Map<string, Stat>} */
-        this._map = new Map;
+        this._map = new Map();
 
         for (const name in this.NAME) {
-            const stat = new Stat;
+            const stat = new Stat();
             stat.on("change", value => this.emit("change", { name, value }));
             this._map.set(name, stat);
         }
@@ -144,12 +144,16 @@ class WebStats extends EventEmitter {
     }
 
     awaitStats() {
-        ipc.awaitAnswer("getWebStats").then(({ stats }) => {
-            for (const name in stats) {
-                if (!this.has(name)) continue;
-                this.get(name).set(stats[name]);
-            }
-        }).catch(() => { /* Do nothing */ });
+        ipc.awaitAnswer("getWebStats")
+            .then(({ stats }) => {
+                for (const name in stats) {
+                    if (!this.has(name)) continue;
+                    this.get(name).set(stats[name]);
+                }
+            })
+            .catch(() => {
+                /* Do nothing */
+            });
 
         setTimeout(() => this.awaitStats(), 10000);
     }
@@ -172,6 +176,6 @@ class WebStats extends EventEmitter {
 }
 
 module.exports = {
-    web: new WebStats,
-    bot: new BotStats,
+    web: new WebStats(),
+    bot: new BotStats(),
 };

@@ -20,7 +20,7 @@ const OnlineStream = require("../stream/OnlineStream");
 // eslint-disable-next-line no-unused-vars
 const StreamConfig = require("../stream/StreamConfig");
 // eslint-disable-next-line no-unused-vars
-const ParsedStream = require("../stream/ParsedStream");
+const ParsedStream = require("../stream/ParsedStream").default;
 
 class StreamProcessor extends EventEmitter {
     /**

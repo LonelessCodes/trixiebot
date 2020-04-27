@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,15 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class ParsedStream {
-    constructor(service, username, userId) {
-        /** @type {PicartoProcessor|TwitchProcessor|PiczelProcessor|SmashcastProcessor} */
+export default class ParsedStream {
+    public service: import("../processor/Processor");
+    public username: string | null;
+    public userId: string | null;
+
+    constructor(service: import("../processor/Processor"), username: string | null, userId: string | null) {
         this.service = service;
-        /** @type {string} */
         this.username = username || null;
-        /** @type {string} */
         this.userId = userId || null;
     }
 }
-
-module.exports = ParsedStream;

@@ -16,7 +16,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const Discord = require("discord.js");
-const ParsedStream = require("./ParsedStream");
+const ParsedStream = require("./ParsedStream").default;
 
 class StreamConfig extends ParsedStream {
     constructor(service, channel, nsfwChannel, sfwChannel, conf = {}) {

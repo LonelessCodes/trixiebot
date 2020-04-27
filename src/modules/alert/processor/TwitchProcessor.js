@@ -18,7 +18,7 @@ const log = require("../../../log").default.namespace("alert cmd");
 const config = require("../../../config").default;
 
 const Processor = require("./Processor");
-const ParsedStream = require("../stream/ParsedStream");
+const ParsedStream = require("../stream/ParsedStream").default;
 const OnlineStream = require("../stream/OnlineStream");
 // eslint-disable-next-line no-unused-vars
 const Stream = require("../stream/Stream");

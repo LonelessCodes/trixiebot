@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 
 const config = require("../config").default;
 const log = require("../log").default;
-const Derpibooru = require("../modules/Derpibooru");
+const Derpibooru = require("../modules/Derpibooru").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 const Translation = require("../modules/i18n/Translation").default;
 
@@ -43,7 +43,8 @@ async function process(key) {
 }
 
 module.exports = function install(cr) {
-    if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
+    if (!config.has("derpibooru.key"))
+        return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
     cr.registerCommand("horsepussy", new SimpleCommand(() => process(config.get("derpibooru.key"))))
         .setHelp(new HelpContent().setUsage("", "Get some gud quality horse pussi OwO"))

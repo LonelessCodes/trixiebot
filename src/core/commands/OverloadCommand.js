@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,14 @@
  */
 
 const BaseCommand = require("./BaseCommand");
-const HelpBuilder = require("../../util/commands/HelpBuilder");
+const HelpBuilder = require("../../util/commands/HelpBuilder").default;
 
 class OverloadCommand extends BaseCommand {
     constructor() {
         super();
 
         /** @type {Map<string, BaseCommand>} */
-        this.overloads = new Map;
+        this.overloads = new Map();
 
         this._linked_to = this;
     }
@@ -59,8 +59,8 @@ class OverloadCommand extends BaseCommand {
      */
     getCmd(args) {
         const size = args.length;
-        for (let [num, cmd] of this.overloads) {
-            for (let option of num.split(/, */).map(s => s.trim())) {
+        for (const [num, cmd] of this.overloads) {
+            for (const option of num.split(/, */).map(s => s.trim())) {
                 if (/^[0-9]+\+$/.test(option)) {
                     const num = parseInt(option.slice(0, -1));
                     if (!Number.isNaN(num) && size >= num) return cmd;
@@ -96,7 +96,7 @@ class OverloadCommand extends BaseCommand {
 
     setScope(v, recursive = false) {
         super.setScope(v, recursive);
-        for (let [, cmd] of this.overloads) cmd.setScope(v, recursive);
+        for (const [, cmd] of this.overloads) cmd.setScope(v, recursive);
         return this;
     }
 }

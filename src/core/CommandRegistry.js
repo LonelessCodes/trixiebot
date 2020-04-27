@@ -19,17 +19,17 @@ const BaseCommand = require("./commands/BaseCommand");
 const AliasCommand = require("./commands/AliasCommand");
 const CCManager = require("./managers/CCManager");
 // eslint-disable-next-line no-unused-vars
-const CommandScope = require("../util/commands/CommandScope");
-const Category = require("../util/commands/Category");
+const CommandScope = require("../util/commands/CommandScope").default;
+const Category = require("../util/commands/Category").default;
 
 class CommandRegistry {
     constructor(client, database) {
         this.CC = new CCManager(client, database);
 
         /** @type {Map<string, BaseCommand>} */
-        this.commands = new Map;
+        this.commands = new Map();
         /** @type {Map<RegExp, BaseCommand>} */
-        this.keywords = new Map;
+        this.keywords = new Map();
         /** @type {Array<{ scope: CommandScope; priority: boolean; handler(context: MessageContext): Promise<void> }>} */
         this.processed_handlers = [];
     }
@@ -84,8 +84,8 @@ class CommandRegistry {
     }
 
     /*
-    * Keyword Commands
-    */
+     * Keyword Commands
+     */
 
     /**
      * @param {RegExp} match
@@ -110,31 +110,33 @@ class CommandRegistry {
     getCommand(message, prefix_used, command_name) {
         if (prefix_used) {
             const command = this.commands.get(command_name);
-            if (command) return {
-                type: CommandRegistry.TYPE.COMMAND,
-                trigger: command_name,
-                command: command,
-                ...CommandRegistry.resolveCommand(command_name, command),
-            };
+            if (command)
+                return {
+                    type: CommandRegistry.TYPE.COMMAND,
+                    trigger: command_name,
+                    command: command,
+                    ...CommandRegistry.resolveCommand(command_name, command),
+                };
         }
 
-        for (let [regex, command] of this.keywords) {
+        for (const [regex, command] of this.keywords) {
             // There appears to be a bug where "@someone" is only a match
             // every second time. Setting lastIndex to 0 before a test solves that
             regex.lastIndex = 0;
 
-            if (regex.test(message.content)) return {
-                type: CommandRegistry.TYPE.KEYWORD,
-                trigger: regex,
-                command: command,
-                ...CommandRegistry.resolveCommand(regex, command),
-            };
+            if (regex.test(message.content))
+                return {
+                    type: CommandRegistry.TYPE.KEYWORD,
+                    trigger: regex,
+                    command: command,
+                    ...CommandRegistry.resolveCommand(regex, command),
+                };
         }
     }
 
     /*
-    * Message Processed Handlers
-    */
+     * Message Processed Handlers
+     */
 
     // eslint-disable-next-line valid-jsdoc
     /**

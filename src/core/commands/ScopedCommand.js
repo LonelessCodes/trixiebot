@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  */
 
 const BaseCommand = require("./BaseCommand");
-const CommandScope = require("../../util/commands/CommandScope");
+const CommandScope = require("../../util/commands/CommandScope").default;
 
 class ScopedCommand extends BaseCommand {
     constructor() {
@@ -46,7 +46,7 @@ class ScopedCommand extends BaseCommand {
     }
 
     getCmd(channel) {
-        for (let command of this.scopes) {
+        for (const command of this.scopes) {
             if (command.hasScope(channel)) return command;
         }
     }
@@ -68,8 +68,8 @@ class ScopedCommand extends BaseCommand {
     registerScope(scope, command) {
         command = command.setScope(scope);
         const scopes = command.scope.toArray();
-        for (let s of this.scopes) {
-            for (let v of scopes) {
+        for (const s of this.scopes) {
+            for (const v of scopes) {
                 if (s.scope.has(CommandScope.FLAGS[v])) throw new Error("Scope already registered");
             }
         }

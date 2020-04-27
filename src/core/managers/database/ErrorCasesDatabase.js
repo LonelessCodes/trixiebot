@@ -16,7 +16,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const Mongo = require("mongodb");
-const getNextSequence = require("../../../modules/db/getNextSequence");
+const getNextSequence = require("../../../modules/db/getNextSequence").default;
 
 class ErrorCasesDatabase {
     /**

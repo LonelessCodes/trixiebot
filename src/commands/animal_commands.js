@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@ const log = require("../log").default;
 const twitter = require("../modules/twitter");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 const Translation = require("../modules/i18n/Translation").default;
 const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
@@ -42,7 +42,7 @@ function reconnectFetch(url, init) {
         const time_wait = reconnectTries * reconnectTries * 1000;
         if (time_wait > 0) await timeout(time_wait);
         try {
-            const response = await fetch(url, init);
+            const response = await fetch.default(url, init);
             return await response.json();
         } catch (err) {
             reconnectTries++;
@@ -80,17 +80,19 @@ async function randomBird() {
 }
 
 module.exports = function install(cr) {
-    cr.registerCommand("cat", new SimpleCommand(async () =>
-        new TranslationMerge(new Translation("animal.cat", "meow"), catFace(), await randomCat())
-    ))
+    cr.registerCommand(
+        "cat",
+        new SimpleCommand(async () => new TranslationMerge(new Translation("animal.cat", "meow"), catFace(), await randomCat()))
+    )
         .setHelp(new HelpContent().setUsage("", "Random cat image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("cat", "kitty");
 
-    cr.registerCommand("dog", new SimpleCommand(async () =>
-        new TranslationMerge(new Translation("animal.dog", "woof"), dogFace(), await randomDog())
-    ))
+    cr.registerCommand(
+        "dog",
+        new SimpleCommand(async () => new TranslationMerge(new Translation("animal.dog", "woof"), dogFace(), await randomDog()))
+    )
         .setHelp(new HelpContent().setUsage("", "Random dog image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
@@ -99,9 +101,10 @@ module.exports = function install(cr) {
     cr.registerAlias("dog", "bork");
     cr.registerAlias("dog", "pup");
 
-    cr.registerCommand("fox", new SimpleCommand(async () =>
-        new TranslationMerge(new Translation("animal.fox", "yip"), "🦊", await randomFox())
-    ))
+    cr.registerCommand(
+        "fox",
+        new SimpleCommand(async () => new TranslationMerge(new Translation("animal.fox", "yip"), "🦊", await randomFox()))
+    )
         .setHelp(new HelpContent().setUsage("", "Random fox image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
@@ -109,17 +112,21 @@ module.exports = function install(cr) {
     cr.registerAlias("fox", "foxi");
     cr.registerAlias("fox", "weff");
 
-    cr.registerCommand("shibe", new SimpleCommand(async () =>
-        new TranslationMerge(new Translation("animal.shibe", "weff"), dogFace(), await randomShibe())
-    ))
+    cr.registerCommand(
+        "shibe",
+        new SimpleCommand(
+            async () => new TranslationMerge(new Translation("animal.shibe", "weff"), dogFace(), await randomShibe())
+        )
+    )
         .setHelp(new HelpContent().setUsage("", "Random SHIBE image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
     cr.registerAlias("shibe", "shiba");
 
-    cr.registerCommand("bird", new SimpleCommand(async () =>
-        new TranslationMerge(new Translation("animal.bird", "peep"), "ovo", await randomBird())
-    ))
+    cr.registerCommand(
+        "bird",
+        new SimpleCommand(async () => new TranslationMerge(new Translation("animal.bird", "peep"), "ovo", await randomBird()))
+    )
         .setHelp(new HelpContent().setUsage("", "Random Birb image ovo"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
@@ -152,24 +159,28 @@ module.exports = function install(cr) {
             if (data.length <= 1) tweets_available = false;
             else {
                 smallest_id = lastItem(data).id_str;
-                data.filter(tweet => tweet.entities.media && tweet.entities.media[0])
-                    .forEach(tweet => possums.add(tweet.entities.media[0].media_url_https));
+                data.filter(tweet => tweet.entities.media && tweet.entities.media[0]).forEach(tweet =>
+                    possums.add(tweet.entities.media[0].media_url_https)
+                );
             }
             resolve(possums); // indicates that the set now has a few values, and then just continue fetching more
-            await timeout(60000 * 15 / 900); // care about rate limits
+            await timeout((60000 * 15) / 900); // care about rate limits
         }
 
         log.namespace("possum cmd")("Possums loaded:", possums.size);
     }).catch(log);
 
     async function randomPossum() {
-        return await randomItem([...await possums]);
+        return await randomItem([...(await possums)]);
     }
 
-    cr.registerCommand("possum", new SimpleCommand(async () =>
-        new TranslationMerge("<:possum:671445107781795851>", await randomPossum())
-    ))
-        .setHelp(new HelpContent().setUsage("", "Gets random Opossum image~. Gets images from <https://twitter.com/PossumEveryHour>"))
+    cr.registerCommand(
+        "possum",
+        new SimpleCommand(async () => new TranslationMerge("<:possum:671445107781795851>", await randomPossum()))
+    )
+        .setHelp(
+            new HelpContent().setUsage("", "Gets random Opossum image~. Gets images from <https://twitter.com/PossumEveryHour>")
+        )
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL, true);
 

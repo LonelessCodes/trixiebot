@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
 
 const BaseCommand = require("./BaseCommand");
 const { userToString } = require("../../util/util");
-const RateLimiter = require("../../util/commands/RateLimiter");
-const TimeUnit = require("../../modules/TimeUnit");
-const HelpContent = require("../../util/commands/HelpContent");
-const Category = require("../../util/commands/Category");
-const MessageMentions = require("../../util/commands/MessageMentions");
+const RateLimiter = require("../../util/commands/RateLimiter").default;
+const TimeUnit = require("../../modules/TimeUnit").default;
+const HelpContent = require("../../util/commands/HelpContent").default;
+const Category = require("../../util/commands/Category").default;
+const MessageMentions = require("../../util/discord/MessageMentions").default;
 const secureRandom = require("../../modules/random/secureRandom").default;
 
 const { MessageAttachment } = require("discord.js");
@@ -32,9 +32,11 @@ class ImageActionCommand extends BaseCommand {
         super();
 
         this.setRateLimiter(new RateLimiter(TimeUnit.SECOND, 10));
-        this.setHelp(new HelpContent()
-            // .setDescription(image + " someone!!!!!")
-            .setUsage("<@user>"));
+        this.setHelp(
+            new HelpContent()
+                // .setDescription(image + " someone!!!!!")
+                .setUsage("<@user>")
+        );
         this.setCategory(Category.ACTION);
 
         this.image = image;
@@ -52,9 +54,9 @@ class ImageActionCommand extends BaseCommand {
         }
 
         const phrase = await secureRandom(this.texts);
-        const user = mentions.everyone ?
-            new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount }) :
-            userToString(mention);
+        const user = mentions.everyone
+            ? new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount })
+            : userToString(mention);
 
         const attachment = new MessageAttachment(this.image);
 

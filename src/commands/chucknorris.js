@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,27 +14,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fetch = require("node-fetch");
+const { default: fetch, Response: FetchResponse } = require("node-fetch");
 const HTMLDecoderEncoder = require("html-encoder-decoder");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 module.exports = function install(cr) {
-    cr.registerCommand("chucknorris", new SimpleCommand(async () => {
-        /** @type {} */
-        const request = await fetch("https://api.chucknorris.io/jokes/random");
-        const magic = await request.json();
-        if (!magic) {
-            throw new Error("API fucked up");
-        }
+    cr.registerCommand(
+        "chucknorris",
+        new SimpleCommand(async () => {
+            /** @type {FetchResponse} */
+            const request = await fetch("https://api.chucknorris.io/jokes/random");
+            const magic = await request.json();
+            if (!magic) {
+                throw new Error("API fucked up");
+            }
 
-        return HTMLDecoderEncoder.decode(magic.value);
-    }))
-        .setHelp(new HelpContent()
-            .setDescription("Chuck\nNorris\nFacts!!!"))
+            return HTMLDecoderEncoder.decode(magic.value);
+        })
+    )
+        .setHelp(new HelpContent().setDescription("Chuck\nNorris\nFacts!!!"))
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 };

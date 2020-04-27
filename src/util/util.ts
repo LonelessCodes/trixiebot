@@ -30,14 +30,12 @@ export function isPlainObject(input: any) {
     return input && !Array.isArray(input) && typeof input === "object";
 }
 
-export function findDefaultChannel(guild: Discord.Guild) {
-    return (
-        guild.channels.cache.find(c => new RegExp("general", "g").test(c.name) && c.type === "text") ||
+export function findDefaultChannel(guild: Discord.Guild): Discord.TextChannel {
+    return (guild.channels.cache.find(c => new RegExp("general", "g").test(c.name) && c.type === "text") ||
         guild.channels.cache
             .filter(c => c instanceof Discord.TextChannel)
             .sort((a, b) => a.rawPosition - b.rawPosition)
-            .find(c => !!guild.me && !!c.permissionsFor(guild.me)?.has("SEND_MESSAGES"))
-    );
+            .find(c => !!guild.me && !!c.permissionsFor(guild.me)?.has("SEND_MESSAGES"))) as Discord.TextChannel;
 }
 
 export function resolveUser(user: UserResolvable): Discord.User {

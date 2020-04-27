@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
 const BaseCommand = require("./BaseCommand");
 
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("../../util/commands/MessageContext");
+const MessageContext = require("../../util/commands/MessageContext").default;
 
 class SimpleCommand extends BaseCommand {
     // eslint-disable-next-line valid-jsdoc
     /**
      * @param {(message: MessageContext, command_name: string) => *} func
      */
-    constructor(func = async () => { /* Do nothing */ }) {
+    constructor(func) {
         super();
 
         this.func = func;

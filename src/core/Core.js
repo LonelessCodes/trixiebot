@@ -22,23 +22,23 @@ const log = require("../log").default.namespace("core");
 const config = require("../config").default;
 const { walk } = require("../util/files");
 const { timeout } = require("../util/promises");
-const helpToJSON = require("../util/commands/helpToJSON");
+const helpToJSON = require("../util/commands/helpToJSON").default;
 const nanoTimer = require("../modules/timer").default;
-const random = require("../modules/random/random");
-const calendar_events = require("../modules/calendar_events");
+const random = require("../modules/random/random").default;
+const calendar_events = require("../modules/calendar/events").default;
 
 const CommandProcessor = require("./CommandProcessor");
 
 const DatabaseManager = require("./managers/DatabaseManager");
 const CM = require("./managers/ConfigManager");
-const LocaleManager = require("./managers/LocaleManager");
+const LocaleManager = require("./managers/LocaleManager").default;
 const WebsiteManager = require("./managers/WebsiteManager");
 const UpvotesManager = require("./managers/UpvotesManager");
 const MemberLog = require("./listeners/MemberLog");
 
 const Discord = require("discord.js");
 
-const CommandScope = require("../util/commands/CommandScope");
+const CommandScope = require("../util/commands/CommandScope").default;
 const AliasCommand = require("./commands/AliasCommand");
 const Translation = require("../modules/i18n/Translation").default;
 
@@ -155,8 +155,8 @@ class Core {
         // by sorting we're getting around an always different order of commands, which
         // confuses git
         jason.commands = jason.commands.sort((a, b) => {
-            if (a.name < b.name) { return -1; }
-            if (a.name > b.name) { return 1; }
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
             return 0;
         });
 
@@ -164,7 +164,7 @@ class Core {
         const src = path.join(var_dir, "commands.json");
         const dest = path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json");
 
-        if (!await fs.pathExists(var_dir)) await fs.mkdir(var_dir);
+        if (!(await fs.pathExists(var_dir))) await fs.mkdir(var_dir);
         await fs.writeFile(src, JSON.stringify(jason, null, 2));
         await fs.copy(src, dest, { overwrite: true });
 

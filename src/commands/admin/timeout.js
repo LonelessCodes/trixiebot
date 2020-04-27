@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,19 @@
 const { userToString, fetchMember } = require("../../util/util");
 const { toHumanTime, parseHumanTime } = require("../../util/time");
 const { splitArgs } = require("../../util/string");
+const { doNothing } = require("../../util/promises");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const OverloadCommand = require("../../core/commands/OverloadCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const CommandPermission = require("../../util/commands/CommandPermission");
-const CommandScope = require("../../util/commands/CommandScope");
-const Category = require("../../util/commands/Category");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const CommandPermission = require("../../util/commands/CommandPermission").default;
+const CommandScope = require("../../util/commands/CommandScope").default;
+const Category = require("../../util/commands/Category").default;
 const MessageMentions = require("../../util/discord/MessageMentions").default;
 
-/** @type {{ [id: string]: { last: boolean; time: Date; message: Discord.Message } }} */
+/** @type {{ [id: string]: { last?: boolean; time?: Date; message?: Discord.Message } }} */
 const timeout_notices = {};
 
 const Translation = require("../../modules/i18n/Translation").default;
@@ -48,15 +49,14 @@ module.exports = function install(cr, { db }) {
     const permission = new CommandPermission([Discord.Permissions.FLAGS.MANAGE_MESSAGES]);
 
     cr.registerProcessedHandler(new CommandScope(CommandScope.FLAGS.GUILD), true, async ({ message, ctx }) => {
-        if (!timeout_notices[message.channel.id])
-            timeout_notices[message.channel.id] = {};
+        if (!timeout_notices[message.channel.id]) timeout_notices[message.channel.id] = {};
 
         const timeout_entry = await database.findOne({ guildId: message.guild.id, memberId: message.author.id });
         if (timeout_entry) {
             const timeleft = timeout_entry.expiresAt.getTime() - Date.now();
             if (timeleft > 0) {
                 const content = message.content;
-                message.delete().catch(() => { /* Do nothing */ });
+                message.delete().catch(doNothing);
 
                 const expiresIn = toHumanTime(timeleft);
 
@@ -99,106 +99,137 @@ module.exports = function install(cr, { db }) {
                 // mongodb has some problems with syncing the expiresAt index properly.
                 // It can take up to a minute for it to remove the document, so we just
                 // remove it manually if it hasn't been cleared already
-                await database.deleteOne({ _id: timeout_entry._id }).catch(() => { /* Do nothing */ });
+                await database.deleteOne({ _id: timeout_entry._id }).catch(doNothing);
             }
         }
 
         timeout_notices[message.channel.id].last = false;
     });
 
-    const timeoutCommand = cr.registerCommand("timeout", new TreeCommand)
-        .setHelp(new HelpContent()
-            .setUsage("<time> <user mention 1> <user mention 2> ...")
-            .addParameter("time", "timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs")
-            .addParameter("user mention", "user to timeout. Multiple users possible"))
+    const timeoutCommand = cr
+        .registerCommand("timeout", new TreeCommand())
+        .setHelp(
+            new HelpContent()
+                .setUsage("<time> <user mention 1> <user mention 2> ...")
+                .addParameter("time", "timeout length. E.g.: `1h 20m 10s`, `0d 100m 70s` or `0.5h` are valid inputs")
+                .addParameter("user mention", "user to timeout. Multiple users possible")
+        )
         .setCategory(Category.MODERATION)
         .setPermissions(permission);
 
-    timeoutCommand.registerSubCommand("remove", new SimpleCommand(async ({ message, mentions, ctx }) => {
-        const members = mentions.members.array();
+    timeoutCommand
+        .registerSubCommand(
+            "remove",
+            new SimpleCommand(async ({ message, mentions, ctx }) => {
+                const members = mentions.members.array();
 
-        if (members.length === 0) {
-            return new Translation("timeouts.found_no_mentions", "Found none of the mentioned users here");
-        }
+                if (members.length === 0) {
+                    return new Translation("timeouts.found_no_mentions", "Found none of the mentioned users here");
+                }
 
-        for (const member of members) {
-            await database_messages.updateMany({
-                guildId: message.guild.id,
-                memberId: member.id,
-            }, {
-                $set: {
-                    timeoutEnd: new Date,
-                },
-            });
-        }
+                for (const member of members) {
+                    await database_messages.updateMany(
+                        {
+                            guildId: message.guild.id,
+                            memberId: member.id,
+                        },
+                        {
+                            $set: {
+                                timeoutEnd: new Date(),
+                            },
+                        }
+                    );
+                }
 
-        const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
+                const promises = members.map(member => database.deleteOne({ guildId: member.guild.id, memberId: member.id }));
 
-        await ctx.send(new Translation("timeout.remove_success", "Removed timeouts for {{user}} successfully. Get dirty~", {
-            users: new ListFormat(members.map(member => userToString(member))),
-        }));
+                await ctx.send(
+                    new Translation("timeout.remove_success", "Removed timeouts for {{user}} successfully. Get dirty~", {
+                        users: new ListFormat(members.map(member => userToString(member))),
+                    })
+                );
 
-        await Promise.all(promises);
-    }))
-        .setHelp(new HelpContent()
-            .setUsage("<user mention 1> <user mention 2> ...")
-            .addParameter("user mention", "user to remove timeout from. Multiple users possible"));
+                await Promise.all(promises);
+            })
+        )
+        .setHelp(
+            new HelpContent()
+                .setUsage("<user mention 1> <user mention 2> ...")
+                .addParameter("user mention", "user to remove timeout from. Multiple users possible")
+        );
 
-    timeoutCommand.registerSubCommand("clear", new SimpleCommand(async message => {
-        const timeouts = await database.find({ guildId: message.guild.id }).toArray();
+    timeoutCommand
+        .registerSubCommand(
+            "clear",
+            new SimpleCommand(async message => {
+                const timeouts = await database.find({ guildId: message.guild.id }).toArray();
 
-        for (const timeout of timeouts) {
-            await database_messages.updateMany({
-                guildId: message.guild.id,
-                memberId: timeout.memberId,
-            }, {
-                $set: {
-                    timeoutEnd: new Date,
-                },
-            });
-        }
+                for (const timeout of timeouts) {
+                    await database_messages.updateMany(
+                        {
+                            guildId: message.guild.id,
+                            memberId: timeout.memberId,
+                        },
+                        {
+                            $set: {
+                                timeoutEnd: new Date(),
+                            },
+                        }
+                    );
+                }
 
-        await database.deleteMany({ guildId: message.guild.id });
+                await database.deleteMany({ guildId: message.guild.id });
 
-        return new Translation("timeout.remove_all_success", "Removed all timeouts successfully");
-    }))
+                return new Translation("timeout.remove_all_success", "Removed all timeouts successfully");
+            })
+        )
         .setHelp(new HelpContent().setUsage("", "remove all timeouts"));
 
-    timeoutCommand.registerSubCommand("list", new SimpleCommand(async message => {
-        let longestName = 0;
-        let longestString = 0;
+    timeoutCommand
+        .registerSubCommand(
+            "list",
+            new SimpleCommand(async message => {
+                let longestName = 0;
+                let longestString = 0;
 
-        const timeouts = await database.find({ guildId: message.guild.id }).toArray();
-        const docs = await Promise.all(timeouts.map(async doc => {
-            doc.member = await fetchMember(message.guild, doc.memberId);
-            return doc;
-        })).then(arr => arr.filter(doc => !!doc.member).map(doc => {
-            if (longestName < userToString(doc.member).length) {
-                longestName = userToString(doc.member).length;
-            }
-            doc.string = toHumanTime(doc.expiresAt.getTime() - Date.now());
-            if (longestString < doc.string.length) {
-                longestString = doc.string.length;
-            }
-            return doc;
-        }));
+                const timeouts = await database.find({ guildId: message.guild.id }).toArray();
+                const docs = await Promise.all(
+                    timeouts.map(async doc => {
+                        doc.member = await fetchMember(message.guild, doc.memberId);
+                        return doc;
+                    })
+                ).then(arr =>
+                    arr
+                        .filter(doc => !!doc.member)
+                        .map(doc => {
+                            if (longestName < userToString(doc.member).length) {
+                                longestName = userToString(doc.member).length;
+                            }
+                            doc.string = toHumanTime(doc.expiresAt.getTime() - Date.now());
+                            if (longestString < doc.string.length) {
+                                longestString = doc.string.length;
+                            }
+                            return doc;
+                        })
+                );
 
-        let str = "```";
-        for (const doc of docs) {
-            str += "\n";
-            str += userToString(doc.member);
-            str += new Array(longestName - userToString(doc.member).length).fill(" ").join("");
-            str += " | ";
-            str += doc.string;
-        }
-        str += "\n```";
-        await message.channel.send(str);
-    }))
-        .setHelp(new HelpContent()
-            .setUsage("", "list all timeouts present at the moment"));
+                let str = "```";
+                for (const doc of docs) {
+                    str += "\n";
+                    str += userToString(doc.member);
+                    str += new Array(longestName - userToString(doc.member).length).fill(" ").join("");
+                    str += " | ";
+                    str += doc.string;
+                }
+                str += "\n```";
+                await message.channel.send(str);
+            })
+        )
+        .setHelp(new HelpContent().setUsage("", "list all timeouts present at the moment"));
 
-    timeoutCommand.registerDefaultCommand(new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async ({ message, content: msg, ctx }) => {
+    timeoutCommand.registerDefaultCommand(new OverloadCommand()).registerOverload(
+        "1+",
+        new SimpleCommand(async ({ message, content: msg, ctx }) => {
             const args = splitArgs(msg, 2);
             if (args.length < 2) {
                 return new Translation("timeout.at_least", "At least two arguments are required: duration and @user");
@@ -262,5 +293,6 @@ module.exports = function install(cr, { db }) {
             ));
 
             await Promise.all(promises);
-        }));
+        })
+    );
 };

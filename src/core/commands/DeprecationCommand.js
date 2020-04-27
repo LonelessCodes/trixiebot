@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
 
 // eslint-disable-next-line no-unused-vars
 const BaseCommand = require("./BaseCommand");
-const { ResolvableObject: Resolvable } = require("../../modules/i18n/Resolvable");
+const { Resolvable } = require("../../modules/i18n/Resolvable");
 
 class DeprecationCommand extends BaseCommand {
     /**
-     * @param {string|Resolvable} desc
+     * @param {Resolvable<string>} desc
      */
     constructor(desc) {
         super();

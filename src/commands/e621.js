@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
 const log = require("../log").default.namespace("e621");
 const { splitArgs } = require("../util/string");
 const { findAndRemove } = require("../util/array");
-const fetch = require("node-fetch");
+const fetch = require("node-fetch").default;
 const INFO = require("../info").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 const Translation = require("../modules/i18n/Translation").default;
 const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
@@ -33,9 +33,8 @@ const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 const filter_tags = ["shota", "cub", "self_harm", "suicide", "animal_abuse", "gore", "child_abuse"];
 
 async function fetchImages(params) {
-    let string = [];
-    for (const key in params)
-        string.push(key + "=" + params[key]);
+    const string = [];
+    for (const key in params) string.push(key + "=" + params[key]);
 
     const url = `https://e621.net/posts.json?${string.join("&")}`;
 
@@ -50,7 +49,7 @@ async function fetchImages(params) {
 }
 
 async function process(message, msg, type) {
-    let args = splitArgs(msg, 2);
+    const args = splitArgs(msg, 2);
 
     let amount = 1;
     try {
@@ -61,7 +60,7 @@ async function process(message, msg, type) {
             }
             amount = numParse;
         } else throw new Error("NaN Error"); // go catch
-    } catch (_) {
+    } catch {
         amount = 1;
         args[1] = args[0] + " " + args[1];
         args[0] = "";
@@ -75,8 +74,7 @@ async function process(message, msg, type) {
 
     // filter nsfw tags in sfw channel
     if (!message.channel.nsfw) {
-        for (const tag of ["rating:e", "rating:q", "rating:explicit", "rating:questionable"])
-            findAndRemove(tags, tag);
+        for (const tag of ["rating:e", "rating:q", "rating:explicit", "rating:questionable"]) findAndRemove(tags, tag);
         tags.push("rating:s");
     }
 
@@ -85,12 +83,22 @@ async function process(message, msg, type) {
     for (const tag of filter_tags) findAndRemove(tags, tag);
 
     let warning = null;
-    if (length_before > tags.length) warning = new Translation("derpi.warning", "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly");
+    if (length_before > tags.length)
+        warning = new Translation(
+            "derpi.warning",
+            "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly"
+        );
 
     switch (type) {
-        case "random": tags.push("order:random"); break; // sort randomly
-        case "first": tags.push("order:id"); break; // sort by id, ascending
-        case "top": tags.push("order:score"); break; // sort by score, descending (why the same syntax has different behaviours? idk man)
+        case "random":
+            tags.push("order:random");
+            break; // sort randomly
+        case "first":
+            tags.push("order:id");
+            break; // sort by id, ascending
+        case "top":
+            tags.push("order:score");
+            break; // sort by score, descending (why the same syntax has different behaviours? idk man)
     }
 
     // join to a query string
@@ -125,26 +133,36 @@ async function process(message, msg, type) {
     }
 
     if (results.length === 0) {
-        if (!warning) return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+        if (!warning)
+            return new Translation(
+                "general.not_found",
+                "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it..."
+            );
         return warning;
     }
 
     return new TranslationMerge(
         warning,
-        results.map(result => {
-            let str = "";
-            if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
-            str += `*<https://e621.net/posts/${result.id}>* `;
-            str += result.image_url;
-            return str;
-        }).join("\n")
+        results
+            .map(result => {
+                let str = "";
+                if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
+                str += `*<https://e621.net/posts/${result.id}>* `;
+                str += result.image_url;
+                return str;
+            })
+            .join("\n")
     ).separator("\n");
 }
 
 module.exports = function install(cr) {
-    const e621Command = cr.registerCommand("e621", new TreeCommand)
-        .setHelp(new HelpContent()
-            .setDescription("Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
+    const e621Command = cr
+        .registerCommand("e621", new TreeCommand())
+        .setHelp(
+            new HelpContent().setDescription(
+                "Search images on e621. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."
+            )
+        )
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL, true);
 
@@ -152,27 +170,30 @@ module.exports = function install(cr) {
      * SUB COMMANDS
      */
 
-    e621Command.registerSubCommand("random", new OverloadCommand)
+    e621Command
+        .registerSubCommand("random", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "random")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>")
-            .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
-            .addParameter("query", "a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)"));
+        .setHelp(
+            new HelpContent()
+                .setUsage("<?amount> <query>")
+                .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
+                .addParameter("query", "a query string. Uses E621's syntax (<https://e621.net/help/show/tags>)")
+        );
 
-    e621Command.registerSubCommand("latest", new OverloadCommand)
+    e621Command
+        .registerSubCommand("latest", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "latest")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>"));
+        .setHelp(new HelpContent().setUsage("<?amount> <query>"));
 
-    e621Command.registerSubCommand("first", new OverloadCommand)
+    e621Command
+        .registerSubCommand("first", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "first")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>"));
+        .setHelp(new HelpContent().setUsage("<?amount> <query>"));
 
-    e621Command.registerSubCommand("top", new OverloadCommand)
+    e621Command
+        .registerSubCommand("top", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(message, content, "top")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>"));
+        .setHelp(new HelpContent().setUsage("<?amount> <query>"));
 
     e621Command.registerSubCommandAlias("random", "*");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ const ipc = require("../../modules/concurrency/ipc");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const BaseCommand = require("../../core/commands/BaseCommand");
-const Category = require("../../util/commands/Category");
-const CommandScope = require("../../util/commands/CommandScope");
+const Category = require("../../util/commands/Category").default;
+const CommandScope = require("../../util/commands/CommandScope").default;
 
 const extnames = {
     ".js": "javascript",
@@ -39,7 +39,7 @@ const extnames = {
 async function sendLargeText(channel, str, lang = "") {
     const collector = channel.createMessageCollector(m => m.content.toLowerCase() === "quit!", { max: 1 });
     let quit = false;
-    collector.once("collect", () => quit = true);
+    collector.once("collect", () => (quit = true));
 
     do {
         if (quit) break;
@@ -82,7 +82,7 @@ module.exports = function install(cr, { client, config, locale, db }) {
 
             await sendLargeText(message.channel, file_content, language);
         }
-    })
+    }())
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 

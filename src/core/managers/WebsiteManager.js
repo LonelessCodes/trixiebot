@@ -15,12 +15,12 @@
  */
 
 const { userToString, isOwner } = require("../../util/util");
-const getChangelog = require("../../modules/getChangelog");
+const getChangelog = require("../../modules/getChangelog").default;
 const ipc = require("../../modules/concurrency/ipc");
 const guild_stats = require("./GuildStatsManager");
-const LocaleManager = require("./LocaleManager");
+const LocaleManager = require("./LocaleManager").default;
 const AliasCommand = require("../commands/AliasCommand");
-const Category = require("../../util/commands/Category");
+const Category = require("../../util/commands/Category").default;
 
 // TODO: use .fetch instead of .get
 function cleanContent(str, guild) {

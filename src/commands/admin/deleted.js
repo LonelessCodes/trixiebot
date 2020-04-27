@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@ const { userToString } = require("../../util/util");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const CommandPermission = require("../../util/commands/CommandPermission");
-const Category = require("../../util/commands/Category");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const CommandPermission = require("../../util/commands/CommandPermission").default;
+const Category = require("../../util/commands/Category").default;
 
 const PaginatorGuildAction = require("../../modules/actions/PaginatorGuildAction");
 
@@ -38,29 +38,33 @@ module.exports = function install(cr, { client, db }) {
         if (message.content === "") return;
         if (message.channel.type !== "text") return;
 
-        await database.updateOne({
-            messageId: message.id,
-        }, {
-            $set: {
-                guildId: message.guild.id,
-                channelId: message.channel.id,
-                userId: message.author.id,
-                name: message.author.tag,
-                attachments: message.attachments.map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
-                createdAt: message.createdAt,
-                deletedAt: new Date,
-                deleted: true,
+        await database.updateOne(
+            {
+                messageId: message.id,
             },
-            $push: {
-                edits: {
-                    content: message.content,
-                    editedAt: message.editedAt || message.createdAt,
+            {
+                $set: {
+                    guildId: message.guild.id,
+                    channelId: message.channel.id,
+                    userId: message.author.id,
+                    name: message.author.tag,
+                    attachments: message.attachments.map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
+                    createdAt: message.createdAt,
+                    deletedAt: new Date(),
+                    deleted: true,
+                },
+                $push: {
+                    edits: {
+                        content: message.content,
+                        editedAt: message.editedAt || message.createdAt,
+                    },
+                },
+                $unset: {
+                    editedAt: 1,
                 },
             },
-            $unset: {
-                editedAt: 1,
-            },
-        }, { upsert: true });
+            { upsert: true }
+        );
     });
 
     client.on("messageUpdate", async (message, new_message) => {
@@ -68,31 +72,37 @@ module.exports = function install(cr, { client, db }) {
         if (message.author.id === client.user.id) return;
         if (message.channel.type !== "text") return;
 
-        await database.updateOne({
-            messageId: message.id,
-        }, {
-            $set: {
-                guildId: message.guild.id,
-                channelId: message.channel.id,
-                userId: message.author.id,
-                name: message.author.tag,
-                attachments: message.attachments.array().map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
-                createdAt: message.createdAt,
-                editedAt: new_message.editedAt,
-                deleted: false,
+        await database.updateOne(
+            {
+                messageId: message.id,
             },
-            $push: {
-                edits: {
-                    content: message.content,
-                    editedAt: message.editedAt || message.createdAt,
+            {
+                $set: {
+                    guildId: message.guild.id,
+                    channelId: message.channel.id,
+                    userId: message.author.id,
+                    name: message.author.tag,
+                    attachments: message.attachments
+                        .array()
+                        .map(a => ({ url: a.url, size: a.filesize, isImg: a.width && a.height })),
+                    createdAt: message.createdAt,
+                    editedAt: new_message.editedAt,
+                    deleted: false,
+                },
+                $push: {
+                    edits: {
+                        content: message.content,
+                        editedAt: message.editedAt || message.createdAt,
+                    },
                 },
             },
-        }, { upsert: true });
+            { upsert: true }
+        );
     });
 
     // Registering down here
 
-    const deletedCommand = cr.registerCommand("deleted", new TreeCommand)
+    const deletedCommand = cr.registerCommand("deleted", new TreeCommand())
         .setHelp(new HelpContent()
             .setDescription("Trixie can collect deleted for up to 7 days, so you always know what's going on in your server behind your back.\nCommand enabled by default. Soon option to turn it off")
             .setUsage("", "List all deleted messages from the last 7 days"))
@@ -137,7 +147,7 @@ module.exports = function install(cr, { client, db }) {
             items.push(str);
         }
 
-        new PaginatorGuildAction(
+        await new PaginatorGuildAction(
             new Translation("deleted.title", "Deleted Messages"),
             new Translation(
                 "deleted.description", "Messages deleted or edited by users: **{{count}}**", { count: items.length }

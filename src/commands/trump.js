@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,42 +15,50 @@
  */
 
 const { userToString } = require("../util/util");
-const fetch = require("node-fetch");
+const fetch = require("node-fetch").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 module.exports = function install(cr) {
-    cr.registerCommand("trump", new SimpleCommand(async ({ message, ctx }) => {
-        if (message.channel.type === "text") {
-            const mentions = ctx.mentions;
-            if (mentions.members.size > 0) {
-                const member = mentions.members.first();
+    cr.registerCommand(
+        "trump",
+        new SimpleCommand(async ({ message, ctx }) => {
+            if (message.channel.type === "text") {
+                const mentions = ctx.mentions;
+                if (mentions.members.size > 0) {
+                    const member = mentions.members.first();
 
-                const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" + encodeURIComponent(userToString(member)));
-                const magic = await request.json();
-                if (!magic) {
-                    throw new Error("API fucked up");
+                    const request = await fetch(
+                        "https://api.whatdoestrumpthink.com/api/v1/quotes/personalized?q=" +
+                            encodeURIComponent(userToString(member))
+                    );
+                    const magic = await request.json();
+                    if (!magic) {
+                        throw new Error("API fucked up");
+                    }
+
+                    return magic.message;
                 }
-
-                return magic.message;
             }
-        }
 
-        const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/random");
-        const magic = await request.json();
-        if (!magic) {
-            throw new Error("API fucked up");
-        }
+            const request = await fetch("https://api.whatdoestrumpthink.com/api/v1/quotes/random");
+            const magic = await request.json();
+            if (!magic) {
+                throw new Error("API fucked up");
+            }
 
-        return magic.message;
-    }))
-        .setHelp(new HelpContent()
-            .setDescription("What would Trump say?\nGets a random Trump quote")
-            .setUsage("<?@mention>")
-            .addParameterOptional("@mention", "If mentioned a user, command will return a personalized quote"))
+            return magic.message;
+        })
+    )
+        .setHelp(
+            new HelpContent()
+                .setDescription("What would Trump say?\nGets a random Trump quote")
+                .setUsage("<?@mention>")
+                .addParameterOptional("@mention", "If mentioned a user, command will return a personalized quote")
+        )
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 };

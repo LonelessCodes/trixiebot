@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@ const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const OverloadCommand = require("../../core/commands/OverloadCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const CommandPermission = require("../../util/commands/CommandPermission");
-const Category = require("../../util/commands/Category");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const CommandPermission = require("../../util/commands/CommandPermission").default;
+const Category = require("../../util/commands/Category").default;
 
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;
@@ -39,95 +39,8 @@ const types_human = new Map([
 ]);
 
 module.exports = function install(cr, { config }) {
-    cr.registerCommand("config", new OverloadCommand)
-        .setHelp(new HelpContent()
-            .setUsage("<?parameter> <?value>", "view the Trixie's config in this server")
-            .addParameterOptional("parameter", "view only this parameter's config")
-            .addParameterOptional("value", "set a parameter in Trixie's config. \"default\" for default config"))
-        .setCategory(Category.CONFIG)
-        .setPermissions(CommandPermission.ADMIN)
-
-        .registerOverload("0", new SimpleCommand(({ message, prefix }) => {
-            const embed = new TranslationEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setTitle(message.guild.name);
-            embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
-            embed.setDescription(new Translation(
-                "config.description", "Use the command format !config <option> to view more info about an option."
-            ));
-
-            const parameters = config.parameters;
-
-            for (let i = 0; i < parameters.length; i++) {
-                let parameter = parameters[i];
-
-                if (Array.isArray(parameter.name)) {
-                    const str = new TranslationMerge().separator("\n");
-                    for (let j = 0; j < parameter.name.length; j++) {
-                        let sub = parameter.name[j];
-                        sub.position = j;
-
-                        str.push(new TranslationMerge(`\`${prefix}config ${sub.name}\` -`, sub.humanName));
-                    }
-                    embed.addField(parameter.humanName, str, true);
-                } else {
-                    embed.addField(parameter.humanName, `\`${prefix}config ${parameter.name}\``, true);
-                }
-            }
-
-            return embed;
-        }))
-        .registerOverload("1", new SimpleCommand(({ message, prefix, content: arg }) => {
-            const find = () => {
-                let rtn;
-                const find = p => {
-                    if (p.name instanceof Array) return p.name.find(find);
-                    if (p.name === arg) rtn = p;
-                };
-                config.parameters.find(find);
-                return rtn;
-            };
-
-            return getParameter(message, prefix, find());
-        }))
-        .registerOverload("2+", new SimpleCommand(({ message, content }) => {
-            const args = splitArgs(content, 2);
-            const value = findArgs(args[1])[0];
-
-            const find = () => {
-                let rtn;
-                const find = p => {
-                    if (p.name instanceof Array) return p.name.find(find);
-                    if (p.name === args[0]) rtn = p;
-                };
-                config.parameters.find(find);
-                return rtn;
-            };
-
-            return setParameter(message, find(), value);
-        }));
-
-    cr.registerAlias("config", "cfg");
-    cr.registerAlias("config", "opts");
-
-    // prefix alias
-
-    cr.registerCommand("prefix", new OverloadCommand)
-        .setHelp(new HelpContent()
-            .setDescription("Alias for `{{prefix}}config prefix <?value>`")
-            .setUsage("<?prefix>", "view Trixie's prefix in this server")
-            .addParameterOptional("prefix", "set the prefix in Trixie's config. \"default\" for default prefix `(!)`"))
-        .setCategory(Category.CONFIG)
-        .setPermissions(CommandPermission.ADMIN)
-
-        .registerOverload("0", new SimpleCommand(({ message, prefix }) =>
-            getParameter(message, prefix, config.parameters.find(p => p.name === "prefix"))
-        ))
-        .registerOverload("1+", new SimpleCommand(({ message, content }) =>
-            setParameter(message, config.parameters.find(p => p.name === "prefix"), content)
-        ));
-
     async function getParameter(message, prefix, parameter) {
-        const embed = new TranslationEmbed;
+        const embed = new TranslationEmbed();
 
         if (!parameter) {
             embed.setColor(CONST.COLOR.ERROR);
@@ -141,33 +54,38 @@ module.exports = function install(cr, { config }) {
             const human_readable = parameter.human(value);
             embed.addField(new Translation("config.currently", "Currently:"), `\`${human_readable}\``);
             embed.addField(new Translation("config.update", "Update:"), `\`${prefix}config ${parameter.name} <new value>\``);
-            embed.addField(new Translation("config.allowed_types", "Allowed Types:"), new ListFormat(
-                parameter.types
-                    .concat(parameter.allowEmpty ? ["none"] : [])
-                    .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
-                { type: "or" }
-            ));
+            embed.addField(
+                new Translation("config.allowed_types", "Allowed Types:"),
+                new ListFormat(
+                    parameter.types
+                        .concat(parameter.allowEmpty ? ["none"] : [])
+                        .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
+                    { type: "or" }
+                )
+            );
         }
 
         return embed;
     }
 
     async function setParameter(message, parameter, value) {
-        const embed = new TranslationEmbed;
+        const embed = new TranslationEmbed();
 
         if (!parameter) {
             embed.setColor(CONST.COLOR.ERROR);
             embed.setDescription(new Translation("config.no_parameter", "No such parameter. *shrugs*"));
         } else if (!parameter.check(value)) {
             embed.setColor(CONST.COLOR.ERROR);
-            embed.setDescription(new Translation("config.wrong_format", "New value has a wrong format. Should be {{format}}", {
-                format: new ListFormat(
-                    parameter.types
-                        .concat(parameter.allowEmpty ? ["none"] : [])
-                        .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
-                    { type: "or" }
-                ),
-            }));
+            embed.setDescription(
+                new Translation("config.wrong_format", "New value has a wrong format. Should be {{format}}", {
+                    format: new ListFormat(
+                        parameter.types
+                            .concat(parameter.allowEmpty ? ["none"] : [])
+                            .map(t => types_human.get(t) || new TranslationMerge("`", t, "`").separator("")),
+                        { type: "or" }
+                    ),
+                })
+            );
         } else {
             embed.setColor(CONST.COLOR.PRIMARY);
 
@@ -175,11 +93,114 @@ module.exports = function install(cr, { config }) {
             const human_readable = parameter.human(new_value);
             await config.set(message.guild.id, { [parameter.name]: new_value });
 
-            embed.setDescription(new Translation("config.success", ":ok_hand: Set to `{{value}}`", {
-                value: human_readable,
-            }));
+            embed.setDescription(
+                new Translation("config.success", ":ok_hand: Set to `{{value}}`", {
+                    value: human_readable,
+                })
+            );
         }
 
         return embed;
     }
+
+    cr.registerCommand("config", new OverloadCommand())
+        .setHelp(
+            new HelpContent()
+                .setUsage("<?parameter> <?value>", "view the Trixie's config in this server")
+                .addParameterOptional("parameter", "view only this parameter's config")
+                .addParameterOptional("value", 'set a parameter in Trixie\'s config. "default" for default config')
+        )
+        .setCategory(Category.CONFIG)
+        .setPermissions(CommandPermission.ADMIN)
+
+        .registerOverload(
+            "0",
+            new SimpleCommand(({ message, prefix }) => {
+                const embed = new TranslationEmbed().setColor(CONST.COLOR.PRIMARY);
+                embed.setTitle(message.guild.name);
+                embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
+                embed.setDescription(
+                    new Translation(
+                        "config.description",
+                        "Use the command format !config <option> to view more info about an option."
+                    )
+                );
+
+                const parameters = config.parameters;
+
+                for (const parameter of parameters) {
+                    if (Array.isArray(parameter.name)) {
+                        const str = new TranslationMerge().separator("\n");
+                        for (let j = 0; j < parameter.name.length; j++) {
+                            const sub = parameter.name[j];
+                            sub.position = j;
+
+                            str.push(new TranslationMerge(`\`${prefix}config ${sub.name}\` -`, sub.humanName));
+                        }
+                        embed.addField(parameter.humanName, str, true);
+                    } else {
+                        embed.addField(parameter.humanName, `\`${prefix}config ${parameter.name}\``, true);
+                    }
+                }
+
+                return embed;
+            })
+        )
+        .registerOverload(
+            "1",
+            new SimpleCommand(({ message, prefix, content: arg }) => {
+                const find = () => {
+                    let rtn;
+                    const find = p => {
+                        if (p.name instanceof Array) return p.name.find(find);
+                        if (p.name === arg) rtn = p;
+                    };
+                    config.parameters.find(find);
+                    return rtn;
+                };
+
+                return getParameter(message, prefix, find());
+            })
+        )
+        .registerOverload(
+            "2+",
+            new SimpleCommand(({ message, content }) => {
+                const args = splitArgs(content, 2);
+                const value = findArgs(args[1])[0];
+
+                const find = () => {
+                    let rtn;
+                    const find = p => {
+                        if (p.name instanceof Array) return p.name.find(find);
+                        if (p.name === args[0]) rtn = p;
+                    };
+                    config.parameters.find(find);
+                    return rtn;
+                };
+
+                return setParameter(message, find(), value);
+            })
+        );
+
+    cr.registerAlias("config", "cfg");
+    cr.registerAlias("config", "opts");
+
+    // prefix alias
+
+    cr.registerCommand("prefix", new OverloadCommand())
+        .setHelp(
+            new HelpContent()
+                .setDescription("Alias for `{{prefix}}config prefix <?value>`")
+                .setUsage("<?prefix>", "view Trixie's prefix in this server")
+                .addParameterOptional("prefix", 'set the prefix in Trixie\'s config. "default" for default prefix `(!)`')
+        )
+        .setCategory(Category.CONFIG)
+        .setPermissions(CommandPermission.ADMIN)
+
+        .registerOverload("0", new SimpleCommand(({ message, prefix }) =>
+            getParameter(message, prefix, config.parameters.find(p => p.name === "prefix"))
+        ))
+        .registerOverload("1+", new SimpleCommand(({ message, content }) =>
+            setParameter(message, config.parameters.find(p => p.name === "prefix"), content)
+        ));
 };

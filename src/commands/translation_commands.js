@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 /*
  * OWO Translator:
@@ -36,17 +36,19 @@ const faces = {
 function owos(input) {
     return input
         .replace(/(?<![.?!])$/, Math.random() > 0.7 ? " " + random(faces["."]) : "")
-        .replace(/(!+|\?+|((?<!\.)\.(?!\.)))/g, match => match[0] in faces ? " " + random(faces[match[0]]) : match);
+        .replace(/(!+|\?+|((?<!\.)\.(?!\.)))/g, match => (match[0] in faces ? " " + random(faces[match[0]]) : match));
 }
 
 function casing(input) {
-    return input.split(/(?<=[!.?]\s*)/g)
+    return input
+        .split(/(?<=[!.?]\s*)/g)
         .map(satz => satz[0].toUpperCase() + satz.slice(1).toLowerCase())
         .join("");
 }
 
 function stutter(input) {
-    return input.split(/\s+/)
+    return input
+        .split(/\s+/)
         .map(word => {
             const r = Math.random();
             if (r > 0.15 || word === "") return word;
@@ -57,20 +59,23 @@ function stutter(input) {
 }
 
 function transform(input) {
-    return input.split(/\s+/g)
-        .map(word => word
-            .replace(/^you$/gi, "u")
-            .replace(/^your$/gi, "ur")
-            .replace(/^you're$/gi, "ur")
-            .replace(/l/gi, "w")
-            .replace(/v/gi, "w")
-            .replace(/th/gi, "t")
-            .replace(/^no/i, "nwo")
-            .replace(/d(?!$)/gi, "w")
-            .replace(/o$/i, "ow")
-            .replace(/r([aeiou])/gi, (_, match) => `w${match}`)
-            .replace(/(?<=\w)([^AEIOUaeiou]+)ou/, (_, match) => `${"w".repeat(match.length)}ou`)
-            .replace(/eou/, "ewou"))
+    return input
+        .split(/\s+/g)
+        .map(word =>
+            word
+                .replace(/^you$/gi, "u")
+                .replace(/^your$/gi, "ur")
+                .replace(/^you're$/gi, "ur")
+                .replace(/l/gi, "w")
+                .replace(/v/gi, "w")
+                .replace(/th/gi, "t")
+                .replace(/^no/i, "nwo")
+                .replace(/d(?!$)/gi, "w")
+                .replace(/o$/i, "ow")
+                .replace(/r([aeiou])/gi, (_, match) => `w${match}`)
+                .replace(/(?<=\w)([^AEIOUaeiou]+)ou/, (_, match) => `${"w".repeat(match.length)}ou`)
+                .replace(/eou/, "ewou")
+        )
         .join(" ");
 }
 
@@ -87,7 +92,7 @@ function translateOwo(input) {
 }
 
 module.exports = function install(cr) {
-    cr.registerCommand("owo", new OverloadCommand)
+    cr.registerCommand("owo", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ content }) => translateOwo(content)))
         .setHelp(new HelpContent()
             .setUsage("<text>", "Translate anything to h-hewwo language")

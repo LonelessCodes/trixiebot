@@ -20,15 +20,15 @@ const { splitArgs } = require("../util/string");
 const BaseCommand = require("./commands/BaseCommand");
 // eslint-disable-next-line no-unused-vars
 const CustomCommand = require("./commands/CustomCommand");
-const Category = require("../util/commands/Category");
-const CommandPermission = require("../util/commands/CommandPermission");
-const CommandScope = require("../util/commands/CommandScope");
-const HelpBuilder = require("../util/commands/HelpBuilder");
-const RateLimiter = require("../util/commands/RateLimiter");
-const TimeUnit = require("../modules/TimeUnit");
+const Category = require("../util/commands/Category").default;
+const CommandPermission = require("../util/commands/CommandPermission").default;
+const CommandScope = require("../util/commands/CommandScope").default;
+const HelpBuilder = require("../util/commands/HelpBuilder").default;
+const RateLimiter = require("../util/commands/RateLimiter").default;
+const TimeUnit = require("../modules/TimeUnit").default;
 const DocumentMapCache = require("../modules/db/DocumentMapCache").default;
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("../util/commands/MessageContext");
+const MessageContext = require("../util/commands/MessageContext").default;
 // eslint-disable-next-line no-unused-vars
 const Discord = require("discord.js");
 // eslint-disable-next-line no-unused-vars
@@ -46,8 +46,10 @@ const DurationFormat = require("../modules/i18n/DurationFormat").default;
  */
 function debugString(command_name, context) {
     switch (context.channel.type) {
-        case "text": return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, guild:${context.guild.id}`;
-        default: return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, c_type:${context.channel.type}`;
+        case "text":
+            return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, guild:${context.guild.id}`;
+        default:
+            return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, c_type:${context.channel.type}`;
     }
 }
 
@@ -65,9 +67,7 @@ class CommandDispatcher {
         this.global_ratelimit_message = new RateLimiter(TimeUnit.MINUTE, 5);
 
         // caches
-        this.blacklisted_users = new DocumentMapCache(
-            database.collection("blacklisted"), "userId", { maxSize: 0, ttl: 3600 }
-        );
+        this.blacklisted_users = new DocumentMapCache(database.collection("blacklisted"), "userId", { maxSize: 0, ttl: 3600 });
 
         this.timeout = database.collection("timeout");
         this.timeout.createIndex({ guildId: 1, memberId: 1 }, { unique: true });
@@ -188,7 +188,11 @@ class CommandDispatcher {
         // command is moderation and user got perms for it
         // we check for the perms of the category, because there are now two moderator categories: Config and Moderation
         // that use CommandPermissions.ADMIN
-        const is_mod_cmd = command && is_guild && command.category.permissions === Category.MODERATION.permissions && command.permissions.test(context.member);
+        const is_mod_cmd =
+            command &&
+            is_guild &&
+            command.category.permissions === Category.MODERATION.permissions &&
+            command.permissions.test(context.member);
 
         if (!is_owner_cmd) {
             if (await this.blacklisted_users.has(context.author.id)) {

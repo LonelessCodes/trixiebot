@@ -18,8 +18,8 @@ const { userToString } = require("../../util/util");
 const CONST = require("../../const").default;
 const events = require("events");
 // eslint-disable-next-line no-unused-vars
-const I18nLocale = require("../../modules/i18n/I18nLocale").default;
-const { ResolvableObject: Resolvable } = require("../../modules/i18n/Resolvable");
+const { I18nLocale } = require("../../modules/i18n/I18n");
+const { Resolvable, ResolvableObject } = require("../../modules/i18n/Resolvable");
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;
 const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
@@ -28,9 +28,9 @@ const { User, TextChannel, Message, MessageReaction, Permissions } = require("di
 
 class PaginatorAction extends events.EventEmitter {
     /**
-     * @param {string|Resolvable} title The title of the embed
-     * @param {string|Resolvable} content The message text
-     * @param {(string|Resolvable)[]} items The items to show
+     * @param {Resolvable<string>} title The title of the embed
+     * @param {Resolvable<string>} content The message text
+     * @param {Resolvable<string>[]} items The items to show
      * @param {User} user The user object of the instantiator
      * @param {Object} [opts] Options for the paginator
      * @param {number} [opts.items_per_page] Max items per page
@@ -38,7 +38,7 @@ class PaginatorAction extends events.EventEmitter {
      * @param {boolean} [opts.show_page_numbers] Wether to show page numbers
      * @param {boolean} [opts.wrap_page_ends] Wether should wrap around back to the first page if clicking "next" on last page
      * @param {boolean} [opts.number_items] Wether to number the items
-     * @param {[(string|Resolvable), (string|Resolvable)]} [opts.prefix_suffix] What to prefix and or suffix to the list of each page
+     * @param {[Resolvable<string>, Resolvable<string>]} [opts.prefix_suffix] What to prefix and or suffix to the list of each page
      */
     constructor(title, content, items, user, {
         items_per_page = 15,
@@ -179,7 +179,7 @@ class PaginatorAction extends events.EventEmitter {
                 reaction.users.remove(this.user);
         } catch (_) { _; }
 
-        const msg = this.renderPage(new_page_num).map(elem => Resolvable.resolve(elem, translator));
+        const msg = this.renderPage(new_page_num).map(elem => ResolvableObject.resolve(elem, translator));
         this.pagination(await message.edit(...msg), translator, new_page_num);
     }
 

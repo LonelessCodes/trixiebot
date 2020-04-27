@@ -16,17 +16,24 @@
 
 const credits = require("../CreditsManager");
 const Translation = require("../../../modules/i18n/Translation").default;
-const TranslationMerge = require("../../../modules/i18n/TranslationMerge.ts").default;
+const TranslationMerge = require("../../../modules/i18n/TranslationMerge").default;
 
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @param {import("../../../../../../TrixieBot/trixiebot/src/util/commands/MessageContext").default} context
+ * @param {Set<string>} activeList
+ * @param {import("../../../../../../TrixieBot/trixiebot/src/util/commands/RateLimiter").default} cooldown
+ * @param {number} cost
+ * @param {import("../../../../../../TrixieBot/trixiebot/src/modules/i18n/Translation").default} success
+ * @param {(cost: number) => Promise<number>} handler
+ */
 async function purchaseSlots(
     context,
     activeList,
     cooldown,
     cost,
     success,
-    handler = async () => {
-        /* Do nothing */
-    }
+    handler
 ) {
     const name = await credits.getName(context.guild);
 

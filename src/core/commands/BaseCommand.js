@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,16 @@
  */
 
 const { toHumanTime } = require("../../util/time");
-const { format } = require("../../util/string");
-const { Message, Channel } = require("discord.js");
 // eslint-disable-next-line no-unused-vars
-const { Category } = require("../../util/commands/Category");
+const Category = require("../../util/commands/Category").default;
 // eslint-disable-next-line no-unused-vars
-const HelpContent = require("../../util/commands/HelpContent");
-const CommandPermission = require("../../util/commands/CommandPermission");
-const CommandScope = require("../../util/commands/CommandScope");
-const RateLimiter = require("../../util/commands/RateLimiter");
-const CalendarRange = require("../../modules/CalendarRange");
-const TimeUnit = require("../../modules/TimeUnit");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const CommandPermission = require("../../util/commands/CommandPermission").default;
+const CommandScope = require("../../util/commands/CommandScope").default;
+const RateLimiter = require("../../util/commands/RateLimiter").default;
+const CalendarRange = require("../../modules/calendar/CalendarRange").default;
+const TimeUnit = require("../../modules/TimeUnit").default;
 
-
-// provide a fallback for old .translate() based commands
-// until they are finally also converted
-Message.prototype.translate = format;
-Channel.prototype.translate = format;
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
 const TranslationPlural = require("../../modules/i18n/TranslationPlural").default;
@@ -53,8 +46,8 @@ class BaseCommand {
         /** @type {string[]} */
         this.aliases = [];
         this.explicit = false;
-        this.scope = new CommandScope(CommandScope.DEFAULT).freeze();
-        this.season = new CalendarRange;
+        this.scope = new CommandScope(CommandScope.DEFAULT);
+        this.season = new CalendarRange();
     }
 
     get category() {
@@ -63,10 +56,7 @@ class BaseCommand {
 
     async rateLimit(context) {
         const id = `${context.channel.type === "text" ? context.guild.id : ""}:${context.channel.id}`;
-        if (
-            !this.rateLimiter ||
-            (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(id))
-        ) return;
+        if (!this.rateLimiter || (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(id))) return;
 
         await context.send(new TranslationPlural(
             "command.ratelimit",
@@ -101,12 +91,11 @@ class BaseCommand {
     }
 
     setPermissions(permissions) {
-        this.permissions =
-            permissions ?
-                permissions instanceof CommandPermission ?
-                    permissions :
-                    new CommandPermission(permissions instanceof Array ? permissions : [permissions]) :
-                CommandPermission.USER;
+        this.permissions = permissions
+            ? permissions instanceof CommandPermission
+                ? permissions
+                : new CommandPermission(permissions instanceof Array ? permissions : [permissions])
+            : CommandPermission.USER;
         return this;
     }
 
@@ -132,12 +121,12 @@ class BaseCommand {
     }
 
     setScope(v) {
-        this.scope = new CommandScope(v || CommandScope.DEFAULT).freeze();
+        this.scope = new CommandScope(v || CommandScope.DEFAULT);
         return this;
     }
 
     setSeason(range) {
-        this.season = range || new CalendarRange;
+        this.season = range || new CalendarRange();
         return this;
     }
 

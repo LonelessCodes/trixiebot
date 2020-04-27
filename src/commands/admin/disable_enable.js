@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const HelpCommand = require("../../core/commands/HelpCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const Category = require("../../util/commands/Category");
-const CategoryClass = Category.Category;
+const HelpContent = require("../../util/commands/HelpContent").default;
+const Category = require("../../util/commands/Category").default;
 
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationPlural = require("../../modules/i18n/TranslationPlural").default;
 const ListFormat = require("../../modules/i18n/ListFormat").default;
-const { ResolvableObject: Resolvable } = require("../../modules/i18n/Resolvable");
+const { ResolvableObject } = require("../../modules/i18n/Resolvable");
 
 // disabled channels
 // disabled commands
@@ -40,11 +39,11 @@ module.exports = function install(cr, { db }) {
     /**
      * DISABLE
      */
-    const disableCmd = cr.registerCommand("disable", new TreeCommand)
+    const disableCmd = cr.registerCommand("disable", new TreeCommand())
         .setHelp(new HelpContent("Disable Trixie from listening to some commands or channels"))
         .setCategory(Category.CONFIG);
 
-    disableCmd.registerDefaultCommand(new HelpCommand);
+    disableCmd.registerDefaultCommand(new HelpCommand());
 
     disableCmd.registerSubCommand("channel", new SimpleCommand(async ({ message }) => {
         const channels = message.mentions.channels;
@@ -104,14 +103,14 @@ module.exports = function install(cr, { db }) {
         }
 
         const trans = await ctx.translator();
-        /** @type {Map<string, CategoryClass>} */
-        const all_categories = new Map;
-        for (let category of Object.keys(Category).filter(c => Category[c] instanceof CategoryClass).map(c => Category[c])) {
+        /** @type {Map<string, Category>} */
+        const all_categories = new Map();
+        for (const category of Object.keys(Category).filter(c => Category[c] instanceof Category).map(c => Category[c])) {
             all_categories.set(category.name.phrase.toLowerCase(), category);
-            all_categories.set(Resolvable.resolve(category.name, trans).toLowerCase(), category);
+            all_categories.set(ResolvableObject.resolve(category.name, trans).toLowerCase(), category);
         }
 
-        /** @type {CategoryClass[]} */
+        /** @type {Category[]} */
         const categories = [];
         const dontExist = [];
         for (const name of categoriesRaw) {
@@ -138,7 +137,7 @@ module.exports = function install(cr, { db }) {
     /**
      * ENABLE
      */
-    const enableCmd = cr.registerCommand("enable", new TreeCommand)
+    const enableCmd = cr.registerCommand("enable", new TreeCommand())
         .setHelp(new HelpContent("If you have disabled channels or commands for Trixie, you can enable them here again."))
         .setCategory(Category.CONFIG);
 
@@ -196,14 +195,14 @@ module.exports = function install(cr, { db }) {
         }
 
         const trans = await ctx.translator();
-        /** @type {Map<string, CategoryClass>} */
-        const all_categories = new Map;
-        for (let category of Object.keys(Category).filter(c => Category[c] instanceof CategoryClass).map(c => Category[c])) {
+        /** @type {Map<string, Category>} */
+        const all_categories = new Map();
+        for (const category of Object.keys(Category).filter(c => Category[c] instanceof Category).map(c => Category[c])) {
             all_categories.set(category.name.phrase.toLowerCase(), category);
-            all_categories.set(Resolvable.resolve(category.name, trans).toLowerCase(), category);
+            all_categories.set(ResolvableObject.resolve(category.name, trans).toLowerCase(), category);
         }
 
-        /** @type {CategoryClass[]} */
+        /** @type {Category[]} */
         const categories = [];
         const dontExist = [];
         for (const name of categoriesRaw) {

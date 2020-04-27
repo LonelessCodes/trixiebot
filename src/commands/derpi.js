@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,29 @@ const log = require("../log").default;
 const random = require("../modules/random/secureRandom").default;
 const { splitArgs } = require("../util/string");
 const { findAndRemove } = require("../util/array");
-const Derpibooru = require("../modules/Derpibooru");
+const Derpibooru = require("../modules/Derpibooru").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
 const TreeCommand = require("../core/commands/TreeCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 const Translation = require("../modules/i18n/Translation").default;
 const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
 //                                                                                               no real gore, but candy gore is allowed
-const filter_tags = ["underage", "foalcon", "bulimia", "self harm", "suicide", "animal cruelty", "(gore AND -candy gore)", "foal abuse"];
+const filter_tags = [
+    "underage",
+    "foalcon",
+    "bulimia",
+    "self harm",
+    "suicide",
+    "animal cruelty",
+    "(gore AND -candy gore)",
+    "foal abuse",
+];
 
 async function getEm(key, type, amount, tags) {
     const derpi = new Derpibooru(key);
@@ -165,13 +174,21 @@ async function process(key, message, msg, type) {
     for (const tag of filter_tags) findAndRemove(tags, tag);
 
     let warning = null;
-    if (length_before > tags.length) warning = new Translation("derpi.warning", "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly");
+    if (length_before > tags.length)
+        warning = new Translation(
+            "derpi.warning",
+            "The content you were trying to look up violates Discord's Community Guidelines :c I had to filter it, cause I wanna be a good filly"
+        );
     tags.push(...filter_tags.map(tag => "-" + tag));
 
     const results = await getEm(key, type, amount, tags);
 
     if (results.length === 0) {
-        if (!warning) return new Translation("general.not_found", "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...");
+        if (!warning)
+            return new Translation(
+                "general.not_found",
+                "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it..."
+            );
         return warning;
     }
 
@@ -190,24 +207,31 @@ async function process(key, message, msg, type) {
 
     return new TranslationMerge(
         warning,
-        results.map(result => {
-            let str = "";
-            if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
-            str += `*<https://derpibooru.org/images/${result.id}>* `;
-            str += result.image_url;
-            return str;
-        }).join("\n")
+        results
+            .map(result => {
+                let str = "";
+                if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
+                str += `*<https://derpibooru.org/images/${result.id}>* `;
+                str += result.image_url;
+                return str;
+            })
+            .join("\n")
     ).separator("\n");
 }
 
 module.exports = function install(cr) {
-    if (!config.has("derpibooru.key")) return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
+    if (!config.has("derpibooru.key"))
+        return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
     const key = config.get("derpibooru.key");
 
-    const derpiCommand = cr.registerCommand("derpi", new TreeCommand)
-        .setHelp(new HelpContent()
-            .setDescription("Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."))
+    const derpiCommand = cr
+        .registerCommand("derpi", new TreeCommand())
+        .setHelp(
+            new HelpContent().setDescription(
+                "Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."
+            )
+        )
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL, true);
 
@@ -215,27 +239,30 @@ module.exports = function install(cr) {
      * SUB COMMANDS
      */
 
-    derpiCommand.registerSubCommand("random", new OverloadCommand)
+    derpiCommand
+        .registerSubCommand("random", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "random")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>")
-            .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
-            .addParameter("query", "a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)"));
+        .setHelp(
+            new HelpContent()
+                .setUsage("<?amount> <query>")
+                .addParameterOptional("amount", "number ranging from 1 to 5 for how many results to return")
+                .addParameter("query", "a query string. Uses Derpibooru's syntax (<https://derpibooru.org/search/syntax>)")
+        );
 
-    derpiCommand.registerSubCommand("top", new OverloadCommand)
+    derpiCommand
+        .registerSubCommand("top", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "top")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>"));
+        .setHelp(new HelpContent().setUsage("<?amount> <query>"));
 
-    derpiCommand.registerSubCommand("latest", new OverloadCommand)
+    derpiCommand
+        .registerSubCommand("latest", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "latest")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>"));
+        .setHelp(new HelpContent().setUsage("<?amount> <query>"));
 
-    derpiCommand.registerSubCommand("first", new OverloadCommand)
+    derpiCommand
+        .registerSubCommand("first", new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(({ message, content }) => process(key, message, content, "first")))
-        .setHelp(new HelpContent()
-            .setUsage("<?amount> <query>"));
+        .setHelp(new HelpContent().setUsage("<?amount> <query>"));
 
     derpiCommand.registerSubCommandAlias("random", "*");
     cr.registerAlias("derpi", "db");

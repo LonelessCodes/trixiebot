@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,7 +104,6 @@ class CreditsManager {
         return await this.getBalance(user);
     }
 
-
     /**
      * Set someone's balance
      * @param {User} user
@@ -158,9 +157,9 @@ class CreditsManager {
 
     /**
      * @param {User} user
-     * @param {string} namespace
-     * @param {number} amount
-     * @returns {{ ts: Date, guildId: string, cost: number, balance: number, ns: string, description: string }[]}
+     * @param {string|number} [namespace]
+     * @param {number} [amount]
+     * @returns {Promise<{ ts: Date, guildId: string, cost: number, balance: number, ns: string, description: string }[]>}
      */
     async getTransactions(user, namespace, amount) {
         if (user instanceof GuildMember) user = user.user;
@@ -280,7 +279,7 @@ class CreditsManager {
      * Convert a balance to a univeral string
      * @param {number} balance
      * @param {string} name
-     * @param {string} middl
+     * @param {string|undefined} [middl]
      * @returns {string}
      */
     getBalanceString(balance = 0, name, middl) {
@@ -291,7 +290,7 @@ class CreditsManager {
      * Convert a balance to a univeral translation resolvable
      * @param {number} balance
      * @param {string} name
-     * @param {string} middl
+     * @param {string|undefined} [middl]
      * @returns {TranslationMerge}
      */
     getBalanceTrans(balance = 0, name, middl) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ const log = require("../log").default;
 const twitter = require("../modules/twitter");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 module.exports = function install(cr) {
     if (!twitter) return log.namespace("config", "Found no API credentials for Twitter - Disabled fact command");
@@ -52,7 +52,7 @@ module.exports = function install(cr) {
                 data.filter(tweet => !tweet.entities.urls[0]).map(tweet => facts.add(tweet.text));
             }
             resolve(facts); // indicates that the set now has a few values, and then just continue fetching more
-            await timeout(60000 * 15 / 900); // care about rate limits
+            await timeout((60000 * 15) / 900); // care about rate limits
         }
 
         log.namespace("fact cmd")("Facts loaded:", facts.size);

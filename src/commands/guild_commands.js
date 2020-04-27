@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@ const Discord = require("discord.js");
 const CONST = require("../const").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
 
 const guild_stats = require("../core/managers/GuildStatsManager");
 const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
@@ -29,14 +29,12 @@ const TranslationPlural = require("../modules/i18n/TranslationPlural").default;
 const ListFormat = require("../modules/i18n/ListFormat").default;
 
 function sort(data) {
-    return data.map(entry => {
-        entry.ts = entry.ts.getTime();
-        return entry;
-    }).sort((a, b) =>
-        b.ts > a.ts ?
-            -1 :
-            b.ts < a.ts ? 1 : 0
-    );
+    return data
+        .map(entry => {
+            entry.ts = entry.ts.getTime();
+            return entry;
+        })
+        .sort((a, b) => (b.ts > a.ts ? -1 : b.ts < a.ts ? 1 : 0));
 }
 
 function findFirstIndex(arr, cb) {
@@ -48,14 +46,14 @@ function findFirstIndex(arr, cb) {
 
 // eslint-disable-next-line valid-jsdoc
 /**
- * @param {Date} start
- * @param {Date} end
- * @param {{ ts: Date, value: number }[][]} param2
- * @returns {string}
+ * @param {Date} start_d
+ * @param {Date} [end_d]
+ * @param {{ ts: Date, value: number }[][]} [param2]
+ * @returns {ListFormat}
  */
-function getString(start, end, [commands = [], messages = [], users = []]) {
-    start = start.getTime();
-    if (end) end = end.getTime();
+function getString(start_d, end_d, [commands = [], messages = [], users = []]) {
+    const start = start_d.getTime();
+    const end = end_d && end_d.getTime();
 
     const findIndex = entry => entry.ts > start;
     const findIndexEnd = entry => entry.ts > end;
@@ -76,25 +74,27 @@ function getString(start, end, [commands = [], messages = [], users = []]) {
     list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], { count: msgs_total }));
 
     const cmds_total = commands.reduce((sum, entry) => sum + entry.value, 0);
-    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], { count: cmds_total }));
+    if (cmds_total)
+        list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], { count: cmds_total }));
 
     const joined_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.added, 0);
     const left_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.removed, 0);
 
-    if (joined_users > 0 || left_users > 0) list.push(new Translation("stats.users", "{{count}} Users", { count: `+${joined_users}/-${left_users}` }));
+    if (joined_users > 0 || left_users > 0)
+        list.push(new Translation("stats.users", "{{count}} Users", { count: `+${joined_users}/-${left_users}` }));
 
     return list;
 }
 
 // eslint-disable-next-line valid-jsdoc
 /**
- * @param {Date} start
+ * @param {Date} start_d
  * @param {number} divider
  * @param {{ ts: Date, value: number }[][]} param2
- * @returns {string}
+ * @returns {ListFormat}
  */
-function getAverageString(start, divider, [commands = [], messages = [], users = []]) {
-    start = start.getTime();
+function getAverageString(start_d, divider, [commands = [], messages = [], users = []]) {
+    const start = start_d.getTime();
 
     const findIndex = entry => entry.ts > start;
 
@@ -105,21 +105,31 @@ function getAverageString(start, divider, [commands = [], messages = [], users =
     const list = new ListFormat();
 
     const msgs_total = messages.reduce((sum, entry) => sum + entry.value, 0) / divider;
-    list.push(new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], { count: msgs_total.toFixed(2) }));
+    list.push(
+        new TranslationPlural("stats.messages", ["{{count}} Message", "{{count}} Messages"], { count: msgs_total.toFixed(2) })
+    );
 
     const cmds_total = commands.reduce((sum, entry) => sum + entry.value, 0) / divider;
-    if (cmds_total) list.push(new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], { count: cmds_total.toFixed(2) }));
+    if (cmds_total)
+        list.push(
+            new TranslationPlural("stats.commands", ["{{count}} Command", "{{count}} Commands"], { count: cmds_total.toFixed(2) })
+        );
 
     const joined_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.added, 0);
     const left_users = users.reduce((accumulator, currentValue) => accumulator + currentValue.removed, 0);
 
-    if (joined_users > 0 || left_users > 0) list.push(new Translation("stats.users", "{{count}} Users", { count: `+${(joined_users / divider).toFixed(2)}/-${(left_users / divider).toFixed(2)}` }));
+    if (joined_users > 0 || left_users > 0)
+        list.push(
+            new Translation("stats.users", "{{count}} Users", {
+                count: `+${(joined_users / divider).toFixed(2)}/-${(left_users / divider).toFixed(2)}`,
+            })
+        );
 
     return list;
 }
 
 function generateTimeFrames() {
-    const now = new Date;
+    const now = new Date();
 
     const today = new Date(now);
     today.setHours(now.getHours() - 24);
@@ -140,76 +150,89 @@ function generateTimeFrames() {
 }
 
 module.exports = function install(cr) {
-    cr.registerCommand("stats", new SimpleCommand(async message => {
-        const guildId = message.guild.id;
+    cr.registerCommand(
+        "stats",
+        new SimpleCommand(async message => {
+            const guildId = message.guild.id;
 
-        const { today, yesterday, week, month, quartal } = generateTimeFrames();
+            const { today, yesterday, week, month, quartal } = generateTimeFrames();
 
-        const results = await Promise.all([
-            guild_stats.get("commands").getRange(quartal, null, guildId).then(sort),
-            guild_stats.get("messages").getRange(quartal, null, guildId).then(sort),
-            guild_stats.get("users").getRange(quartal, null, guildId).then(sort),
+            const results = await Promise.all([
+                guild_stats.get("commands").getRange(quartal, null, guildId).then(sort),
+                guild_stats.get("messages").getRange(quartal, null, guildId).then(sort),
+                guild_stats.get("users").getRange(quartal, null, guildId).then(sort),
 
-            guild_stats.get("users").getLastItemBefore(quartal, guildId),
-        ]);
+                guild_stats.get("users").getLastItemBefore(quartal, guildId),
+            ]);
 
-        const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), message.guild);
+            const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), message.guild);
 
-        embed.addField(new Translation("stats.today", "Today"), getString(today, null, results), true);
-        embed.addField(new Translation("stats.yesterday", "Yesterday"), getString(yesterday, today, results), true);
+            embed.addField(new Translation("stats.today", "Today"), getString(today, null, results), true);
+            embed.addField(new Translation("stats.yesterday", "Yesterday"), getString(yesterday, today, results), true);
 
-        embed.addField(new Translation("stats.avg_7d", "Average (7 days)"), getAverageString(week, 7, results));
-        embed.addField(new Translation("stats.avg_30d", "Average (30 days)"), getAverageString(month, 30, results));
-        if (results[3] && results[3].ts.getTime() < quartal.getTime()) embed.addField(new Translation("stats.avg_90d", "Average (90 days)"), getAverageString(quartal, 90, results));
+            embed.addField(new Translation("stats.avg_7d", "Average (7 days)"), getAverageString(week, 7, results));
+            embed.addField(new Translation("stats.avg_30d", "Average (30 days)"), getAverageString(month, 30, results));
+            if (results[3] && results[3].ts.getTime() < quartal.getTime())
+                embed.addField(new Translation("stats.avg_90d", "Average (90 days)"), getAverageString(quartal, 90, results));
 
-        return { embed };
-    }))
+            return { embed };
+        })
+    )
         .setHelp(new HelpContent().setUsage("", "Get some stats about the alive-ness of this server"))
         .setCategory(Category.INFO);
 
-    cr.registerCommand("userstats", new SimpleCommand(async ({ message, mentions }) => {
-        const member = mentions.members.first() || message.member;
-        const user = member.user;
+    cr.registerCommand(
+        "userstats",
+        new SimpleCommand(async ({ message, mentions }) => {
+            const member = mentions.members.first() || message.member;
+            const user = member.user;
 
-        const guildId = message.guild.id;
+            const guildId = message.guild.id;
 
-        const { today, yesterday, week, month, quartal } = generateTimeFrames();
+            const { today, yesterday, week, month, quartal } = generateTimeFrames();
 
-        const results = await Promise.all([
-            guild_stats.get("commands").getRangeUser(quartal, null, guildId, user.id).then(sort),
-            guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort),
-        ]);
+            const results = await Promise.all([
+                guild_stats.get("commands").getRangeUser(quartal, null, guildId, user.id).then(sort),
+                guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort),
+            ]);
 
-        const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), member);
+            const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), member);
 
-        embed.addField(new Translation("stats.today", "Today"), getString(today, null, results), true);
-        embed.addField(new Translation("stats.yesterday", "Yesterday"), getString(yesterday, today, results), true);
+            embed.addField(new Translation("stats.today", "Today"), getString(today, null, results), true);
+            embed.addField(new Translation("stats.yesterday", "Yesterday"), getString(yesterday, today, results), true);
 
-        embed.addField(new Translation("stats.avg_7d", "Average (7 days)"), getAverageString(week, 7, results));
-        embed.addField(new Translation("stats.avg_30d", "Average (30 days)"), getAverageString(month, 30, results));
-        embed.addField(new Translation("stats.avg_90d", "Average (90 days)"), getAverageString(quartal, 90, results));
+            embed.addField(new Translation("stats.avg_7d", "Average (7 days)"), getAverageString(week, 7, results));
+            embed.addField(new Translation("stats.avg_30d", "Average (30 days)"), getAverageString(month, 30, results));
+            embed.addField(new Translation("stats.avg_90d", "Average (90 days)"), getAverageString(quartal, 90, results));
 
-        return { embed };
-    }))
-        .setHelp(new HelpContent().setUsage("<?@user>", "Get some stats about how active someone is on the server")
-            .addParameterOptional("@user", "The member c:"))
+            return { embed };
+        })
+    )
+        .setHelp(
+            new HelpContent()
+                .setUsage("<?@user>", "Get some stats about how active someone is on the server")
+                .addParameterOptional("@user", "The member c:")
+        )
         .setCategory(Category.INFO);
 
-    cr.registerCommand("serverinfo", new SimpleCommand(async message => {
-        const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
-        embed.setTitle(`${message.guild.name} ${await message.channel.translate("Statistics")}`);
-        embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
+    cr.registerCommand(
+        "serverinfo",
+        new SimpleCommand(message => {
+            const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
+            embed.setTitle(`${message.guild.name} Statistics`);
+            embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
 
-        if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
-        embed.addField("ID", message.guild.id, true);
-        embed.addField("User Count", message.guild.memberCount, true);
-        embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
-        embed.addField("Channel Count", message.guild.channels.cache.filter(c => c.type === "text").size, true);
-        embed.addField("Emoji Count", message.guild.emojis.cache.size, true);
-        embed.addField("Region", message.guild.region, true);
+            if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
+            embed.addField("ID", message.guild.id, true);
+            embed.addField("User Count", message.guild.memberCount, true);
+            embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
+            embed.addField("Channel Count", message.guild.channels.cache.filter(c => c.type === "text").size, true);
+            embed.addField("Emoji Count", message.guild.emojis.cache.size, true);
+            embed.addField("Region", message.guild.region, true);
 
-        return { embed };
-    }))
+            return { embed };
+        })
+    )
         .setHelp(new HelpContent().setUsage("", "Receive information about this server"))
         .setCategory(Category.INFO);
 };

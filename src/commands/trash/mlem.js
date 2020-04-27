@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@ const { userToString } = require("../../util/util");
 const CONST = require("../../const").default;
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const Category = require("../../util/commands/Category");
-const CommandScope = require("../../util/commands/CommandScope");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const Category = require("../../util/commands/Category").default;
+const CommandScope = require("../../util/commands/CommandScope").default;
 
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;

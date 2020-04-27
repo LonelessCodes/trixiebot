@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,16 @@
 
 const log = require("../../log").default.namespace("mute");
 const nanoTimer = require("../../modules/timer").default;
+const { doNothing } = require("../../util/promises");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const OverloadCommand = require("../../core/commands/OverloadCommand");
 const TreeCommand = require("../../core/commands/TreeCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const CommandPermission = require("../../util/commands/CommandPermission");
-const CommandScope = require("../../util/commands/CommandScope");
-const Category = require("../../util/commands/Category");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const CommandPermission = require("../../util/commands/CommandPermission").default;
+const CommandScope = require("../../util/commands/CommandScope").default;
+const Category = require("../../util/commands/Category").default;
 
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationMerge = require("../../modules/i18n/TranslationMerge").default;
@@ -40,9 +41,11 @@ module.exports = function install(cr, { db }) {
     // anywhere up to 80 seconds to get
 
     /** @type {Map<string, Set<string>>} */
-    const muted_words = new Map;
+    const muted_words = new Map();
     const timer = nanoTimer();
-    database.find({}).stream()
+    database
+        .find({})
+        .stream()
         .on("data", ({ word, guildId }) => {
             if (muted_words.has(guildId)) muted_words.get(guildId).add(word);
             else muted_words.set(guildId, new Set([word]));
@@ -58,12 +61,12 @@ module.exports = function install(cr, { db }) {
             for (const word of words) {
                 if (msg.indexOf(word) === -1) continue;
 
-                await message.delete().catch(() => { /* Do nothing */ });
+                await message.delete().catch(doNothing);
             }
         }
     });
 
-    const muteWordCommand = cr.registerCommand("muteword", new TreeCommand)
+    const muteWordCommand = cr.registerCommand("muteword", new TreeCommand())
         .setHelp(new HelpContent()
             .setUsage("<phrase>", "Mute/Blacklist specific words in this server")
             .addParameter("phrase", "Word or phrase to be muted/blacklisted"))
@@ -105,13 +108,12 @@ module.exports = function install(cr, { db }) {
                 new Translation("mute.currently", "Currently muted are:"), "\n",
                 new ListFormat([...muted_words.get(message.guild.id)].map(w => `\`${w}\``))
             );
-        } else {
-            return new Translation("mute.nothing_muted", "Nothing yet muted");
         }
+        return new Translation("mute.nothing_muted", "Nothing yet muted");
     }))
         .setHelp(new HelpContent().setUsage("", "list all muted words and phrases"));
 
-    muteWordCommand.registerDefaultCommand(new OverloadCommand)
+    muteWordCommand.registerDefaultCommand(new OverloadCommand())
         .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
             const word = content.trim().toLowerCase();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,28 +23,6 @@ class Attachment {
             height: attach.height,
             width: attach.width,
             url: attach.url,
-        };
-    }
-}
-
-class Message {
-    constructor(message) {
-        return {
-            id: message.id,
-            member: new Member(message.member),
-            channel: new Channel(message.channel),
-            text: message.content,
-            createdAt: message.createdTimestamp,
-            editedAt: message.editedTimestamp,
-            mentions: {
-                members: message.mentions.members.array().map(m => new Member(m)),
-                channels: message.mentions.channels.array().map(c => new Channel(c)),
-                roles: message.mentions.roles.array().map(c => new Role(c)),
-                everyone: message.mentions.everyone,
-            },
-            pinned: message.pinned,
-            reactions: message.reactions.cache.map(r => new Reaction({ ...r[1], id: r[0] })),
-            attachments: message.attachments.array().map(a => new Attachment(a)),
         };
     }
 }
@@ -127,6 +105,33 @@ class Reaction {
     }
 }
 
+class Message {
+    constructor(message) {
+        return {
+            id: message.id,
+            member: new Member(message.member),
+            channel: new Channel(message.channel),
+            text: message.content,
+            createdAt: message.createdTimestamp,
+            editedAt: message.editedTimestamp,
+            mentions: {
+                members: message.mentions.members.array().map(m => new Member(m)),
+                channels: message.mentions.channels.array().map(c => new Channel(c)),
+                roles: message.mentions.roles.array().map(c => new Role(c)),
+                everyone: message.mentions.everyone,
+            },
+            pinned: message.pinned,
+            reactions: message.reactions.cache.map(r => new Reaction({ ...r[1], id: r[0] })),
+            attachments: message.attachments.array().map(a => new Attachment(a)),
+        };
+    }
+}
+
 module.exports = {
-    Message, Reaction, Emoji, Role, Channel, Member,
+    Message,
+    Reaction,
+    Emoji,
+    Role,
+    Channel,
+    Member,
 };

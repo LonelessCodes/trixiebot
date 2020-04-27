@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,14 @@
  */
 
 const config = require("../config").default;
-const getTumblrBlog = require("../modules/getTumblrBlog");
+const getTumblrBlog = require("../modules/getTumblrBlog").default;
 const secureRandom = require("../modules/random/secureRandom").default;
 const log = require("../log").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 const usernameRegExp = /@([\w-]+)\b/g;
 
@@ -31,24 +31,34 @@ module.exports = function install(cr) {
 
     let quotes = [];
     getTumblrBlog(config.get("tumblr.key"), "incorrectmylittleponyquotes.tumblr.com")
-        .then(posts => posts
-            .filter(post => post.tags.includes("incorrect my little pony quotes"))
-            .map(post => post.body.trim())
-            .filter(post => /\w+:/gi.test(post))
-            .map(quote => quote.replace(usernameRegExp, (_, username) => `<http://${username}.tumblr.com>`)))
-        .then(q => quotes = q)
+        .then(posts =>
+            posts
+                .filter(post => post.tags.includes("incorrect my little pony quotes"))
+                .map(post => post.body.trim())
+                .filter(post => /\w+:/gi.test(post))
+                .map(quote => quote.replace(usernameRegExp, (_, username) => `<http://${username}.tumblr.com>`))
+        )
+        .then(q => (quotes = q))
         .then(() => log.namespace("mlpquote cmd")("Quotes loaded:", quotes.length))
-        .catch(() => { /* Do nothing */ });
+        .catch(() => {
+            /* Do nothing */
+        });
 
-    cr.registerCommand("mlpquote", new SimpleCommand(async () => {
-        if (quotes.length === 0) {
-            return "Quotes not yet done loading :c come back in a few seconds to minutes";
-        }
+    cr.registerCommand(
+        "mlpquote",
+        new SimpleCommand(async () => {
+            if (quotes.length === 0) {
+                return "Quotes not yet done loading :c come back in a few seconds to minutes";
+            }
 
-        return await secureRandom(quotes);
-    }))
-        .setHelp(new HelpContent()
-            .setDescription("Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com"))
+            return await secureRandom(quotes);
+        })
+    )
+        .setHelp(
+            new HelpContent().setDescription(
+                "Gets you only a true incorrect my little pony quote. Parsed from https://incorrectmylittleponyquotes.tumblr.com"
+            )
+        )
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
 

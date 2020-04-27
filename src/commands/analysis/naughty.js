@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,29 @@
  */
 
 const { userToString, progressBar } = require("../../util/util");
+const { doNothing } = require("../../util/promises");
 const CONST = require("../../const").default;
-const Queue = require("../../modules/Queue");
+const Queue = require("../../modules/Queue").default;
 const fs = require("fs-extra");
 const path = require("path");
-const { promisify } = require("util");
-const figlet = promisify(require("figlet"));
+/**
+ * @param {string} txt
+ * @param {string} font
+ * @returns {Promise<string>}
+ */
+const figlet = (txt, font) =>
+    new Promise((resolve, reject) => {
+        require("figlet")(txt, font, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const Category = require("../../util/commands/Category");
-const CalendarRange = require("../../modules/CalendarRange");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const Category = require("../../util/commands/Category").default;
+const CalendarRange = require("../../modules/calendar/CalendarRange").default;
 
 const bad_words_array = fs.readFileSync(path.join(__dirname, "..", "..", "..", "assets", "text", "bad_words.txt"), "utf8").split(",");
 for (let word of bad_words_array) {
@@ -44,11 +55,15 @@ module.exports = function install(cr, { db }) {
     cr.registerCommand("naughty", new SimpleCommand(async message => {
         const progress = await message.channel.send(`${progressBar(0.0, 12, "█", "░")} | Waiting in queue...`);
 
-        queue.push(async () => {
+        await queue.push(async () => {
             const user = message.author;
 
-            const channels = message.guild.channels.cache.array().filter(c => c.type === "text" &&
-                c.permissionsFor(message.guild.me).has(Discord.Permissions.FLAGS.VIEW_CHANNEL));
+            /** @type {Discord.TextChannel[]} */
+            const channels = message.guild.channels.cache
+                .array()
+                .filter(
+                    c => c.type === "text" && c.permissionsFor(message.guild.me).has(Discord.Permissions.FLAGS.VIEW_CHANNEL)
+                );
 
             const step = 1 / channels.length;
             const limit = 4000;
@@ -87,7 +102,10 @@ module.exports = function install(cr, { db }) {
                     messages += m.size;
                     lastID = m.last().id;
 
-                    if (!(j % 8)) progress.edit(`${progressBar((i / channels.length) + ((messages / limit) * step), 12, "█", "░")} | Fetching messages...`);
+                    if (!(j % 8)) {
+                        const v = i / channels.length + (messages / limit) * step;
+                        progress.edit(`${progressBar(v, 12, "█", "░")} | Fetching messages...`).catch(doNothing);
+                    }
                     j++;
                 }
 
@@ -96,7 +114,7 @@ module.exports = function install(cr, { db }) {
 
             await progress.edit(`${progressBar(1, 12, "█", "░")} Done!`);
 
-            const naughty_percent = Math.min(bad_words / total * 45, 1);
+            const naughty_percent = Math.min((bad_words / total) * 45, 1);
 
             const embed = new Discord.MessageEmbed();
 
@@ -107,24 +125,34 @@ module.exports = function install(cr, { db }) {
                 embed.setColor(CONST.COLOR.ERROR);
                 embed.setThumbnail("https://derpicdn.net/img/view/2018/4/9/1703511.png");
                 embed.setTitle(`${userToString(user)} is on the Naughty list`);
-                embed.setDescription(`${str}Oh dear ... You swore a total of **${bad_words}** times in the messages we analysed (${total_user_messages}). It's a lump of coal in your stocking this year, you naughty thing.`);
+                embed.setDescription(
+                    `${str}Oh dear ... You swore a total of **${bad_words}** times in the messages we analysed (${total_user_messages}). It's a lump of coal in your stocking this year, you naughty thing.`
+                );
             } else {
                 embed.setColor(CONST.COLOR.SUCCESS);
                 embed.setTitle(`${userToString(user)} is on the Nice list`);
                 if (naughty_percent === 0) {
-                    embed.setDescription(`${str}Wow! You didn't swear at all in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time.`);
+                    embed.setDescription(
+                        `${str}Wow! You didn't swear at all in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time.`
+                    );
                 } else if (naughty_percent < 0.2) {
-                    embed.setDescription(`${str}Wow! You only swore **${bad_words}** times in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time`);
+                    embed.setDescription(
+                        `${str}Wow! You only swore **${bad_words}** times in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time`
+                    );
                 } else {
                     embed.setColor(CONST.COLOR.WARNING);
-                    embed.setDescription(`${str}Close call! You swore **${bad_words}** times in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time`);
+                    embed.setDescription(
+                        `${str}Close call! You swore **${bad_words}** times in the messages we analysed (${total_user_messages}). Come on! Live a little. No one can be good all the time`
+                    );
                 }
             }
 
             if (Object.keys(bad_words_used).length) {
-                const words = Object.keys(bad_words_used).map(key => [key, bad_words_used[key]]).sort((a, b) => b[1] - a[1]);
+                const words = Object.keys(bad_words_used)
+                    .map(key => [key, bad_words_used[key]])
+                    .sort((a, b) => b[1] - a[1]);
 
-                let str = [];
+                const str = [];
                 for (const word of words.slice(0, 20)) {
                     str.push(`**${word[0].toLowerCase()}** (${word[1]})`);
                 }

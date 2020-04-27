@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@ const CommandScope = require("../util/commands/CommandScope").default;
 const log = require("../log").default;
 const config = require("../config").default;
 
-const fetch = require("node-fetch");
+const fetch = require("node-fetch").default;
 const base_url = "https://cleverbot.io/1.0/";
 
-class CleverbotError extends Error { }
+class CleverbotError extends Error {}
 
 class Session {
     /**
@@ -56,7 +56,7 @@ class Session {
         const json = await req.json();
 
         if (json.status == "success") return json.response;
-        else throw new CleverbotError(json.status);
+        throw new CleverbotError(json.status);
     }
 }
 
@@ -70,7 +70,7 @@ class Cleverbot {
         this.user = user;
         this.key = key;
         /** @type {Set<string>} */
-        this._cache = new Set;
+        this._cache = new Set();
     }
 
     /**
@@ -108,9 +108,8 @@ class Cleverbot {
         } else if (status == "Error: reference name already exists") {
             this._cache.add(nick);
             return new Session(this, nick);
-        } else {
-            throw new CleverbotError(status);
         }
+        throw new CleverbotError(status);
     }
 }
 

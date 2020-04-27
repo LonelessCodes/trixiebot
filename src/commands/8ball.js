@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
  */
 
 const CONST = require("../const").default;
-const RandomChance = require("../modules/random/RandomChance");
+const RandomChance = require("../modules/random/RandomChance").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
-const HelpContent = require("../util/commands/HelpContent");
-const Category = require("../util/commands/Category");
-const CommandScope = require("../util/commands/CommandScope");
+const HelpContent = require("../util/commands/HelpContent").default;
+const Category = require("../util/commands/Category").default;
+const CommandScope = require("../util/commands/CommandScope").default;
 
 const Translation = require("../modules/i18n/Translation").default;
 const TranslationEmbed = require("../modules/i18n/TranslationEmbed").default;
@@ -112,32 +112,37 @@ replies.add({
 }, 1);
 
 module.exports = function install(cr) {
-    cr.registerCommand("8ball", new OverloadCommand)
-        .registerOverload("1+", new SimpleCommand(async () => {
-            /** @type {{ text: string; type: number; }} */
-            const reply = await replies.random();
+    cr.registerCommand("8ball", new OverloadCommand())
+        .registerOverload(
+            "1+",
+            new SimpleCommand(async () => {
+                /** @type {{ text: string; type: number; }} */
+                const reply = await replies.random();
 
-            let emoji = "";
-            switch (reply.type) {
-                case 1:
-                    emoji = ":white_check_mark:";
-                    break;
-                case -1:
-                    emoji = ":x:";
-                    break;
-                case 0:
-                    emoji = ":crystal_ball:";
-                    break;
-            }
+                let emoji = "";
+                switch (reply.type) {
+                    case 1:
+                        emoji = ":white_check_mark:";
+                        break;
+                    case -1:
+                        emoji = ":x:";
+                        break;
+                    case 0:
+                        emoji = ":crystal_ball:";
+                        break;
+                }
 
-            return new TranslationEmbed()
-                .setColor(CONST.COLOR.PRIMARY)
-                .setTitle(new TranslationMerge(reply.text, emoji));
-        }))
-        .setHelp(new HelpContent()
-            .setDescription("An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy")
-            .setUsage("<question>")
-            .addParameter("question", "The question you are eager to ask"))
+                return new TranslationEmbed().setColor(CONST.COLOR.PRIMARY).setTitle(new TranslationMerge(reply.text, emoji));
+            })
+        )
+        .setHelp(
+            new HelpContent()
+                .setDescription(
+                    "An easy way to find out the quick answer to ANY yes or no question!!!\nYou won't believe it yourself. Spoopy"
+                )
+                .setUsage("<question>")
+                .addParameter("question", "The question you are eager to ask")
+        )
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
     cr.registerAlias("8ball", "tellme");

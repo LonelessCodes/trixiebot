@@ -24,7 +24,7 @@ const BSON = require("bson");
 const CustomCommand = require("../commands/CustomCommand");
 const WorkerMethods = require("./cc_utils/WorkerMethods");
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("../../util/commands/MessageContext");
+const MessageContext = require("../../util/commands/MessageContext").default;
 
 const TYPE = Object.freeze({
     COMMAND: 0,
@@ -65,16 +65,16 @@ class Trigger {
                 break;
             case TYPE.STARTS_WITH:
                 if (this.case_sensitive) return raw_content.startsWith(this.trigger);
-                else return raw_content.toLowerCase().startsWith(this.trigger.toLowerCase());
+                return raw_content.toLowerCase().startsWith(this.trigger.toLowerCase());
             case TYPE.CONTAINS:
                 if (this.case_sensitive) return raw_content.includes(this.trigger);
-                else return raw_content.toLowerCase().includes(this.trigger.toLowerCase());
+                return raw_content.toLowerCase().includes(this.trigger.toLowerCase());
             case TYPE.REGEX:
                 if (this.case_sensitive) return new RegExp(this.trigger, "").test(raw_content);
-                else return new RegExp(this.trigger, "gi").test(raw_content);
+                return new RegExp(this.trigger, "gi").test(raw_content);
             case TYPE.EXACT_MATCH:
                 if (this.case_sensitive) return raw_content === this.trigger;
-                else return raw_content.toLowerCase() === this.trigger.toLowerCase();
+                return raw_content.toLowerCase() === this.trigger.toLowerCase();
         }
 
         return false;
@@ -133,8 +133,8 @@ class CCManager {
 
         this.worker_methods = new WorkerMethods(this.client, this.cpc);
 
-        /** @type {Map<string, Trigger[]} */
-        this.trigger_cache = new Map;
+        /** @type {Map<string, Trigger[]>} */
+        this.trigger_cache = new Map();
     }
 
     /*
@@ -144,13 +144,12 @@ class CCManager {
     async get(guild, { command_name, prefix_used, raw_content }) {
         const guildId = guild.id;
         if (!this.trigger_cache.has(guildId)) {
-            const rows = await this.database.find(
-                { guildId, enabled: true },
-                { type: 1, trigger: 1, id: 1, case_sensitive: 1 }
-            ).toArray();
+            const rows = await this.database
+                .find({ guildId, enabled: true }, { type: 1, trigger: 1, id: 1, case_sensitive: 1 })
+                .toArray();
 
             const triggers = [];
-            for (let row of rows) {
+            for (const row of rows) {
                 triggers.push(new Trigger(this, row.type, row.trigger, row.case_sensitive, row.id));
             }
             this.trigger_cache.set(guildId, triggers);
@@ -158,14 +157,14 @@ class CCManager {
 
         const triggers = this.trigger_cache.get(guildId);
         // first check against commands
-        for (let trigger of triggers.filter(t => t.type === TYPE.COMMAND)) {
-            if (!await trigger.test(command_name, prefix_used, raw_content)) continue;
+        for (const trigger of triggers.filter(t => t.type === TYPE.COMMAND)) {
+            if (!(await trigger.test(command_name, prefix_used, raw_content))) continue;
 
             return await trigger.getCommand();
         }
         // then check against anything else
-        for (let trigger of triggers.filter(t => t.type !== TYPE.COMMAND)) {
-            if (!await trigger.test(command_name, prefix_used, raw_content)) continue;
+        for (const trigger of triggers.filter(t => t.type !== TYPE.COMMAND)) {
+            if (!(await trigger.test(command_name, prefix_used, raw_content))) continue;
 
             return await trigger.getCommand();
         }
@@ -199,11 +198,12 @@ class CCManager {
 
     async getCommands(guildId, channelId) {
         const query = { guildId, enabled: true, type: TYPE.COMMAND };
-        if (channelId) query.disabled_channels = {
-            $not: {
-                $all: [channelId],
-            },
-        };
+        if (channelId)
+            query.disabled_channels = {
+                $not: {
+                    $all: [channelId],
+                },
+            };
 
         return await this.database.find(query).toArray();
     }
@@ -214,25 +214,31 @@ class CCManager {
 
     async getCommandsForWeb(guildId) {
         const rows = await this.database.find({ guildId }).toArray();
-        const errors = new Map;
-        for (let row of rows) {
-            const err = await this.errors_db.find({ commandId: row.id, ts: { $gt: row.last_read } }).count().catch(() => 0);
+        const errors = new Map();
+        for (const row of rows) {
+            const err = await this.errors_db
+                .find({ commandId: row.id, ts: { $gt: row.last_read } })
+                .count()
+                .catch(() => 0);
             errors.set(row.id, err);
         }
 
-        return rows.sort((a, b) => {
-            const bmod = b.modified_at || b.created_at;
-            const amod = a.modified_at || a.created_at;
-            if (bmod < amod) return -1;
-            if (bmod > amod) return 1;
-            return 0;
-        }).map(row => new WebCommand(row, errors.get(row.id)));
+        return rows
+            .sort((a, b) => {
+                const bmod = b.modified_at || b.created_at;
+                const amod = a.modified_at || a.created_at;
+                if (bmod < amod) return -1;
+                if (bmod > amod) return 1;
+                return 0;
+            })
+            .map(row => new WebCommand(row, errors.get(row.id)));
     }
 
     async getSettings(guildId) {
-        const settings = Object.assign({
+        const settings = {
             allowed_roles: [],
-        }, await this.settings_db.findOne({ guildId }));
+            ...(await this.settings_db.findOne({ guildId })),
+        };
 
         return {
             allowed_roles: settings.allowed_roles,
@@ -242,11 +248,9 @@ class CCManager {
     async updateSettings(guildId, settings) {
         await this.settings_db.updateOne({ guildId }, { $set: { ...settings } }, { upsert: true });
 
-        return Object.assign({
-            allowed_roles: [],
-        }, {
+        return {
             allowed_roles: settings.allowed_roles,
-        });
+        };
     }
 
     async addCommand(guildId, conf = { type: 0, trigger: "", case_sensitive: false, code: "", disabled_channels: [] }) {
@@ -261,15 +265,19 @@ class CCManager {
         const row = {
             id,
             guildId,
-            type, trigger, case_sensitive,
+            type,
+            trigger,
+            case_sensitive,
             use_trixiescript: true,
             replies: [],
-            code, cst: cst ? BSON.serialize(cst) : null,
+            code,
+            cst: cst ? BSON.serialize(cst) : null,
             compile_errors,
-            last_read: new Date,
+            last_read: new Date(),
             disabled_channels,
             enabled,
-            created_at, modified_at: null,
+            created_at,
+            modified_at: null,
         };
 
         await this.database.insertOne(row);

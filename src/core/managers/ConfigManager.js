@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ function index(obj, is, value) {
 class Parameter {
     /**
      * @param {string} name
-     * @param {Resolvable|string} humanName
+     * @param {Resolvable<string>} humanName
      * @param {*} defaultValue
      * @param {*} type
      * @param {boolean} allowEmpty

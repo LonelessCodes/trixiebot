@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 
 const { userToString } = require("../../util/util");
 const BaseCommand = require("./BaseCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const Category = require("../../util/commands/Category");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const Category = require("../../util/commands/Category").default;
 const secureRandom = require("../../modules/random/secureRandom").default;
 
 const TranslationFormatter = require("../../modules/i18n/TranslationFormatter").default;
@@ -27,8 +27,7 @@ class TextActionCommand extends BaseCommand {
     constructor(description, content, noMentionMessage) {
         super();
 
-        this.setHelp(new HelpContent()
-            .setUsage("<@user>", description));
+        this.setHelp(new HelpContent().setUsage("<@user>", description));
         this.setCategory(Category.ACTION);
 
         this.texts = content instanceof Array ? content : [content];
@@ -46,7 +45,11 @@ class TextActionCommand extends BaseCommand {
         const phrase = await secureRandom(this.texts);
 
         if (context.mentions.everyone) {
-            await context.send(new TranslationFormatter(phrase, { user: new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount }) }));
+            await context.send(
+                new TranslationFormatter(phrase, {
+                    user: new Translation("textaction.everyone", "all {{count}} users", { count: context.guild.memberCount }),
+                })
+            );
         } else {
             await context.send(new TranslationFormatter(phrase, { user: userToString(mention) }));
         }

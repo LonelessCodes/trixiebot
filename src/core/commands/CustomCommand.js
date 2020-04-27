@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ const BaseCommand = require("./BaseCommand");
 // eslint-disable-next-line no-unused-vars
 const { MessageEmbed } = require("discord.js");
 // eslint-disable-next-line no-unused-vars
-const MessageContext = require("../../util/commands/MessageContext");
+const MessageContext = require("../../util/commands/MessageContext").default;
 const BSON = require("bson");
 
 const { Message: CCMessage } = require("../managers/cc_utils/cc_classes");
@@ -40,7 +40,7 @@ class CustomCommand extends BaseCommand {
 
     // eslint-disable-next-line valid-jsdoc
     /**
-     * @param {{ id: string, guildId: string, type: number, trigger: string, case_sensitive: boolean, code: string, cst?: BSON.Binary, compile_errors: any[], last_read: Date, created_at: Date, modified_at: Date, disabled_channels: string[], enabled: boolean }} row
+     * @param {{ id: string, guildId: string, type: number, trigger: string, case_sensitive: boolean, code: string, cst?: BSON.Binary, _cst?: object, compile_errors: any[], last_read: Date, created_at: Date, modified_at: Date, disabled_channels: string[], enabled: boolean }} row
      * @returns {void}
      */
     update(row) {
@@ -124,7 +124,7 @@ class CustomCommand extends BaseCommand {
         });
 
         if (error && error.name === "RuntimeError") {
-            error.ts = new Date;
+            error.ts = new Date();
             error.commandId = this.id;
             error.guildId = this.guildId;
 
@@ -132,7 +132,7 @@ class CustomCommand extends BaseCommand {
             return;
         } else if (error) {
             const err = {
-                ts: new Date,
+                ts: new Date(),
                 commandId: this.id,
                 guildId: this.guildId,
                 name: "Unknown Error",

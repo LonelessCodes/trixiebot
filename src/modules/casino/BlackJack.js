@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const random = require("../random/random");
+const random = require("../random/random").default;
 const credits = require("../../core/managers/CreditsManager");
 const { basicTEmbed } = require("../i18n/TranslationEmbed");
 

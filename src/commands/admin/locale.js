@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,18 +20,18 @@ const { splitArgs } = require("../../util/string");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const OverloadCommand = require("../../core/commands/OverloadCommand");
-const HelpContent = require("../../util/commands/HelpContent");
-const CommandPermission = require("../../util/commands/CommandPermission");
-const Category = require("../../util/commands/Category");
+const HelpContent = require("../../util/commands/HelpContent").default;
+const CommandPermission = require("../../util/commands/CommandPermission").default;
+const Category = require("../../util/commands/Category").default;
 
-const LocaleManager = require("../../core/managers/LocaleManager");
+const LocaleManager = require("../../core/managers/LocaleManager").default;
 
 const Translation = require("../../modules/i18n/Translation").default;
 const TranslationEmbed = require("../../modules/i18n/TranslationEmbed").default;
 const ListFormat = require("../../modules/i18n/ListFormat").default;
 
 module.exports = function install(cr, { locale: locale_manager }) {
-    cr.registerCommand("locale", new OverloadCommand)
+    cr.registerCommand("locale", new OverloadCommand())
         .setHelp(new HelpContent()
             .setDescription("Trixie supports multiple different languages, including " + LocaleManager.getLocales().map(v => `\`${v.name_en}\``).join(", ") + ". Here you can set them in your server")
             .setUsage("<?locale> <?channel>", "view the Trixie's locales in this server")
@@ -81,14 +81,14 @@ module.exports = function install(cr, { locale: locale_manager }) {
                     locale: LocaleManager.getLocaleInfo(new_val.global).name,
                 }));
                 return embed;
-            } else {
-                await locale_manager.set(message.guild.id, channel.id, fit || "default");
-                const new_val = await locale_manager.get(message.guild.id, channel.id);
-                embed.setDescription(new Translation("locale.success_ch", "Changed locale for {{channel}} to {{locale}}", {
-                    channel: channel.toString(),
-                    locale: LocaleManager.getLocaleInfo(new_val).name_en,
-                }));
-                return embed;
             }
+
+            await locale_manager.set(message.guild.id, channel.id, fit || "default");
+            const new_val = await locale_manager.get(message.guild.id, channel.id);
+            embed.setDescription(new Translation("locale.success_ch", "Changed locale for {{channel}} to {{locale}}", {
+                channel: channel.toString(),
+                locale: LocaleManager.getLocaleInfo(new_val).name_en,
+            }));
+            return embed;
         }));
 };

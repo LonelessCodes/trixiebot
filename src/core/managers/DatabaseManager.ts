@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,29 +14,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line no-unused-vars
-const Mongo = require("mongodb");
+import { Db } from "mongodb";
+import Discord from "discord.js";
 
-class DatabaseManager {
-    /**
-     * @param {Mongo.Db} db
-     */
-    constructor(db) {
-        this.db = db;
+export default class DatabaseManager {
+    slots: import("./database/SlotsDatabase");
 
+    constructor(public db: Db) {
         this.slots = new (require("./database/SlotsDatabase"))(db);
-        this.error_cases = new (require("./database/ErrorCasesDatabase"))(db);
     }
 
-    collection(name) {
+    collection(name: string) {
         return this.db.collection(name);
     }
 
-    async getUser(user) {
+    async getUser(user: Discord.GuildMember | Discord.User) {
         return {
             slots: await this.slots.getUser(user),
         };
     }
 }
-
-module.exports = DatabaseManager;

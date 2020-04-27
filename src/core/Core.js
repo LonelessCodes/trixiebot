@@ -29,7 +29,7 @@ const calendar_events = require("../modules/calendar/events").default;
 
 const CommandProcessor = require("./CommandProcessor");
 
-const DatabaseManager = require("./managers/DatabaseManager");
+const DatabaseManager = require("./managers/DatabaseManager").default;
 const CM = require("./managers/ConfigManager");
 const LocaleManager = require("./managers/LocaleManager").default;
 const WebsiteManager = require("./managers/WebsiteManager");

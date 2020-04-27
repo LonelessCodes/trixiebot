@@ -14,7 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Discord = require("discord.js");
 const CONST = require("../const").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
@@ -26,7 +25,10 @@ const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
 
 const Translation = require("../modules/i18n/Translation").default;
 const TranslationPlural = require("../modules/i18n/TranslationPlural").default;
+const TranslationEmbed = require("../modules/i18n/TranslationEmbed").default;
+const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 const ListFormat = require("../modules/i18n/ListFormat").default;
+const CalendarTimeFormat = require("../modules/i18n/CalendarTimeFormat").default;
 
 function sort(data) {
     return data
@@ -218,14 +220,14 @@ module.exports = function install(cr) {
     cr.registerCommand(
         "serverinfo",
         new SimpleCommand(message => {
-            const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
-            embed.setTitle(`${message.guild.name} Statistics`);
+            const embed = new TranslationEmbed().setColor(CONST.COLOR.PRIMARY);
+            embed.setTitle(new TranslationMerge(message.guild.name, new Translation("stats.statistics", "Statistics")));
             embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
 
             if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
             embed.addField("ID", message.guild.id, true);
             embed.addField("User Count", message.guild.memberCount, true);
-            embed.addField("Creation Time", message.guild.createdAt.toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC", true);
+            embed.addField("Creation Time", new CalendarTimeFormat(message.guild.createdAt), "UTC", true);
             embed.addField("Channel Count", message.guild.channels.cache.filter(c => c.type === "text").size, true);
             embed.addField("Emoji Count", message.guild.emojis.cache.size, true);
             embed.addField("Region", message.guild.region, true);

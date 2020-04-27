@@ -15,6 +15,7 @@
  */
 
 const config = require("../config").default;
+const { doNothing } = require("../util/util");
 const getTumblrBlog = require("../modules/getTumblrBlog").default;
 const secureRandom = require("../modules/random/secureRandom").default;
 const log = require("../log").default;
@@ -40,9 +41,7 @@ module.exports = function install(cr) {
         )
         .then(q => (quotes = q))
         .then(() => log.namespace("mlpquote cmd")("Quotes loaded:", quotes.length))
-        .catch(() => {
-            /* Do nothing */
-        });
+        .catch(doNothing);
 
     cr.registerCommand(
         "mlpquote",

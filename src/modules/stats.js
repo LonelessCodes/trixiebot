@@ -15,6 +15,7 @@
  */
 
 const ipc = require("./concurrency/ipc");
+const { doNothing } = require("../util/util");
 const EventEmitter = require("events");
 const database = require("./db/database").default;
 
@@ -151,9 +152,7 @@ class WebStats extends EventEmitter {
                     this.get(name).set(stats[name]);
                 }
             })
-            .catch(() => {
-                /* Do nothing */
-            });
+            .catch(doNothing);
 
         setTimeout(() => this.awaitStats(), 10000);
     }

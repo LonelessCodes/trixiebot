@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const { doNothing } = require("../../util/util");
 const random = require("../random/random").default;
 const credits = require("../../core/managers/CreditsManager");
 const { basicTEmbed } = require("../i18n/TranslationEmbed");
@@ -276,7 +277,7 @@ class BlackJack {
             const options = game.doubledown_able ? /hit|stand|double/i : /hit|stand/i;
             const msgs = await channel.awaitMessages(m => m.author.equals(author) && options.test(m.content), { max: 1, time: 30000 });
 
-            if (msg.deletable) msg.delete().catch(() => { /* Do nothing */ });
+            if (msg.deletable) msg.delete().catch(doNothing);
 
             let action = "";
             if (msgs.size === 0) action = "stand";

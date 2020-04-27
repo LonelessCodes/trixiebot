@@ -114,3 +114,8 @@ export function debounce<A extends [], B, C>(func: (this: C, ...args: A) => B, w
         return result;
     };
 }
+
+// a function that does nothing (e.g. for Promise.catch() errors we don't care about)
+export function doNothing() {
+    // Do nothing
+}

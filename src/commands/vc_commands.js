@@ -16,6 +16,7 @@
 
 const { AudioConnectError } = require("../core/managers/AudioManager");
 const log = require("../log").default.namespace("vc cmds");
+const { doNothing } = require("../util/util");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent").default;
@@ -28,9 +29,7 @@ module.exports = function install(cr) {
         "leavevc",
         new SimpleCommand(async ({ message, audio }) => {
             audio.leave();
-            await message.react("👍").catch(() => {
-                /* Do nothing */
-            });
+            await message.react("👍").catch(doNothing);
         })
     )
         .setHelp(new HelpContent().setUsage("", "Make Trixie leave the voice channel!"))
@@ -43,9 +42,7 @@ module.exports = function install(cr) {
         "stopvc",
         new SimpleCommand(async ({ message, audio }) => {
             audio.stop();
-            await message.react("👍").catch(() => {
-                /* Do nothing */
-            });
+            await message.react("👍").catch(doNothing);
         })
     )
         .setHelp(new HelpContent().setUsage("", "Stop whatever Trixie is saying in VC"))
@@ -58,7 +55,7 @@ module.exports = function install(cr) {
         new SimpleCommand(async ({ message, audio }) => {
             try {
                 await audio.connect(message.member);
-                await message.react("👍");
+                await message.react("👍").catch(doNothing);
             } catch (err) {
                 await message.react("❌");
                 if (err instanceof AudioConnectError) {

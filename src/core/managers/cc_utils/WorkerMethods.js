@@ -200,7 +200,7 @@ class WorkerMethods {
             try {
                 const member = await guild.members.fetch(memberId);
                 return new Member(member);
-            } catch (_) { /* Do nothing */ }
+            } catch { /* Do nothing */ }
         });
 
         this.cpc.answer("member.getRoles", async ({ guildId, memberId }) => {

@@ -15,6 +15,7 @@
  */
 
 const fetch = require("node-fetch");
+const { doNothing } = require("../../../util/util");
 const CONST = require("../../../const").default;
 const Discord = require("discord.js");
 const gm = require("gm");
@@ -102,7 +103,7 @@ class OnlineStream extends Stream {
         }
 
         if (this.message && this.message.deletable && !this.message.deleted)
-            await this.message.delete().catch(() => { /* Do nothing */ });
+            await this.message.delete().catch(doNothing);
 
         this.messageId = null;
         this.lastChannelId = null;

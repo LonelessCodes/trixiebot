@@ -15,7 +15,7 @@
  */
 
 const { findArgs } = require("../util/string");
-const { doNothing } = require("../util/promises");
+const { doNothing } = require("../util/util");
 const Discord = require("discord.js");
 
 const AliasCommand = require("../core/commands/AliasCommand");

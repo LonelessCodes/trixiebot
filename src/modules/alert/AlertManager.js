@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const { doNothing } = require("../../util/util");
 const Discord = require("discord.js");
 const { EventEmitter } = require("events");
 
@@ -201,7 +202,7 @@ class AlertManager extends EventEmitter {
         const index = this.online.findIndex(stream => stream._id.valueOf() === config._id.valueOf());
         if (index > -1) {
             const stream = this.online[index];
-            await stream.delete().catch(() => { /* Do nothing */ });
+            await stream.delete().catch(doNothing);
             this.online.splice(index, 1);
         }
 

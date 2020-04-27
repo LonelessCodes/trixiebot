@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { userToString, fetchMember } = require("../util/util");
+const { userToString, fetchMember, doNothing } = require("../util/util");
 const { timeout } = require("../util/promises");
 const { splitArgs } = require("../util/string");
 const { toHumanTime } = require("../util/time");
@@ -309,10 +309,6 @@ module.exports = function install(cr, { db }) {
                             waifuUser.user.avatarURL({ size: 32, dynamic: true })
                         )
                     );
-                    await timeout(60000);
-                    await m1.delete().catch(() => {
-                        /* Do nothing */
-                    });
                 } else {
                     await ctx.edit(
                         m2,
@@ -322,11 +318,8 @@ module.exports = function install(cr, { db }) {
                             { user: userToString(waifuUser) }
                         )
                     );
-                    await timeout(60000);
-                    await m1.delete().catch(() => {
-                        /* Do nothing */
-                    });
                 }
+                await m1.delete({ timeout: 60000 }).catch(doNothing);
             })
         )
         .setHelp(
@@ -394,13 +387,6 @@ module.exports = function install(cr, { db }) {
                             message.author.avatarURL({ size: 32, dynamic: true })
                         )
                     );
-                    await timeout(60000);
-                    await m1.delete().catch(() => {
-                        /* Do nothing */
-                    });
-                    await m2.delete().catch(() => {
-                        /* Do nothing */
-                    });
                 } else {
                     await ctx.send(
                         new Translation(
@@ -409,14 +395,10 @@ module.exports = function install(cr, { db }) {
                             { user: userToString(ownerUser) }
                         )
                     );
-                    await timeout(60000);
-                    await m1.delete().catch(() => {
-                        /* Do nothing */
-                    });
-                    await m2.delete().catch(() => {
-                        /* Do nothing */
-                    });
                 }
+                await timeout(60000);
+                await m1.delete().catch(doNothing);
+                await m2.delete().catch(doNothing);
             })
         )
         .setHelp(

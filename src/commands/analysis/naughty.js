@@ -15,7 +15,7 @@
  */
 
 const { userToString, progressBar } = require("../../util/util");
-const { doNothing } = require("../../util/promises");
+const { doNothing } = require("../../util/util");
 const CONST = require("../../const").default;
 const Queue = require("../../modules/Queue").default;
 const fs = require("fs-extra");

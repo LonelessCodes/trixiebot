@@ -14,8 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { basicEmbed } from "../../../util/util";
-import { doNothing } from "../../../util/promises";
+import { basicEmbed, doNothing } from "../../../util/util";
 import { EventEmitter } from "events";
 import AudioManager from "../AudioManager";
 import { PredefinedSample, UserSample, GuildSample, Sample } from "./Sample";
@@ -102,9 +101,7 @@ export default class SampleList extends EventEmitter {
      */
     async display(channel: Discord.TextChannel) {
         const msg = await channel.send(this.renderEmbed());
-        this.initialize(msg).catch(() => {
-            /* Do nothing */
-        });
+        this.initialize(msg).catch(doNothing);
         return msg;
     }
 

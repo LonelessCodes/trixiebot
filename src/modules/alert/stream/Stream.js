@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const { doNothing } = require("../../../util/util");
 const StreamConfig = require("./StreamConfig");
 
 class Stream extends StreamConfig {
@@ -45,7 +46,7 @@ class Stream extends StreamConfig {
         this.lastChannelId = null;
         if (!onlineMessage || !(onlineMessage.deletable && !onlineMessage.deleted)) return;
 
-        await onlineMessage.delete().catch(() => { /* Do nothing */ });
+        await onlineMessage.delete().catch(doNothing);
     }
 
     get lastChannel() {
@@ -59,7 +60,7 @@ class Stream extends StreamConfig {
         const channel = this.lastChannel;
         if (!channel) return;
 
-        return await channel.messages.fetch(this.messageId).catch(() => { /* Do nothing */ });
+        return await channel.messages.fetch(this.messageId).catch(doNothing);
     }
 }
 

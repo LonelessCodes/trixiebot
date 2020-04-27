@@ -15,7 +15,7 @@
  */
 
 const { CronJob } = require("cron");
-const { fetchMember, basicEmbed, userToString } = require("../util/util");
+const { fetchMember, basicEmbed, userToString, doNothing } = require("../util/util");
 const { pad } = require("../util/string");
 const moment = require("moment");
 const Discord = require("discord.js");
@@ -77,14 +77,10 @@ module.exports = function install(cr, { client, db }) {
 
                 // if member has role and it's not their birthday or is disabled
                 if ((!is_birthday || !config.enabled) && has_role)
-                    member.roles.remove(role).catch(() => {
-                        /* Do nothing */
-                    });
+                    member.roles.remove(role).catch(doNothing);
                 // if member doesn't have role and it's their birthday
                 else if (is_birthday && !has_role)
-                    member.roles.add(role).catch(() => {
-                        /* Do nothing */
-                    });
+                    member.roles.add(role).catch(doNothing);
             }
         }
     };

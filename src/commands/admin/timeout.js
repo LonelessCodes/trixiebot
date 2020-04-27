@@ -18,7 +18,7 @@
 const { userToString, fetchMember } = require("../../util/util");
 const { toHumanTime, parseHumanTime } = require("../../util/time");
 const { splitArgs } = require("../../util/string");
-const { doNothing } = require("../../util/promises");
+const { doNothing } = require("../../util/util");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");

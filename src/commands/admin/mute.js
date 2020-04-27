@@ -16,7 +16,7 @@
 
 const log = require("../../log").default.namespace("mute");
 const nanoTimer = require("../../modules/timer").default;
-const { doNothing } = require("../../util/promises");
+const { doNothing } = require("../../util/util");
 const Discord = require("discord.js");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");

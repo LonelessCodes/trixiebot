@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { doNothing } from "../../util/util";
 import { Except } from "type-fest";
 import { CronJob } from "cron";
 import { Collection, IndexOptions } from "mongodb";
@@ -62,9 +63,7 @@ export default class DocumentMapCache<
 
         this.indexes = opts.indexes;
         for (const index in this.indexes) {
-            this.db.createIndex({ [index]: 1 }, this.indexes[index]).catch(() => {
-                /* Do nothing */
-            });
+            this.db.createIndex({ [index]: 1 }, this.indexes[index]).catch(doNothing);
         }
 
         this.ttl = opts.ttl * 1000;

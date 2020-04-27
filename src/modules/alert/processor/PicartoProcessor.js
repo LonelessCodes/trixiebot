@@ -73,8 +73,7 @@ class PicartoProcessor extends Processor {
             const db_stream = this.manager.getServiceConfigsStream(this);
 
             db_stream.addListener("data", config => this.checkChange(picartoOnline, config));
-            db_stream.once("end", () => { /* Do nothing */ });
-            db_stream.once("error", err => { log(err); });
+            db_stream.once("error", log.error);
         } catch (_) { _; } // Picarto is down
     }
 

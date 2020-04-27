@@ -23,7 +23,7 @@ const CommandPermissions = require("../util/commands/CommandPermission").default
 
 const credits = require("../core/managers/CreditsManager");
 const moment = require("moment");
-const { userToString } = require("../util/util");
+const { userToString, doNothing } = require("../util/util");
 const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
 const { splitArgs } = require("../util/string");
 const { toHumanTime } = require("../util/time");
@@ -439,9 +439,7 @@ module.exports = function install(cr) {
                     })
                 );
                 await timeout(1000 * 15);
-                m.delete().catch(() => {
-                    /* Do nothing */
-                });
+                m.delete().catch(doNothing);
                 return;
             }
 

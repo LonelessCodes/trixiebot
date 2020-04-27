@@ -19,7 +19,7 @@ const logtts = log.namespace("tts cmd");
 const config = require("../config").default;
 const fetch = require("node-fetch").default;
 const { AudioConnectError } = require("../core/managers/AudioManager");
-const { doNothing } = require("../util/promises");
+const { doNothing } = require("../util/util");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");

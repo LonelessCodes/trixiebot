@@ -71,13 +71,12 @@ class PiczelProcessor extends Processor {
         // get all online channels
         try {
             const piczelOnline = await this.request("streams/?nsfw=true&live_only=false");
-            if (piczelOnline.error) throw new Error("Piczel error:", piczelOnline.error);
+            if (piczelOnline.error) return log.error("Piczel error:", piczelOnline.error);
 
             const db_stream = this.manager.getServiceConfigsStream(this);
 
             db_stream.addListener("data", config => this.checkChange(piczelOnline, config));
-            db_stream.once("end", () => { /* Do nothing */ });
-            db_stream.once("error", err => { log(err); });
+            db_stream.once("error", log.error);
         } catch (_) { _; } // Piczel is down
     }
 

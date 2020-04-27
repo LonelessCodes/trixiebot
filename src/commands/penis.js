@@ -110,8 +110,8 @@ module.exports = function install(cr, { client, db }) {
         const sorted = penises.sort((a, b) => b.length - a.length);
 
         const items = [];
-        for (let penis of sorted) {
-            const member = message.guild.members.get(penis.userId);
+        for (const penis of sorted) {
+            const member = message.guild.members.cache.get(penis.userId);
             if (!member) continue;
             items.push(
                 await ctx.translate(new TranslationMerge(
@@ -121,7 +121,7 @@ module.exports = function install(cr, { client, db }) {
             );
         }
 
-        new PaginatorGuildAction(
+        await new PaginatorGuildAction(
             "Penis Leaderboard",
             new Translation("penis.top_penises", "The top penises in this server"),
             items, message.author, message.guild, { items_per_page: 20, number_items: true }

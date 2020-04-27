@@ -21,6 +21,7 @@ const Category = require("../util/commands/Category").default;
 const CommandScope = require("../util/commands/CommandScope").default;
 
 const log = require("../log").default;
+const { doNothing } = require("../util/util");
 const config = require("../config").default;
 
 const fetch = require("node-fetch").default;
@@ -123,7 +124,7 @@ module.exports = function install(cr) {
         .registerOverload(
             "1+",
             new SimpleCommand(async ({ message, content: input }) => {
-                await message.channel.startTyping();
+                message.channel.startTyping().catch(doNothing);
 
                 try {
                     const session = await bot.create(message.author.id);
@@ -133,7 +134,7 @@ module.exports = function install(cr) {
                     if (message.channel.type === "text") await message.channel.send(`${message.member.toString()} ${reply}`);
                     else await message.channel.send(`${message.author.toString()} ${reply}`);
                 } finally {
-                    await message.channel.stopTyping();
+                    message.channel.stopTyping();
                 }
             })
         )

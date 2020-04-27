@@ -25,6 +25,9 @@ const bootup_timer = timer();
 import log from "./log";
 const djs_log = log.namespace("discord.js");
 
+import tmp from "tmp";
+tmp.setGracefulCleanup();
+
 import Discord from "discord.js";
 import config from "./config";
 import info from "./info";

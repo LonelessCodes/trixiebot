@@ -35,8 +35,6 @@ import { UserSample, GuildSample, PredefinedSample } from "./Sample";
 import Translation from "../../../modules/i18n/Translation";
 import ListFormat from "../../../modules/i18n/ListFormat";
 
-tmp.setGracefulCleanup();
-
 class Type {
     mime: string | null;
     ext: string | null;

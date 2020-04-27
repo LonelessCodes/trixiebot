@@ -15,7 +15,7 @@
  */
 
 const { doNothing } = require("../../../util/util");
-const StreamConfig = require("./StreamConfig");
+const StreamConfig = require("./StreamConfig").default;
 
 class Stream extends StreamConfig {
     constructor(manager, service, channel, nsfwChannel, sfwChannel, conf = {}) {

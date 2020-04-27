@@ -18,7 +18,7 @@ const { EventEmitter } = require("events");
 // eslint-disable-next-line no-unused-vars
 const OnlineStream = require("../stream/OnlineStream");
 // eslint-disable-next-line no-unused-vars
-const StreamConfig = require("../stream/StreamConfig");
+const StreamConfig = require("../stream/StreamConfig").default;
 // eslint-disable-next-line no-unused-vars
 const ParsedStream = require("../stream/ParsedStream").default;
 

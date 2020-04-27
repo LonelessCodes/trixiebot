@@ -25,7 +25,7 @@ const Translation = require("../i18n/Translation").default;
 // eslint-disable-next-line no-unused-vars
 const OnlineStream = require("./stream/OnlineStream");
 // eslint-disable-next-line no-unused-vars
-const StreamConfig = require("./stream/StreamConfig");
+const StreamConfig = require("./stream/StreamConfig").default;
 const Stream = require("./stream/Stream");
 const StreamQueryCursor = require("./StreamQueryCursor");
 

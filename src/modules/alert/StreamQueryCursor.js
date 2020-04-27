@@ -15,7 +15,7 @@
  */
 
 const Stream = require("./stream/Stream");
-const StreamConfig = require("./stream/StreamConfig");
+const StreamConfig = require("./stream/StreamConfig").default;
 
 class StreamQueryCursor {
     constructor(db_cursor, manager) {

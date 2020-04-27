@@ -19,7 +19,7 @@ export default class ParsedStream {
     public username: string | null;
     public userId: string | null;
 
-    constructor(service: import("../processor/Processor"), username: string | null, userId: string | null) {
+    constructor(service: import("../processor/Processor"), username?: string, userId?: string) {
         this.service = service;
         this.username = username || null;
         this.userId = userId || null;

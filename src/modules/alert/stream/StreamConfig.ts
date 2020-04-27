@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,32 +14,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line no-unused-vars
-const Discord = require("discord.js");
-const ParsedStream = require("./ParsedStream").default;
+import Discord from "discord.js";
+import { ObjectId } from "mongodb";
+import ParsedStream from "./ParsedStream";
 
-class StreamConfig extends ParsedStream {
-    constructor(service, channel, nsfwChannel, sfwChannel, conf = {}) {
+export interface Document {
+    _id?: ObjectId;
+    username?: string;
+    name?: string;
+    userId?: string;
+}
+
+export default class StreamConfig extends ParsedStream {
+    public channel: Discord.TextChannel | null;
+    public nsfwChannel: Discord.TextChannel | null;
+    public sfwChannel: Discord.TextChannel | null;
+
+    public _id: ObjectId | null;
+
+    constructor(
+        service: import("../processor/Processor"),
+        channel: Discord.TextChannel | null,
+        nsfwChannel: Discord.TextChannel | null,
+        sfwChannel: Discord.TextChannel | null,
+        conf: Document = {}
+    ) {
         super(service, conf.username || conf.name, conf.userId);
 
-        /** @type {Discord.TextChannel} */
-        this.channel = channel || null;
-        /** @type {Discord.TextChannel} */
-        this.nsfwChannel = nsfwChannel || null;
-        /** @type {Discord.TextChannel} */
-        this.sfwChannel = sfwChannel || null;
+        this.channel = channel;
+        this.nsfwChannel = nsfwChannel;
+        this.sfwChannel = sfwChannel;
         this._id = conf._id || null;
     }
 
-    get guild() {
-        return (this.channel || this.nsfwChannel || this.sfwChannel || {}).guild;
+    public get guild(): Discord.Guild | null {
+        return (this.channel || this.nsfwChannel || this.sfwChannel || {}).guild || null;
     }
 
-    /**
-     * @param {boolean} nsfw
-     * @returns {Discord.TextChannel}
-     */
-    getChannel(nsfw) {
+    public getChannel(nsfw: boolean): Discord.TextChannel | undefined {
         if (nsfw) {
             if (this.channel) return this.channel;
             if (this.nsfwChannel) return this.nsfwChannel;
@@ -49,11 +61,7 @@ class StreamConfig extends ParsedStream {
         }
     }
 
-    /**
-     * @param {boolean} nsfw
-     * @returns {boolean}
-     */
-    getSendable(nsfw) {
+    public getSendable(nsfw: boolean): boolean {
         if (nsfw) {
             if (this.channel) return true;
             if (this.nsfwChannel) return true;
@@ -64,5 +72,3 @@ class StreamConfig extends ParsedStream {
         return false;
     }
 }
-
-module.exports = StreamConfig;

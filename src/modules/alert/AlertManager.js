@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const log = require("../../log").default.namespace("alert manager");
 const { doNothing } = require("../../util/util");
 const Discord = require("discord.js");
 const { EventEmitter } = require("events");
@@ -27,7 +28,6 @@ const OnlineStream = require("./stream/OnlineStream").default;
 // eslint-disable-next-line no-unused-vars
 const StreamConfig = require("./stream/StreamConfig").default;
 const Stream = require("./stream/Stream").default;
-const StreamQueryCursor = require("./StreamQueryCursor");
 
 class AlertManager extends EventEmitter {
     /**
@@ -151,10 +151,35 @@ class AlertManager extends EventEmitter {
         }
     }
 
-    getServiceConfigsStream(service) {
-        const db_stream = this.database.find({ service: service.name });
+    docToStream(raw) {
+        // mask to proper stream options
+        const doc = { ...raw, username: raw.name };
 
-        return new StreamQueryCursor(db_stream, this, service);
+        const service = this.services_mapped[doc.service];
+        if (!service) return;
+
+        const guild = this.client.guilds.cache.get(doc.guildId);
+        if (!guild) return;
+        if (!guild.available) return;
+
+        const def_channel = guild.channels.cache.get(doc.channelId);
+        const nsfw_channel = guild.channels.cache.get(doc.nsfwChannelId);
+        const sfw_channel = guild.channels.cache.get(doc.sfwChannelId);
+        if (!def_channel && !nsfw_channel && !sfw_channel) {
+            this.removeStreamConfig(new StreamConfig(service, null, null, null, doc)).catch(log.error);
+            return;
+        }
+
+        const online = this.online.find(
+            online => online.service.name === service.name && online.guild.id === guild.id && online.userId === doc.userId
+        );
+        if (online) return online;
+
+        return new Stream(this, service, def_channel, nsfw_channel, sfw_channel, doc);
+    }
+
+    getServiceConfigsStream(service) {
+        return this.database.find({ service: service.name }).map(raw => this.docToStream(raw));
     }
 
     /**
@@ -238,7 +263,11 @@ class AlertManager extends EventEmitter {
     }
 
     getStreamConfigs(guild) {
-        return new StreamQueryCursor(this.database.find({ guildId: guild.id }), this).toArray();
+        // Cursor automatically removes undefined docs from the result - to our advantage
+        return this.database
+            .find({ guildId: guild.id })
+            .map(raw => this.docToStream(raw))
+            .toArray();
     }
 
     getOnlineStreams(guild) {

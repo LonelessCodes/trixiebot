@@ -1,5 +1,5 @@
 {
-    "header": "Changelog",
+    "header": "# Changelog\n",
     "types": [
         {
             "type": "feat",

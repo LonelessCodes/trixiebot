@@ -1,4 +1,5 @@
-Changelog
+# Changelog
+
 ### [3.7.5](https://github.com/LonelessCodes/trixiebot/compare/v3.7.4...v3.7.5) (2020-04-29)
 
 

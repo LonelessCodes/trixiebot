@@ -15,7 +15,6 @@
  */
 
 const log = require("../log").default.namespace("alert cmd");
-const CONST = require("../const").default;
 const config = require("../config").default;
 const Discord = require("discord.js");
 
@@ -29,6 +28,7 @@ const CommandPermission = require("../util/commands/CommandPermission").default;
 const Translation = require("../modules/i18n/Translation").default;
 const { ResolvableObject } = require("../modules/i18n/Resolvable");
 
+const AlertList = require("../modules/alert/AlertList").default;
 const AlertManager = require("../modules/alert/AlertManager").default;
 const PicartoProcessor = require("../modules/alert/processor/PicartoProcessor").default;
 const PiczelProcessor = require("../modules/alert/processor/PiczelProcessor").default;
@@ -71,40 +71,7 @@ module.exports = function install(cr, { client, locale, db }) {
     const list_command = new SimpleCommand(async message => {
         const streams = await manager.getStreamConfigs(message.guild);
 
-        if (streams.length === 0) {
-            return new Translation("alert.empty", "Hehe, nothing here lol. Time to add some.");
-        }
-
-        /** @type {Map<any, string[]>} */
-        const sorted_by_channels = new Map();
-        for (const stream of streams) {
-            if (stream.channel) {
-                sorted_by_channels.set(stream.channel, [...(sorted_by_channels.get(stream.channel) || []), stream.getURL(true)]);
-            } else {
-                if (stream.nsfwChannel) {
-                    sorted_by_channels.set(stream.nsfwChannel, [
-                        ...(sorted_by_channels.get(stream.nsfwChannel) || []),
-                        stream.getURL(true) + " (NSFW)",
-                    ]);
-                }
-                if (stream.sfwChannel) {
-                    sorted_by_channels.set(stream.sfwChannel, [
-                        ...(sorted_by_channels.get(stream.sfwChannel) || []),
-                        stream.getURL(true) + " (SFW)",
-                    ]);
-                }
-            }
-        }
-
-        const embed = new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY);
-        for (const [channel, streams] of sorted_by_channels) {
-            let str = "";
-            for (const stream of streams) str += stream + "\n";
-
-            embed.addField("#" + channel.name, str);
-        }
-
-        return embed;
+        await new AlertList(streams, message.channel, locale, message.author).display();
     });
 
     alertCommand

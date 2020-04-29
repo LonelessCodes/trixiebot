@@ -96,7 +96,11 @@
     "cleanup_on": "Cleaning up online announcements now.",
     "url_missing": "`page url` should be a vaid url! Instead I got nothing",
     "no_exist": "That user does not exist!",
-    "already_subscribed": "This server is already subscribed to this streamer."
+    "already_subscribed": "This server is already subscribed to this streamer.",
+    "list": {
+      "title": "Alert List",
+      "footer": "Total Streams: {{streams}}"
+    }
   },
   "general": {
     "lang_name": "English",

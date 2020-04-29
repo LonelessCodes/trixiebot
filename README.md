@@ -38,7 +38,7 @@ If you however still want to build your own instance of Trixie or would like to 
 ### Preparing
 
 Trixie is dependant on:
-* node.js v10.x
+* node.js v12.x
 * graphicsmagick
 * ffmpeg
 * mongodb

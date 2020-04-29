@@ -1,4 +1,17 @@
 Changelog
+### [3.7.3](https://github.com/LonelessCodes/trixiebot/compare/v3.7.2...v3.7.3) (2020-04-29)
+
+
+### Bug Fixes
+
+* **alert cmd:** fixed so many problems in alerts, migrated alert system to TS ([cb1cf8c](https://github.com/LonelessCodes/trixiebot/commit/cb1cf8cd5281bd4b86ce6b2c956878723c6d3713))
+* fixed getter over inherited property "category" in AliasCommand ([f454349](https://github.com/LonelessCodes/trixiebot/commit/f45434925e49c16f6a8fcee0caa69f0efc2d3e62))
+
+
+### Improvements
+
+* **AlertManager:** use Cursor.map() to transform DB results to Stream classes ([9349df5](https://github.com/LonelessCodes/trixiebot/commit/9349df5c223caf1c0e1f4ca53bfac848dc6f2e77))
+
 ### [3.7.2](https://github.com/LonelessCodes/trixiebot/compare/v3.7.1...v3.7.2) (2020-04-27)
 
 

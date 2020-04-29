@@ -146,66 +146,95 @@ module.exports = function install(cr, { db, locale }) {
         const m = await locale.send(message.channel, new TranslationMerge(":arrows_counterclockwise:", uploader.status));
 
         await uploader
-            .on("statusChange", status => m.edit(new TranslationMerge(":arrows_counterclockwise:", status)))
+            .on("statusChange", status => locale.edit(m, new TranslationMerge(":arrows_counterclockwise:", status)))
             .upload(message.attachments.first(), name.toLowerCase())
             .then(sample => {
                 const embed = cb(new Discord.MessageEmbed().setColor(CONST.COLOR.PRIMARY), sample);
-                m.edit(new TranslationMerge("✅", new Translation("sb.success", "Successfully added!")), { embed });
+                locale.edit(m, new TranslationMerge("✅", new Translation("sb.success", "Successfully added!")), { embed });
             })
             .catch(err => {
-                if (err instanceof ResolvableObject) return m.edit(new TranslationMerge("❌", err));
+                if (err instanceof ResolvableObject) return locale.edit(m, new TranslationMerge("❌", err));
 
                 log.error(err);
-                m.edit(
+                locale.edit(
+                    m,
                     new TranslationMerge("❌", new Translation("audio.error", "Some error happened and caused some whoopsies"))
                 );
             });
     }
 
-    sbCmd.registerSubCommand("upload", new class extends ChooseCommand {
-        async user({ message, prefix, content: name }) {
-            const slots = await soundboard.getTakenSlotsUser(message.author);
-            const max_slots = await soundboard.getSlotsUser(message.author);
-            if (slots >= max_slots) {
-                return new Translation("sb.not_enough_slots_guild", "❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot`", { prefix });
-            }
+    sbCmd
+        .registerSubCommand(
+            "upload",
+            new (class extends ChooseCommand {
+                async user({ message, prefix, content: name }) {
+                    const slots = await soundboard.getTakenSlotsUser(message.author);
+                    const max_slots = await soundboard.getSlotsUser(message.author);
+                    if (slots >= max_slots) {
+                        return new Translation(
+                            "sb.not_enough_slots_guild",
+                            "❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot`",
+                            { prefix }
+                        );
+                    }
 
-            return await uploadSample(message, message.author, name, (embed, sample) => {
-                embed.setAuthor(userToString(message.author, true) + " | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
+                    return await uploadSample(message, message.author, name, (embed, sample) => {
+                        embed.setAuthor(
+                            userToString(message.author, true) + " | " + sample.name,
+                            message.author.avatarURL({ size: 32, dynamic: true })
+                        );
 
-                embed.addField("Name", sample.name, true);
-                embed.addField("ID", sample.id, true);
-                return embed;
-            });
-        }
-        async server({ message, prefix, content: name }) {
-            const slots = await soundboard.getTakenSlotsGuild(message.guild);
-            const max_slots = await soundboard.getSlotsGuild(message.guild);
-            if (slots >= max_slots) {
-                return new Translation("sb.not_enough_slots_user", "❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot server`", { prefix });
-            }
+                        embed.addField("Name", sample.name, true);
+                        embed.addField("ID", sample.id, true);
+                        return embed;
+                    });
+                }
+                async server({ message, prefix, content: name }) {
+                    const slots = await soundboard.getTakenSlotsGuild(message.guild);
+                    const max_slots = await soundboard.getSlotsGuild(message.guild);
+                    if (slots >= max_slots) {
+                        return new Translation(
+                            "sb.not_enough_slots_user",
+                            "❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot server`",
+                            { prefix }
+                        );
+                    }
 
-            return await uploadSample(message, message.guild, name, (embed, sample) => {
-                embed.setAuthor(message.guild.name + " | " + sample.name, message.guild.iconURL({ size: 32, dynamic: true }));
+                    return await uploadSample(message, message.guild, name, (embed, sample) => {
+                        embed.setAuthor(
+                            message.guild.name + " | " + sample.name,
+                            message.guild.iconURL({ size: 32, dynamic: true })
+                        );
 
-                embed.addField("Name", sample.name, true);
-                embed.addField("ID", sample.id, true);
-                return embed;
-            });
-        }
-        async pre({ message, content: name }) {
-            return await uploadSample(message, null, name, (embed, sample) => {
-                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
+                        embed.addField("Name", sample.name, true);
+                        embed.addField("ID", sample.id, true);
+                        return embed;
+                    });
+                }
+                async pre({ message, content: name }) {
+                    return await uploadSample(message, null, name, (embed, sample) => {
+                        embed.setAuthor(
+                            "Predefined Samples | " + sample.name,
+                            message.author.avatarURL({ size: 32, dynamic: true })
+                        );
 
-                embed.addField("Name", sample.name, true);
-                return embed;
-            });
-        }
-    }()).setRateLimiter(new RateLimiter(TimeUnit.MINUTE, 15, 5)).setHelp(new HelpContent()
-        .setUsageTitle("Manage Your Soundboards")
-        .setUsage("<?scope> <sound name>", "Upload a sound clip to Trixie. Attach the audio file to the message when sending")
-        .addParameterOptional("scope", "`user` or `server`")
-        .addParameter("sound name", "Name of the new sound clip"));
+                        embed.addField("Name", sample.name, true);
+                        return embed;
+                    });
+                }
+            })()
+        )
+        .setRateLimiter(new RateLimiter(TimeUnit.MINUTE, 15, 5))
+        .setHelp(
+            new HelpContent()
+                .setUsageTitle("Manage Your Soundboards")
+                .setUsage(
+                    "<?scope> <sound name>",
+                    "Upload a sound clip to Trixie. Attach the audio file to the message when sending"
+                )
+                .addParameterOptional("scope", "`user` or `server`")
+                .addParameter("sound name", "Name of the new sound clip")
+        );
     sbCmd.registerSubCommandAlias("upload", "u");
 
     async function importSample(scope, prefix, user, id, cb) {
@@ -254,48 +283,76 @@ module.exports = function install(cr, { db, locale }) {
         return [new Translation("sb.success_import", "✅ Successfully imported!"), { embed }];
     }
 
-    sbCmd.registerSubCommand("import", new class extends ChooseCommand {
-        async user({ message, prefix, content: id }) {
-            const slots = await soundboard.getTakenSlotsUser(message.author);
-            const max_slots = await soundboard.getSlotsUser(message.author);
-            if (slots >= max_slots) {
-                return new Translation("sb.no_free_slots", "❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot`", { prefix });
-            }
+    sbCmd
+        .registerSubCommand(
+            "import",
+            new (class extends ChooseCommand {
+                async user({ message, prefix, content: id }) {
+                    const slots = await soundboard.getTakenSlotsUser(message.author);
+                    const max_slots = await soundboard.getSlotsUser(message.author);
+                    if (slots >= max_slots) {
+                        return new Translation(
+                            "sb.no_free_slots",
+                            "❌ You don't have any free slots left in your soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot`",
+                            { prefix }
+                        );
+                    }
 
-            return await importSample("user", prefix, message.author, id, (embed, sample) => {
-                embed.setAuthor(userToString(message.author, true) + " | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
+                    return await importSample("user", prefix, message.author, id, (embed, sample) => {
+                        embed.setAuthor(
+                            userToString(message.author, true) + " | " + sample.name,
+                            message.author.avatarURL({ size: 32, dynamic: true })
+                        );
 
-                embed.addField("Name", sample.name, true);
-                embed.addField("ID", sample.id, true);
-                return embed;
-            });
-        }
-        async server({ message, prefix, content: id }) {
-            const slots = await soundboard.getTakenSlotsGuild(message.guild);
-            const max_slots = await soundboard.getSlotsGuild(message.guild);
-            if (slots >= max_slots) {
-                return new Translation("sb.no_free_slots", "❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot server`", { prefix });
-            }
+                        embed.addField("Name", sample.name, true);
+                        embed.addField("ID", sample.id, true);
+                        return embed;
+                    });
+                }
+                async server({ message, prefix, content: id }) {
+                    const slots = await soundboard.getTakenSlotsGuild(message.guild);
+                    const max_slots = await soundboard.getSlotsGuild(message.guild);
+                    if (slots >= max_slots) {
+                        return new Translation(
+                            "sb.no_free_slots",
+                            "❌ You don't have any free slots left in your server's soundboard. Worry not my child, you can still buy more by typing `{{prefix}}sb buyslot server`",
+                            { prefix }
+                        );
+                    }
 
-            return await importSample("guild", prefix, message.guild, id, (embed, sample) => {
-                embed.setAuthor(message.guild.name + " | " + sample.name, message.guild.iconURL({ size: 32, dynamic: true }));
+                    return await importSample("guild", prefix, message.guild, id, (embed, sample) => {
+                        embed.setAuthor(
+                            message.guild.name + " | " + sample.name,
+                            message.guild.iconURL({ size: 32, dynamic: true })
+                        );
 
-                embed.addField("Name", sample.name, true);
-                embed.addField("ID", sample.id, true);
-                return embed;
-            });
-        }
-        async pre({ message, prefix, content: id }) {
-            return await importSample("predefined", prefix, null, id, (embed, sample) => {
-                embed.setAuthor("Predefined Samples | " + sample.name, message.author.avatarURL({ size: 32, dynamic: true }));
+                        embed.addField("Name", sample.name, true);
+                        embed.addField("ID", sample.id, true);
+                        return embed;
+                    });
+                }
+                async pre({ message, prefix, content: id }) {
+                    return await importSample("predefined", prefix, null, id, (embed, sample) => {
+                        embed.setAuthor(
+                            "Predefined Samples | " + sample.name,
+                            message.author.avatarURL({ size: 32, dynamic: true })
+                        );
 
-                embed.addField("Name", sample.name, true);
-                return embed;
-            });
-        }
-    }()).setRateLimiter(new RateLimiter(TimeUnit.MINUTE, 15, 5)).setHelp(new HelpContent()
-        .setUsage("<?scope> <id>", "Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `{{prefix}}sb info <sound name>`")
-        .addParameter("id", "The unique ID of a soundclip"));
+                        embed.addField("Name", sample.name, true);
+                        return embed;
+                    });
+                }
+            })()
+        )
+        .setRateLimiter(new RateLimiter(TimeUnit.MINUTE, 15, 5))
+        .setHelp(
+            new HelpContent()
+                .setUsage(
+                    "<?scope> <id>",
+                    "Import a soundclip from another user or server to your or your server's soundboard. You can get the ID of a soundclip by asking the owner of the clip you want to import to type `{{prefix}}sb info <sound name>`"
+                )
+                .addParameter("id", "The unique ID of a soundclip")
+        );
     sbCmd.registerSubCommandAlias("import", "i");
 
     sbCmd

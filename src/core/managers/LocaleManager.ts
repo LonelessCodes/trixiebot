@@ -199,9 +199,7 @@ export default class LocaleManager {
         options?: ResolvableMessageOptions | ResolvableMessageAdditions
     ): Promise<Discord.Message> {
         const api_message = new Discord.APIMessage(ch, await this._transformMsg(ch, content, options));
-        // Change the interface of the returned Message object to support editing with
-        // Translation objects
-        return this._addEdit(await ch.send(api_message));
+        return await ch.send(api_message);
     }
 
     edit(msg: Discord.Message, options: ResolvableMessageEditOptions): Promise<Discord.Message>;
@@ -219,23 +217,6 @@ export default class LocaleManager {
             return await msg.edit(await this._transformMsg(msg.channel, content, options));
         }
         throw new Error("Cannot edit a Message not coming from a TextChannel or DMChannel");
-    }
-
-    private _addEdit(msg: Discord.Message): Discord.Message {
-        const old_edit = msg.edit.bind(msg);
-        return Object.assign(msg, {
-            edit: async (
-                content: Resolvable<string> | ResolvableMessageEditOptions | ResolvableMessageEditAdditions | Discord.APIMessage,
-                options?: ResolvableMessageEditOptions | ResolvableMessageEditAdditions
-            ) => {
-                const _old_edit = msg.edit.bind(msg);
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                // @ts-ignore
-                await this.edit(Object.assign(msg, { edit: old_edit }), content, options);
-                Object.assign(msg, { edit: _old_edit });
-                return msg;
-            },
-        });
     }
 
     // STATIC

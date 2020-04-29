@@ -20,36 +20,38 @@ import ParsedStream from "./ParsedStream";
 
 export interface StreamConfigOptions {
     _id?: ObjectId;
-    username?: string;
-    userId?: string;
-    messageId?: string;
-    lastChannelId?: string;
+    username: string;
+    userId: string;
 }
 
-export default class StreamConfig extends ParsedStream {
+export default class StreamConfig extends ParsedStream implements StreamConfigOptions {
     public channel: Discord.TextChannel | null;
     public nsfwChannel: Discord.TextChannel | null;
     public sfwChannel: Discord.TextChannel | null;
+    public guild: Discord.Guild;
 
     public _id?: ObjectId;
+    public username: string;
+    public userId: string;
 
     constructor(
-        service: import("../processor/Processor"),
+        service: import("../processor/Processor").default,
         channel: Discord.TextChannel | null,
         nsfwChannel: Discord.TextChannel | null,
         sfwChannel: Discord.TextChannel | null,
-        conf: StreamConfigOptions = {}
+        guild: Discord.Guild,
+        conf: StreamConfigOptions
     ) {
         super(service, conf.username, conf.userId);
 
         this.channel = channel;
         this.nsfwChannel = nsfwChannel;
         this.sfwChannel = sfwChannel;
-        this._id = conf._id;
-    }
+        this.guild = guild;
 
-    public get guild(): Discord.Guild | undefined {
-        return (this.channel || this.nsfwChannel || this.sfwChannel || {}).guild;
+        this._id = conf._id;
+        this.username = conf.username;
+        this.userId = conf.userId;
     }
 
     public getChannel(nsfw: boolean): Discord.TextChannel | undefined {
@@ -63,13 +65,6 @@ export default class StreamConfig extends ParsedStream {
     }
 
     public getSendable(nsfw: boolean): boolean {
-        if (nsfw) {
-            if (this.channel) return true;
-            if (this.nsfwChannel) return true;
-        } else {
-            if (this.channel) return true;
-            if (this.sfwChannel) return true;
-        }
-        return false;
+        return !!this.getChannel(nsfw);
     }
 }

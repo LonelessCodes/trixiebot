@@ -59,7 +59,7 @@ export interface OnlineStreamOptions extends StreamOptions {
     title: string;
     totalviews?: number;
     followers?: number;
-    avatar: string;
+    avatar?: string;
     thumbnail?: string;
     nsfw?: boolean;
     category?: string;
@@ -72,7 +72,7 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
     title: string;
     totalviews?: number;
     followers?: number;
-    avatar: string;
+    avatar?: string;
     thumbnail?: string;
     nsfw: boolean;
     category?: string;
@@ -80,35 +80,46 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
     language?: string;
     tags?: string[];
 
-    public message?: Discord.Message;
+    public message: Discord.Message | null;
 
     constructor(stream: Stream, conf: OnlineStreamOptions);
     constructor(
-        manager: import("../AlertManager"),
-        service: import("../processor/Processor"),
+        manager: import("../AlertManager").default,
+        service: import("../processor/Processor").default,
         channel: Discord.TextChannel | null,
         nsfwChannel: Discord.TextChannel | null,
         sfwChannel: Discord.TextChannel | null,
+        guild: Discord.Guild,
         conf: OnlineStreamOptions
     );
     constructor(
-        manager: import("../AlertManager") | Stream,
-        service: import("../processor/Processor") | OnlineStreamOptions,
+        manager: import("../AlertManager").default | Stream,
+        service: import("../processor/Processor").default | OnlineStreamOptions,
         channel?: Discord.TextChannel | null,
         nsfwChannel?: Discord.TextChannel | null,
         sfwChannel?: Discord.TextChannel | null,
+        guild?: Discord.Guild,
         conf?: OnlineStreamOptions
     ) {
         if (manager instanceof Stream && arguments.length === 2) {
             conf = service as OnlineStreamOptions;
-            super(manager.manager, manager.service, manager.channel, manager.nsfwChannel, manager.sfwChannel, manager);
+            super(
+                manager.manager,
+                manager.service,
+                manager.channel,
+                manager.nsfwChannel,
+                manager.sfwChannel,
+                manager.guild,
+                manager
+            );
         } else {
             super(
-                manager as import("../AlertManager"),
-                service as import("../processor/Processor"),
+                manager as import("../AlertManager").default,
+                service as import("../processor/Processor").default,
                 channel || null,
                 nsfwChannel || null,
                 sfwChannel || null,
+                guild as Discord.Guild,
                 conf as OnlineStreamOptions
             );
             conf = conf as OnlineStreamOptions;
@@ -127,15 +138,11 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
         this.language = conf.language;
         this.tags = conf.tags;
 
-        this.message = undefined;
+        this.message = null;
     }
 
     get curr_channel() {
         return this.getChannel(this.nsfw);
-    }
-
-    get sendable() {
-        return this.getSendable(this.nsfw);
     }
 
     setMessage(m: Discord.Message) {
@@ -146,20 +153,20 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
     async delete() {
         if (this.messageId && !this.message) {
             const onlineMessage = await this.fetch();
-            this.messageId = undefined;
-            this.lastChannelId = undefined;
+            this.messageId = null;
+            this.lastChannelId = null;
             if (!onlineMessage) return;
             this.message = onlineMessage;
         }
 
         if (this.message && this.message.deletable && !this.message.deleted) await this.message.delete().catch(doNothing);
 
-        this.messageId = undefined;
-        this.lastChannelId = undefined;
-        this.message = undefined;
+        this.messageId = null;
+        this.lastChannelId = null;
+        this.message = null;
     }
 
-    async getEmbed() {
+    async generateEmbed() {
         if (!this.curr_channel) return;
 
         const footer = new TranslationMerge().separator(" | ");
@@ -187,7 +194,7 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
         const embed = new TranslationEmbed().setColor(this.service.color || CONST.COLOR.PRIMARY).setURL(this.url);
 
         if (await this.manager.isCompact(this.guild)) {
-            embed.setAuthor(this.username || this.userId, this.avatar, this.url);
+            embed.setAuthor(this.username, this.avatar, this.url);
             if (thumbnail) {
                 if (can_use_blur) embed.attachFiles([thumbnail]);
                 embed.setImage(thumbnail);
@@ -197,7 +204,8 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
             return embed;
         }
 
-        embed.setAuthor(this.username).setTitle(this.title).setThumbnail(this.avatar);
+        embed.setAuthor(this.username).setTitle(this.title);
+        if (this.avatar) embed.setThumbnail(this.avatar);
         if (this.followers != undefined)
             embed.addField(new Translation("alert.embed.followers", "Followers"), new NumberFormat(this.followers), true);
         if (this.totalviews != undefined)

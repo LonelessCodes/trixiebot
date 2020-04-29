@@ -29,11 +29,11 @@ const CommandPermission = require("../util/commands/CommandPermission").default;
 const Translation = require("../modules/i18n/Translation").default;
 const { ResolvableObject } = require("../modules/i18n/Resolvable");
 
-const AlertManager = require("../modules/alert/AlertManager");
-const PicartoProcessor = require("../modules/alert/processor/PicartoProcessor");
-const PiczelProcessor = require("../modules/alert/processor/PiczelProcessor");
-const SmashcastProcessor = require("../modules/alert/processor/SmashcastProcessor");
-const TwitchProcessor = require("../modules/alert/processor/TwitchProcessor");
+const AlertManager = require("../modules/alert/AlertManager").default;
+const PicartoProcessor = require("../modules/alert/processor/PicartoProcessor").default;
+const PiczelProcessor = require("../modules/alert/processor/PiczelProcessor").default;
+const SmashcastProcessor = require("../modules/alert/processor/SmashcastProcessor").default;
+const TwitchProcessor = require("../modules/alert/processor/TwitchProcessor").default;
 
 const { findChannels } = require("../modules/alert/helpers");
 const StreamConfig = require("../modules/alert/stream/StreamConfig").default;
@@ -41,7 +41,7 @@ const StreamConfig = require("../modules/alert/stream/StreamConfig").default;
 const URL_REGEX = /^(https?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/;
 
 module.exports = function install(cr, { client, locale, db }) {
-    /** @type {typeof import("../modules/alert/processor/Processor")[]} */
+    /** @type {typeof import("../modules/alert/processor/Processor").default[]} */
     const services = [PicartoProcessor, PiczelProcessor, SmashcastProcessor];
     if (config.has("twitch.client_id")) services.push(TwitchProcessor);
     else log.namespace("config", "Found no API client ID for Twitch - Disabled alerting Twitch streams");
@@ -117,6 +117,8 @@ module.exports = function install(cr, { client, locale, db }) {
         .registerOverload(
             "1+",
             new SimpleCommand(async ({ message, content }) => {
+                if (!message.guild) return;
+
                 const [first, ...args_arr] = content.trim().split(/\s+/);
 
                 const url = first.replace(/<.*>/, str => str.slice(1, str.length - 1)); // clean links
@@ -158,7 +160,7 @@ module.exports = function install(cr, { client, locale, db }) {
                 }
 
                 await manager.addStreamConfig(
-                    new StreamConfig(service, final_channels.def, final_channels.nsfw, final_channels.sfw, parsed)
+                    new StreamConfig(service, final_channels.def, final_channels.nsfw, final_channels.sfw, message.guild, parsed)
                 );
 
                 return new Translation("alert.success", "Will be alerting y'all there when {{name}} goes online!", {
@@ -172,6 +174,8 @@ module.exports = function install(cr, { client, locale, db }) {
         .registerOverload(
             "1+",
             new SimpleCommand(async ({ message, content }) => {
+                if (!message.guild) return;
+
                 const url = content
                     .replace(/<.*>/, str => str.slice(1, str.length - 1)) // clean links
                     .trim();

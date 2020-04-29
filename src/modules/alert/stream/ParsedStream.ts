@@ -15,11 +15,11 @@
  */
 
 export default class ParsedStream {
-    public service: import("../processor/Processor");
+    public service: import("../processor/Processor").default;
     public username?: string;
     public userId?: string;
 
-    constructor(service: import("../processor/Processor"), username?: string, userId?: string) {
+    constructor(service: import("../processor/Processor").default, username?: string, userId?: string) {
         this.service = service;
         this.username = username;
         this.userId = userId;

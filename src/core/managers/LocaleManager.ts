@@ -182,8 +182,16 @@ export default class LocaleManager {
     send(ch: Discord.MessageTarget, options: ResolvableMessageOptions): Promise<Discord.Message>;
     send(ch: Discord.MessageTarget, options: ResolvableMessageAdditions): Promise<Discord.Message>;
     send(ch: Discord.MessageTarget, content: Resolvable<string>): Promise<Discord.Message>;
-    send(ch: Discord.MessageTarget, content: Resolvable<string>, options: ResolvableMessageOptions): Promise<Discord.Message>;
-    send(ch: Discord.MessageTarget, content: Resolvable<string>, options: ResolvableMessageAdditions): Promise<Discord.Message>;
+    send(
+        ch: Discord.MessageTarget,
+        content: Resolvable<string>,
+        options: ResolvableMessageOptions | undefined
+    ): Promise<Discord.Message>;
+    send(
+        ch: Discord.MessageTarget,
+        content: Resolvable<string>,
+        options: ResolvableMessageAdditions | undefined
+    ): Promise<Discord.Message>;
 
     async send(
         ch: Discord.MessageTarget,

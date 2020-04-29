@@ -196,7 +196,7 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
         if (await this.manager.isCompact(this.guild)) {
             embed.setAuthor(this.username, this.avatar, this.url);
             if (thumbnail) {
-                if (can_use_blur) embed.attachFiles([thumbnail]);
+                if (can_use_blur) embed.attachFiles([attachment!]);
                 embed.setImage(thumbnail);
             }
             embed.setFooter(footer);
@@ -211,7 +211,7 @@ export default class OnlineStream extends Stream implements OnlineStreamOptions 
         if (this.totalviews != undefined)
             embed.addField(new Translation("alert.embed.viewers", "Total Viewers"), new NumberFormat(this.totalviews), true);
         if (thumbnail) {
-            if (can_use_blur) embed.attachFiles([thumbnail]);
+            if (can_use_blur) embed.attachFiles([attachment!]);
             embed.setImage(thumbnail);
         }
         embed.setFooter(footer);

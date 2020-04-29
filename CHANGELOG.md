@@ -1,5 +1,13 @@
 # Changelog
 
+### [3.7.6](https://github.com/LonelessCodes/trixiebot/compare/v3.7.5...v3.7.6) (2020-04-29)
+
+
+### Bug Fixes
+
+* **alert:** fixed typo in stream embed generation ([431c759](https://github.com/LonelessCodes/trixiebot/commit/431c7595f5a1ef21d0f98ae151c5b1c4502249e9))
+* fixed changelog ([8a559a8](https://github.com/LonelessCodes/trixiebot/commit/8a559a893694acfaba13510e44f382c87e4792e1))
+
 ### [3.7.5](https://github.com/LonelessCodes/trixiebot/compare/v3.7.4...v3.7.5) (2020-04-29)
 
 

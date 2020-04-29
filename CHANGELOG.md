@@ -1,4 +1,17 @@
 Changelog
+### [3.7.5](https://github.com/LonelessCodes/trixiebot/compare/v3.7.4...v3.7.5) (2020-04-29)
+
+
+### Bug Fixes
+
+* **alert:** fixed Cursor@data -> undefined ([9d798fb](https://github.com/LonelessCodes/trixiebot/commit/9d798fb77a972a84571eb1055767a53fb76ceea3))
+* **alert cmd:** fixed error on !alert when a server had a lot of subscribed streams ([85c4b2f](https://github.com/LonelessCodes/trixiebot/commit/85c4b2ffb84dbcdbf0d5c55c0420506b1b204d97))
+
+
+### Changes
+
+* **locale:** stopped adding modified edit() to Message and use LocaleManager.edit(message) instead ([fb0f37f](https://github.com/LonelessCodes/trixiebot/commit/fb0f37f4693e8d8036dde5c7d3430f8e7ec4fc38))
+
 ### [3.7.4](https://github.com/LonelessCodes/trixiebot/compare/v3.7.3...v3.7.4) (2020-04-29)
 
 ### [3.7.3](https://github.com/LonelessCodes/trixiebot/compare/v3.7.2...v3.7.3) (2020-04-29)

@@ -1,4 +1,6 @@
 Changelog
+### [3.7.4](https://github.com/LonelessCodes/trixiebot/compare/v3.7.3...v3.7.4) (2020-04-29)
+
 ### [3.7.3](https://github.com/LonelessCodes/trixiebot/compare/v3.7.2...v3.7.3) (2020-04-29)
 
 

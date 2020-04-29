@@ -30,6 +30,8 @@ import ParsedStream from "./stream/ParsedStream";
 
 import Processor from "./processor/Processor";
 
+import stream from "stream";
+
 interface StreamDocument {
     _id: mongo.ObjectId;
     service: string;
@@ -197,8 +199,16 @@ class AlertManager extends EventEmitter {
     getConfigsStream(query: mongo.FilterQuery<StreamDocument>): mongo.Cursor<Stream> {
         return this.database.find(query).map(raw => this.docToStream(raw)) as mongo.Cursor<Stream>;
     }
-    getServiceConfigsStream(service: Processor): mongo.Cursor<Stream> {
-        return this.getConfigsStream({ service: service.name });
+    getServiceConfigsStream(service: Processor): stream.Transform {
+        return this.getConfigsStream({ service: service.name }).pipe(
+            new stream.Transform({
+                objectMode: true,
+                transform(chunk, encoding, callback) {
+                    if (chunk) this.push(chunk);
+                    callback();
+                },
+            })
+        );
     }
     getStreamConfigs(guild: Discord.Guild) {
         // Cursor automatically removes undefined docs from the result - to our advantage

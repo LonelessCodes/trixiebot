@@ -26,8 +26,6 @@ export default class MessageMentions extends Discord.MessageMentions {
         // Pass results from original MessageMentions through
         super(message, message.mentions.users, message.mentions.roles, message.mentions.everyone);
 
-        Object.defineProperty(this, "_content", { value: content });
-
         // delete to re-arrange
         const _users = this.users.array();
         this.users.clear();

@@ -91,7 +91,7 @@ class CommandDispatcher {
             "There is still {{time_left}} left to wait.",
         ], {
             count: this.global_ratelimit.max,
-            time_frame: this.global_ratelimit.timeUnit.toTranslation(this.global_ratelimit.timeNum),
+            time_frame: this.global_ratelimit.time_unit.toTranslation(this.global_ratelimit.time_num),
             time_left: new DurationFormat(this.global_ratelimit.tryAgainIn(context.author.id)),
         }));
     }

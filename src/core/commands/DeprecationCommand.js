@@ -21,15 +21,18 @@ const { Resolvable } = require("../../modules/i18n/Resolvable");
 class DeprecationCommand extends BaseCommand {
     /**
      * @param {Resolvable<string>} desc
+     * @param {BaseCommand} [cmd]
      */
-    constructor(desc) {
+    constructor(desc, cmd) {
         super();
 
         this.desc = desc;
+        this.cmd = cmd;
     }
 
-    async run(context) {
+    async run(context, command_name) {
         await context.send(this.desc);
+        if (this.cmd) await this.cmd.run(context, command_name);
     }
 }
 

@@ -16,6 +16,7 @@
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
+const DeprecationCommand = require("../core/commands/DeprecationCommand");
 const HelpContent = require("../util/commands/HelpContent").default;
 const Category = require("../util/commands/Category").default;
 const CommandScope = require("../util/commands/CommandScope").default;
@@ -120,24 +121,29 @@ module.exports = function install(cr) {
 
     const bot = new Cleverbot(config.get("cleverbot.user"), config.get("cleverbot.key"));
 
-    cr.registerCommand("chat", new OverloadCommand())
-        .registerOverload(
-            "1+",
-            new SimpleCommand(async ({ message, content: input }) => {
-                message.channel.startTyping().catch(doNothing);
+    cr.registerCommand(
+        "chat",
+        new DeprecationCommand(
+            "❕ The chat command will be removed in the next major release, but will still work for now",
+            new OverloadCommand().registerOverload(
+                "1+",
+                new SimpleCommand(async ({ message, content: input }) => {
+                    message.channel.startTyping().catch(doNothing);
 
-                try {
-                    const session = await bot.create(message.author.id);
+                    try {
+                        const session = await bot.create(message.author.id);
 
-                    const reply = await session.ask(input);
+                        const reply = await session.ask(input);
 
-                    if (message.channel.type === "text") await message.channel.send(`${message.member.toString()} ${reply}`);
-                    else await message.channel.send(`${message.author.toString()} ${reply}`);
-                } finally {
-                    message.channel.stopTyping();
-                }
-            })
+                        if (message.member) await message.channel.send(`${message.member.toString()} ${reply}`);
+                        else await message.channel.send(`${message.author.toString()} ${reply}`);
+                    } finally {
+                        message.channel.stopTyping();
+                    }
+                })
+            )
         )
+    )
         .setHelp(new HelpContent().setUsage("<text>", "Talk with Trixie1!!! (using a cleverbot integration)"))
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);

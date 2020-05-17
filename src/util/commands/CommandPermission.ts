@@ -33,7 +33,8 @@ export default class CommandPermission {
     }
 
     test(member: Discord.UserResolvable): boolean {
-        if (this.permissions.length === 0) true;
+        // if there are no requirements => can safely run in DMs
+        if (this.permissions.length === 0) return true;
 
         if (!(member instanceof Discord.GuildMember)) return false;
         for (const permission of this.permissions) {

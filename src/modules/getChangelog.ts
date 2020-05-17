@@ -35,7 +35,7 @@ export default async function getChangelog() {
     let body = "";
 
     for (const line of file.split(/\r?\n/g)) {
-        if ((match = /^##? \[(\d+\.\d+\.\d+)\]\(http[\w+.:/]+\) \((\d{4}-\d{2}-\d{2})\)/g.exec(line))) {
+        if ((match = /^###? \[(\d+\.\d+\.\d+)\]\(http[\w+.:/]+\) \((\d{4}-\d{2}-\d{2})\)/g.exec(line))) {
             if (version && date) {
                 releases.push({
                     body: body.trim(),

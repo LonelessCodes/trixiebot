@@ -67,7 +67,7 @@
 * translate serverinfo cmd and remove all old i18n fallback code ([f8e2e60](https://github.com/LonelessCodes/trixiebot/commit/f8e2e60d77f4f2a59c2fdef5c632ed09768a88ab))
 
 <a name="3.7.1"></a>
-## [3.7.1](https://github.com/LonelessCodes/trixiebot/compare/v3.7.0...v3.7.1) (2020-04-19)
+### [3.7.1](https://github.com/LonelessCodes/trixiebot/compare/v3.7.0...v3.7.1) (2020-04-19)
 
 
 ### Bug Fixes
@@ -77,7 +77,7 @@
 
 
 <a name="3.7.0"></a>
-# [3.7.0](https://github.com/LonelessCodes/trixiebot/compare/v3.6.0...v3.7.0) (2020-04-18)
+## [3.7.0](https://github.com/LonelessCodes/trixiebot/compare/v3.6.0...v3.7.0) (2020-04-18)
 
 
 ### Bug Fixes
@@ -101,7 +101,7 @@
 
 
 <a name="3.6.0"></a>
-# [3.6.0](https://github.com/LonelessCodes/trixiebot/compare/v3.5.1...v3.6.0) (2020-02-01)
+## [3.6.0](https://github.com/LonelessCodes/trixiebot/compare/v3.5.1...v3.6.0) (2020-02-01)
 
 
 ### Features
@@ -111,7 +111,7 @@
 
 
 <a name="3.5.1"></a>
-## [3.5.1](https://github.com/LonelessCodes/trixiebot/compare/v3.5.0...v3.5.1) (2020-01-30)
+### [3.5.1](https://github.com/LonelessCodes/trixiebot/compare/v3.5.0...v3.5.1) (2020-01-30)
 
 
 ### Bug Fixes
@@ -122,7 +122,7 @@
 
 
 <a name="3.5.0"></a>
-# [3.5.0](https://github.com/LonelessCodes/trixiebot/compare/v3.4.3...v3.5.0) (2020-01-27)
+## [3.5.0](https://github.com/LonelessCodes/trixiebot/compare/v3.4.3...v3.5.0) (2020-01-27)
 
 
 ### Bug Fixes
@@ -139,7 +139,7 @@
 
 
 <a name="3.4.3"></a>
-## [3.4.3](https://github.com/LonelessCodes/trixiebot/compare/v3.4.2...v3.4.3) (2019-12-20)
+### [3.4.3](https://github.com/LonelessCodes/trixiebot/compare/v3.4.2...v3.4.3) (2019-12-20)
 
 
 ### Bug Fixes
@@ -149,7 +149,7 @@
 
 
 <a name="3.4.2"></a>
-## [3.4.2](https://github.com/LonelessCodes/trixiebot/compare/v3.4.1...v3.4.2) (2019-12-13)
+### [3.4.2](https://github.com/LonelessCodes/trixiebot/compare/v3.4.1...v3.4.2) (2019-12-13)
 
 
 ### Bug Fixes
@@ -159,7 +159,7 @@
 
 
 <a name="3.4.1"></a>
-## [3.4.1](https://github.com/LonelessCodes/trixiebot/compare/v3.4.0...v3.4.1) (2019-12-13)
+### [3.4.1](https://github.com/LonelessCodes/trixiebot/compare/v3.4.0...v3.4.1) (2019-12-13)
 
 
 ### Bug Fixes
@@ -169,7 +169,7 @@
 
 
 <a name="3.4.0"></a>
-# [3.4.0](https://github.com/LonelessCodes/trixiebot/compare/v3.3.2...v3.4.0) (2019-12-12)
+## [3.4.0](https://github.com/LonelessCodes/trixiebot/compare/v3.3.2...v3.4.0) (2019-12-12)
 
 
 ### Bug Fixes
@@ -192,7 +192,7 @@
 
 
 <a name="3.3.2"></a>
-## [3.3.2](https://github.com/LonelessCodes/trixiebot/compare/v3.3.1...v3.3.2) (2019-12-08)
+### [3.3.2](https://github.com/LonelessCodes/trixiebot/compare/v3.3.1...v3.3.2) (2019-12-08)
 
 
 ### Bug Fixes
@@ -210,7 +210,7 @@
 
 
 <a name="3.3.1"></a>
-## [3.3.1](https://github.com/LonelessCodes/trixiebot/compare/v3.3.0...v3.3.1) (2019-12-04)
+### [3.3.1](https://github.com/LonelessCodes/trixiebot/compare/v3.3.0...v3.3.1) (2019-12-04)
 
 
 ### Bug Fixes
@@ -227,7 +227,7 @@
 
 
 <a name="3.3.0"></a>
-# [3.3.0](https://github.com/LonelessCodes/trixiebot/compare/v3.2.0...v3.3.0) (2019-11-16)
+## [3.3.0](https://github.com/LonelessCodes/trixiebot/compare/v3.2.0...v3.3.0) (2019-11-16)
 
 
 ### Bug Fixes
@@ -248,7 +248,7 @@
 
 
 <a name="3.2.0"></a>
-# [3.2.0](https://github.com/LonelessCodes/trixiebot/compare/v3.1.1...v3.2.0) (2019-11-15)
+## [3.2.0](https://github.com/LonelessCodes/trixiebot/compare/v3.1.1...v3.2.0) (2019-11-15)
 
 
 ### Bug Fixes
@@ -264,7 +264,7 @@
 
 
 <a name="3.1.1"></a>
-## [3.1.1](https://github.com/LonelessCodes/trixiebot/compare/v3.1.0...v3.1.1) (2019-11-14)
+### [3.1.1](https://github.com/LonelessCodes/trixiebot/compare/v3.1.0...v3.1.1) (2019-11-14)
 
 
 ### Bug Fixes
@@ -275,7 +275,7 @@
 
 
 <a name="3.1.0"></a>
-# [3.1.0](https://bitbucket.org/Loneless/trixiebot/compare/v3.0.0...v3.1.0) (2019-11-13)
+## [3.1.0](https://bitbucket.org/Loneless/trixiebot/compare/v3.0.0...v3.1.0) (2019-11-13)
 
 
 ### Bug Fixes
@@ -293,7 +293,7 @@
 
 
 <a name="3.0.0"></a>
-# [3.0.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.5...v3.0.0) (2019-11-11)
+## [3.0.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.5...v3.0.0) (2019-11-11)
 
 
 ### Bug Fixes
@@ -317,7 +317,7 @@
 
 
 <a name="2.16.5"></a>
-## [2.16.5](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.4...v2.16.5) (2019-11-11)
+### [2.16.5](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.4...v2.16.5) (2019-11-11)
 
 
 ### Bug Fixes
@@ -327,7 +327,7 @@
 
 
 <a name="2.16.4"></a>
-## [2.16.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.3...v2.16.4) (2019-11-09)
+### [2.16.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.3...v2.16.4) (2019-11-09)
 
 
 ### Bug Fixes
@@ -346,7 +346,7 @@
 
 
 <a name="2.16.3"></a>
-## [2.16.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.2...v2.16.3) (2019-10-31)
+### [2.16.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.2...v2.16.3) (2019-10-31)
 
 
 ### Bug Fixes
@@ -358,7 +358,7 @@
 
 
 <a name="2.16.2"></a>
-## [2.16.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.1...v2.16.2) (2019-10-06)
+### [2.16.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.1...v2.16.2) (2019-10-06)
 
 
 ### Bug Fixes
@@ -376,7 +376,7 @@
 
 
 <a name="2.16.1"></a>
-## [2.16.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.0...v2.16.1) (2019-09-28)
+### [2.16.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.16.0...v2.16.1) (2019-09-28)
 
 
 ### Bug Fixes
@@ -386,7 +386,7 @@
 
 
 <a name="2.16.0"></a>
-# [2.16.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.3...v2.16.0) (2019-09-26)
+## [2.16.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.3...v2.16.0) (2019-09-26)
 
 
 ### Bug Fixes
@@ -405,7 +405,7 @@
 
 
 <a name="2.15.3"></a>
-## [2.15.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.2...v2.15.3) (2019-09-25)
+### [2.15.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.2...v2.15.3) (2019-09-25)
 
 
 ### Bug Fixes
@@ -415,7 +415,7 @@
 
 
 <a name="2.15.2"></a>
-## [2.15.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.1...v2.15.2) (2019-09-25)
+### [2.15.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.1...v2.15.2) (2019-09-25)
 
 
 ### Bug Fixes
@@ -425,7 +425,7 @@
 
 
 <a name="2.15.1"></a>
-## [2.15.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.0...v2.15.1) (2019-09-23)
+### [2.15.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.15.0...v2.15.1) (2019-09-23)
 
 
 ### Bug Fixes
@@ -435,7 +435,7 @@
 
 
 <a name="2.15.0"></a>
-# [2.15.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.2...v2.15.0) (2019-09-23)
+## [2.15.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.2...v2.15.0) (2019-09-23)
 
 
 ### Features
@@ -446,7 +446,7 @@
 
 
 <a name="2.14.2"></a>
-## [2.14.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.1...v2.14.2) (2019-09-18)
+### [2.14.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.1...v2.14.2) (2019-09-18)
 
 
 ### Bug Fixes
@@ -467,7 +467,7 @@
 
 
 <a name="2.14.1"></a>
-## [2.14.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.0...v2.14.1) (2019-09-10)
+### [2.14.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.14.0...v2.14.1) (2019-09-10)
 
 
 ### Bug Fixes
@@ -477,7 +477,7 @@
 
 
 <a name="2.14.0"></a>
-# [2.14.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.3...v2.14.0) (2019-09-10)
+## [2.14.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.3...v2.14.0) (2019-09-10)
 
 
 ### Bug Fixes
@@ -497,7 +497,7 @@
 
 
 <a name="2.13.3"></a>
-## [2.13.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.2...v2.13.3) (2019-08-29)
+### [2.13.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.2...v2.13.3) (2019-08-29)
 
 
 ### Bug Fixes
@@ -507,7 +507,7 @@
 
 
 <a name="2.13.2"></a>
-## [2.13.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.1...v2.13.2) (2019-08-29)
+### [2.13.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.1...v2.13.2) (2019-08-29)
 
 
 ### Bug Fixes
@@ -522,7 +522,7 @@
 
 
 <a name="2.13.1"></a>
-## [2.13.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.0...v2.13.1) (2019-08-28)
+### [2.13.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.13.0...v2.13.1) (2019-08-28)
 
 
 ### Bug Fixes
@@ -532,7 +532,7 @@
 
 
 <a name="2.13.0"></a>
-# [2.13.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.2...v2.13.0) (2019-08-28)
+## [2.13.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.2...v2.13.0) (2019-08-28)
 
 
 ### Bug Fixes
@@ -550,7 +550,7 @@
 
 
 <a name="2.12.2"></a>
-## [2.12.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.1...v2.12.2) (2019-08-15)
+### [2.12.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.1...v2.12.2) (2019-08-15)
 
 
 ### Bug Fixes
@@ -570,7 +570,7 @@
 
 
 <a name="2.12.1"></a>
-## [2.12.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.0...v2.12.1) (2019-08-10)
+### [2.12.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.12.0...v2.12.1) (2019-08-10)
 
 
 ### Bug Fixes
@@ -580,7 +580,7 @@
 
 
 <a name="2.12.0"></a>
-# [2.12.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.2...v2.12.0) (2019-08-10)
+## [2.12.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.2...v2.12.0) (2019-08-10)
 
 
 ### Features
@@ -590,7 +590,7 @@
 
 
 <a name="2.11.2"></a>
-## [2.11.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.1...v2.11.2) (2019-08-10)
+### [2.11.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.1...v2.11.2) (2019-08-10)
 
 
 ### Bug Fixes
@@ -601,7 +601,7 @@
 
 
 <a name="2.11.1"></a>
-## [2.11.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.0...v2.11.1) (2019-08-07)
+### [2.11.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.11.0...v2.11.1) (2019-08-07)
 
 
 ### Bug Fixes
@@ -617,7 +617,7 @@
 
 
 <a name="2.11.0"></a>
-## [2.11.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.10.0...v2.11.0) (2019-08-06)
+### [2.11.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.10.0...v2.11.0) (2019-08-06)
 
 
 ### Bug Fixes
@@ -635,7 +635,7 @@
 
 
 <a name="2.10.0"></a>
-## [2.10.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.9.1...v2.10.0) (2019-07-25)
+### [2.10.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.9.1...v2.10.0) (2019-07-25)
 
 
 ### Features
@@ -655,7 +655,7 @@
 
 
 <a name="2.9.0"></a>
-## [2.9.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.3...v2.9.0) (2019-07-24)
+### [2.9.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.3...v2.9.0) (2019-07-24)
 
 
 ### Bug Fixes
@@ -676,7 +676,7 @@
 
 
 <a name="2.8.3"></a>
-## [2.8.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.2...v2.8.3) (2019-07-13)
+### [2.8.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.2...v2.8.3) (2019-07-13)
 
 
 ### Bug Fixes
@@ -699,7 +699,7 @@
 
 
 <a name="2.8.2"></a>
-## [2.8.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.1...v2.8.2) (2019-07-08)
+### [2.8.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.1...v2.8.2) (2019-07-08)
 
 
 ### Bug Fixes
@@ -709,7 +709,7 @@
 
 
 <a name="2.8.1"></a>
-## [2.8.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.0...v2.8.1) (2019-07-05)
+### [2.8.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.8.0...v2.8.1) (2019-07-05)
 
 
 ### Bug Fixes
@@ -720,7 +720,7 @@
 
 
 <a name="2.8.0"></a>
-# [2.8.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.3...v2.8.0) (2019-06-30)
+## [2.8.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.3...v2.8.0) (2019-06-30)
 
 
 ### Features
@@ -730,7 +730,7 @@
 
 
 <a name="2.7.3"></a>
-## [2.7.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.2...v2.7.3) (2019-06-28)
+### [2.7.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.2...v2.7.3) (2019-06-28)
 
 
 ### Bug Fixes
@@ -740,7 +740,7 @@
 
 
 <a name="2.7.2"></a>
-## [2.7.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.1...v2.7.2) (2019-06-27)
+### [2.7.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.1...v2.7.2) (2019-06-27)
 
 
 ### Bug Fixes
@@ -755,7 +755,7 @@
 
 
 <a name="2.7.1"></a>
-## [2.7.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.0...v2.7.1) (2019-06-26)
+### [2.7.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.7.0...v2.7.1) (2019-06-26)
 
 
 ### Bug Fixes
@@ -772,7 +772,7 @@
 
 
 <a name="2.7.0"></a>
-# [2.7.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.6.0...v2.7.0) (2019-06-24)
+## [2.7.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.6.0...v2.7.0) (2019-06-24)
 
 
 ### Bug Fixes
@@ -793,7 +793,7 @@
 
 
 <a name="2.6.0"></a>
-# [2.6.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.1...v2.6.0) (2019-06-20)
+## [2.6.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.1...v2.6.0) (2019-06-20)
 
 
 ### Bug Fixes
@@ -814,7 +814,7 @@
 
 
 <a name="2.5.1"></a>
-## [2.5.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.0...v2.5.1) (2019-06-17)
+### [2.5.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.5.0...v2.5.1) (2019-06-17)
 
 
 ### Bug Fixes
@@ -830,7 +830,7 @@
 
 
 <a name="2.5.0"></a>
-# [2.5.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.10...v2.5.0) (2019-06-12)
+## [2.5.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.10...v2.5.0) (2019-06-12)
 
 
 ### Bug Fixes
@@ -846,7 +846,7 @@
 
 
 <a name="2.4.10"></a>
-## [2.4.10](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.9...v2.4.10) (2019-05-28)
+### [2.4.10](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.9...v2.4.10) (2019-05-28)
 
 
 ### Bug Fixes
@@ -864,7 +864,7 @@
 
 
 <a name="2.4.9"></a>
-## [2.4.9](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.8...v2.4.9) (2019-05-28)
+### [2.4.9](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.8...v2.4.9) (2019-05-28)
 
 
 ### Bug Fixes
@@ -875,7 +875,7 @@
 
 
 <a name="2.4.8"></a>
-## [2.4.8](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.7...v2.4.8) (2019-05-28)
+### [2.4.8](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.7...v2.4.8) (2019-05-28)
 
 
 ### Bug Fixes
@@ -885,7 +885,7 @@
 
 
 <a name="2.4.7"></a>
-## [2.4.7](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.6...v2.4.7) (2019-05-25)
+### [2.4.7](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.6...v2.4.7) (2019-05-25)
 
 
 ### Bug Fixes
@@ -895,7 +895,7 @@
 
 
 <a name="2.4.6"></a>
-## [2.4.6](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.5...v2.4.6) (2019-05-25)
+### [2.4.6](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.5...v2.4.6) (2019-05-25)
 
 
 ### Features
@@ -905,7 +905,7 @@
 
 
 <a name="2.4.5"></a>
-## [2.4.5](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.4...v2.4.5) (2019-05-22)
+### [2.4.5](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.4...v2.4.5) (2019-05-22)
 
 
 ### Bug Fixes
@@ -922,7 +922,7 @@
 
 
 <a name="2.4.4"></a>
-## [2.4.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.3...v2.4.4) (2019-05-14)
+### [2.4.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.3...v2.4.4) (2019-05-14)
 
 
 ### Bug Fixes
@@ -937,7 +937,7 @@
 
 
 <a name="2.4.3"></a>
-## [2.4.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.2...v2.4.3) (2019-05-13)
+### [2.4.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.2...v2.4.3) (2019-05-13)
 
 
 ### Bug Fixes
@@ -947,7 +947,7 @@
 
 
 <a name="2.4.2"></a>
-## [2.4.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.1...v2.4.2) (2019-05-13)
+### [2.4.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.1...v2.4.2) (2019-05-13)
 
 
 ### Bug Fixes
@@ -958,7 +958,7 @@
 
 
 <a name="2.4.1"></a>
-## [2.4.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.0...v2.4.1) (2019-05-12)
+### [2.4.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.4.0...v2.4.1) (2019-05-12)
 
 
 ### Bug Fixes
@@ -969,7 +969,7 @@
 
 
 <a name="2.4.0"></a>
-# [2.4.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.2...v2.4.0) (2019-05-12)
+## [2.4.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.2...v2.4.0) (2019-05-12)
 
 
 ### Bug Fixes
@@ -984,7 +984,7 @@
 
 
 <a name="2.3.2"></a>
-## [2.3.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.1...v2.3.2) (2019-05-04)
+### [2.3.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.1...v2.3.2) (2019-05-04)
 
 
 ### Bug Fixes
@@ -994,7 +994,7 @@
 
 
 <a name="2.3.1"></a>
-## [2.3.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.0...v2.3.1) (2019-04-21)
+### [2.3.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.3.0...v2.3.1) (2019-04-21)
 
 
 ### Bug Fixes
@@ -1004,7 +1004,7 @@
 
 
 <a name="2.3.0"></a>
-# [2.3.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.2.0...v2.3.0) (2019-04-16)
+## [2.3.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.2.0...v2.3.0) (2019-04-16)
 
 
 ### Bug Fixes
@@ -1021,7 +1021,7 @@
 
 
 <a name="2.2.0"></a>
-# [2.2.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.1.1...v2.2.0) (2019-04-15)
+## [2.2.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.1.1...v2.2.0) (2019-04-15)
 
 
 ### Bug Fixes
@@ -1038,7 +1038,7 @@
 
 
 <a name="2.1.1"></a>
-## [2.1.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.4...v2.1.1) (2019-03-03)
+### [2.1.1](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.4...v2.1.1) (2019-03-03)
 
 
 ### Bug Fixes
@@ -1052,7 +1052,7 @@
 
 
 <a name="2.1.0"></a>
-# [2.1.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.4...v2.1.0) (2019-03-03)
+## [2.1.0](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.4...v2.1.0) (2019-03-03)
 
 
 ### Bug Fixes
@@ -1070,7 +1070,7 @@
 
 
 <a name="2.0.4"></a>
-## [2.0.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.3...v2.0.4) (2019-02-03)
+### [2.0.4](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.3...v2.0.4) (2019-02-03)
 
 
 ### Bug Fixes
@@ -1081,7 +1081,7 @@
 
 
 <a name="2.0.3"></a>
-## [2.0.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.2...v2.0.3) (2019-01-31)
+### [2.0.3](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.2...v2.0.3) (2019-01-31)
 
 
 ### Bug Fixes
@@ -1091,7 +1091,7 @@
 
 
 <a name="2.0.2"></a>
-## [2.0.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.1...v2.0.2) (2019-01-31)
+### [2.0.2](https://bitbucket.org/Loneless/trixiebot/compare/v2.0.1...v2.0.2) (2019-01-31)
 
 
 ### Bug Fixes
@@ -1101,7 +1101,7 @@
 
 
 <a name="2.0.1"></a>
-## [2.0.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.1...v2.0.1) (2019-01-30)
+### [2.0.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.1...v2.0.1) (2019-01-30)
 
 
 ### Bug Fixes
@@ -1111,7 +1111,7 @@
 
 
 <a name="2.0.0"></a>
-# [2.0.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.1...v2.0.0) (2019-01-30)
+## [2.0.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.1...v2.0.0) (2019-01-30)
 
 
 ### Bug Fixes
@@ -1133,7 +1133,7 @@
 
 
 <a name="1.34.1"></a>
-## [1.34.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.0...v1.34.1) (2019-01-27)
+### [1.34.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.34.0...v1.34.1) (2019-01-27)
 
 
 ### Bug Fixes
@@ -1144,7 +1144,7 @@
 
 
 <a name="1.34.0"></a>
-# [1.34.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.33.0...v1.34.0) (2019-01-27)
+## [1.34.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.33.0...v1.34.0) (2019-01-27)
 
 
 ### Bug Fixes
@@ -1171,7 +1171,7 @@
 
 
 <a name="1.33.0"></a>
-# [1.33.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.1...v1.33.0) (2019-01-22)
+## [1.33.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.1...v1.33.0) (2019-01-22)
 
 
 ### Bug Fixes
@@ -1192,7 +1192,7 @@
 
 
 <a name="1.32.1"></a>
-## [1.32.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.0...v1.32.1) (2019-01-16)
+### [1.32.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.32.0...v1.32.1) (2019-01-16)
 
 
 ### Bug Fixes
@@ -1203,7 +1203,7 @@
 
 
 <a name="1.32.0"></a>
-# [1.32.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.31.0...v1.32.0) (2019-01-16)
+## [1.32.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.31.0...v1.32.0) (2019-01-16)
 
 
 ### Bug Fixes
@@ -1221,7 +1221,7 @@
 
 
 <a name="1.31.0"></a>
-## [1.31.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.1...v1.31.0) (2019-01-09)
+### [1.31.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.1...v1.31.0) (2019-01-09)
 
 
 ### Features
@@ -1231,7 +1231,7 @@
 
 
 <a name="1.30.1"></a>
-## [1.30.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.0...v1.30.1) (2019-01-03)
+### [1.30.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.30.0...v1.30.1) (2019-01-03)
 
 
 ### Bug Fixes
@@ -1247,7 +1247,7 @@
 
 
 <a name="1.30.0"></a>
-# [1.30.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.1...v1.30.0) (2018-12-31)
+## [1.30.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.1...v1.30.0) (2018-12-31)
 
 
 ### Features
@@ -1257,7 +1257,7 @@
 
 
 <a name="1.29.1"></a>
-## [1.29.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.0...v1.29.1) (2018-12-31)
+### [1.29.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.29.0...v1.29.1) (2018-12-31)
 
 
 ### Bug Fixes
@@ -1267,7 +1267,7 @@
 
 
 <a name="1.29.0"></a>
-# [1.29.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.1...v1.29.0) (2018-12-30)
+## [1.29.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.1...v1.29.0) (2018-12-30)
 
 
 ### Bug Fixes
@@ -1287,7 +1287,7 @@
 
 
 <a name="1.28.1"></a>
-## [1.28.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.0...v1.28.1) (2018-12-28)
+### [1.28.1](https://bitbucket.org/Loneless/trixiebot/compare/v1.28.0...v1.28.1) (2018-12-28)
 
 
 ### Bug Fixes
@@ -1297,7 +1297,7 @@
 
 
 <a name="1.28.0"></a>
-# [1.28.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.27.1...v1.28.0) (2018-12-28)
+## [1.28.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.27.1...v1.28.0) (2018-12-28)
 
 
 ### Features
@@ -1307,7 +1307,7 @@
 
 
 <a name="1.27.0"></a>
-# [1.27.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.25.6...v1.27.0) (2018-12-28)
+## [1.27.0](https://bitbucket.org/Loneless/trixiebot/compare/v1.25.6...v1.27.0) (2018-12-28)
 
 
 ### Bug Fixes
@@ -1323,7 +1323,7 @@
 
 
 <a name="1.25.6"></a>
-## [1.25.6](https://bitbucket.org/Loneless/trixiebot/compare/v1.25.7...v1.25.6) (2018-12-27)
+### [1.25.6](https://bitbucket.org/Loneless/trixiebot/compare/v1.25.7...v1.25.6) (2018-12-27)
 
 
 ### Bug Fixes

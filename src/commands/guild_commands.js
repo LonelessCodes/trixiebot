@@ -27,6 +27,7 @@ const Translation = require("../modules/i18n/Translation").default;
 const TranslationPlural = require("../modules/i18n/TranslationPlural").default;
 const TranslationEmbed = require("../modules/i18n/TranslationEmbed").default;
 const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
+const NumberFormat = require("../modules/i18n/NumberFormat").default;
 const ListFormat = require("../modules/i18n/ListFormat").default;
 const CalendarTimeFormat = require("../modules/i18n/CalendarTimeFormat").default;
 
@@ -49,7 +50,7 @@ function findFirstIndex(arr, cb) {
 // eslint-disable-next-line valid-jsdoc
 /**
  * @param {Date} start_d
- * @param {Date} [end_d]
+ * @param {Date|null} [end_d]
  * @param {{ ts: Date, value: number }[][]} [param2]
  * @returns {ListFormat}
  */
@@ -186,8 +187,7 @@ module.exports = function install(cr) {
     cr.registerCommand(
         "userstats",
         new SimpleCommand(async ({ message, mentions }) => {
-            const member = mentions.members.first() || message.member;
-            const user = member.user;
+            const user = mentions.members?.first() || message.member || message.author;
 
             const guildId = message.guild.id;
 
@@ -198,7 +198,7 @@ module.exports = function install(cr) {
                 guild_stats.get("messages").getRangeUser(quartal, null, guildId, user.id).then(sort),
             ]);
 
-            const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), member);
+            const embed = basicTEmbed(new Translation("stats.statistics", "Statistics"), user);
 
             embed.addField(new Translation("stats.today", "Today"), getString(today, null, results), true);
             embed.addField(new Translation("stats.yesterday", "Yesterday"), getString(yesterday, today, results), true);
@@ -222,14 +222,16 @@ module.exports = function install(cr) {
         new SimpleCommand(message => {
             const embed = new TranslationEmbed().setColor(CONST.COLOR.PRIMARY);
             embed.setTitle(new TranslationMerge(message.guild.name, new Translation("stats.statistics", "Statistics")));
-            embed.setThumbnail(message.guild.iconURL({ size: 256, dynamic: true }));
+
+            const icon_url = message.guild.iconURL({ size: 256, dynamic: true });
+            if (icon_url) embed.setThumbnail(icon_url);
 
             if (message.guild.owner) embed.addField("Owner", message.guild.owner.user.tag, true);
             embed.addField("ID", message.guild.id, true);
-            embed.addField("User Count", message.guild.memberCount, true);
-            embed.addField("Creation Time", new CalendarTimeFormat(message.guild.createdAt), "UTC", true);
-            embed.addField("Channel Count", message.guild.channels.cache.filter(c => c.type === "text").size, true);
-            embed.addField("Emoji Count", message.guild.emojis.cache.size, true);
+            embed.addField("User Count", new NumberFormat(message.guild.memberCount), true);
+            embed.addField("Creation Time", new TranslationMerge(new CalendarTimeFormat(message.guild.createdAt), "UTC"), true);
+            embed.addField("Channel Count", new NumberFormat(message.guild.channels.cache.filter(c => c.type === "text").size), true);
+            embed.addField("Emoji Count", new NumberFormat(message.guild.emojis.cache.size), true);
             embed.addField("Region", message.guild.region, true);
 
             return { embed };

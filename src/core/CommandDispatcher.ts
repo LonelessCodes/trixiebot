@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,51 +15,49 @@
  */
 
 const log = require("../log").default.namespace("registry");
-const { splitArgs } = require("../util/string");
-// eslint-disable-next-line no-unused-vars
-const BaseCommand = require("./commands/BaseCommand");
-// eslint-disable-next-line no-unused-vars
-const CustomCommand = require("./commands/CustomCommand");
-const Category = require("../util/commands/Category").default;
-const CommandPermission = require("../util/commands/CommandPermission").default;
-const CommandScope = require("../util/commands/CommandScope").default;
-const HelpBuilder = require("../util/commands/HelpBuilder").default;
-const RateLimiter = require("../util/commands/RateLimiter").default;
-const TimeUnit = require("../modules/TimeUnit").default;
-const DocumentMapCache = require("../modules/db/DocumentMapCache").default;
-// eslint-disable-next-line no-unused-vars
-const MessageContext = require("../util/commands/MessageContext").default;
-// eslint-disable-next-line no-unused-vars
-const Discord = require("discord.js");
-// eslint-disable-next-line no-unused-vars
-const Mongo = require("mongodb");
-const CommandRegistry = require("./CommandRegistry");
+import { splitArgs } from "../util/string";
+import BaseCommand from "./commands/BaseCommand";
+import CustomCommand from "./commands/CustomCommand";
+import Category from "../util/commands/Category";
+import CommandPermission from "../util/commands/CommandPermission";
+import CommandScope from "../util/commands/CommandScope";
+import HelpBuilder from "../util/commands/HelpBuilder";
+import RateLimiter from "../util/commands/RateLimiter";
+import TimeUnit from "../modules/TimeUnit";
+import DocumentMapCache from "../modules/db/DocumentMapCache";
+import MessageContext from "../util/commands/MessageContext";
+import Discord from "discord.js";
+import Mongo from "mongodb";
+import CommandRegistry from "./CommandRegistry";
 
-const Translation = require("../modules/i18n/Translation").default;
-const TranslationPlural = require("../modules/i18n/TranslationPlural").default;
-const DurationFormat = require("../modules/i18n/DurationFormat").default;
+import Translation from "../modules/i18n/Translation";
+import TranslationPlural from "../modules/i18n/TranslationPlural";
+import DurationFormat from "../modules/i18n/DurationFormat";
+import { doNothing } from "../util/util";
 
-/**
- * @param {string} command_name
- * @param {MessageContext} context
- * @returns {string}
- */
-function debugString(command_name, context) {
-    switch (context.channel.type) {
-        case "text":
-            return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, guild:${context.guild.id}`;
-        default:
-            return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, c_type:${context.channel.type}`;
-    }
+function debugString(command_name: string | RegExp, context: MessageContext): string {
+    if (context.guild)
+        return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, guild:${context.guild.id}`;
+
+    return `command:${command_name}, user:${context.author.username}#${context.author.discriminator}, userid:${context.author.id}, channel:${context.channel.id}, c_type:${context.channel.type}`;
 }
 
 class CommandDispatcher {
-    /**
-     * @param {Discord.Client} client
-     * @param {Mongo.Db} database
-     * @param {CommandRegistry} registry
-     */
-    constructor(client, database, registry) {
+    client: Discord.Client;
+    REGISTRY: CommandRegistry;
+
+    global_ratelimit: RateLimiter;
+    global_ratelimit_message: RateLimiter;
+
+    blacklisted_users: DocumentMapCache<"userId", string, { userId: string }>;
+
+    timeout: Mongo.Collection;
+    disabled_commands: Mongo.Collection;
+    disabled_channels: Mongo.Collection;
+    disabled_categories: Mongo.Collection;
+    disabled_commands_channels: Mongo.Collection;
+
+    constructor(client: Discord.Client, database: Mongo.Db, registry: CommandRegistry) {
         this.client = client;
         this.REGISTRY = registry;
 
@@ -70,19 +68,19 @@ class CommandDispatcher {
         this.blacklisted_users = new DocumentMapCache(database.collection("blacklisted"), "userId", { maxSize: 0, ttl: 3600 });
 
         this.timeout = database.collection("timeout");
-        this.timeout.createIndex({ guildId: 1, memberId: 1 }, { unique: true });
+        this.timeout.createIndex({ guildId: 1, memberId: 1 }, { unique: true }).catch(doNothing);
         this.disabled_commands = database.collection("disabled_commands");
-        this.disabled_commands.createIndex({ guildId: 1 }, { unique: true });
+        this.disabled_commands.createIndex({ guildId: 1 }, { unique: true }).catch(doNothing);
         this.disabled_channels = database.collection("disabled_channels");
-        this.disabled_channels.createIndex({ guildId: 1 }, { unique: true });
+        this.disabled_channels.createIndex({ guildId: 1 }, { unique: true }).catch(doNothing);
         this.disabled_categories = database.collection("disabled_categories");
-        this.disabled_categories.createIndex({ guildId: 1 }, { unique: true });
+        this.disabled_categories.createIndex({ guildId: 1 }, { unique: true }).catch(doNothing);
         this.disabled_commands_channels = database.collection("disabled_commands_channels");
-        this.disabled_commands_channels.createIndex({ guildId: 1, command: 1 }, { unique: true });
+        this.disabled_commands_channels.createIndex({ guildId: 1, command: 1 }, { unique: true }).catch(doNothing);
     }
 
-    async rateLimit(context) {
-        if (!this.global_ratelimit_message.testAndAdd(`${context.guild.id}:${context.channel.id}`)) return;
+    async rateLimit(context: MessageContext) {
+        if (!this.global_ratelimit_message.testAndAdd(context.channel.id)) return;
 
         await context.send(new TranslationPlural("command.ratelimit", [
             "Whoa whoa not so fast! You may only do this {{count}} time every {{time_frame}}. " +
@@ -96,13 +94,8 @@ class CommandDispatcher {
         }));
     }
 
-    /**
-     * @param {MessageContext} ctx
-     * @param {string} command_name
-     */
-    async process({ message, channel, guild, prefix_used, ctx }, command_name) {
+    async process({ message, channel, guild, prefix_used, ctx }: MessageContext, command_name: string) {
         if (channel.type === "text") {
-            /** @type {CustomCommand} */
             const cc = await this.REGISTRY.CC.get(guild, { command_name, prefix_used, raw_content: message.content });
             if (cc && cc.enabled) return await this.processCC(ctx, command_name, cc);
         }
@@ -113,12 +106,8 @@ class CommandDispatcher {
         await this.processCommand(ctx, -1, command_name, null);
     }
 
-    /**
-     * @param {MessageContext} context
-     * @param {string} command_name
-     * @param {CustomCommand} command
-     */
-    async processCC(context, command_name, command) {
+    async processCC(context: MessageContext, command_name: string, command: CustomCommand) {
+        if (!context.guild) return false;
         if (!context.member) return false;
 
         if (await this.blacklisted_users.has(context.author.id)) {
@@ -140,7 +129,7 @@ class CommandDispatcher {
 
         if (command.disabled_channels.includes(context.channel.id)) return false;
 
-        if (!context.channel.nsfw && command.explicit && !context.config.explicit) return false;
+        if (!(context.channel as Discord.TextChannel).nsfw && command.explicit && !context.config.explicit) return false;
 
         if (!command.permissions.test(context.member)) {
             await command.noPermission(context);
@@ -164,35 +153,27 @@ class CommandDispatcher {
         return true;
     }
 
-    /**
-     * @param {MessageContext} context
-     * @param {number} type
-     * @param {string|RegExp} cmd_name
-     * @param {BaseCommand} command
-     * @returns {Promise<boolean>}
-     */
-    async processCommand(context, type, cmd_name, command) {
+    async processCommand(context: MessageContext, type: number, cmd_name: string | RegExp, command: BaseCommand | null): Promise<boolean> {
         const processed_handlers = this.REGISTRY.processed_handlers.filter(h => CommandScope.hasScope(h.scope, context.channel));
 
-        for (let { handler } of processed_handlers.filter(h => h.priority)) handler(context);
+        for (const { handler } of processed_handlers.filter(h => h.priority)) handler(context).catch(doNothing);
 
         const is_command = type === CommandRegistry.TYPE.COMMAND;
-        const is_guild = context.channel.type === "text";
 
         // is the case of cases, Owner should be able to use Owner commands everywhere, regardless of timeouts and other problems
         const is_owner = Category.OWNER.permissions.test(context.author);
         const is_owner_cmd = command && command.category === Category.OWNER && is_owner;
 
         // user is a mod
-        const is_mod = is_guild && Category.MODERATION.permissions.test(context.member);
+        const is_mod = context.guild && Category.MODERATION.permissions.test(context.member || context.author);
         // command is moderation and user got perms for it
         // we check for the perms of the category, because there are now two moderator categories: Config and Moderation
         // that use CommandPermissions.ADMIN
         const is_mod_cmd =
             command &&
-            is_guild &&
-            command.category.permissions === Category.MODERATION.permissions &&
-            command.permissions.test(context.member);
+            context.guild &&
+            command.category?.permissions === Category.MODERATION.permissions &&
+            command.permissions.test(context.member || context.author);
 
         if (!is_owner_cmd) {
             if (await this.blacklisted_users.has(context.author.id)) {
@@ -204,7 +185,7 @@ class CommandDispatcher {
                 return false;
             }
 
-            if (is_guild) {
+            if (context.guild) {
                 if (!is_mod_cmd) {
                     const disabled_chs = await this.disabled_channels.findOne({
                         guildId: context.guild.id,
@@ -222,14 +203,14 @@ class CommandDispatcher {
             }
         }
 
-        for (let { handler } of processed_handlers.filter(h => !h.priority)) handler(context);
+        for (const { handler } of processed_handlers.filter(h => !h.priority)) handler(context).catch(doNothing);
 
         if (!command) return false;
 
         if (!command.hasScope(context.channel)) return false;
         if (!command.isInSeason()) return false;
 
-        if (is_guild) {
+        if (context.guild) {
             if (is_command && !is_owner_cmd && !is_mod_cmd) {
                 const [disabled_cmds, disabled_cats, disabled_cmd_chs] = await Promise.all([
                     this.disabled_commands.findOne({
@@ -238,7 +219,7 @@ class CommandDispatcher {
                             $all: [cmd_name],
                         },
                     }),
-                    this.disabled_categories.findOne({
+                    command.category && this.disabled_categories.findOne({
                         guildId: context.guild.id,
                         categories: {
                             $all: [command.category.id],
@@ -260,7 +241,7 @@ class CommandDispatcher {
 
             if (!context.member) return false;
 
-            if (!context.channel.nsfw && command.explicit) return false;
+            if (!(context.channel as Discord.TextChannel).nsfw && command.explicit) return false;
         }
 
         if (!command.permissions.test(context.member || context.author)) {
@@ -282,7 +263,7 @@ class CommandDispatcher {
         if (is_command && /^(help|usage)$/i.test(splitArgs(context.content, 2)[0])) {
             log.debug("Command", debugString("help", context));
 
-            await HelpBuilder.sendHelp(context, cmd_name, command);
+            await HelpBuilder.sendHelp(context, cmd_name as string, command);
         } else {
             if (is_command) log.debug("Command", debugString(cmd_name, context));
             else log.debug("Keyword", debugString(cmd_name, context));
@@ -294,4 +275,4 @@ class CommandDispatcher {
     }
 }
 
-module.exports = CommandDispatcher;
+export default CommandDispatcher;

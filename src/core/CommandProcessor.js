@@ -21,7 +21,7 @@ const stats = require("../modules/stats");
 const guild_stats = require("./managers/GuildStatsManager");
 const ErrorCaseManager = require("./managers/ErrorCaseManager").default;
 const CommandRegistry = require("./CommandRegistry");
-const CommandDispatcher = require("./CommandDispatcher");
+const CommandDispatcher = require("./CommandDispatcher").default;
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("./managers/ConfigManager");
 // eslint-disable-next-line no-unused-vars

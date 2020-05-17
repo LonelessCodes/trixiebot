@@ -20,6 +20,8 @@ const AliasCommand = require("./commands/AliasCommand");
 const CCManager = require("./managers/CCManager");
 // eslint-disable-next-line no-unused-vars
 const CommandScope = require("../util/commands/CommandScope").default;
+// eslint-disable-next-line no-unused-vars
+const MessageContext = require("../util/commands/MessageContext").default;
 const Category = require("../util/commands/Category").default;
 
 class CommandRegistry {
@@ -30,7 +32,7 @@ class CommandRegistry {
         this.commands = new Map();
         /** @type {Map<RegExp, BaseCommand>} */
         this.keywords = new Map();
-        /** @type {Array<{ scope: CommandScope; priority: boolean; handler(context: MessageContext): Promise<void> }>} */
+        /** @type {Array<{ scope: CommandScope; priority: boolean; handler: (context: MessageContext) => Promise<void> }>} */
         this.processed_handlers = [];
     }
 
@@ -105,7 +107,7 @@ class CommandRegistry {
      * @param {Message} message
      * @param {boolean} prefix_used
      * @param {string} command_name
-     * @returns {{ type: number; trigger: string | RegExp; command: BaseCommand; }}
+     * @returns {{ type: number; trigger: string | RegExp; command: BaseCommand; } | undefined}
      */
     getCommand(message, prefix_used, command_name) {
         if (prefix_used) {

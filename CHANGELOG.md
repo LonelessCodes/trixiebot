@@ -1,5 +1,22 @@
 # Changelog
 
+### [3.7.7](https://github.com/LonelessCodes/trixiebot/compare/v3.7.6...v3.7.7) (2020-05-17)
+
+
+### Bug Fixes
+
+* **derpi cmd:** limit number of artists displayed ([20ffe30](https://github.com/LonelessCodes/trixiebot/commit/20ffe300771f9cea96ed12e78ec79fc641cd69d8))
+* fixed all commands that parse message mentions to throw error ([51fed01](https://github.com/LonelessCodes/trixiebot/commit/51fed0158cf8eab988de853ec00ec59ceb52fc01))
+* fixed changelog parser ([7d4fc9a](https://github.com/LonelessCodes/trixiebot/commit/7d4fc9a8d9fb9cd54c03113dc09b0bde155ab0d1))
+* fixed getting random item of array (which fixed undefined status) ([250df3b](https://github.com/LonelessCodes/trixiebot/commit/250df3b96b7b6a9e958557bd32e0213df0af154f))
+* fixed global rate limiter typos ([7134e58](https://github.com/LonelessCodes/trixiebot/commit/7134e587373edea577beebb456f8fed83a262a55))
+* fixed serverinfo command ([ad34426](https://github.com/LonelessCodes/trixiebot/commit/ad3442674244a1555bfbf503de2bc8708eac2555))
+
+
+### Deprecations
+
+* deprecate chat command, as it has never really worked ([8ab6c59](https://github.com/LonelessCodes/trixiebot/commit/8ab6c5999a34919f83fc374014522a9215213cc1))
+
 ### [3.7.6](https://github.com/LonelessCodes/trixiebot/compare/v3.7.5...v3.7.6) (2020-04-29)
 
 

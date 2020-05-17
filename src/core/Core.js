@@ -204,7 +204,7 @@ class Core {
             // Status text
 
             let status = null;
-            for (let event of calendar_events) {
+            for (const event of calendar_events) {
                 if (!event.isToday()) continue;
 
                 status = event.getStatus();

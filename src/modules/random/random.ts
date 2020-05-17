@@ -25,8 +25,10 @@ export default function random<T>(...args: T[]): number | T {
         const param = args[0];
         if (typeof param === "number") {
             return param <= 1 ? 0 : Math.random() * param;
-        } else if (param instanceof Array) {
-            return param.length <= 1 ? param[0] : param[Math.floor(Math.random() * param[0].length)];
+        } else if (Array.isArray(param)) {
+            return param.length <= 1
+                ? param[0]
+                : param[Math.floor(Math.random() * param.length)];
         }
         throw new TypeError("First argument should be number or Array");
     } else if (args.length === 2) {

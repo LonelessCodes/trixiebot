@@ -31,7 +31,7 @@ const CommandScope = require("../util/commands/CommandScope").default;
 const Translation = require("../modules/i18n/Translation").default;
 const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 
-//                                                                                               no real gore, but candy gore is allowed
+// no real gore, but candy gore is allowed
 const filter_tags = [
     "underage",
     "foalcon",
@@ -210,7 +210,10 @@ async function process(key, message, msg, type) {
         results
             .map(result => {
                 let str = "";
-                if (result.artists.length) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
+                if (result.artists.length) {
+                    if (result.artists.length < 4) str += result.artists.map(a => `**${a}**`).join(", ") + " ";
+                    else str += result.artists.slice(0, 3).map(a => `**${a}**`).join(", ") + ", ... ";
+                }
                 str += `*<https://derpibooru.org/images/${result.id}>* `;
                 str += result.image_url;
                 return str;

@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.7.8](https://github.com/LonelessCodes/trixiebot/compare/v3.7.7...v3.7.8) (2020-05-20)
+
+
+### Bug Fixes
+
+* fixed permissions problems in DMs and Guilds with unfetched message author ([fbc4b91](https://github.com/LonelessCodes/trixiebot/commit/fbc4b9101abc2d239ccdbbb828d499a1abecb1dd))
+
 ### [3.7.7](https://github.com/LonelessCodes/trixiebot/compare/v3.7.6...v3.7.7) (2020-05-17)
 
 

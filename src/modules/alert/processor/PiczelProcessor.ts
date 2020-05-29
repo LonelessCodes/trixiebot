@@ -63,7 +63,10 @@ interface PiczelOnlineResponse {
     viewers: number;
     username: string;
     slug: string;
-    tags: string[];
+    tags: {
+        title: string;
+        count: number;
+    }[];
     user: {
         id: number;
         username: string;
@@ -183,7 +186,7 @@ class PiczelProcessor extends Processor {
             followers: raw.follower_count,
             avatar: raw.user.avatar ? raw.user.avatar.url || undefined : undefined,
             nsfw: raw.adult,
-            tags: raw.tags,
+            tags: raw.tags.map(tag => tag.title),
             thumbnail: `https://piczel.tv/static/screenshots/stream_${raw.id}.jpg`,
         };
     }

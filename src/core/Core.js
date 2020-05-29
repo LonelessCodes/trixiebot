@@ -275,14 +275,14 @@ class Core {
             }).catch(err => err));
 
         if (config.has("botlists.discordbotlist_com"))
-            promises.push(fetchPost(`https://discordbotlist.com/api/bots/${id}/stats`, {
+            promises.push(fetchPost(`https://discordbotlist.com/api/v1/bots/${id}/stats`, {
                 json: {
                     guilds: server_count,
                     users: this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0),
                     voice_connections: this.client.voice.connections.size,
                 },
                 headers: {
-                    Authorization: "Bot " + config.get("botlists.discordbotlist_com"),
+                    Authorization: config.get("botlists.discordbotlist_com"),
                 },
             }).catch(err => err));
 

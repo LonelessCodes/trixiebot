@@ -14,11 +14,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fetch = require("node-fetch");
 const fs = require("fs-extra");
 const path = require("path");
 
 const log = require("../log").default.namespace("core");
+const INFO = require("../info").default;
 const config = require("../config").default;
 const { walk } = require("../util/files");
 const { timeout } = require("../util/promises");
@@ -42,19 +42,7 @@ const CommandScope = require("../util/commands/CommandScope").default;
 const AliasCommand = require("./commands/AliasCommand");
 const Translation = require("../modules/i18n/Translation").default;
 
-function fetchPost(url, opts) {
-    if (opts.json) {
-        opts.body = JSON.stringify(opts.json);
-        delete opts.json;
-    }
-    return fetch(url, {
-        method: "POST", ...opts,
-        headers: {
-            "Content-Type": "application/json",
-            ...(opts.headers || {}),
-        },
-    });
-}
+const BotListManager = require("./managers/BotListManager").default;
 
 class Core {
     /**
@@ -98,6 +86,8 @@ class Core {
         this.upvotes = new UpvotesManager(this.client, this.db);
 
         this.member_log = new MemberLog(this.client, this.config, this.locale);
+
+        this.botlist = new BotListManager(this.client);
     }
 
     async startMainComponents(commands_package) {
@@ -106,7 +96,8 @@ class Core {
         await this.loadCommands(commands_package);
         await this.attachListeners();
         await this.setStatus();
-        this.setupDiscordBots();
+
+        if (!INFO.DEV) this.botlist.init();
     }
 
     async loadCommands(commands_package) {
@@ -221,80 +212,6 @@ class Core {
         }
 
         updateStatus();
-    }
-
-    setupDiscordBots() {
-        this.updateStatistics();
-        setInterval(() => this.updateStatistics(), 3600 * 1000);
-    }
-
-    async updateStatistics() {
-        const id = this.client.user.id;
-        const server_count = this.client.guilds.cache.size;
-
-        const promises = [];
-
-        if (config.has("botlists.divinediscordbots_com"))
-            promises.push(fetchPost(`https://divinediscordbots.com/bot/${id}/stats`, {
-                json: { server_count },
-                headers: {
-                    Authorization: config.get("botlists.divinediscordbots_com"),
-                },
-            }).catch(err => err));
-
-        if (config.has("botlists.botsfordiscord_com"))
-            promises.push(fetchPost(`https://botsfordiscord.com/api/bot/${id}`, {
-                json: { server_count },
-                headers: {
-                    Authorization: config.get("botlists.botsfordiscord_com"),
-                },
-            }).catch(err => err));
-
-        if (config.has("botlists.discord_bots_gg"))
-            promises.push(fetchPost(`https://discord.bots.gg/api/v1/bots/${id}/stats`, {
-                json: { guildCount: server_count },
-                headers: {
-                    Authorization: config.get("botlists.discord_bots_gg"),
-                },
-            }).catch(err => err));
-
-        if (config.has("botlists.botlist_space"))
-            promises.push(fetchPost(`https://botlist.space/api/bots/${id}`, {
-                json: { server_count },
-                headers: {
-                    Authorization: config.get("botlists.botlist_space"),
-                },
-            }).catch(err => err));
-
-        if (config.has("botlists.ls_terminal_ink"))
-            promises.push(fetchPost(`https://ls.terminal.ink/api/v2/bots/${id}`, {
-                json: { bot: { count: server_count } },
-                headers: {
-                    Authorization: config.get("botlists.ls_terminal_ink"),
-                },
-            }).catch(err => err));
-
-        if (config.has("botlists.discordbotlist_com"))
-            promises.push(fetchPost(`https://discordbotlist.com/api/v1/bots/${id}/stats`, {
-                json: {
-                    guilds: server_count,
-                    users: this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0),
-                    voice_connections: this.client.voice.connections.size,
-                },
-                headers: {
-                    Authorization: config.get("botlists.discordbotlist_com"),
-                },
-            }).catch(err => err));
-
-        if (config.has("botlists.discordbots_org"))
-            promises.push(fetchPost(`https://top.gg/api/bots/${id}/stats`, {
-                json: { server_count },
-                headers: {
-                    Authorization: config.get("botlists.discordbots_org"),
-                },
-            }).catch(err => err));
-
-        await Promise.all(promises);
     }
 }
 

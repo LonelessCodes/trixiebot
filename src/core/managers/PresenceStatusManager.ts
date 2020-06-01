@@ -100,8 +100,6 @@ export default class PresenceStatusManager {
             this.addCachedEvent(new CalendarStatus(new CalendarRange(c_event.start, c_event.end), c_event.status));
         }
 
-        this.addCachedEvent(new CalendarStatus(new CalendarRange(moment("2020-06-01"), moment("2020-06-02")), "Happy Pride Month!"));
-
         this._update().catch(doNothing);
     }
 

@@ -1,5 +1,34 @@
 # Changelog
 
+## [3.8.0](https://github.com/LonelessCodes/trixiebot/compare/v3.7.8...v3.8.0) (2020-06-01)
+
+
+### Features
+
+* add more Trixie quotes ([08b3e8d](https://github.com/LonelessCodes/trixiebot/commit/08b3e8d52b03c3f76ac699c3f1a9284ebb123169))
+* add setstatus owner command to set a custom event status ([2054653](https://github.com/LonelessCodes/trixiebot/commit/205465376039f256fcb09b76de962e9aa6043b60))
+
+
+### Bug Fixes
+
+* fixed tag displayment on Piczel streams ([8c2d648](https://github.com/LonelessCodes/trixiebot/commit/8c2d648390518d6ece76719c311609958c3b985d))
+* fixed wrongful argument type in HelpBuilder.createParameter() ([3137495](https://github.com/LonelessCodes/trixiebot/commit/3137495f38ce6651363f7030396aa9e509e71a9d))
+
+
+### Deprecations
+
+* remove seasonal commands feature ([e746116](https://github.com/LonelessCodes/trixiebot/commit/e7461168ba74bff503f214245cb439ba14a0e86b))
+
+
+### Changes
+
+* move presence status updater to own manager ([75d8527](https://github.com/LonelessCodes/trixiebot/commit/75d85274e88a04f18248ebad280fcad2a99b0af1))
+* remove chat command ([efd8047](https://github.com/LonelessCodes/trixiebot/commit/efd8047f8053eba82c3d29a5e65e1551caecfd51))
+* remove chucknorris command ([80f8422](https://github.com/LonelessCodes/trixiebot/commit/80f842262fdd9ae52bdf2a817eea154a1bf894a1))
+* remove larson command ([f9fdd8d](https://github.com/LonelessCodes/trixiebot/commit/f9fdd8dff2630a429aa856bc8190cfaa7f379da0))
+* remove naughty command ([4931f72](https://github.com/LonelessCodes/trixiebot/commit/4931f729f6d2174b2fd81496261f4bc4a273ddeb))
+* remove trump command ([ac16d38](https://github.com/LonelessCodes/trixiebot/commit/ac16d3879e6e289823e78aa6a71df3342b06e994))
+
 ### [3.7.8](https://github.com/LonelessCodes/trixiebot/compare/v3.7.7...v3.7.8) (2020-05-20)
 
 

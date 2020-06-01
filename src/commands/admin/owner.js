@@ -89,9 +89,10 @@ module.exports = function install(cr, { client, config, locale, db, presence_sta
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);
 
-    cr.registerCommand("exec", new SimpleCommand(async ({ message, content }) => {
-        const { stdout, stderr } = await promisify(exec)(content);
-        await sendLargeText(message.channel, resolveStdout("Out:\n" + stdout + "\nErr:\n" + stderr));
+    cr.registerCommand("exec", new SimpleCommand(({ message, content }) => {
+        exec(content, async (error, stdout, stderr) => {
+            await sendLargeText(message.channel, resolveStdout("Out:\n" + stdout + "\nErr:\n" + stderr + "\nCode: " + (error?.code || 0)));
+        });
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.ALL);

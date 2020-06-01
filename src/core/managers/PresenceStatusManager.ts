@@ -65,12 +65,12 @@ export default class PresenceStatusManager {
         // schedule next time to get events
         new CronJob(
             now.clone().set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }).add(1, "month"),
-            () => this._loadFromAPI().catch(doNothing),
+            () => this._loadFromAPI().catch(err => log.error("Couldn't fetch holidays from API", err))
         ).start();
 
         log.debug("api", "Getting holidays for %d-%d...", now.year(), now.month());
         const res = await this._calendarific.holidays({
-            country: "GB", year: now.year(), month: now.month() + 1
+            country: "GB", year: now.year(), month: now.month() + 1,
         });
         const holidays = res.response.holidays.filter(hol => (
             !/queen/gi.test(hol.name) && // remove events like Queen's Birthday
@@ -94,11 +94,12 @@ export default class PresenceStatusManager {
         const txt = await fs.readFile(path.join(process.cwd(), "assets/text/statuses.txt"), "utf8");
         this.statuses = txt.split("\n").filter(s => s !== "");
 
-        await this._loadFromAPI().catch(doNothing);
+        this._loadFromAPI().catch(err => log.error("Couldn't fetch holidays from API", err));
 
-        for (const c_event of await this.database.find({}).toArray()) {
+        // non-blocking db call
+        this.database.find({}).on("data", c_event => {
             this.addCachedEvent(new CalendarStatus(new CalendarRange(c_event.start, c_event.end), c_event.status));
-        }
+        });
 
         this._update().catch(doNothing);
     }

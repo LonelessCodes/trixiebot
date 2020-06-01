@@ -93,7 +93,8 @@
     },
     "scripts": {
         "build": "rimraf dist && tsc",
-        "start:dev": "nodemon --watch src --ext .ts,.js --exec cross-env NODE_ENV=development ts-node src/index.ts",
+        "start:watch": "nodemon --watch src --ext .ts,.js --exec cross-env NODE_ENV=development ts-node -T src/index.ts",
+        "start:dev": "cross-env NODE_ENV=development node dist/index.js",
         "start": "cross-env NODE_ENV=production node --icu-data-dir=/home/trixie/trixiebot/node_modules/full-icu dist/index.js",
         "lint": "eslint src/ --ext .ts,.js",
         "lint:fix": "eslint src/ --ext .ts,.js --fix",

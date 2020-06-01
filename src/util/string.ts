@@ -32,7 +32,7 @@ export function normalizeArray(raw: string[], expected_size: number): string[] {
 export function splitArgs(args: string, expected_args: number = 0): string[] {
     if (expected_args < 1) return [args];
 
-    const raw = [];
+    const raw: string[] = [];
 
     let i = 0;
     while (i < expected_args - 1) {
@@ -50,7 +50,7 @@ export function splitArgs(args: string, expected_args: number = 0): string[] {
 }
 
 export function findArgs(str: string): string[] {
-    const array = [];
+    const array: string[] = [];
     let tmp = "";
     let inquote = false;
     let quote = "";
@@ -60,7 +60,7 @@ export function findArgs(str: string): string[] {
         char = str.charAt(i);
         i++;
 
-        if (char === '"' || char === "'") {
+        if (char === "\"" || char === "'") {
             if (!inquote) {
                 quote = char;
                 inquote = true;

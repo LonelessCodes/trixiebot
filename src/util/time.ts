@@ -34,7 +34,6 @@ const multiplier: { [index: string]: number } = {
 
 export function toHumanTime(ms: number): string {
     const d = moment.duration(ms);
-    // eslint-disable-next-line prettier/prettier
     return [d.weeks(), d.days(), d.hours(), d.minutes(), d.seconds()]
         .map((num, i) => {
             if (num > 0) return pad(num, 2) + names[i];

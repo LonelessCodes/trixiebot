@@ -90,8 +90,11 @@ class Core {
         this.botlist = new BotListManager(this.client);
     }
 
-    async startMainComponents(commands_package) {
-        for (const [, voice] of this.client.voice.connections) voice.disconnect();
+    /**
+     * @param {string} commands_package
+     */
+    async init(commands_package) {
+        if (this.client.voice) for (const voice of this.client.voice.connections.values()) voice.disconnect();
 
         await this.loadCommands(commands_package);
         await this.attachListeners();
@@ -100,6 +103,9 @@ class Core {
         if (!INFO.DEV) this.botlist.init();
     }
 
+    /**
+     * @param {string} commands_package
+     */
     async loadCommands(commands_package) {
         if (!commands_package || typeof commands_package !== "string")
             throw new Error("Cannot load commands if not given a path to look at!");
@@ -108,7 +114,7 @@ class Core {
 
         const timer = nanoTimer();
 
-        const files = await walk(path.resolve(__dirname, "..", commands_package))
+        const files = await walk(commands_package)
             .then(files => files.filter(file => path.extname(file) === ".js"));
 
         const install_opts = {

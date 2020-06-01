@@ -28,6 +28,8 @@ const djs_log = log.namespace("discord.js");
 import tmp from "tmp";
 tmp.setGracefulCleanup();
 
+import path from "path";
+
 import Discord from "discord.js";
 import config from "./config";
 import info from "./info";
@@ -106,7 +108,7 @@ async function initialize(client: Discord.Client) {
     await loginClient(client);
 
     const core = new Core(client, db);
-    await core.startMainComponents("commands");
+    await core.init(path.resolve(__dirname, "commands"));
     log.namespace("app", "Ready uwu.", `bootup_time:${(timer.diff(bootup_timer) / timer.NS_PER_SEC).toFixed(3)}s`);
 }
 

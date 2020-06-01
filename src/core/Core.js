@@ -123,11 +123,11 @@ class Core {
             presence_status: this.presence_status,
         };
         await Promise.all(files.map(async file => {
-            log.debug(file, "installing...");
+            log("%s:", file, "installing...");
             const time = nanoTimer();
             const install = require(file);
             await install(this.processor.REGISTRY, install_opts);
-            log.debug(file, "installed.", nanoTimer.diffMs(time).toFixed(3), "ms");
+            log("%s:", file, "installed.", nanoTimer.diffMs(time).toFixed(3), "ms");
         }));
 
         const install_time = nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC;
@@ -161,7 +161,7 @@ class Core {
         const src = path.join(var_dir, "commands.json");
         const dest = path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json");
 
-        if (!(await fs.pathExists(var_dir))) await fs.mkdir(var_dir);
+        if (!await fs.pathExists(var_dir)) await fs.mkdir(var_dir);
         await fs.writeFile(src, JSON.stringify(jason, null, 2));
         await fs.copy(src, dest, { overwrite: true });
 

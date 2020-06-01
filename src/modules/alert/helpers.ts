@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,15 @@
  */
 /* eslint-disable brace-style */
 
-const Translation = require("../i18n/Translation").default;
+import Discord from "discord.js";
+import Translation from "../i18n/Translation";
 
-/**
- * @param {string} str
- * @returns {any}
- */
-function getNamedArgs(str) {
+export function getNamedArgs(str: string): any {
     const match = str.match(/(\w+:\s*[^\s]+)/g);
     if (!match) return {};
 
     const res = {};
-    for (let elem of match) {
+    for (const elem of match) {
         const [value, key] = elem.split(/:\s*/).reverse(); // reverse is important
         res[key] = value;
     }
@@ -34,15 +31,15 @@ function getNamedArgs(str) {
     return res;
 }
 
-function findChannels(message, args_arr) {
+export function findChannels(message: Discord.Message, args_arr: string[]) {
     const args_str = args_arr.join(" ");
     const channels = message.mentions.channels;
 
-    let def;
-    let sfw;
-    let nsfw;
+    let def: Discord.TextChannel | undefined;
+    let sfw: Discord.TextChannel | undefined;
+    let nsfw: Discord.TextChannel | undefined;
     if (args_arr.length === 0) { // no channel given
-        def = message.channel;
+        def = message.channel as Discord.TextChannel;
     } else if (args_arr.length === 1 && channels.size) { // default channel given
         def = channels.first();
     } else {
@@ -54,11 +51,11 @@ function findChannels(message, args_arr) {
 
         if (channels.size === 0) {
             // !alert <url> dsadsdsdsdsdasaddfdnghfg
-            if (a_sfw !== "none" && a_nsfw !== "none") def = message.channel;
+            if (a_sfw !== "none" && a_nsfw !== "none") def = message.channel as Discord.TextChannel;
             // !alert <url> sfw:none
-            else if (a_sfw === "none") nsfw = message.channel;
+            else if (a_sfw === "none") nsfw = message.channel as Discord.TextChannel;
             // !alert <url> nsfw:none
-            else if (a_nsfw === "none") sfw = message.channel;
+            else if (a_nsfw === "none") sfw = message.channel as Discord.TextChannel;
         } else {
             if (typeof a_sfw === "string" && a_sfw !== "none") a_sfw = a_sfw.slice(2, -1);
             if (typeof a_nsfw === "string" && a_nsfw !== "none") a_nsfw = a_nsfw.slice(2, -1);
@@ -99,8 +96,3 @@ function findChannels(message, args_arr) {
 
     return { def, sfw, nsfw };
 }
-
-module.exports = {
-    getNamedArgs,
-    findChannels,
-};

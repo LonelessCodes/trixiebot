@@ -58,8 +58,10 @@ process.addListener("warning", warning => {
  * ==== START BOT ====
  */
 
+// instead of relying on cache, subscribe to partials to get message edits
+//   => reduce memory usage drastically
 const client = new Discord.Client({
-    messageCacheMaxSize: 200,
+    messageCacheMaxSize: 50,
     messageCacheLifetime: 60 * 10,
     messageSweepInterval: 60 * 10,
 

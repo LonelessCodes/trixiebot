@@ -123,7 +123,6 @@ export default class HelpBuilder extends Discord.MessageEmbed {
                 for (const [sub_cmd_name, sub_command] of command.sub_commands) {
                     if (sub_command instanceof AliasCommand) continue;
                     if (!sub_command.hasScope(channel)) continue;
-                    if (!sub_command.isInSeason()) continue;
                     if (sub_cmd_name === "*") continue;
                     if (!nsfw && sub_command.explicit) continue;
                     if (!sub_command.listed) continue;

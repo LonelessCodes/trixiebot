@@ -208,7 +208,6 @@ class CommandDispatcher {
         if (!command) return false;
 
         if (!command.hasScope(context.channel)) return false;
-        if (!command.isInSeason()) return false;
 
         if (context.guild) {
             if (is_command && !is_owner_cmd && !is_mod_cmd) {

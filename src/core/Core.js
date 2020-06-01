@@ -142,7 +142,6 @@ class Core {
             if (cmd instanceof AliasCommand) continue;
             if (!cmd.help) continue;
             if (!cmd.scope.has(CommandScope.FLAGS.GUILD)) continue;
-            if (!cmd.isInSeason()) continue;
             jason.commands.push({
                 name,
                 help: helpToJSON(this.config.default_config, name, cmd),

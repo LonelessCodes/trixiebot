@@ -60,7 +60,6 @@ module.exports = function install(cr, { client, db: database }) {
                             command = command.command;
                         }
                         if (!command.hasScope(message.channel)) continue;
-                        if (!command.isInSeason()) continue;
 
                         path.push(name);
 
@@ -105,7 +104,6 @@ module.exports = function install(cr, { client, db: database }) {
                 for (const [name, command] of cr.commands) {
                     if (command instanceof AliasCommand) continue;
                     if (!command.hasScope(message.channel)) continue;
-                    if (!command.isInSeason()) continue;
                     if (disabledCommands.commands.includes(name)) continue;
                     if (!message.channel.nsfw && command.explicit) continue;
                     if (!command.listed) continue;

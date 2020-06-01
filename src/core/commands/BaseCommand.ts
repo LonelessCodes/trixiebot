@@ -22,7 +22,6 @@ import CommandPermission from "../../util/commands/CommandPermission";
 import CommandScope from "../../util/commands/CommandScope";
 import RateLimiter from "../../util/commands/RateLimiter";
 import MessageContext from "../../util/commands/MessageContext";
-import CalendarRange from "../../modules/calendar/CalendarRange";
 import TimeUnit from "../../modules/TimeUnit";
 
 import Translation from "../../modules/i18n/Translation";
@@ -40,7 +39,6 @@ export default abstract class BaseCommand {
     aliases: string[] = [];
     explicit: boolean = false;
     scope: CommandScope = new CommandScope(CommandScope.DEFAULT);
-    season: CalendarRange = new CalendarRange();
 
     async rateLimit(context: MessageContext) {
         if (
@@ -124,17 +122,8 @@ export default abstract class BaseCommand {
         return this;
     }
 
-    setSeason(range?: CalendarRange): this {
-        this.season = range || new CalendarRange();
-        return this;
-    }
-
     hasScope(channel: Discord.Channel): boolean {
         return CommandScope.hasScope(this.scope, channel);
-    }
-
-    isInSeason() {
-        return this.season.isToday();
     }
 
     async run(ctx: MessageContext, command_name: string | RegExp): Promise<void> {

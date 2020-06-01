@@ -18,6 +18,9 @@ const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
 const { promisify, format } = require("util");
+import moment from "moment";
+import CalendarStatus from "../../modules/calendar/CalendarStatus";
+import CalendarRange from "../../modules/calendar/CalendarRange";
 const { findDefaultChannel } = require("../../util/util");
 const { resolveStdout } = require("../../util/string");
 const { splitArgs } = require("../../util/string");
@@ -124,6 +127,22 @@ module.exports = function install(cr, { client, config, locale, db, presence_sta
         const url = await ipc.awaitAnswer("admin:mongoarchive");
 
         return `Get your archive here: ${url}`;
+    }))
+        .setCategory(Category.OWNER)
+        .setScope(CommandScope.FLAGS.DM);
+
+    cr.registerCommand("setstatus", new SimpleCommand(async ctx => {
+        const args = splitArgs(ctx.content, 3);
+
+        const start = moment(args[0]);
+        const end = moment(args[1]);
+        const status = args[2];
+
+        const event = new CalendarStatus(new CalendarRange(start, end), status);
+
+        await presence_status.addCustomEvent(event);
+
+        return `Event ${JSON.stringify(status)} starts ${moment().to(start)}`;
     }))
         .setCategory(Category.OWNER)
         .setScope(CommandScope.FLAGS.DM);

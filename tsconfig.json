@@ -13,7 +13,7 @@
         /* Strict Type-Checking Options */
         "strict": true /* Enable all strict type-checking options. */,
         // turn off for migrating over time
-        // "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+        "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,
 
         /* Module Resolution Options */
         "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,

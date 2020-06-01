@@ -18,8 +18,8 @@ import BaseCommand from "../../core/commands/BaseCommand";
 import TreeCommand from "../../core/commands/TreeCommand";
 import ScopedCommand from "../../core/commands/ScopedCommand";
 import AliasCommand from "../../core/commands/AliasCommand";
-import { Parameter } from "../../core/managers/ConfigManager";
 import CommandPermission from "./CommandPermission";
+import { HelpParameter } from "./HelpContent";
 import Category from "./Category";
 import Discord from "discord.js";
 import { ucFirst, format } from "../string";
@@ -51,7 +51,7 @@ export default class HelpBuilder extends Discord.MessageEmbed {
         if (command.category) this.setFooter(`Category: ${command.category.toString()}`);
     }
 
-    static createParameter(name: string, parameter: Parameter) {
+    static createParameter(name: string, parameter: HelpParameter) {
         return `\`${name}\` ${parameter.optional ? "- optional " : ""}- ${parameter.content}`;
     }
 

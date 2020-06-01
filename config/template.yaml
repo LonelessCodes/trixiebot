@@ -30,6 +30,9 @@ prefix: "!"
 website_url: https://trixie.loneless.art
 invite_url:  https://trixie.loneless.art/invite
 
+calendarific: # calendarific.com
+  key:  XXXX
+
 derpibooru: # derpibooru.org
   key:  XXXX
 

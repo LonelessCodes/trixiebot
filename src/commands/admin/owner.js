@@ -56,7 +56,7 @@ async function sendLargeText(channel, str, lang = "") {
 }
 
 // eslint-disable-next-line no-unused-vars
-module.exports = function install(cr, { client, config, locale, db }) {
+module.exports = function install(cr, { client, config, locale, db, presence_status }) {
     cr.registerCommand("file", new class extends BaseCommand {
         async noPermission(context) {
             await context.send("no");

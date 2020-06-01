@@ -15,58 +15,47 @@
  */
 
 import { CronJob } from "cron";
-import { EventEmitter } from "events";
+import moment from "moment";
 
-export default class CalendarRange extends EventEmitter {
-    public active: boolean;
+export default class CalendarRange {
+    public active: boolean = false;
 
-    private start_job: CronJob | undefined;
-    private end_job: CronJob | undefined;
+    public readonly start: moment.Moment;
+    public readonly end: moment.Moment;
 
-    constructor(public start?: string | undefined, public end?: string | undefined) {
-        super();
+    private _start_job?: CronJob;
+    private _end_job?: CronJob;
 
-        if (this.start && this.end) {
-            this.start_job = new CronJob(this.start, this.startTick.bind(this), null, true);
-            this.end_job = new CronJob(this.end, this.endTick.bind(this), null, true);
+    constructor(start: moment.Moment | Date, end: moment.Moment | Date) {
+        this.start = moment(start);
+        this.end = moment(end);
 
-            this.active = false;
+        const now = moment();
 
-            this.checkJobs();
-        } else {
-            this.active = true;
-        }
-    }
+        if (this.isSame(now)) this.active = true;
 
-    checkJobs() {
-        if (!this.start_job || !this.end_job) return;
-
-        const start = this.start_job.nextDate();
-        const end = this.end_job.nextDate();
-
-        if (!start.isAfter(end)) {
-            this.active = false;
-        } else if (!this.active) {
-            this.active = true;
-            setImmediate(() => this.emit("start"));
-        }
+        this._start_job = this.start.isAfter(now) ? new CronJob(this.start, () => this.active = true, null, true) : undefined;
+        this._end_job = this.end.isAfter(now) ? new CronJob(this.end, () => this.active = false, null, true) : undefined;
     }
 
     isToday() {
         return this.active;
     }
 
-    startTick() {
-        if (this.active) return;
-        this.active = true;
-
-        this.emit("start");
+    isSame(m: moment.Moment = moment()) {
+        return m.isBetween(this.start, this.end, null, "[)");
     }
 
-    endTick() {
-        if (!this.active) return;
-        this.active = false;
+    isAfter(m: moment.Moment = moment()) {
+        return this.start.isSameOrAfter(m);
+    }
 
-        this.emit("end");
+    isBefore(m: moment.Moment = moment()) {
+        return this.end.isBefore(m);
+    }
+
+    destroy() {
+        this._start_job?.stop();
+        this._end_job?.stop();
     }
 }

@@ -21,11 +21,8 @@ const log = require("../log").default.namespace("core");
 const INFO = require("../info").default;
 const config = require("../config").default;
 const { walk } = require("../util/files");
-const { timeout } = require("../util/promises");
 const helpToJSON = require("../util/commands/helpToJSON").default;
 const nanoTimer = require("../modules/timer").default;
-const random = require("../modules/random/random").default;
-const calendar_events = require("../modules/calendar/events").default;
 
 const CommandProcessor = require("./CommandProcessor");
 
@@ -43,6 +40,7 @@ const AliasCommand = require("./commands/AliasCommand");
 const Translation = require("../modules/i18n/Translation").default;
 
 const BotListManager = require("./managers/BotListManager").default;
+const PresenceStatusManager = require("./managers/PresenceStatusManager").default;
 
 class Core {
     /**
@@ -88,6 +86,7 @@ class Core {
         this.member_log = new MemberLog(this.client, this.config, this.locale);
 
         this.botlist = new BotListManager(this.client);
+        this.presence_status = new PresenceStatusManager(this.client, this.db);
     }
 
     /**
@@ -97,10 +96,11 @@ class Core {
         if (this.client.voice) for (const voice of this.client.voice.connections.values()) voice.disconnect();
 
         await this.loadCommands(commands_package);
-        await this.attachListeners();
-        await this.setStatus();
 
+        await this.presence_status.init();
         if (!INFO.DEV) this.botlist.init();
+
+        this.attachListeners();
     }
 
     /**
@@ -120,6 +120,7 @@ class Core {
         const install_opts = {
             client: this.client,
             config: this.config, locale: this.locale, db: this.db, error_cases: this.processor.error_cases,
+            presence_status: this.presence_status,
         };
         await Promise.all(files.map(async file => {
             log.debug(file, "installing...");
@@ -171,52 +172,6 @@ class Core {
 
     attachListeners() {
         this.client.addListener("message", message => this.processor.onMessage(message));
-    }
-
-    async setStatus() {
-        let timeout_ref = null;
-
-        const txt = await fs.readFile(path.join(process.cwd(), "assets/text/statuses.txt"), "utf8");
-        const statuses = txt.split("\n").filter(s => s !== "");
-
-        const updateStatus = async () => {
-            clearTimeout(timeout_ref);
-            timeout_ref = setTimeout(updateStatus, 3 * 60000);
-
-            this.client.user.setStatus("online");
-
-            // Server count
-
-            this.client.user.setActivity(`!trixie | ${this.client.guilds.cache.size.toLocaleString("en")} servers`, { type: "WATCHING" });
-
-            await timeout(60000);
-
-            // Website
-
-            this.client.user.setActivity("!trixie | trixie.loneless.art", { type: "PLAYING" });
-
-            await timeout(60000);
-
-            // Status text
-
-            let status = null;
-            for (const event of calendar_events) {
-                if (!event.isToday()) continue;
-
-                status = event.getStatus();
-                break;
-            }
-
-            status = status || random(statuses);
-
-            this.client.user.setActivity(`!trixie | ${status}`, { type: "PLAYING" });
-        };
-
-        for (let event of calendar_events) {
-            event.on("start", updateStatus).on("end", updateStatus);
-        }
-
-        updateStatus();
     }
 }
 

@@ -14,27 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { EventEmitter } from "events";
 import CalendarRange from "./CalendarRange";
-import random from "../random/random";
 
-export default class CalendarStatus extends EventEmitter {
-    public statuses: string[];
+export default class CalendarStatus {
+    public readonly status: string;
+    public readonly range: CalendarRange;
 
-    constructor(public range: CalendarRange, status: string | string[]) {
-        super();
-
+    constructor(range: CalendarRange, status: string) {
         this.range = range;
-        this.statuses = !Array.isArray(status) ? [status] : status;
-
-        this.range.on("start", () => this.emit("start")).on("end", () => this.emit("end"));
-    }
-
-    getStatus() {
-        return random(this.statuses);
-    }
-
-    isToday() {
-        return this.range.isToday();
+        this.status = status;
     }
 }

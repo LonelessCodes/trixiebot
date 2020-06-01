@@ -51,14 +51,6 @@ export default class BotListManager {
         const id = this.client.user.id;
         const server_count = this.client.guilds.cache.size;
 
-        if (config.has("botlists.divinediscordbots_com"))
-            BotListManager.post(`https://divinediscordbots.com/bot/${id}/stats`, {
-                json: { server_count },
-                headers: {
-                    Authorization: config.get("botlists.divinediscordbots_com"),
-                },
-            }).then(catchResolve("divinediscordbots_com")).catch(catchReject("divinediscordbots_com"));
-
         if (config.has("botlists.botsfordiscord_com"))
             BotListManager.post(`https://botsfordiscord.com/api/bot/${id}`, {
                 json: { server_count },
@@ -110,6 +102,14 @@ export default class BotListManager {
                     Authorization: config.get("botlists.discordbots_org"),
                 },
             }).then(catchResolve("discordbots_org")).catch(catchReject("discordbots_org"));
+
+        if (config.has("botlists.bots_ondiscord_xyz"))
+            BotListManager.post(`https://bots.ondiscord.xyz/bot-api/bots/${id}/guilds`, {
+                json: { guildCount: server_count },
+                headers: {
+                    Authorization: config.get("botlists.bots_ondiscord_xyz"),
+                },
+            }).then(catchResolve("bots_ondiscord_xyz")).catch(catchReject("bots_ondiscord_xyz"));
     }
 
     static post(url: string, opts: RequestInit & { json?: JsonObject }) {

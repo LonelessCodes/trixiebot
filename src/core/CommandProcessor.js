@@ -20,7 +20,7 @@ const { splitArgs } = require("../util/string");
 const stats = require("../modules/stats");
 const guild_stats = require("./managers/GuildStatsManager");
 const ErrorCaseManager = require("./managers/ErrorCaseManager").default;
-const CommandRegistry = require("./CommandRegistry");
+const CommandRegistry = require("./CommandRegistry").default;
 const CommandDispatcher = require("./CommandDispatcher").default;
 // eslint-disable-next-line no-unused-vars
 const ConfigManager = require("./managers/ConfigManager");

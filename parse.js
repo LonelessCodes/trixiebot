@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 const fs = require("fs-extra");
-const { walk } = require("./src/util/files");
+const { walk } = require("./dist/util/files");
 
 const t = /new Translation\(\s*("[\w.]+"),\s*("[\w\s:.,!?|"\\{}`'()#<>-]+")(?!\s*\+)/g;
 const tp = /new TranslationPlural\(\s*("[\w.]+"),\s*\[\s*("[\w\s:.,!?|"\\{}`'()#<>-]+"),\s*("[\w\s:.,!?|"\\{}`'()#<>-]+")\]/g;

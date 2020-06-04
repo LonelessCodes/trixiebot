@@ -1,5 +1,21 @@
 # Changelog
 
+### [3.8.1](https://github.com/LonelessCodes/trixiebot/compare/v3.8.0...v3.8.1) (2020-06-04)
+
+
+### Bug Fixes
+
+* update imports for CommandRegistry ([bc4ed62](https://github.com/LonelessCodes/trixiebot/commit/bc4ed62dc7d5a904f0401ab91f8f16a6c8258800))
+* **presence status:** stop blocking in init ([daba8c3](https://github.com/LonelessCodes/trixiebot/commit/daba8c3a43a4f23a85a8783f40cda7ea2f693a66))
+* fixed exec command throwing when exit code != 0 and output exit code ([07c9477](https://github.com/LonelessCodes/trixiebot/commit/07c94772daad10a562ea76f2f018164403e70c20))
+* fixed uuid v1 import ([d9fdb20](https://github.com/LonelessCodes/trixiebot/commit/d9fdb20f0643e081c46acae53c81041e4167b459))
+* removed hard coded status from development ([22e6f4d](https://github.com/LonelessCodes/trixiebot/commit/22e6f4d4d4aa94602d0a280703e8d773807b13db))
+
+
+### Improvements
+
+* reduce message cache size to lower memory usage until trixie is ready to handle partials ([ea7a4de](https://github.com/LonelessCodes/trixiebot/commit/ea7a4dec609e5624f48448de4574f467f653f523))
+
 ## [3.8.0](https://github.com/LonelessCodes/trixiebot/compare/v3.7.8...v3.8.0) (2020-06-01)
 
 

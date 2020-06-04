@@ -34,7 +34,8 @@
     "currently": "Currently muted are:",
     "nothing_muted": "Nothing yet muted",
     "exists": "Already got this muted",
-    "success": "Got it! Blacklisted use of \"{{word}}\""
+    "success": "Got it! Blacklisted use of \"{{word}}\"",
+    "removed_not_found": "That word has not been muted"
   },
   "config": {
     "no_parameter": "No such parameter. *shrugs*",
@@ -100,7 +101,8 @@
     "list": {
       "title": "Alert List",
       "footer": "Total Streams: {{streams}}"
-    }
+    },
+    "both_none": "`sfw` and `nsfw` can't both be `none`"
   },
   "general": {
     "lang_name": "English",
@@ -161,7 +163,8 @@
       "guild_clip_exists": "You already have a soundclip with that name in this server's soundboard",
       "pre_clip_exists": "There is already a predefined soundclip with this name",
       "downloading": "Error downloading the file from Discord's servers",
-      "too_long": "The soundclip cannot be longer than {{time}}"
+      "too_long": "The soundclip cannot be longer than {{time}}",
+      "unsupported_unknown": "File type unknown. Try uploading {{supported}} files."
     },
     "success": "Successfully added!",
     "buy_rate_limit": "You can only purchase 2 slots an hour! Wait {{time}} before you can go again",
@@ -173,7 +176,7 @@
     "doesnt_exist": "❌ That sample doesn't exist"
   },
   "autoban": {
-    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userI\\|username#0000\\|glob>`",
+    "no_configs": "No autoban configs yet. Add some by using `{{prefix}}autoban <userID\\|username#0000\\|glob>`",
     "not_valid_id": "`{{id}}` is not a valid user ID. User IDs contain only digits. U dumbo",
     "added_id": ":police_car: Added `{{id}}` as an ID",
     "added_name": ":police_car: Added `{{name}}`",
@@ -314,7 +317,8 @@
     "success_cat": {
       "one": "Commands in category {{categories}} will listen again",
       "other": "Commands in categories {{categories}} will listen again"
-    }
+    },
+    "no_category": "Uhm, I guess... but you gotta give me a category or more to disable"
   },
   "enable": {
     "no_ch": "Uhm, I guess... but you gotta give me a channel or more to enable",
@@ -438,9 +442,16 @@
     "info": "Info",
     "util": "Utility",
     "trixie": "Trixie",
-    "owner": "Owner"
+    "owner": "Owner",
+    "keyword": "Keyword"
   },
   "e621": {
     "error": "❌ There's been an error talking to e621 :'c"
+  },
+  "delete_data": {
+    "warning": "❗❗❗ This will delete all personal data Trixie holds that is connected to your account.\n**B E W A R E**: This will reset all your slots, your birthday, unsubscribe you from the newsletter, reset all your waifus, reset your credits to 0 and wipe all transactions, resets your whole and removes those samples from other users soundboards, if they imported them and finally, deletes your penis settings ❗❗❗\n\nDo you want to proceed? (yes/no).",
+    "no": "Data deletion has been aborted. You're fine.",
+    "success": "All of your personal data has been purged successfully 🎉",
+    "timeout": "Data deletion has been aborted due to inactivity."
   }
 }

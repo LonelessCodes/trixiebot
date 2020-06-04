@@ -94,6 +94,14 @@ class SlotsDatabase {
         if (user instanceof GuildMember) user = user.user;
         return this.db.findOne({ userId: user.id }, { projection: { _id: 0, userId: 0 } });
     }
+
+    /**
+     * @param {GuildMember|User} user
+     * @returns {Promise<void>}
+     */
+    async deleteUser(user) {
+        await this.db.deleteOne({ userId: user.id });
+    }
 }
 
 module.exports = SlotsDatabase;

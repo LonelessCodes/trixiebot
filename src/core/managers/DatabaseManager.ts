@@ -14,8 +14,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Db } from "mongodb";
+import INFO from "../../info";
+import { Db, Collection } from "mongodb";
 import Discord from "discord.js";
+import path from "path";
+import { unlink } from "fs-extra";
 
 export default class DatabaseManager {
     slots: import("./database/SlotsDatabase");
@@ -24,13 +27,46 @@ export default class DatabaseManager {
         this.slots = new (require("./database/SlotsDatabase"))(db);
     }
 
-    collection(name: string) {
+    collection(name: string): Collection {
         return this.db.collection(name);
     }
 
-    async getUser(user: Discord.GuildMember | Discord.User) {
-        return {
-            slots: await this.slots.getUser(user),
-        };
+    // TODO: build database manager in a way that all database interactions are handled
+    //       by abstractions in the form of managers
+    //       these abstractions should host a deleteUserData() and a getUserData() method
+    //       that can be used by DataManager.deleteUserData() and DataManager.getUserData()
+
+    async deleteUserData(user: Discord.User): Promise<void> {
+        await this.slots.deleteUser(user);
+
+        await this.collection("birthday").deleteOne({ userId: user.id });
+
+        await this.collection("newsletter").deleteOne({ userId: user.id });
+
+        await this.collection("penis").deleteOne({ userId: user.id });
+
+        await this.collection("waifu").deleteMany({ ownerId: user.id });
+        await this.collection("waifu").deleteMany({ waifuId: user.id });
+
+        await this.collection("deleted_messages").deleteMany({ userId: user.id });
+
+        await this.collection("fuck").deleteMany({ authorId: user.id });
+
+        await this.collection("credits_accounts").deleteOne({ userId: user.id });
+        await this.collection("credits_transactions").deleteMany({ userId: user.id });
+
+        await this.collection("soundboard_samples").updateMany({ owners: user.id }, { $pull: { owners: user.id } });
+        const samples = await this.collection("soundboard_samples").find({ $or: [{ owners: { $exists: true, $eq: [] } }, { creator: user.id }] }).toArray();
+        await this.collection("soundboard_samples").deleteMany({ $or: [{ owners: { $exists: true, $eq: [] } }, { creator: user.id }] });
+        try {
+            for (const sample of samples) {
+                await unlink(path.join(INFO.FILES_BASE, "soundboard", sample.id + ".ogg"));
+            }
+        } catch {
+            // do nothing
+        }
+        await this.collection("soundboard_slots").deleteOne({ user: user.id });
+
+        await this.collection("votes").deleteOne({ userId: user.id });
     }
 }

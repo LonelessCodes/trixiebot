@@ -7,7 +7,7 @@
             "env": {
                 "NODE_ENV": "development"
             },
-            "args": "-P tsconfig.json --icu-data-dir=/home/trixie/trixiebot/node_modules/full-icu src/index.ts"
+            "args": "-P tsconfig.json -T --icu-data-dir ./node_modules/full-icu src/index.ts"
         }
     ]
 }

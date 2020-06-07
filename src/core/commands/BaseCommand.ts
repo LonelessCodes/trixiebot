@@ -40,7 +40,7 @@ export default abstract class BaseCommand {
     explicit: boolean = false;
     scope: CommandScope = new CommandScope(CommandScope.DEFAULT);
 
-    async rateLimit(context: MessageContext) {
+    async rateLimit(context: MessageContext): Promise<void> {
         if (
             !this.rateLimiter ||
             (this._rateLimitMessageRateLimiter && !this._rateLimitMessageRateLimiter.testAndAdd(context.channel.id))
@@ -125,6 +125,8 @@ export default abstract class BaseCommand {
     hasScope(channel: Discord.Channel): boolean {
         return CommandScope.hasScope(this.scope, channel);
     }
+
+    linkTo?(c: BaseCommand): void;
 
     async run(ctx: MessageContext, command_name: string | RegExp): Promise<void> {
         return await this.call(ctx, command_name);

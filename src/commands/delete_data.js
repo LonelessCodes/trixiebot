@@ -24,7 +24,7 @@ module.exports = function install(cr, { db }) {
     cr.registerCommand(
         "deletedata",
         new SimpleCommand(async message => {
-            await message.send(new Translation("delete_data.warning", "❗❗❗ This will delete all personal data Trixie holds that is connected to your account.\n**B E W A R E**: This will reset all your slots, your birthday, unsubscribe you from the newsletter, reset all your waifus, reset your credits to 0 and wipe all transactions, resets your whole soundboard and removes those samples from other users soundboards, if they imported them and finally, deletes your penis settings ❗❗❗\n\nDo you want to proceed? (yes/no)."));
+            await message.send(new Translation("delete_data.warning", "❗❗❗ This will delete all personal data Trixie holds that is connected to your account.\n**B E W A R E**: This will reset all your slots, your birthday, your user stats, unsubscribe you from the newsletter, reset all your waifus, reset your credits to 0 and wipe all transactions, resets your whole soundboard and removes those samples from other users soundboards, if they imported them and finally, deletes your penis settings ❗❗❗\n\nDo you want to proceed? (yes/no)."));
 
             const messages = await message.channel.awaitMessages(m => m.author.id === message.author.id && /yes|no/.test(m.content), { max: 1, time: 60000 });
 
@@ -40,7 +40,7 @@ module.exports = function install(cr, { db }) {
         })
     )
         .setHelp(new HelpContent()
-            .setDescription("This deletes all personal data Trixie holds that is connected to your account.\n**B E W A R E**: This will reset all your slots, your birthday, unsubscribe you from the newsletter, reset all your waifus, reset your credits to 0 and wipe all transactions, resets your whole soundboard and removes those samples from other users soundboards, if they imported them and finally, deletes your penis settings.")
+            .setDescription("This deletes all personal data Trixie holds that is connected to your account.\n**B E W A R E**: This will reset all your slots, your birthday, your user stats, unsubscribe you from the newsletter, reset all your waifus, reset your credits to 0 and wipe all transactions, resets your whole soundboard and removes those samples from other users soundboards, if they imported them and finally, deletes your penis settings.")
             .setUsage("", "Delete all personal data Trixie holds of you."))
         .setCategory(Category.TRIXIE);
 };

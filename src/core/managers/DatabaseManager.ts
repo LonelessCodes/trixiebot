@@ -68,5 +68,7 @@ export default class DatabaseManager {
         await this.collection("soundboard_slots").deleteOne({ user: user.id });
 
         await this.collection("votes").deleteOne({ userId: user.id });
+
+        await this.collection("guild_stats_new").updateMany({ userId: user.id }, { $unset: { userId: 1 } });
     }
 }

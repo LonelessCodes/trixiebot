@@ -95,7 +95,7 @@
     },
     "scripts": {
         "build": "rimraf dist && tsc",
-        "start:watch": "nodemon --watch src --ext .ts,.js --exec cross-env NODE_ENV=development ts-node -T --icu-data-dir ./node_modules/full-icu src/index.ts",
+        "start:watch": "nodemon --watch src --ext .ts,.js --exec cross-env NODE_ENV=development ts-node -T src/index.ts",
         "start:dev": "cross-env NODE_ENV=development node --icu-data-dir ./node_modules/full-icu dist/index.js",
         "start": "cross-env NODE_ENV=production node --icu-data-dir ./node_modules/full-icu dist/index.js",
         "lint": "eslint src/ --ext .ts,.js",

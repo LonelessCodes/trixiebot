@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,19 +94,13 @@ export default class CommandRegistry {
     /**
      * Unsused function until I finally manage to seperate aliases from the BaseCommand objects
      * in an attempt to finally make Commands fully pluggable and reusable
-     * @param {string|BaseCommand} command_name
+     * @param {string} command_name
      * @returns {string[]}
      */
-    getAliasesFor(command_name: string | BaseCommand): string[] {
+    getAliasesFor(command_name: string): string[] {
         const aliases: string[] = [];
-        if (typeof command_name === "string") {
-            for (const [name, command] of this.commands) {
-                if (command instanceof AliasCommand && command.parentName === command_name) aliases.push(name);
-            }
-        } else if (command_name instanceof BaseCommand) {
-            for (const [name, command] of this.commands) {
-                if (command instanceof AliasCommand && command.command === command_name) aliases.push(name);
-            }
+        for (const [name, command] of this.commands) {
+            if (command instanceof AliasCommand && command.parentName === command_name) aliases.push(name);
         }
         return aliases;
     }

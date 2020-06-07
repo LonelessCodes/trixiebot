@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.9.0](https://github.com/LonelessCodes/trixiebot/compare/v3.8.1...v3.9.0) (2020-06-07)
+
+
+### Features
+
+* add deletedata command, allowing the deletion of all personal data ([1fb8bab](https://github.com/LonelessCodes/trixiebot/commit/1fb8bab202b887d41a9b09779ccbec718b7d4409))
+
+
+### Improvements
+
+* add gateway intents to client options ([1ba9064](https://github.com/LonelessCodes/trixiebot/commit/1ba906468ff815211cd4ed24c22517a98eb85fda))
+
 ### [3.8.1](https://github.com/LonelessCodes/trixiebot/compare/v3.8.0...v3.8.1) (2020-06-04)
 
 

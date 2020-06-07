@@ -65,6 +65,21 @@ const client = new Discord.Client({
     messageCacheLifetime: 60 * 10,
     messageSweepInterval: 60 * 10,
 
+    ws: {
+        intents: [
+            "GUILDS",
+            "GUILD_BANS",
+            "GUILD_EMOJIS",
+            "GUILD_MEMBERS",
+            "GUILD_MESSAGES",
+            "GUILD_MESSAGE_REACTIONS",
+            "GUILD_PRESENCES",
+            "GUILD_VOICE_STATES",
+            "DIRECT_MESSAGES",
+            "DIRECT_MESSAGE_REACTIONS",
+        ],
+    },
+
     presence: {
         status: "dnd",
         activity: {

@@ -17,7 +17,7 @@
 const { timeout } = require("../../util/promises");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
-const TreeCommand = require("../../core/commands/TreeCommand");
+const TreeCommand = require("../../core/commands/TreeCommand").default;
 const CommandScope = require("../../util/commands/CommandScope").default;
 const Category = require("../../util/commands/Category").default;
 

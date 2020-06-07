@@ -20,7 +20,7 @@ const Discord = require("discord.js");
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
-const TreeCommand = require("../core/commands/TreeCommand");
+const TreeCommand = require("../core/commands/TreeCommand").default;
 const HelpContent = require("../util/commands/HelpContent").default;
 const Category = require("../util/commands/Category").default;
 const CommandPermission = require("../util/commands/CommandPermission").default;

@@ -19,7 +19,7 @@ const { doNothing } = require("../util/util");
 const Discord = require("discord.js");
 
 const AliasCommand = require("../core/commands/AliasCommand");
-const TreeCommand = require("../core/commands/TreeCommand");
+const TreeCommand = require("../core/commands/TreeCommand").default;
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
 

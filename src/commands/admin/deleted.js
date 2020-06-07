@@ -17,7 +17,7 @@
 const { userToString } = require("../../util/util");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
-const TreeCommand = require("../../core/commands/TreeCommand");
+const TreeCommand = require("../../core/commands/TreeCommand").default;
 const HelpContent = require("../../util/commands/HelpContent").default;
 const CommandPermission = require("../../util/commands/CommandPermission").default;
 const Category = require("../../util/commands/Category").default;

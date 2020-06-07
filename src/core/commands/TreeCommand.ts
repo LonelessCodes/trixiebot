@@ -14,18 +14,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BaseCommand = require("./BaseCommand").default;
-const AliasCommand = require("./AliasCommand");
-const { splitArgs } = require("../../util/string");
+import BaseCommand from "./BaseCommand";
+import AliasCommand from "./AliasCommand";
+import { splitArgs } from "../../util/string";
+import MessageContext from "../../util/commands/MessageContext";
+import { BitFieldResolvable } from "discord.js";
 
-class TreeCommand extends BaseCommand {
-    constructor() {
-        super();
+export default class TreeCommand extends BaseCommand {
+    sub_commands: Map<string, BaseCommand> = new Map();
 
-        this.sub_commands = new Map;
-    }
-
-    async run(context, command_name) {
+    async run(context: MessageContext, command_name: string | RegExp): Promise<void> {
         const args = splitArgs(context.content, 2);
 
         if (this.sub_commands.size === 0) {
@@ -54,7 +52,7 @@ class TreeCommand extends BaseCommand {
         await command.run(context, command_name);
     }
 
-    registerSubCommand(id, command) {
+    registerSubCommand<T extends BaseCommand>(id: string, command: T): T {
         if (this.sub_commands.has(id)) throw new Error("Command name already exists");
 
         command.setPermissions(this.permissions);
@@ -62,16 +60,17 @@ class TreeCommand extends BaseCommand {
         return command;
     }
 
-    registerSubCommandAlias(command, alias) {
-        if (!this.sub_commands.has(command)) throw new Error(command + " isn't in the command map...");
+    registerSubCommandAlias(command: string, alias: string): void {
         if (this.sub_commands.has(alias)) throw new Error("Alias '" + alias + "' is already registered in the command map...");
 
         const cmd = this.sub_commands.get(command);
+        if (!cmd) throw new Error(command + " isn't in the command map...");
+
         cmd.aliases.push(alias);
         this.registerSubCommand(alias, new AliasCommand(command, cmd));
     }
 
-    registerDefaultCommand(command) {
+    registerDefaultCommand<T extends BaseCommand>(command: T): T {
         // not a great solution
         // but the only thing that works
         if (typeof command.linkTo === "function") command.linkTo(this);
@@ -80,11 +79,17 @@ class TreeCommand extends BaseCommand {
         return command;
     }
 
-    setScope(v, recursive = false) {
-        super.setScope(v, recursive);
-        if (recursive) for (let [, cmd] of this.sub_commands) cmd.setScope(v, recursive);
+    getAliasesFor(command_name: string): string[] {
+        const aliases: string[] = [];
+        for (const [name, command] of this.sub_commands) {
+            if (command instanceof AliasCommand && command.parentName === command_name) aliases.push(name);
+        }
+        return aliases;
+    }
+
+    setScope(v: BitFieldResolvable<"GUILD" | "DM">, recursive = false): this {
+        super.setScope(v);
+        if (recursive) for (const [, cmd] of this.sub_commands) (cmd as BaseCommand | TreeCommand).setScope(v, recursive);
         return this;
     }
 }
-
-module.exports = TreeCommand;

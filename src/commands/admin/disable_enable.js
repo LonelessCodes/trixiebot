@@ -16,7 +16,7 @@
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const HelpCommand = require("../../core/commands/HelpCommand");
-const TreeCommand = require("../../core/commands/TreeCommand");
+const TreeCommand = require("../../core/commands/TreeCommand").default;
 const HelpContent = require("../../util/commands/HelpContent").default;
 const Category = require("../../util/commands/Category").default;
 

@@ -20,7 +20,7 @@ const CONST = require("../const").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
-const TreeCommand = require("../core/commands/TreeCommand");
+const TreeCommand = require("../core/commands/TreeCommand").default;
 const AliasCommand = require("../core/commands/AliasCommand");
 // eslint-disable-next-line no-unused-vars
 const BaseCommand = require("../core/commands/BaseCommand").default;

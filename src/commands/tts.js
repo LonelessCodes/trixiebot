@@ -77,9 +77,9 @@ module.exports = function install(cr) {
                     dispatcher.once("error", () => connection.setSpeaking(0));
                     stream.once("error", () => connection.setSpeaking(0));
 
-                    await message.react("👍");
+                    message.react("👍").catch(doNothing);
                 } catch (err) {
-                    await message.react("❌");
+                    message.react("❌").catch(doNothing);
                     if (err instanceof AudioConnectError) {
                         return err.message;
                     }

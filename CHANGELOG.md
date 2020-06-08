@@ -1,15 +1,5 @@
 # Changelog
 
-### [3.9.1](https://github.com/LonelessCodes/trixiebot/compare/v3.9.0...v3.9.1) (2020-06-08)
-
-
-### Bug Fixes
-
-* **alert:** fixed Twitch alerts ([68831c7](https://github.com/LonelessCodes/trixiebot/commit/68831c7eeb1896c97f3451d23d2d86d13aa57f14))
-* **tts:** fixed throwing error if message to react to has been deleted ([64725ae](https://github.com/LonelessCodes/trixiebot/commit/64725ae677502e6e8c0a360fdb3a05567eaf4aa2))
-* anonymise user statistics in DatabaseManager.deleteUserData() ([7782eac](https://github.com/LonelessCodes/trixiebot/commit/7782eac4e48f45777754b98bb2030bbe66ed1982))
-* removed --icu-data-dir as ts-node flag ([e53ba74](https://github.com/LonelessCodes/trixiebot/commit/e53ba748e3be54a10ede87f76f86058eaad3904b))
-
 ## [3.9.0](https://github.com/LonelessCodes/trixiebot/compare/v3.8.1...v3.9.0) (2020-06-07)
 
 

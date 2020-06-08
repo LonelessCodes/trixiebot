@@ -26,7 +26,7 @@ import TwitchClient, { Stream as TwitchStream } from "twitch";
 import { doNothing } from "../../../util/util";
 
 class TwitchProcessor extends Processor {
-    twitch = TwitchClient.withCredentials(config.get("twitch.client_id"));
+    twitch = TwitchClient.withClientCredentials(config.get("twitch.client_id"), config.get("twitch.client_secret"));
 
     constructor(manager: import("../AlertManager").default) {
         super(manager);
@@ -35,7 +35,7 @@ class TwitchProcessor extends Processor {
         this._checkChanges().catch(doNothing);
     }
 
-    testURL(url: string) {
+    testURL(url: string): boolean {
         return /^(http:\/\/|https:\/\/)?(www\.twitch\.tv|twitch\.tv)\/[-a-zA-Z0-9@:%_+.~]{2,}\b/.test(url);
     }
 
@@ -55,7 +55,7 @@ class TwitchProcessor extends Processor {
         return new ParsedStream(this, username, user_id);
     }
 
-    formatURL(stream: ParsedStream, fat = false) {
+    formatURL(stream: ParsedStream, fat = false): string {
         if (fat) return this.url + "/**" + stream.username + "**";
         return "https://" + this.url + "/" + stream.username;
     }
@@ -63,7 +63,7 @@ class TwitchProcessor extends Processor {
     // PRIVATE
 
     private async _checkChanges() {
-        const streams = await this.manager.getServiceConfigsStream(this).toArray();
+        const streams = await this.manager.getConfigsStream({ service: this.name }).toArray();
         if (streams.length === 0) return;
 
         const users = Array.from(new Set(streams.map(s => s.userId)));

@@ -27,8 +27,8 @@ user_files_dir: trixiefiles
 
 prefix: "!"
 
-website_url: https://trixie.loneless.art
-invite_url:  https://trixie.loneless.art/invite
+website_url: https://trixiebot.com
+invite_url:  https://trixiebot.com/invite
 
 calendarific: # calendarific.com
   key:  XXXX

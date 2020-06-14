@@ -32,6 +32,8 @@ import Calendarific from "../../modules/Calendarific";
 
 import CalendarRange from "../../modules/calendar/CalendarRange";
 import CalendarStatus from "../../modules/calendar/CalendarStatus";
+import url from "url";
+import info from "../../info";
 
 interface DbCustomEvent {
     start: Date;
@@ -145,7 +147,7 @@ export default class PresenceStatusManager {
         await timeout(60000);
 
         // Website
-        this.client.user.setActivity("!trixie | trixie.loneless.art", { type: "PLAYING" }).catch(doNothing);
+        this.client.user.setActivity(`!trixie | ${info.WEBSITE ? url.parse(info.WEBSITE).hostname : "trixiebot.com"}`, { type: "PLAYING" }).catch(doNothing);
         await timeout(60000);
 
         // Status text

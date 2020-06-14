@@ -6,7 +6,7 @@
 
 ## Using the Official TrixieBot
 
-***[Add TrixieBot to your server now](https://trixie.loneless.art/invite) and enjoy it's full set of features with low latency on machines it was specifically designed for.***
+***[Add TrixieBot to your server now](https://trixiebot.com/invite) and enjoy it's full set of features with low latency on machines it was specifically designed for.***
 
 </div>
 

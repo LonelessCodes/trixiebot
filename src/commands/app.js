@@ -89,7 +89,8 @@ module.exports = function install(cr, { client }) {
         if (INFO.WEBSITE) {
             const host = url.parse(INFO.WEBSITE).host;
             let links =
-                `**📘 Getting Started**: [${host}/get-started](${INFO.WEBSITE}/get-started)\n` +
+                // TODO: make getting started page
+                // `**📘 Getting Started**: [${host}/get-started](${INFO.WEBSITE}/get-started)\n` +
                 `**🌐 Website**: [${host}](${INFO.WEBSITE})\n`;
             if (message.guild)
                 links +=

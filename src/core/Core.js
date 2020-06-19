@@ -31,7 +31,7 @@ const CM = require("./managers/ConfigManager");
 const LocaleManager = require("./managers/LocaleManager").default;
 const WebsiteManager = require("./managers/WebsiteManager");
 const UpvotesManager = require("./managers/UpvotesManager");
-const MemberLog = require("./listeners/MemberLog");
+const MemberLog = require("./listeners/MemberLog").default;
 
 const Discord = require("discord.js");
 

@@ -68,10 +68,11 @@ export default abstract class Paginator {
     }
 
     private async _initialize(message: Discord.Message): Promise<Discord.Message> {
+        this._pagination((this.message = message));
+
         await message.react(Paginator.LEFT);
         await message.react(Paginator.STOP);
         await message.react(Paginator.RIGHT);
-        this._pagination((this.message = message));
 
         return this.message;
     }

@@ -98,13 +98,13 @@ class PaginatorAction extends events.EventEmitter {
      */
     async initialize(message, translator, page_num) {
         if (this.page_count > 1) {
+            this.pagination(message, translator, page_num);
             await message.react(PaginatorAction.LEFT);
             await message.react(PaginatorAction.STOP);
             await message.react(PaginatorAction.RIGHT);
-            this.pagination(message, translator, page_num);
         } else {
-            await message.react(PaginatorAction.STOP);
             this.pagination(message, translator, page_num);
+            await message.react(PaginatorAction.STOP);
         }
 
         return message;

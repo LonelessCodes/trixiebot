@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const stats = require("../modules/stats");
+const { TOTAL_SERVERS, TEXT_CHANNELS, TOTAL_USERS, COMMANDS_EXECUTED, MESSAGES_TODAY, ACTIVE_WEB_USERS, TOTAL_WEB_USERS } = require("../core/managers/BotStatsManager");
 const os = require("os");
 const { toHumanTime } = require("../util/time");
 const { timeout } = require("../util/promises");
@@ -75,53 +75,44 @@ const CommandScope = require("../util/commands/CommandScope").default;
 
 const PaginatorAction = require("../modules/actions/PaginatorAction");
 
-module.exports = function install(cr, { client, error_cases }) {
+module.exports = function install(cr, { client, error_cases, bot_stats }) {
     cr.registerCommand(
         "info",
-        new SimpleCommand(async () => {
-            const guilds = client.guilds.cache;
-            const users = guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
-            const channels = client.channels.cache;
+        new SimpleCommand(async () => new Discord.MessageEmbed()
+            .setColor(CONST.COLOR.PRIMARY)
 
-            const embed = new Discord.MessageEmbed()
-                .setColor(CONST.COLOR.PRIMARY)
+            .addField("Commands", cr.commands.size.toLocaleString("en"))
 
-                .addField("Commands", cr.commands.size.toLocaleString("en"))
+            .addField("Bot Version", INFO.VERSION, true)
+            .addField("Node.js Version", process.version.substr(1), true)
+            .addField("Discord.js Version", Discord.version)
 
-                .addField("Bot Version", INFO.VERSION, true)
-                .addField("Node.js Version", process.version.substr(1), true)
-                .addField("Discord.js Version", Discord.version)
+            .addField("CPU Usage", ((await getCPUUsage()) * 100).toFixed(0) + "%", true)
+            .addField("CPU Cores", os.cpus().length.toString(), true)
+            .addField(
+                "Memory Usage",
+                (process.memoryUsage().rss / (1024 * 1024)).toFixed(2) +
+                    " / " +
+                    (os.totalmem() / (1024 * 1024)).toFixed(2) +
+                    " MB"
+            )
 
-                .addField("CPU Usage", ((await getCPUUsage()) * 100).toFixed(0) + "%", true)
-                .addField("CPU Cores", os.cpus().length.toString(), true)
-                .addField(
-                    "Memory Usage",
-                    (process.memoryUsage().rss / (1024 * 1024)).toFixed(2) +
-                        " / " +
-                        (os.totalmem() / (1024 * 1024)).toFixed(2) +
-                        " MB"
-                )
+            .addField(
+                "Uptime",
+                "Server: " + toHumanTime(Math.floor(os.uptime() * 1000)) +
+                ", Bot: " + toHumanTime(Math.floor(process.uptime() * 1000))
+            )
 
-                .addField(
-                    "Uptime",
-                    "Server: " +
-                        toHumanTime(Math.floor(os.uptime() * 1000)) +
-                        ", Bot: " +
-                        toHumanTime(Math.floor(process.uptime() * 1000))
-                )
+            .addField("Total Servers", bot_stats.get(TOTAL_SERVERS).toLocaleString("en"), true)
+            .addField("Text Channels", bot_stats.get(TEXT_CHANNELS).toLocaleString("en"), true)
+            .addField("Total Users", bot_stats.get(TOTAL_USERS).toLocaleString("en"))
 
-                .addField("Total Servers", guilds.size.toLocaleString("en"), true)
-                .addField("Text Channels", channels.filter(c => c.type === "text").size.toLocaleString("en"), true)
-                .addField("Total Users", users.toLocaleString("en"))
+            .addField("Executed Commands", bot_stats.get(COMMANDS_EXECUTED).toLocaleString("en"), true)
+            .addField("Processed Messages", bot_stats.get(MESSAGES_TODAY).toLocaleString("en"))
 
-                .addField("Executed Commands", stats.bot.get("COMMANDS_EXECUTED").get().toLocaleString("en"), true)
-                .addField("Processed Messages", stats.bot.get("MESSAGES_TODAY").get().toLocaleString("en"))
-
-                .addField("Active Web Users", stats.web.get(stats.web.NAME.ACTIVE_WEB_USERS).get().toLocaleString("en"), true)
-                .addField("Total Web Users", stats.web.get(stats.web.NAME.TOTAL_WEB_USERS).get().toLocaleString("en"));
-
-            return { embed };
-        })
+            .addField("Active Web Users", bot_stats.get(ACTIVE_WEB_USERS).toLocaleString("en"), true)
+            .addField("Total Web Users", bot_stats.get(TOTAL_WEB_USERS).toLocaleString("en"))
+        )
     )
         .setHelp(new HelpContent().setDescription("Gets the bot technical information. Nothing all that interesting."))
         .setCategory(Category.TRIXIE)

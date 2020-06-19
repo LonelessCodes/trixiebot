@@ -31,12 +31,13 @@ const CM = require("./managers/ConfigManager");
 const LocaleManager = require("./managers/LocaleManager").default;
 const WebsiteManager = require("./managers/WebsiteManager");
 const UpvotesManager = require("./managers/UpvotesManager");
-const MemberLog = require("./listeners/MemberLog");
+const MemberLog = require("./listeners/MemberLog").default;
 
 const Discord = require("discord.js");
 
 const CommandScope = require("../util/commands/CommandScope").default;
 const AliasCommand = require("./commands/AliasCommand");
+const { default: BotStatsManager, MESSAGES_TODAY, COMMANDS_EXECUTED } = require("./managers/BotStatsManager");
 const Translation = require("../modules/i18n/Translation").default;
 
 const BotListManager = require("./managers/BotListManager").default;
@@ -79,11 +80,13 @@ class Core {
 
         this.locale = new LocaleManager(this.client, this.db);
 
-        this.processor = new CommandProcessor(this.client, this.config, this.locale, this.db);
+        this.bot_stats = new BotStatsManager(this.db);
+
+        this.processor = new CommandProcessor(this.client, this.config, this.locale, this.db, this.bot_stats);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.locale, this.db);
         this.upvotes = new UpvotesManager(this.client, this.db);
 
-        this.member_log = new MemberLog(this.client, this.config, this.locale);
+        this.member_log = new MemberLog(this.client, this.config, this.locale, this.bot_stats);
 
         this.botlist = new BotListManager(this.client);
         this.presence_status = new PresenceStatusManager(this.client, this.db);
@@ -94,6 +97,9 @@ class Core {
      */
     async init(commands_package) {
         if (this.client.voice) for (const voice of this.client.voice.connections.values()) voice.disconnect();
+
+        await this.bot_stats.load(COMMANDS_EXECUTED);
+        await this.bot_stats.load(MESSAGES_TODAY);
 
         await this.loadCommands(commands_package);
 
@@ -115,18 +121,25 @@ class Core {
         const timer = nanoTimer();
 
         const files = await walk(commands_package)
-            .then(files => files.filter(file => path.extname(file) === ".js"));
+            .then(files => files.filter(file => {
+                const ext = path.extname(file);
+                return ext === ".js" || ext === ".ts";
+            }));
 
         const install_opts = {
             client: this.client,
             config: this.config, locale: this.locale, db: this.db, error_cases: this.processor.error_cases,
-            presence_status: this.presence_status,
+            presence_status: this.presence_status, bot_stats: this.bot_stats,
         };
         await Promise.all(files.map(async file => {
             log("%s:", file, "installing...");
             const time = nanoTimer();
+
             const install = require(file);
-            await install(this.processor.REGISTRY, install_opts);
+            if (typeof install.default === "function") await install.default(this.processor.REGISTRY, install_opts);
+            else if (typeof install.install === "function") await install.install(this.processor.REGISTRY, install_opts);
+            else await install(this.processor.REGISTRY, install_opts);
+
             log("%s:", file, "installed.", nanoTimer.diffMs(time).toFixed(3), "ms");
         }));
 

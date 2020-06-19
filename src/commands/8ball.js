@@ -145,6 +145,5 @@ module.exports = function install(cr) {
         )
         .setCategory(Category.FUN)
         .setScope(CommandScope.ALL);
-    cr.registerAlias("8ball", "tellme");
-    cr.registerAlias("8ball", "8");
+    cr.registerAlias("8ball", "tellme", "8");
 };

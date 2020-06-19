@@ -52,7 +52,7 @@ export default class HelpBuilder extends Discord.MessageEmbed {
     }
 
     static createParameter(name: string, parameter: HelpParameter) {
-        return `\`${name}\` ${parameter.optional ? "- optional " : ""}- ${parameter.content}`;
+        return `\`${name}\` ${parameter.optional ? "- *optional* " : ""}- ${parameter.content}`;
     }
 
     static generateUsage(
@@ -114,7 +114,7 @@ export default class HelpBuilder extends Discord.MessageEmbed {
 
                 if (help.parameters.size > 0) {
                     for (const [name, parameter] of help.parameters) {
-                        field.usage += `${this.createParameter(name, parameter)}\n`;
+                        field.usage += `> ${this.createParameter(name, parameter)}\n`;
                     }
                 }
             }

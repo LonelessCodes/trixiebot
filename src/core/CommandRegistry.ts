@@ -80,14 +80,14 @@ export default class CommandRegistry {
         return command;
     }
 
-    registerAlias(command: string, alias: string): void {
-        if (this.commands.has(alias)) throw new Error("Alias '" + alias + "' is already registered in the command map...");
+    registerAlias(command: string, ...aliases: string[]): void {
+        for (const alias of aliases) if (this.commands.has(alias)) throw new Error("Alias '" + alias + "' is already registered in the command map...");
 
         const cmd = this.commands.get(command);
         if (!cmd) throw new Error(command + " isn't in the command map...");
 
-        cmd.aliases.push(alias);
-        this.registerCommand(alias, new AliasCommand(command, cmd));
+        cmd.aliases.push(...aliases);
+        for (const alias of aliases) this.registerCommand(alias, new AliasCommand(command, cmd));
     }
 
     // TODO: remove aliases on Command classes!!!

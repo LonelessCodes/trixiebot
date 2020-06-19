@@ -99,6 +99,7 @@ module.exports = function install(cr, { client, db }) {
                 .setUsage("<YYYY-MM-DD>", "Set your birthday")
                 .addParameterOptional("YYYY-MM-DD", "Your b-day in Year-Month-Day format")
         )
+        .setListed(false)
         .setCategory(Category.UTIL)
         .setScope(CommandScope.ALL);
 

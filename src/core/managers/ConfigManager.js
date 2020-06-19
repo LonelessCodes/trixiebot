@@ -145,6 +145,10 @@ class ConfigManager {
         this.parameters = parameters;
     }
 
+    /**
+     * @param {string} guildId
+     * @param {string} [parameter]
+     */
     async get(guildId, parameter) {
         // will fire instantly if loaded already, are wait
         // till all configurations are initially loaded into memory

@@ -52,9 +52,5 @@ module.exports = function install(cr) {
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
 
-    cr.registerAlias("horsepussy", "horsepussi");
-    cr.registerAlias("horsepussy", "ponypussy");
-    cr.registerAlias("horsepussy", "ponypussi");
-    cr.registerAlias("horsepussy", "ponepussi");
-    cr.registerAlias("horsepussy", "ponypoossy");
+    cr.registerAlias("horsepussy", "horsepussi", "ponypussy", "ponypussi", "ponepussi", "ponypoossy");
 };

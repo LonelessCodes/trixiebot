@@ -49,11 +49,8 @@ class ChooseCommand extends TreeCommand {
         this.registerSubCommand("user", new SimpleCommand(context => this.user(context)));
         this.registerSubCommand("server", new SimpleCommand(context => this.server(context))).setCategory(Category.MODERATION);
         this.registerSubCommand("pre", new SimpleCommand(context => this.pre(context))).setCategory(Category.OWNER);
-        this.registerSubCommandAlias("user", "*");
-        this.registerSubCommandAlias("user", "u");
-        this.registerSubCommandAlias("server", "s");
-        this.registerSubCommandAlias("server", "guild");
-        this.registerSubCommandAlias("server", "g");
+        this.registerSubCommandAlias("user", "*", "u");
+        this.registerSubCommandAlias("server", "s", "guild", "g");
     }
 
     user() {

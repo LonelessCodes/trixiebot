@@ -182,8 +182,7 @@ module.exports = function install(cr, { config }) {
             })
         );
 
-    cr.registerAlias("config", "cfg");
-    cr.registerAlias("config", "opts");
+    cr.registerAlias("config", "cfg", "opts");
 
     // prefix alias
 

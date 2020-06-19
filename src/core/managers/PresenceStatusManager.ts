@@ -99,7 +99,7 @@ export default class PresenceStatusManager {
         this._loadFromAPI().catch(err => log.error("Couldn't fetch holidays from API", err));
 
         // non-blocking db call
-        this.database.find({}).on("data", c_event => {
+        this.database.find({ end: { $gt: new Date() } }).on("data", c_event => {
             this.addCachedEvent(new CalendarStatus(new CalendarRange(c_event.start, c_event.end), c_event.status));
         });
 

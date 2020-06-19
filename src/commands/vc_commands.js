@@ -35,8 +35,7 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent().setUsage("", "Make Trixie leave the voice channel!"))
         .setCategory(Category.AUDIO);
 
-    cr.registerAlias("leavevc", "leave");
-    cr.registerAlias("leavevc", "begone");
+    cr.registerAlias("leavevc", "leave", "begone");
 
     cr.registerCommand(
         "stopvc",

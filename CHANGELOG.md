@@ -1,5 +1,40 @@
 # Changelog
 
+## [3.10.0](https://github.com/LonelessCodes/trixiebot/compare/v3.9.1...v3.10.0) (2020-06-19)
+
+
+### Features
+
+* add watch command ([a80b042](https://github.com/LonelessCodes/trixiebot/commit/a80b04212e3aed3a074a9824d8ae16f636055ea0))
+
+
+### Bug Fixes
+
+* **Core:** allow loading TypeScript command files ([86072e8](https://github.com/LonelessCodes/trixiebot/commit/86072e859c40fa89591c6ef3ae339b32dd3b5a79))
+* fixed @Trixiebot <command> not working ([c7476e1](https://github.com/LonelessCodes/trixiebot/commit/c7476e18f9f6c797798c1cfcb8e30d96c96bc555))
+* fixed findDefaultChannel() return type ([195ff0a](https://github.com/LonelessCodes/trixiebot/commit/195ff0a46bd2af005bd59e282993d0904e3c5c81))
+* fixed searching with AND, OR, NOT on derpi and e621 commands ([6a7838a](https://github.com/LonelessCodes/trixiebot/commit/6a7838a9d34c1a44577066970d47e5781a199f20))
+
+
+### Deprecations
+
+* remove less used commands: pat, touch, point, poke, bite, lick, tickle, smile, stare, holdhands, cuddle, snuggle, nuzzle, nom, ascii, fuck ([93c6427](https://github.com/LonelessCodes/trixiebot/commit/93c642799e49c97d693996dcce1d3f05a3a4cfcb))
+
+
+### Changes
+
+* update trixie command ([d9cd8fd](https://github.com/LonelessCodes/trixiebot/commit/d9cd8fdca1b535bb530b216393a20f018cfd6fdc))
+* **types:** changed getNextSequence() context to any type (to allow for per-guild sequences like { type: string, guildId: string }) ([5dd3fff](https://github.com/LonelessCodes/trixiebot/commit/5dd3fff49aa330afa0ec693b687f6a503c0c53fe))
+* migrate to new hostname ([56b7e22](https://github.com/LonelessCodes/trixiebot/commit/56b7e225990a4e4eeae5fe9b3078eb9d82dc2bf7))
+
+
+### Improvements
+
+* **member log:** update info message when Trixie joins the server ([e73efa5](https://github.com/LonelessCodes/trixiebot/commit/e73efa57f826f7f23b2cff8c0cda77bc5de598b0))
+* **stats:** improve type support and bad coding habits ([523b0b5](https://github.com/LonelessCodes/trixiebot/commit/523b0b5a352253359825c21f32f23fc462d5a551))
+* allow registering multiple aliases per registerAlias() call on CommandRegistry and TreeCommand ([9e49bf0](https://github.com/LonelessCodes/trixiebot/commit/9e49bf0fa8bd60f172584491bc7070096d86dbc1))
+* **status:** load only events from DB that are active or upcoming ([a61da60](https://github.com/LonelessCodes/trixiebot/commit/a61da60ca82d98d05e5bbcf5981671734d56bb41))
+
 ### [3.9.1](https://github.com/LonelessCodes/trixiebot/compare/v3.9.0...v3.9.1) (2020-06-08)
 
 

@@ -135,6 +135,5 @@ module.exports = function install(cr, { client, db }) {
     }))
         .setHelp(new HelpContent().setUsage("", "Shows where you are in the penis size ranking"));
 
-    cr.registerAlias("penis", "cock");
-    cr.registerAlias("penis", "dick");
+    cr.registerAlias("penis", "cock", "dick");
 };

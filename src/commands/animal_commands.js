@@ -35,7 +35,7 @@ const TranslationMerge = require("../modules/i18n/TranslationMerge").default;
 /**
  * @param {fetch.RequestInfo} url
  * @param {fetch.RequestInit} [init]
- * @returns {Promise<fetch.Response>}
+ * @returns {Promise<any>}
  */
 function reconnectFetch(url, init) {
     const reconnect = async (reconnectTries = 0) => {
@@ -96,10 +96,7 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent().setUsage("", "Random dog image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
-    cr.registerAlias("dog", "doggo");
-    cr.registerAlias("dog", "puppy");
-    cr.registerAlias("dog", "bork");
-    cr.registerAlias("dog", "pup");
+    cr.registerAlias("dog", "doggo", "puppy", "bork", "pup");
 
     cr.registerCommand(
         "fox",
@@ -108,9 +105,7 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent().setUsage("", "Random fox image :3"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
-    cr.registerAlias("fox", "foxie");
-    cr.registerAlias("fox", "foxi");
-    cr.registerAlias("fox", "weff");
+    cr.registerAlias("fox", "foxie", "foxi", "weff");
 
     cr.registerCommand(
         "shibe",
@@ -130,9 +125,7 @@ module.exports = function install(cr) {
         .setHelp(new HelpContent().setUsage("", "Random Birb image ovo"))
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
-    cr.registerAlias("bird", "birb");
-    cr.registerAlias("bird", "borb");
-    cr.registerAlias("bird", "birbo");
+    cr.registerAlias("bird", "birb", "borb", "birbo");
 
     // POSSUMS~~~<3
     if (!twitter) return log.namespace("config", "Found no API credentials for Twitter - Disabled possum command");
@@ -184,6 +177,5 @@ module.exports = function install(cr) {
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL, true);
 
-    cr.registerAlias("possum", "opossum");
-    cr.registerAlias("possum", "poss");
+    cr.registerAlias("possum", "opossum", "poss");
 };

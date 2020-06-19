@@ -60,14 +60,14 @@ export default class TreeCommand extends BaseCommand {
         return command;
     }
 
-    registerSubCommandAlias(command: string, alias: string): void {
-        if (this.sub_commands.has(alias)) throw new Error("Alias '" + alias + "' is already registered in the command map...");
+    registerSubCommandAlias(command: string, ...aliases: string[]): void {
+        for (const alias of aliases) if (this.sub_commands.has(alias)) throw new Error("Alias '" + alias + "' is already registered in the command map...");
 
         const cmd = this.sub_commands.get(command);
         if (!cmd) throw new Error(command + " isn't in the command map...");
 
-        cmd.aliases.push(alias);
-        this.registerSubCommand(alias, new AliasCommand(command, cmd));
+        cmd.aliases.push(...aliases);
+        for (const alias of aliases) this.registerSubCommand(alias, new AliasCommand(command, cmd));
     }
 
     registerDefaultCommand<T extends BaseCommand>(command: T): T {

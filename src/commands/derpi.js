@@ -156,7 +156,7 @@ async function process(key, message, msg, type) {
         args[0] = "";
     }
 
-    const tags = args[1].toLowerCase().trim().split(/,\s*/g);
+    const tags = args[1].trim().split(/,\s*/g);
 
     if (tags.length === 0 || (tags.length === 1 && tags[0] === "")) {
         return new Translation("derpi.query_missing", "`query` **must** be given");
@@ -173,7 +173,7 @@ async function process(key, message, msg, type) {
     const length_before = tags.length;
     for (const tag of filter_tags) findAndRemove(tags, tag);
 
-    let warning = null;
+    let warning;
     if (length_before > tags.length)
         warning = new Translation(
             "derpi.warning",

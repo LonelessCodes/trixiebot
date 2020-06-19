@@ -16,10 +16,10 @@
 
 const ipc = require("./concurrency/ipc");
 const { doNothing } = require("../util/util");
-const EventEmitter = require("events");
+const events = require("events");
 const database = require("./db/database").default;
 
-class Stat extends EventEmitter {
+class Stat extends events.EventEmitter {
     /**
      * A Stats Manager to keep track of a single metric
      */
@@ -64,7 +64,7 @@ class Stat extends EventEmitter {
     }
 }
 
-class BotStats extends EventEmitter {
+class BotStats extends events.EventEmitter {
     constructor() {
         super();
 
@@ -89,12 +89,13 @@ class BotStats extends EventEmitter {
     }
 
     async register(id, saveToDatabase = false) {
-        if (this._map.has(id)) return this._map.get(id);
+        let stat = this._map.get(id);
+        if (stat) return stat;
 
-        const stat = new Stat(id);
+        stat = new Stat();
         stat.on("change", val => {
             this.emit("change", { name: id, value: val });
-            if (saveToDatabase) this.db.then(db => db.updateOne({ name: id }, { $set: { value: val } }, { upsert: true }));
+            if (saveToDatabase) this.db.then(db => db.updateOne({ name: id }, { $set: { value: val } }, { upsert: true })).catch(doNothing);
         });
         this._map.set(id, stat);
 
@@ -123,7 +124,7 @@ class BotStats extends EventEmitter {
     }
 }
 
-class WebStats extends EventEmitter {
+class WebStats extends events.EventEmitter {
     constructor() {
         super();
 
@@ -148,8 +149,9 @@ class WebStats extends EventEmitter {
         ipc.awaitAnswer("getWebStats")
             .then(({ stats }) => {
                 for (const name in stats) {
-                    if (!this.has(name)) continue;
-                    this.get(name).set(stats[name]);
+                    const stat = this.get(name);
+                    if (!stat) continue;
+                    stat.set(stats[name]);
                 }
             })
             .catch(doNothing);

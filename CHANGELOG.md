@@ -1,5 +1,13 @@
 # Changelog
 
+### [3.10.1](https://github.com/LonelessCodes/trixiebot/compare/v3.10.0...v3.10.1) (2020-06-19)
+
+
+### Bug Fixes
+
+* fixed settings communication with website ([050ff32](https://github.com/LonelessCodes/trixiebot/commit/050ff32fe261371ec7472057ab7edf73d8a6afb7))
+* maybe fixed broken pagination on paginators? ([275d5f5](https://github.com/LonelessCodes/trixiebot/commit/275d5f5ebc7978cd45d4b7546d27767bb3975243))
+
 ## [3.10.0](https://github.com/LonelessCodes/trixiebot/compare/v3.9.1...v3.10.0) (2020-06-19)
 
 

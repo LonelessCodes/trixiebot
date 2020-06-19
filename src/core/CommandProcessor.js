@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,15 @@
 const log = require("../log").default.namespace("processor");
 const INFO = require("../info").default;
 const { splitArgs } = require("../util/string");
-const stats = require("../modules/stats");
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { default: BotStatsManager, COMMANDS_EXECUTED, MESSAGES_TODAY } = require("./managers/BotStatsManager");
 const guild_stats = require("./managers/GuildStatsManager");
 const ErrorCaseManager = require("./managers/ErrorCaseManager").default;
 const CommandRegistry = require("./CommandRegistry").default;
 const CommandDispatcher = require("./CommandDispatcher").default;
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ConfigManager = require("./managers/ConfigManager");
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LocaleManager = require("./managers/LocaleManager").default;
 const MessageContext = require("../util/commands/MessageContext").default;
 const timer = require("../modules/timer").default;
@@ -39,20 +40,19 @@ class CommandProcessor {
      * @param {ConfigManager} config
      * @param {LocaleManager} locale
      * @param {*} db
+     * @param {BotStatsManager} bot_stats
      */
-    constructor(client, config, locale, db) {
+    constructor(client, config, locale, db, bot_stats) {
         this.client = client;
         this.config = config;
         this.locale = locale;
         this.db = db;
+        this.bot_stats = bot_stats;
 
         this.error_cases = new ErrorCaseManager(this.db);
 
         this.REGISTRY = new CommandRegistry(client, this.db);
         this.DISPATCHER = new CommandDispatcher(client, this.db, this.REGISTRY);
-
-        stats.bot.register("COMMANDS_EXECUTED", true);
-        stats.bot.register("MESSAGES_TODAY", true);
 
         guild_stats.registerCounter("commands");
         guild_stats.registerCounter("messages");
@@ -62,10 +62,11 @@ class CommandProcessor {
 
     /**
      * @param {Discord.Message} message
+     * @param {string} prefix
      * @param {Error} err
      * @returns {Promise<void>}
      */
-    async onProcessingError(message, err) {
+    async onProcessingError(message, prefix, err) {
         const caseId = await this.error_cases.collectInfo(message, err);
 
         log.error([
@@ -73,7 +74,7 @@ class CommandProcessor {
             "  caseID:      " + caseId,
             "  content:     " + JSON.stringify(message.content),
             "  channelType: " + message.channel.type,
-            message.channel.type === "text" && "  guildId:     " + message.guild.id,
+            message.guild && "  guildId:     " + message.guild.id,
             "  channelId:   " + message.channel.id,
             "  userId:      " + message.author.id,
             "  error:      ",
@@ -82,7 +83,7 @@ class CommandProcessor {
         const err_message = new Translation(
             "general.error",
             "Uh... I think... I might've run into a problem there...?\nIf you believe this is unintended behaviour, report the error with `{{prefix}}reporterror {{caseId}}`",
-            { prefix: message.prefix || "!", caseId }
+            { prefix: prefix || "!", caseId }
         );
 
         try {
@@ -100,71 +101,62 @@ class CommandProcessor {
     async onMessage(message) {
         const received_at = timer();
 
-        try {
-            if (message.author.bot || message.author.equals(message.client.user)) return;
+        if (message.author.bot || message.author.equals(message.client.user)) return;
 
-            stats.bot.get("MESSAGES_TODAY").inc(1);
-            if (message.channel.type === "text")
-                guild_stats.get("messages").add(new Date, message.guild.id, message.channel.id, message.author.id);
+        this.bot_stats.inc(MESSAGES_TODAY, 1, true);
+        if (message.channel.type === "text") guild_stats.get("messages").add(new Date(), message.guild.id, message.channel.id, message.author.id);
 
-            if (message.channel.type === "text" &&
-                !message.channel.permissionsFor(message.guild.me).has(Discord.Permissions.FLAGS.SEND_MESSAGES, true))
-                return;
+        if (message.channel.type === "text" &&
+            !message.channel.permissionsFor(message.guild.me)?.has(Discord.Permissions.FLAGS.SEND_MESSAGES, true))
+            return;
 
-            await this.run(message, received_at);
-        } catch (err) {
-            await this.onProcessingError(message, err);
-        }
-    }
-
-    /**
-     * @param {Discord.Message} message
-     * @param {bigint} received_at
-     */
-    async run(message, received_at) {
         let raw_content = message.content;
 
         // remove prefix
         let prefix = "";
         let prefix_used = true;
 
-        let config = null;
-        if (message.guild) {
-            config = await this.config.get(message.guild.id);
+        try {
+            let config = null;
+            if (message.guild) {
+                config = await this.config.get(message.guild.id);
 
-            prefix = config.prefix;
-        }
+                prefix = config.prefix;
+            }
 
-        // check prefixes
-        if (this.me_regex.test(raw_content)) {
-            const i = raw_content.indexOf(" "); // RegEx includes space after @mention, therefore look for first space
-            raw_content = raw_content.substr(i + 1);
-        } else if (raw_content.startsWith(prefix)) {
-            raw_content = raw_content.substr(prefix.length);
-        } else {
-            prefix_used = false;
-        }
+            // check prefixes
+            if (this.me_regex.test(raw_content)) {
+                const i = raw_content.indexOf(" "); // RegEx includes space after @mention, therefore look for first space
+                raw_content = raw_content.substr(i + 1);
+            } else if (raw_content.startsWith(prefix)) {
+                raw_content = raw_content.substr(prefix.length);
+            } else {
+                prefix_used = false;
+            }
 
-        const [command_name_raw, content] = prefix_used ? splitArgs(raw_content, 2) : ["", raw_content];
-        const command_name = command_name_raw.toLowerCase();
+            const [command_name_raw, content] = prefix_used ? splitArgs(raw_content, 2) : ["", raw_content];
+            const command_name = command_name_raw.toLowerCase();
 
-        const ctx = new MessageContext({
-            message: message,
-            locale: this.locale,
-            config: config,
-            content: content,
-            prefix: prefix,
-            prefix_used: prefix_used,
-            received_at: received_at,
-        });
+            const ctx = new MessageContext({
+                message: message,
+                locale: this.locale,
+                config: config,
+                content: content,
+                prefix: prefix,
+                prefix_used: prefix_used,
+                received_at: received_at,
+            });
 
-        const executed = await this.DISPATCHER.process(ctx, command_name);
-        if (!executed) return;
+            const executed = await this.DISPATCHER.process(ctx, command_name);
+            if (!executed) return;
 
-        stats.bot.get("COMMANDS_EXECUTED").inc(1);
+            this.bot_stats.inc(COMMANDS_EXECUTED, 1, true);
 
-        if (message.guild) {
-            await guild_stats.get("commands").add(new Date(), message.guild.id, message.channel.id, message.author.id, command_name);
+            if (message.guild) {
+                await guild_stats.get("commands").add(new Date(), message.guild.id, message.channel.id, message.author.id, command_name);
+            }
+        } catch (err) {
+            await this.onProcessingError(message, prefix, err);
         }
     }
 }

@@ -20,7 +20,6 @@ import INFO from "../../info";
 import url from "url";
 import { userToString, findDefaultChannel, doNothing } from "../../util/util";
 import { immediate } from "../../util/promises";
-import { bot } from "../../modules/stats";
 import { registerHistogram } from "../managers/GuildStatsManager";
 
 import Translation from "../../modules/i18n/Translation";
@@ -29,29 +28,23 @@ import TranslationFormatter from "../../modules/i18n/TranslationFormatter";
 import Discord from "discord.js";
 import LocaleManager from "../managers/LocaleManager";
 import ConfigManager from "../managers/ConfigManager";
+import BotStatsManager, { TOTAL_SERVERS, LARGE_SERVERS, TOTAL_USERS, TEXT_CHANNELS } from "../managers/BotStatsManager";
 
 class MemberLog {
-    TOTAL_SERVERS = bot.register("TOTAL_SERVERS");
-    LARGE_SERVERS = bot.register("LARGE_SERVERS");
-    TOTAL_USERS = bot.register("TOTAL_USERS");
-    TEXT_CHANNELS = bot.register("TEXT_CHANNELS");
-
     user_count = registerHistogram("users");
 
     constructor(
         public client: Discord.Client,
         public config: ConfigManager,
-        public locale: LocaleManager
+        public locale: LocaleManager,
+        public bot_stats: BotStatsManager
     ) {
         for (const [guildId, guild] of client.guilds.cache)
             this.user_count.set(new Date(), guildId, null, guild.memberCount).catch(doNothing);
 
-        this.updateGuildStatistics().catch(doNothing);
+        this.updateGuildStatistics();
 
-        this.attachListeners();
-    }
-
-    attachListeners() {
+        // attach listeners
         this.client.on("guildCreate", this.guildCreate.bind(this));
         this.client.on("guildDelete", this.guildDelete.bind(this));
 
@@ -60,19 +53,19 @@ class MemberLog {
         this.client.on("guildBanAdd", this.guildBanAdd.bind(this));
     }
 
-    async updateGuildStatistics() {
-        (await this.TOTAL_SERVERS).set(this.client.guilds.cache.size);
-        (await this.LARGE_SERVERS).set(this.client.guilds.cache.filter(guild => !!guild.large).size);
-        (await this.TOTAL_USERS).set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
-        (await this.TEXT_CHANNELS).set(this.client.channels.cache.filter(guild => guild.type === "text").size);
+    updateGuildStatistics(): void {
+        this.bot_stats.set(TOTAL_SERVERS, this.client.guilds.cache.size);
+        this.bot_stats.set(LARGE_SERVERS, this.client.guilds.cache.filter(guild => !!guild.large).size);
+        this.bot_stats.set(TOTAL_USERS, this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
+        this.bot_stats.set(TEXT_CHANNELS, this.client.channels.cache.filter(guild => guild.type === "text").size);
     }
 
-    async guildCreate(guild: Discord.Guild) {
+    async guildCreate(guild: Discord.Guild): Promise<void> {
         await immediate(); // guild isn't immediately available
 
         log.debug("added", `id:${guild.id} name:${JSON.stringify(guild.name)} channels:${guild.channels.cache.size} members:${guild.memberCount}`);
 
-        this.user_count.set(new Date, guild.id, null, guild.memberCount);
+        this.user_count.set(new Date(), guild.id, null, guild.memberCount).catch(doNothing);
 
         const channel = findDefaultChannel(guild);
         if (!channel) return;
@@ -102,18 +95,18 @@ class MemberLog {
         this.updateGuildStatistics();
     }
 
-    guildDelete(guild: Discord.Guild) {
+    guildDelete(guild: Discord.Guild): void {
         log.debug("removed", `id:${guild.id}`);
         this.updateGuildStatistics();
     }
 
-    async guildMemberAdd(member: Discord.GuildMember | Discord.PartialGuildMember) {
+    async guildMemberAdd(member: Discord.GuildMember | Discord.PartialGuildMember): Promise<void> {
         if (member.partial) member = await member.fetch();
 
         const guild = member.guild;
 
-        (await this.TOTAL_USERS).set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
-        this.user_count.set(new Date, guild.id, null, guild.memberCount);
+        this.bot_stats.set(TOTAL_USERS, this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
+        this.user_count.set(new Date(), guild.id, null, guild.memberCount).catch(doNothing);
 
         const guild_config = await this.config.get(guild.id);
 
@@ -130,13 +123,13 @@ class MemberLog {
         ));
     }
 
-    async guildMemberRemove(member: Discord.GuildMember | Discord.PartialGuildMember) {
+    async guildMemberRemove(member: Discord.GuildMember | Discord.PartialGuildMember): Promise<void> {
         if (member.partial) member = await member.fetch();
 
         const guild = member.guild;
 
-        (await this.TOTAL_USERS).set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
-        this.user_count.set(new Date, guild.id, null, guild.memberCount);
+        this.bot_stats.set(TOTAL_USERS, this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
+        this.user_count.set(new Date(), guild.id, null, guild.memberCount).catch(doNothing);
 
         const guild_config = await this.config.get(guild.id);
 
@@ -153,11 +146,11 @@ class MemberLog {
         ));
     }
 
-    async guildBanAdd(guild: Discord.Guild, user: Discord.User | Discord.PartialUser) {
+    async guildBanAdd(guild: Discord.Guild, user: Discord.User | Discord.PartialUser): Promise<void> {
         if (user.partial) user = await user.fetch();
 
-        (await this.TOTAL_USERS).set(this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
-        this.user_count.set(new Date, guild.id, null, guild.memberCount);
+        this.bot_stats.set(TOTAL_USERS, this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
+        this.user_count.set(new Date(), guild.id, null, guild.memberCount).catch(doNothing);
 
         const guild_config = await this.config.get(guild.id);
 

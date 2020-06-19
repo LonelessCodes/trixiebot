@@ -37,6 +37,7 @@ const Discord = require("discord.js");
 
 const CommandScope = require("../util/commands/CommandScope").default;
 const AliasCommand = require("./commands/AliasCommand");
+const { default: BotStatsManager, MESSAGES_TODAY, COMMANDS_EXECUTED } = require("./managers/BotStatsManager");
 const Translation = require("../modules/i18n/Translation").default;
 
 const BotListManager = require("./managers/BotListManager").default;
@@ -79,11 +80,13 @@ class Core {
 
         this.locale = new LocaleManager(this.client, this.db);
 
-        this.processor = new CommandProcessor(this.client, this.config, this.locale, this.db);
+        this.bot_stats = new BotStatsManager(this.db);
+
+        this.processor = new CommandProcessor(this.client, this.config, this.locale, this.db, this.bot_stats);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.locale, this.db);
         this.upvotes = new UpvotesManager(this.client, this.db);
 
-        this.member_log = new MemberLog(this.client, this.config, this.locale);
+        this.member_log = new MemberLog(this.client, this.config, this.locale, this.bot_stats);
 
         this.botlist = new BotListManager(this.client);
         this.presence_status = new PresenceStatusManager(this.client, this.db);
@@ -94,6 +97,9 @@ class Core {
      */
     async init(commands_package) {
         if (this.client.voice) for (const voice of this.client.voice.connections.values()) voice.disconnect();
+
+        await this.bot_stats.load(COMMANDS_EXECUTED);
+        await this.bot_stats.load(MESSAGES_TODAY);
 
         await this.loadCommands(commands_package);
 
@@ -123,7 +129,7 @@ class Core {
         const install_opts = {
             client: this.client,
             config: this.config, locale: this.locale, db: this.db, error_cases: this.processor.error_cases,
-            presence_status: this.presence_status,
+            presence_status: this.presence_status, bot_stats: this.bot_stats,
         };
         await Promise.all(files.map(async file => {
             log("%s:", file, "installing...");

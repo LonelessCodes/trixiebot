@@ -115,7 +115,10 @@ class Core {
         const timer = nanoTimer();
 
         const files = await walk(commands_package)
-            .then(files => files.filter(file => path.extname(file) === ".js"));
+            .then(files => files.filter(file => {
+                const ext = path.extname(file);
+                return ext === ".js" || ext === ".ts";
+            }));
 
         const install_opts = {
             client: this.client,
@@ -125,8 +128,12 @@ class Core {
         await Promise.all(files.map(async file => {
             log("%s:", file, "installing...");
             const time = nanoTimer();
+
             const install = require(file);
-            await install(this.processor.REGISTRY, install_opts);
+            if (typeof install.default === "function") await install.default(this.processor.REGISTRY, install_opts);
+            else if (typeof install.install === "function") await install.install(this.processor.REGISTRY, install_opts);
+            else await install(this.processor.REGISTRY, install_opts);
+
             log("%s:", file, "installed.", nanoTimer.diffMs(time).toFixed(3), "ms");
         }));
 

@@ -10,10 +10,10 @@ import { Db } from "mongodb";
  * Get next sequence id for the given collection in the given database
  *
  * @param {Db} db Connection to mongodb native driver
- * @param {string} context Current context to get auto increment field for
+ * @param {any} context Current context to get auto increment field for
  * @returns {Promise<number>}
  */
-async function getNextSequence(db: Db, context: string): Promise<number> {
+async function getNextSequence(db: Db, context: any): Promise<number> {
     const collection = db.collection("inc_counters");
 
     try {

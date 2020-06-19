@@ -423,7 +423,7 @@ class WebsiteManager {
                 locale: {
                     global: locale.global,
                     channels: channels
-                        .sort((a, b) => a.rawPosition - b.rawPosition)
+                        .sort((a, b) => a.position - b.position)
                         .map(c => ({
                             id: c.id,
                             name: c.name,
@@ -498,7 +498,7 @@ class WebsiteManager {
                 locale: {
                     global: locale.global,
                     channels: channels
-                        .sort((a, b) => a.rawPosition - b.rawPosition)
+                        .sort((a, b) => a.position - b.position)
                         .map(c => ({
                             id: c.id,
                             name: c.name,
@@ -548,7 +548,7 @@ class WebsiteManager {
                 locale: {
                     global: locale.global,
                     channels: channels
-                        .sort((a, b) => a.rawPosition - b.rawPosition)
+                        .sort((a, b) => a.position - b.position)
                         .map(c => ({
                             id: c.id,
                             name: c.name,

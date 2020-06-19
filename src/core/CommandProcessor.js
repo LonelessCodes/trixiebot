@@ -56,6 +56,8 @@ class CommandProcessor {
 
         guild_stats.registerCounter("commands");
         guild_stats.registerCounter("messages");
+
+        this.me_regex = new RegExp(`^<@!?${this.client.user.id}> `);
     }
 
     /**
@@ -123,21 +125,20 @@ class CommandProcessor {
         let raw_content = message.content;
 
         // remove prefix
-        let me = "";
         let prefix = "";
         let prefix_used = true;
 
         let config = null;
-        if (message.channel.type === "text") {
+        if (message.guild) {
             config = await this.config.get(message.guild.id);
 
-            me = message.guild.me.toString();
             prefix = config.prefix;
         }
 
         // check prefixes
-        if (raw_content.startsWith(`${me} `)) {
-            raw_content = raw_content.substr(me.length + 1);
+        if (this.me_regex.test(raw_content)) {
+            const i = raw_content.indexOf(" "); // RegEx includes space after @mention, therefore look for first space
+            raw_content = raw_content.substr(i + 1);
         } else if (raw_content.startsWith(prefix)) {
             raw_content = raw_content.substr(prefix.length);
         } else {
@@ -162,8 +163,8 @@ class CommandProcessor {
 
         stats.bot.get("COMMANDS_EXECUTED").inc(1);
 
-        if (message.channel.type === "text") {
-            await guild_stats.get("commands").add(new Date, message.guild.id, message.channel.id, message.author.id, command_name);
+        if (message.guild) {
+            await guild_stats.get("commands").add(new Date(), message.guild.id, message.channel.id, message.author.id, command_name);
         }
     }
 }

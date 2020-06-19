@@ -16,7 +16,7 @@
 
 import INFO from "../info";
 import random from "./random/secureRandom";
-import { stringify } from "querystring";
+import qs from "querystring";
 import fetch from "node-fetch";
 
 interface Params {
@@ -29,7 +29,7 @@ interface ImageResponse {
     total: number;
 }
 
-interface Image {
+export interface Image {
     aspect_ratio: number;
     comment_count: number;
     created_at: string;
@@ -87,7 +87,7 @@ export default class Derpibooru {
         return Derpibooru.fetch(this.key, scope, params);
     }
 
-    searchAll(tags: string[], params: Params = {}) {
+    searchAll(tags: string[] | string, params: Params = {}) {
         return this.fetchAll("search/images", {
             q: Derpibooru.encodeTags(tags),
             ...params,
@@ -130,7 +130,7 @@ export default class Derpibooru {
             }
             return s;
         });
-        const url = `${Derpibooru.BASE}${path}?${stringify({ key, ...params })}`;
+        const url = `${Derpibooru.BASE}${path}?${qs.stringify({ key, ...params })}`;
 
         return await fetch(url, {
             timeout: 10000,
@@ -140,8 +140,12 @@ export default class Derpibooru {
         }).then(request => request.json());
     }
 
-    static async fetchAll(key: string, scope: string, params: Params & { sf?: string; sd?: "asc" | "desc" } = {}) {
-        if (scope !== "search/images") throw new Error("Scope of other than 'search' is not supported");
+    /*
+    key, filter_id, page, per_page, q, sd, sf
+    */
+
+    static async fetchAll(key: string, scope: string, params: Params & { sf?: string; sd?: "asc" | "desc" } = {}): Promise<Image[]> {
+        if (scope !== "search/images") throw new Error("Scope of other than 'search/images' is not supported");
         if (!params["q"]) throw new Error("Search criteria must be specified");
         if (typeof params["start_at"] !== "string") throw new TypeError("params.start_at must be set!");
 
@@ -156,8 +160,8 @@ export default class Derpibooru {
         let total = 0;
 
         do {
-            if (sd === "asc") params["q"] = `${orig_q},${sf}.gt:${last_val}`;
-            else params["q"] = `${orig_q},${sf}.lt:${last_val}`;
+            if (sd === "asc") params["q"] = `(${orig_q}),${sf}.gt:${last_val}`;
+            else params["q"] = `(${orig_q}),${sf}.lt:${last_val}`;
 
             const result = await Derpibooru.fetch(key, scope, params);
             total = result.total;
@@ -176,18 +180,26 @@ export default class Derpibooru {
             }
 
             results = results.concat(result.images);
+            total = result.total - result.images.length;
         } while (total > 0);
 
         return results;
     }
 
-    static encodeTags(tags: string[]) {
+    static encodeTags(tags: string[] | string): string {
+        if (typeof tags === "string") return tags;
         return tags.join(",");
     }
 
-    static getArtists(tags: string | string[]) {
-        const artists = [];
-        const arr = typeof tags === "string" ? tags.split(/,\s*/g) : tags;
+    static resolveTags(tags: string[] | string): string[] {
+        if (Array.isArray(tags)) return tags.map(tag => tag.trim());
+        if (typeof tags === "string") return tags.split(/,\s*/g);
+        throw new TypeError("'tags' is not of type array or string");
+    }
+
+    static getArtists(tags: string | string[]): string[] {
+        const artists: string[] = [];
+        const arr = Derpibooru.resolveTags(tags);
         for (const tag of arr) {
             if (/^artist:[\w\s]+/gi.test(tag)) {
                 artists.push(tag.replace(/^artist:\s*/i, ""));

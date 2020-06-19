@@ -453,5 +453,19 @@
     "no": "Data deletion has been aborted. You're fine.",
     "success": "All of your personal data has been purged successfully 🎉",
     "timeout": "Data deletion has been aborted due to inactivity."
+  },
+  "watch": {
+    "derpi": {
+      "success_here": "Alright! I'll be posting all new uploads for {{tags}} here",
+      "remove_fail": "Watch trigger {{id}} doesn't exist.",
+      "remove_success": "Removed watch trigger {{id}} successfully.",
+      "success_there": "Alright! I'll be posting all new uploads for {{tags}} there"
+    },
+    "list": {
+      "title": "Watch Triggers",
+      "footer": "Total Watch Triggers: {{watchers}}",
+      "description": "Reply with the number you want to remove."
+    },
+    "empty": "Hehe, nothing here lol. Time to add some."
   }
 }

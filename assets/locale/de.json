@@ -30,7 +30,6 @@
         "lang_name": "Deutsch",
         "lang_name_en": "German",
         "error": "Äh... Ich glaube... es gab da ein Problem...? Wenn du findest dass das gerade ungewolltes Verhalten war, melden den Fehler mit `{{prefix}}reporterror {{caseId}}`",
-        "introduction": "**Trixie ist ein Alles-in-Einem Discord Bot für Ponyliebhaber**\n\nSie bietet eine Vielzahl toller Features, von denen viele die Bedürfnisse von My Little Pony Fans und Serveradmins zufrieden stellen dürften.\n\nIhre Auswahl an Commands reichen von nützlichen Zeug, einfachem Spaß, Imageboard Commands, Custom Commands, Soundboards bis hin zu einer kompletten Weboberfläche um Trixie zu konfigurieren und das Wachstum des Servers zu beobachten, und so viel mehr!\n\nFür eine Liste aller Commands, schreibe `{{prefix}}help`.",
         "github": "Hilf der Entwicklung von TrixieBot auf <https://github.com/LonelessCodes/trixiebot> :heart::heart::heart:",
         "report_bug": "Berichte von Bugs und reiche Featureanfragen ein auf <https://github.com/LonelessCodes/trixiebot/issues>",
         "not_found": "Tja, dumm gelaufen. Ich hab da nicht so wirklich was gefunden? Tut mir auch leid und so"

@@ -108,10 +108,10 @@
     "lang_name": "English",
     "lang_name_en": "English",
     "error": "Uh... I think... I might've run into a problem there...?\nIf you believe this is unintended behaviour, report the error with `{{prefix}}reporterror {{caseId}}`",
-    "introduction": "**Trixie is an all-in-one Discord Bot for pony lovers**\n\nShe offers a variety of great features, many of which to satisfy the needs of My Little Pony fans and server admins.\n\nHer set of commands range from utility stuff, simple fun, imageboard commands, custom commands, soundboards, to even a full web dashboard to configure Trixie and watch the growth of your server and so much more!\n\nFor a list of all commands, go `{{prefix}}help`.",
     "github": "Help the development of TrixieBot on <https://github.com/LonelessCodes/trixiebot> :heart::heart::heart:",
     "report_bug": "Report bugs and submit feature requests at <https://github.com/LonelessCodes/trixiebot/issues>",
-    "not_found": "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it..."
+    "not_found": "The **Great and Powerful Trixie** c-... coul-... *couldn't find anything*. There, I said it...",
+    "introduction": "👋 **__Hey, I'm TrixieBot,__**\n\na creative community oriented bot for your server. I focus on providing powerful features instead of cluttering your chat.\nI have many commands to engage with creative content, customize my behaviour, analyse server activity or just to help out.\n\nFor a list and usage of commands, use `{{prefix}}help`."
   },
   "format": {
     "and": "and",

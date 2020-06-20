@@ -62,6 +62,7 @@ class CustomCommand extends BaseCommand {
         this.created_at = row.created_at;
         this.modified_at = row.modified_at;
 
+        /** @type {string[]} */
         this.disabled_channels = row.disabled_channels;
         this.enabled = row.enabled;
     }

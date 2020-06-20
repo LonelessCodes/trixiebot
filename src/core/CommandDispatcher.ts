@@ -79,7 +79,7 @@ class CommandDispatcher {
         this.disabled_commands_channels.createIndex({ guildId: 1, command: 1 }, { unique: true }).catch(doNothing);
     }
 
-    async rateLimit(context: MessageContext) {
+    async rateLimit(context: MessageContext): Promise<void> {
         if (!this.global_ratelimit_message.testAndAdd(context.channel.id)) return;
 
         await context.send(new TranslationPlural("command.ratelimit", [
@@ -94,7 +94,7 @@ class CommandDispatcher {
         }));
     }
 
-    async process({ message, channel, guild, prefix_used, ctx }: MessageContext, command_name: string) {
+    async process({ message, channel, guild, prefix_used, ctx }: MessageContext, command_name: string): Promise<boolean> {
         if (channel.type === "text") {
             const cc = await this.REGISTRY.CC.get(guild, { command_name, prefix_used, raw_content: message.content });
             if (cc && cc.enabled) return await this.processCC(ctx, command_name, cc);
@@ -103,10 +103,10 @@ class CommandDispatcher {
         const command = this.REGISTRY.getCommand(message, prefix_used, command_name);
         if (command) return await this.processCommand(ctx, command.type, command.trigger, command.command);
 
-        await this.processCommand(ctx, -1, command_name, null);
+        return await this.processCommand(ctx, -1, command_name, null);
     }
 
-    async processCC(context: MessageContext, command_name: string, command: CustomCommand) {
+    async processCC(context: MessageContext, command_name: string, command: CustomCommand): Promise<boolean> {
         if (!context.guild) return false;
         if (!context.member) return false;
 

@@ -20,7 +20,6 @@ const SimpleCommand = require("../core/commands/SimpleCommand");
 const HelpContent = require("../util/commands/HelpContent").default;
 const Category = require("../util/commands/Category").default;
 
-const guild_stats = require("../core/managers/GuildStatsManager");
 const { basicTEmbed } = require("../modules/i18n/TranslationEmbed");
 
 const Translation = require("../modules/i18n/Translation").default;
@@ -152,7 +151,7 @@ function generateTimeFrames() {
     return { now, today, yesterday, week, month, quartal };
 }
 
-module.exports = function install(cr) {
+module.exports = function install(cr, { guild_stats }) {
     cr.registerCommand(
         "stats",
         new SimpleCommand(async message => {

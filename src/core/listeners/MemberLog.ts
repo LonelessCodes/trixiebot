@@ -20,7 +20,7 @@ import INFO from "../../info";
 import url from "url";
 import { userToString, findDefaultChannel, doNothing } from "../../util/util";
 import { immediate } from "../../util/promises";
-import { registerHistogram } from "../managers/GuildStatsManager";
+import GuildStatsManager, { Histogram } from "../managers/GuildStatsManager";
 
 import Translation from "../../modules/i18n/Translation";
 import TranslationFormatter from "../../modules/i18n/TranslationFormatter";
@@ -31,14 +31,17 @@ import ConfigManager from "../managers/ConfigManager";
 import BotStatsManager, { TOTAL_SERVERS, LARGE_SERVERS, TOTAL_USERS, TEXT_CHANNELS } from "../managers/BotStatsManager";
 
 class MemberLog {
-    user_count = registerHistogram("users");
+    user_count: Histogram;
 
     constructor(
         public client: Discord.Client,
         public config: ConfigManager,
         public locale: LocaleManager,
-        public bot_stats: BotStatsManager
+        public bot_stats: BotStatsManager,
+        public guild_stats: GuildStatsManager
     ) {
+        this.user_count = guild_stats.registerHistogram("users");
+
         for (const [guildId, guild] of client.guilds.cache)
             this.user_count.set(new Date(), guildId, null, guild.memberCount).catch(doNothing);
 

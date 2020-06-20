@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,25 +14,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const database = require("../../modules/db/database").default;
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-class Base {
-    constructor(id, db) {
+import { SetRequired, SetOptional } from "type-fest";
+import { Collection, Db, ObjectId, FilterQuery } from "mongodb";
+import { doNothing } from "../../util/util";
+
+interface GetRangeForAllOptions {
+    channelId: string;
+    userId: string;
+    data: any;
+}
+
+interface GuildStatsDocument {
+    _id: ObjectId;
+    type: string;
+    id: string;
+
+    ts: Date;
+    guildId: string;
+    channelId?: string;
+    userId?: string;
+    data?: any;
+    value: number;
+    added?: number;
+    removed?: number;
+}
+
+abstract class Base {
+    id: string;
+    db: Collection<GuildStatsDocument>;
+
+    $group = {
+        _id: "$ts",
+        value: { $sum: "$value" },
+    };
+    $project = {
+        value: 1,
+        ts: "$_id",
+    };
+
+    abstract readonly type: string;
+
+    constructor(id: string, db: Collection<GuildStatsDocument>) {
         this.id = id;
         this.db = db;
-        this.$group = {
-            _id: "$ts",
-            value: { $sum: "$value" },
-        };
-        this.$project = {
-            value: 1,
-            ts: "$_id",
-        };
     }
 
-    get type() { return null; }
-
-    getTS(timestamp) {
+    getTS(timestamp: Date | number) {
         const ts = new Date(timestamp);
         // means it will increment the value until that hour changes. So the value then represents the value at that time
         ts.setHours(ts.getHours() + 1);
@@ -40,8 +69,8 @@ class Base {
         return ts;
     }
 
-    async getRangeOfAll(start, end, { channelId, userId, data }) {
-        const query = {
+    async getRangeOfAll(start: Date, end: Date, { channelId, userId, data }: GetRangeForAllOptions) {
+        const query: FilterQuery<GuildStatsDocument> = {
             type: this.type,
             id: this.id,
         };
@@ -54,7 +83,7 @@ class Base {
         if (userId) query.userId = userId;
         if (data) query.data = data;
 
-        const rows = await this.db.then(db => db.find(query).toArray());
+        const rows = await this.db.find(query).toArray();
 
         return rows.map(row => ({
             ts: row.ts,
@@ -66,12 +95,12 @@ class Base {
         }));
     }
 
-    async _aggregate(start, end, $match = {}, $group = {}, $project = {}) {
-        const query = [];
+    async _aggregate(start: Date, end: Date, $match: Record<string, any> = {}, $group: Record<string, any> = {}, $project: Record<string, any> = {}) {
+        const query: Record<string, any>[] = [];
         if (start) query.push({ ts: { $gte: start } });
         if (end) query.push({ ts: { $lt: end } });
 
-        const rows = await this.db.then(db => db.aggregate(
+        const rows = await this.db.aggregate([
             {
                 $match: {
                     type: this.type,
@@ -82,8 +111,8 @@ class Base {
             },
             { $group: { ...this.$group, ...$group } },
             { $project: { ...this.$project, ...$project } },
-            { $project: { _id: 0 } }
-        ).toArray());
+            { $project: { _id: 0 } },
+        ]).toArray();
 
         return rows.map(row => {
             delete row._id;
@@ -91,15 +120,15 @@ class Base {
         });
     }
 
-    async getRange(start, end, guildId) {
+    async getRange(start: Date, end: Date, guildId: string) {
         return await this._aggregate(start, end, { guildId });
     }
 
-    async getRangeUser(start, end, guildId, userId) {
+    async getRangeUser(start: Date, end: Date, guildId: string, userId: string) {
         return await this._aggregate(start, end, { guildId, userId });
     }
 
-    async getRangeUsers(start, end, guildId) {
+    async getRangeUsers(start: Date, end: Date, guildId: string) {
         return await this._aggregate(
             start, end, { guildId },
             {
@@ -115,11 +144,11 @@ class Base {
         );
     }
 
-    async getRangeChannel(start, end, guildId, channelId) {
+    async getRangeChannel(start: Date, end: Date, guildId: string, channelId: string) {
         return await this._aggregate(start, end, { guildId, channelId });
     }
 
-    async getRangeChannels(start, end, guildId) {
+    async getRangeChannels(start: Date, end: Date, guildId: string) {
         return await this._aggregate(
             start, end, { guildId },
             {
@@ -135,31 +164,11 @@ class Base {
         );
     }
 
-    async getRangeChannelData(start, end, guildId, channelId, data) {
-        return await this._aggregate(start, end, { guildId, channelId, data });
-    }
-
-    async getRangeChannelDatas(start, end, guildId, channelId) {
-        return await this._aggregate(
-            start, end, { guildId, channelId },
-            {
-                _id: {
-                    ts: "$ts",
-                    data: "$data",
-                },
-            },
-            {
-                ts: "$_id.ts",
-                data: "$_id.data",
-            }
-        );
-    }
-
-    async getRangeData(start, end, guildId, data) {
+    async getRangeData(start: Date, end: Date, guildId: string, data: any) {
         return await this._aggregate(start, end, { guildId, data });
     }
 
-    async getRangeDatas(start, end, guildId) {
+    async getRangeDatas(start: Date, end: Date, guildId: string) {
         return await this._aggregate(
             start, end, { guildId },
             {
@@ -174,57 +183,74 @@ class Base {
             }
         );
     }
-}
 
-class Histogram extends Base {
-    constructor(id, db) {
-        super(id, db);
-
-        /** @type {Map<string, Map<string, number>>} */
-        this.values = new Map;
-        this.$group = {
-            _id: "$ts",
-            value: { $sum: "$value" },
-            added: { $sum: "$added" },
-            removed: { $sum: "$removed" },
-        };
-        this.$project = {
-            ...this.$project,
-            added: 1,
-            removed: 1,
-        };
+    async getRangeChannelData(start: Date, end: Date, guildId: string, channelId: string, data: any) {
+        return await this._aggregate(start, end, { guildId, channelId, data });
     }
 
-    get type() { return "value"; }
+    async getRangeChannelDatas(start: Date, end: Date, guildId: string, channelId: string) {
+        return await this._aggregate(
+            start, end, { guildId, channelId },
+            {
+                _id: {
+                    ts: "$ts",
+                    data: "$data",
+                },
+            },
+            {
+                ts: "$_id.ts",
+                data: "$_id.data",
+            }
+        );
+    }
+}
 
-    async getOldVal(query) {
-        let old_val;
-        if (!this.values.has(query.guildId)) {
+export class Histogram extends Base {
+    readonly type = "value";
+
+    values: Map<string, Map<string, number>> = new Map();
+    $group = {
+        _id: "$ts",
+        value: { $sum: "$value" },
+        added: { $sum: "$added" },
+        removed: { $sum: "$removed" },
+    };
+    $project = {
+        value: 1,
+        ts: "$_id",
+        added: 1,
+        removed: 1,
+    };
+
+    async getOldVal(query: SetRequired<Partial<GuildStatsDocument>, "guildId" | "ts">) {
+        let old_val: number | undefined;
+        const map = this.values.get(query.guildId);
+        if (!map) {
             const row = await this.getLastItemBefore(query.ts, query.guildId, query.data);
             if (row) old_val = row.value;
         } else {
-            const map = this.values.get(query.guildId);
-            if (!map.has(query.data || "")) {
+            const val = map.get(query.data || "");
+            if (typeof val === "undefined") {
                 const row = await this.getLastItemBefore(query.ts, query.guildId, query.data);
                 if (row) old_val = row.value;
             } else {
-                old_val = map.get(query.data || "");
+                old_val = val;
             }
         }
         return old_val;
     }
 
-    setNewVal(query, value) {
+    setNewVal(query: SetRequired<Partial<GuildStatsDocument>, "guildId">, value: number) {
         let map = this.values.get(query.guildId);
         if (!map) {
-            map = new Map;
+            map = new Map();
             this.values.set(query.guildId, map);
         }
         map.set(query.data || "", value);
     }
 
-    async set(timestamp, guildId, data, value = 0) {
-        const query = {
+    async set(timestamp: number | Date, guildId: string, data: any, value: number = 0) {
+        const query: SetOptional<GuildStatsDocument, "_id" | "value"> = {
             ts: this.getTS(timestamp),
 
             type: this.type,
@@ -233,23 +259,23 @@ class Histogram extends Base {
         };
         if (data) query.data = data;
 
-        const old_val = await this.getOldVal(query, value);
+        const old_val = await this.getOldVal(query);
         this.setNewVal(query, value);
 
         if (old_val) {
             const diff = value - old_val;
             if (diff > 0) {
-                await this.db.then(db => db.updateOne(query, { $set: { value }, $inc: { added: diff } }, { upsert: true }));
+                await this.db.updateOne(query, { $set: { value }, $inc: { added: diff } }, { upsert: true });
             } else if (diff < 0) {
-                await this.db.then(db => db.updateOne(query, { $set: { value }, $inc: { removed: -diff } }, { upsert: true }));
+                await this.db.updateOne(query, { $set: { value }, $inc: { removed: -diff } }, { upsert: true });
             }
         } else {
-            await this.db.then(db => db.updateOne(query, { $set: { value, added: 0, removed: 0 } }, { upsert: true }));
+            await this.db.updateOne(query, { $set: { value, added: 0, removed: 0 } }, { upsert: true });
         }
     }
 
-    async getLastItemBefore(end, guildId, data) {
-        const query = {
+    async getLastItemBefore(end: Date, guildId: string, data: any) {
+        const query: FilterQuery<GuildStatsDocument> = {
             type: this.type,
             id: this.id,
             guildId,
@@ -259,10 +285,11 @@ class Histogram extends Base {
         };
         if (data) query.data = data;
 
-        const rows = await this.db.then(db => db.find(query)
-            .sort({ ts: -1 }).limit(1)
+        const rows = await this.db.find(query)
+            .sort({ ts: -1 })
+            .limit(1)
             .project(this.$project)
-            .toArray());
+            .toArray();
 
         if (rows[0]) {
             delete rows[0]._id;
@@ -272,10 +299,10 @@ class Histogram extends Base {
 }
 
 class Counter extends Base {
-    get type() { return "counter"; }
+    readonly type = "counter";
 
-    async add(timestamp, guildId, channelId, userId, data) {
-        const query = {
+    async add(timestamp: number | Date, guildId: string, channelId: string, userId: string, data: any) {
+        const query: FilterQuery<GuildStatsDocument> = {
             ts: this.getTS(timestamp),
 
             type: this.type,
@@ -286,15 +313,15 @@ class Counter extends Base {
         };
         if (data) query.data = data;
 
-        await this.db.then(db => db.updateOne(query, { $inc: { value: 1 } }, { upsert: true }));
+        await this.db.updateOne(query, { $inc: { value: 1 } }, { upsert: true });
     }
 
-    async _sum(start, end, $match = {}) {
-        const query = [];
+    async _sum(start: Date | undefined, end: Date | undefined, $match = {}) {
+        const query: FilterQuery<GuildStatsDocument>[] = [];
         if (start) query.push({ ts: { $gte: start } });
         if (end) query.push({ ts: { $lt: end } });
 
-        const rows = await this.db.then(db => db.aggregate(
+        const rows = await this.db.aggregate([
             {
                 $match: {
                     type: this.type,
@@ -314,48 +341,40 @@ class Counter extends Base {
                     _id: 0,
                     sum: "$value",
                 },
-            }
-        ).toArray());
+            },
+        ]).toArray() as unknown as [{ sum: number }];
 
         return rows[0] ? rows[0].sum : 0;
     }
 
-    async getSumGlobal(start, end) {
+    async getSumGlobal(start: Date | undefined, end: Date | undefined) {
         return await this._sum(start, end);
     }
 
-    async getSum(start, end, guildId) {
+    async getSum(start: Date | undefined, end: Date | undefined, guildId: string) {
         return await this._sum(start, end, { guildId });
     }
 
-    async getSumChannel(start, end, guildId, channelId) {
+    async getSumChannel(start: Date | undefined, end: Date | undefined, guildId: string, channelId: string) {
         return await this._sum(start, end, { guildId, channelId });
     }
 
-    async getSumUser(start, end, guildId, userId) {
+    async getSumUser(start: Date | undefined, end: Date | undefined, guildId: string, userId: string) {
         return await this._sum(start, end, { guildId, userId });
     }
 }
 
-class GuildStatsManager {
-    constructor() {
-        this.db = database()
-            .then(db => db.collection("guild_stats_new"))
-            .then(async db => {
-                await db.createIndex({ ts: 1 }, { expireAfterSeconds: 3600 * 24 * 92 }); // expire after 3 months
-                return db;
-            });
+export default class GuildStatsManager {
+    db: Collection<GuildStatsDocument>;
 
-        /** @type {Map<string, Counter | Histogram>} */
-        this._map = new Map;
+    private _map: Map<string, Base> = new Map();
+
+    constructor(db: Db) {
+        this.db = db.collection("guild_stats_new");
+        this.db.createIndex({ ts: 1 }, { expireAfterSeconds: 3600 * 24 * 92 }).catch(doNothing); // expire after 3 months
     }
 
-    /**
-     * @param {string} id
-     * @param {Counter|Histogram} cursor
-     * @returns {Counter|Histogram}
-     */
-    _register(id, cursor) {
+    private _register<T extends Base>(id: string, cursor: T): T {
         this._map.set(id, cursor);
         return cursor;
     }
@@ -365,7 +384,7 @@ class GuildStatsManager {
      * @param {string} id
      * @returns {Counter}
      */
-    registerCounter(id) {
+    registerCounter(id: string): Counter {
         return this._register(id, new Counter(id, this.db));
     }
 
@@ -374,18 +393,16 @@ class GuildStatsManager {
      * @param {string} id
      * @returns {Histogram}
      */
-    registerHistogram(id) {
+    registerHistogram(id: string): Histogram {
         return this._register(id, new Histogram(id, this.db));
     }
 
     /**
      * Get a new Histogram
      * @param {string} id
-     * @returns {Histogram|Counter}
+     * @returns {Base}
      */
-    get(id) {
+    get(id: string): Base | undefined {
         return this._map.get(id);
     }
 }
-
-module.exports = new GuildStatsManager;

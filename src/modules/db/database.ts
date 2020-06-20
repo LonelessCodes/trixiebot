@@ -22,13 +22,13 @@ if (!config.has("database.host") || !config.has("database.port"))
 if (!config.has("database.db")) throw new Error("No db name was specified in the configs");
 
 const promise = MongoClient.connect(`mongodb://${config.get("database.host")}:${config.get("database.port")}/`, {
-    useNewUrlParser: true,
+    appname: "trixiebot",
     useUnifiedTopology: true,
     auth: config.has("database.auth")
         ? (config.get("database.auth") as {
-              user: string;
-              password: string;
-          })
+            user: string;
+            password: string;
+        })
         : undefined,
 });
 

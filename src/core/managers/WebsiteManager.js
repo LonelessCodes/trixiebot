@@ -17,7 +17,6 @@
 const { userToString, isOwner } = require("../../util/util");
 const getChangelog = require("../../modules/getChangelog").default;
 const ipc = require("../../modules/concurrency/ipc");
-const guild_stats = require("./GuildStatsManager");
 const LocaleManager = require("./LocaleManager").default;
 const AliasCommand = require("../commands/AliasCommand");
 const Category = require("../../util/commands/Category").default;
@@ -55,11 +54,12 @@ function ts(ts) {
 }
 
 class WebsiteManager {
-    constructor(REGISTRY, client, config, locale, database) {
+    constructor(REGISTRY, client, config, locale, guild_stats, database) {
         this.REGISTRY = REGISTRY;
         this.client = client;
         this.config = config;
         this.locale = locale;
+        this.guild_stats = guild_stats;
         this.db = database;
 
         this.initializeIPC();
@@ -75,40 +75,40 @@ class WebsiteManager {
             const now = new Date();
 
             const results = await Promise.all([
-                guild_stats.get("commands").getRange(month, now, guildId),
-                guild_stats.get("messages").getRange(month, now, guildId),
-                guild_stats.get("users").getRange(month, now, guildId),
+                this.guild_stats.get("commands").getRange(month, now, guildId),
+                this.guild_stats.get("messages").getRange(month, now, guildId),
+                this.guild_stats.get("users").getRange(month, now, guildId),
 
-                guild_stats.get("users").getLastItemBefore(month, guildId),
+                this.guild_stats.get("users").getLastItemBefore(month, guildId),
             ]);
 
             return {
                 success: true,
                 commands: {
-                    type: guild_stats.get("commands").type,
+                    type: this.guild_stats.get("commands").type,
                     data: results[0].map(a => {
                         a.ts = ts(a.ts);
                         return a;
                     }),
                 },
                 messages: {
-                    type: guild_stats.get("messages").type,
+                    type: this.guild_stats.get("messages").type,
                     data: results[1].map(a => {
                         a.ts = ts(a.ts);
                         return a;
                     }),
                 },
                 users: {
-                    type: guild_stats.get("users").type,
+                    type: this.guild_stats.get("users").type,
                     data: results[2].map(a => {
                         a.ts = ts(a.ts);
                         return a;
                     }),
                     before: results[3]
                         ? {
-                              ...results[3],
-                              ts: ts(results[3].ts),
-                          }
+                            ...results[3],
+                            ts: ts(results[3].ts),
+                        }
                         : undefined,
                 },
             };

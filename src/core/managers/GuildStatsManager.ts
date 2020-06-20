@@ -372,6 +372,7 @@ export default class GuildStatsManager {
     constructor(db: Db) {
         this.db = db.collection("guild_stats_new");
         this.db.createIndex({ ts: 1 }, { expireAfterSeconds: 3600 * 24 * 92 }).catch(doNothing); // expire after 3 months
+        this.db.createIndex({ guildId: 1 }).catch(doNothing);
     }
 
     private _register<T extends Base>(id: string, cursor: T): T {

@@ -19,7 +19,8 @@ const INFO = require("../info").default;
 const { splitArgs } = require("../util/string");
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { default: BotStatsManager, COMMANDS_EXECUTED, MESSAGES_TODAY } = require("./managers/BotStatsManager");
-const guild_stats = require("./managers/GuildStatsManager");
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const GuildStatsManager = require("./managers/GuildStatsManager").default;
 const ErrorCaseManager = require("./managers/ErrorCaseManager").default;
 const CommandRegistry = require("./CommandRegistry").default;
 const CommandDispatcher = require("./CommandDispatcher").default;
@@ -39,23 +40,25 @@ class CommandProcessor {
      * @param {Discord.Client} client
      * @param {ConfigManager} config
      * @param {LocaleManager} locale
-     * @param {*} db
      * @param {BotStatsManager} bot_stats
+     * @param {GuildStatsManager} guild_stats
+     * @param {*} db
      */
-    constructor(client, config, locale, db, bot_stats) {
+    constructor(client, config, locale, bot_stats, guild_stats, db) {
         this.client = client;
         this.config = config;
         this.locale = locale;
         this.db = db;
         this.bot_stats = bot_stats;
+        this.guild_stats = guild_stats;
 
         this.error_cases = new ErrorCaseManager(this.db);
 
         this.REGISTRY = new CommandRegistry(client, this.db);
         this.DISPATCHER = new CommandDispatcher(client, this.db, this.REGISTRY);
 
-        guild_stats.registerCounter("commands");
-        guild_stats.registerCounter("messages");
+        this.guild_stats.registerCounter("commands");
+        this.guild_stats.registerCounter("messages");
 
         this.me_regex = new RegExp(`^<@!?${this.client.user.id}> `);
     }
@@ -104,7 +107,7 @@ class CommandProcessor {
         if (message.author.bot || message.author.equals(message.client.user)) return;
 
         this.bot_stats.inc(MESSAGES_TODAY, 1, true);
-        if (message.channel.type === "text") guild_stats.get("messages").add(new Date(), message.guild.id, message.channel.id, message.author.id);
+        if (message.channel.type === "text") this.guild_stats.get("messages").add(new Date(), message.guild.id, message.channel.id, message.author.id);
 
         if (message.channel.type === "text" &&
             !message.channel.permissionsFor(message.guild.me)?.has(Discord.Permissions.FLAGS.SEND_MESSAGES, true))
@@ -153,7 +156,7 @@ class CommandProcessor {
             this.bot_stats.inc(COMMANDS_EXECUTED, 1, true);
 
             if (message.guild) {
-                await guild_stats.get("commands").add(new Date(), message.guild.id, message.channel.id, message.author.id, command_name);
+                await this.guild_stats.get("commands").add(new Date(), message.guild.id, message.channel.id, message.author.id, command_name);
             }
         } catch (err) {
             await this.onProcessingError(message, prefix, err);

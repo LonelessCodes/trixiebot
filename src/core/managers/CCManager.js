@@ -21,7 +21,7 @@ const log = require("../../log").default.namespace("cc manager");
 const path = require("path");
 const { v1: uuid } = require("uuid");
 const BSON = require("bson");
-const CustomCommand = require("../commands/CustomCommand");
+const CustomCommand = require("../commands/CustomCommand").default;
 const WorkerMethods = require("./cc_utils/WorkerMethods");
 // eslint-disable-next-line no-unused-vars
 const MessageContext = require("../../util/commands/MessageContext").default;

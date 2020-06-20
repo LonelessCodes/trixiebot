@@ -14,23 +14,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { findArgs } = require("../../util/string");
-const BaseCommand = require("./BaseCommand").default;
-// eslint-disable-next-line no-unused-vars
-const { MessageEmbed } = require("discord.js");
-// eslint-disable-next-line no-unused-vars
-const MessageContext = require("../../util/commands/MessageContext").default;
-const BSON = require("bson");
+import { MessageEmbed } from "discord.js";
+import BSON from "bson";
+import { ObjectId } from "mongodb";
+import { findArgs } from "../../util/string";
+import BaseCommand from "./BaseCommand";
 
-const { Message: CCMessage } = require("../managers/cc_utils/cc_classes");
+import { Message as CCMessage } from "../managers/cc_utils/cc_classes";
+import CCManager from "../managers/CCManager";
+import MessageContext from "../../util/commands/MessageContext";
 
-class CustomCommand extends BaseCommand {
-    // eslint-disable-next-line valid-jsdoc
-    /**
-     * @param {*} manager
-     * @param {{ id: string, guildId: string, type: number, trigger: string, case_sensitive: boolean, code: string, cst?: BSON.Binary, compile_errors: any[], last_read: Date, created_at: Date, modified_at: Date, disabled_channels: string[], enabled: boolean }} row
-     */
-    constructor(manager, row) {
+interface CompileError {
+    startLineNumber: number;
+    startColumn: number;
+    endLineNumber: number;
+    endColumn: number;
+    message: string;
+}
+
+interface CCDocument {
+    _id: ObjectId;
+    id: string;
+    guildId: string;
+    type: number;
+    trigger: string;
+    case_sensitive: boolean;
+    use_trixiescript: boolean;
+    replies: string[];
+    code: string;
+    cst?: BSON.Binary;
+    compile_errors: CompileError[];
+    last_read: Date;
+    created_at: Date;
+    modified_at: Date | null;
+    disabled_channels: string[];
+    enabled: boolean;
+}
+
+export default class CustomCommand extends BaseCommand {
+    manager: CCManager;
+
+    id!: string;
+    guildId!: string;
+    type!: number;
+    trigger!: string;
+    case_sensitive!: boolean;
+    code!: string;
+    raw_cst!: BSON.Binary | null;
+    _cst!: null;
+    compile_errors!: CompileError[];
+    last_read!: Date;
+    created_at!: Date;
+    modified_at!: Date | null;
+    disabled_channels!: string[];
+    enabled!: boolean;
+
+    constructor(manager: CCManager, row: CCDocument | CustomCommand) {
         super();
 
         this.update(row);
@@ -38,12 +77,7 @@ class CustomCommand extends BaseCommand {
         this.manager = manager;
     }
 
-    // eslint-disable-next-line valid-jsdoc
-    /**
-     * @param {{ id: string, guildId: string, type: number, trigger: string, case_sensitive: boolean, code: string, cst?: BSON.Binary, _cst?: object, compile_errors: any[], last_read: Date, created_at: Date, modified_at: Date, disabled_channels: string[], enabled: boolean }} row
-     * @returns {void}
-     */
-    update(row) {
+    update(row: CCDocument | CustomCommand): void {
         this.id = row.id;
 
         this.guildId = row.guildId;
@@ -66,7 +100,7 @@ class CustomCommand extends BaseCommand {
         this.enabled = row.enabled;
     }
 
-    get cst() {
+    get cst(): any {
         if (!this._cst) {
             this._cst = this.raw_cst ? Object.freeze(BSON.deserialize(this.raw_cst.buffer)) : null;
             this.raw_cst = null;
@@ -74,35 +108,27 @@ class CustomCommand extends BaseCommand {
         return this._cst;
     }
 
-    async compile() {
+    async compile(): Promise<void> {
         const { errors, cst } = await this.manager.compile(this.code);
 
         if (errors.length > 0) {
-            this.update({
-                compile_errors: errors,
-                cst: null,
-                _cst: null,
-            });
+            this.compile_errors = errors;
+            this.raw_cst = null;
+            this._cst = null;
             await this.manager.database.updateOne({ id: this.id }, { $set: { compile_errors: errors, cst: null } });
             throw errors;
         }
 
-        this.update({
-            compile_errors: [],
-            cst: null,
-            _cst: cst,
-        });
+        this.compile_errors = [];
+        this.raw_cst = null;
+        this._cst = Object.freeze(cst);
         await this.manager.database.updateOne({ id: this.id }, { $set: { compile_errors: [], cst: BSON.serialize(cst) } });
     }
 
-    /**
-     * @param {MessageContext} context
-     * @param {string} command_name
-     */
-    async run(context, command_name) {
+    async run(context: MessageContext, command_name: string | RegExp): Promise<void> {
         if (!this.cst) return;
 
-        const guild = context.guild;
+        const guild = context.guild!;
 
         const msg = {
             command_name: this.type === 0 ? command_name : null,
@@ -148,5 +174,3 @@ class CustomCommand extends BaseCommand {
         }
     }
 }
-
-module.exports = CustomCommand;

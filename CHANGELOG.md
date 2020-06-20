@@ -1,5 +1,17 @@
 # Changelog
 
+### [3.10.2](https://github.com/LonelessCodes/trixiebot/compare/v3.10.1...v3.10.2) (2020-06-20)
+
+
+### Bug Fixes
+
+* migrate CommandProcessor over to using GuildStatsManager from Core ([91211f7](https://github.com/LonelessCodes/trixiebot/commit/91211f7285d2a9a87d8f8a77f75a4ca23888c64c))
+
+
+### Improvements
+
+* add guildId as an index in guild_stats_new collection ([705f917](https://github.com/LonelessCodes/trixiebot/commit/705f9170a83b2b0547aab64aa62592eacd62faab))
+
 ### [3.10.1](https://github.com/LonelessCodes/trixiebot/compare/v3.10.0...v3.10.1) (2020-06-19)
 
 

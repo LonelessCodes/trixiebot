@@ -17,11 +17,11 @@
 const fs = require("fs-extra");
 const { exec } = require("child_process");
 const path = require("path");
-const { promisify, format } = require("util");
+const { format } = require("util");
 import moment from "moment";
 import CalendarStatus from "../../modules/calendar/CalendarStatus";
 import CalendarRange from "../../modules/calendar/CalendarRange";
-const { findDefaultChannel } = require("../../util/util");
+const { findDefaultChannel, doNothing } = require("../../util/util");
 const { resolveStdout } = require("../../util/string");
 const { splitArgs } = require("../../util/string");
 const ipc = require("../../modules/concurrency/ipc");
@@ -109,7 +109,7 @@ module.exports = function install(cr, { client, config, locale, db, presence_sta
         const s = splitArgs(content, 2);
         const guild = client.guilds.cache.get(s[0]);
         if (!guild) {
-            const channel = await client.channels.fetch(s[0]);
+            const channel = await client.channels.fetch(s[0]).catch(doNothing);
             if (!channel) return "Channel doesn't exist";
             await channel.send(s[1]);
         } else {

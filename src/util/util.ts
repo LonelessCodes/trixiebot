@@ -88,7 +88,7 @@ export async function fetchMember(
 ): Promise<Discord.GuildMember | null> {
     try {
         return await guild.members.fetch({ user, cache });
-    } catch (e) {
+    } catch {
         return null;
     }
 }

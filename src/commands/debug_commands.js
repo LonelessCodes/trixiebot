@@ -200,22 +200,21 @@ module.exports = function install(cr, { client, error_cases, bot_stats }) {
             const items = [];
 
             for (const err of errs) {
-                items.push(
-                    "```\n" +
-                        `${err.ts.toString().slice(4, 24)}   ${err._id}\n` +
-                        "Message Id             User Id\n" +
-                        `${err.message_id}     ${err.user_id}\n` +
-                        "Channel Id             Guild Id\n" +
-                        `${err.channel_id}     ${err.guild_id}\n` +
-                        "Guild Large?           Channel Type\n" +
-                        `${err.guild_large}                  ${err.channel_type}\n` +
-                        "Memory Usage           Uptime\n" +
-                        `${(err.memory_usage.rss / 1024 / 1024).toFixed(3)} MB             ${err.uptime / 1000} s\n` +
-                        "Content\n" +
-                        `${err.content.replace("`", "´")}\n` +
-                        `${err.err.stack}\n` +
-                        "```"
-                );
+                let content =
+                    `${err.ts.toString().slice(4, 24)}   ${err._id}\n` +
+                    "Message Id             User Id\n" +
+                    `${err.message_id}     ${err.user_id}\n` +
+                    "Channel Id             Guild Id\n" +
+                    `${err.channel_id}     ${err.guild_id}\n` +
+                    "Guild Large?           Channel Type\n" +
+                    `${err.guild_large}                  ${err.channel_type}\n` +
+                    "Memory Usage           Uptime\n" +
+                    `${(err.memory_usage.rss / 1024 / 1024).toFixed(3)} MB             ${err.uptime / 1000} s\n` +
+                    "Content\n" +
+                    `${err.content.replace("`", "´")}\n` +
+                    `${err.err.stack}`;
+                if (content.length > 2000 - 8) content = content.slice(0, 2000 - 11) + "...";
+                items.push("```\n" + content + "\n```");
             }
 
             await new PaginatorAction("Error Cases", "", items, context.author, { items_per_page: 1 }).display(

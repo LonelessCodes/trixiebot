@@ -104,12 +104,12 @@ class MemberLog {
     }
 
     async guildMemberAdd(member: Discord.GuildMember | Discord.PartialGuildMember): Promise<void> {
-        if (member.partial) member = await member.fetch();
-
         const guild = member.guild;
 
         this.bot_stats.set(TOTAL_USERS, this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
         this.user_count.set(new Date(), guild.id, null, guild.memberCount).catch(doNothing);
+
+        if (member.partial) member = await member.fetch();
 
         const guild_config = await this.config.get(guild.id);
 
@@ -127,17 +127,18 @@ class MemberLog {
     }
 
     async guildMemberRemove(member: Discord.GuildMember | Discord.PartialGuildMember): Promise<void> {
-        if (member.partial) member = await member.fetch();
-
         const guild = member.guild;
 
         this.bot_stats.set(TOTAL_USERS, this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
         this.user_count.set(new Date(), guild.id, null, guild.memberCount).catch(doNothing);
 
+        const user = await this.client.users.fetch(member.id).catch(doNothing);
+        if (!user) return;
+
         const guild_config = await this.config.get(guild.id);
 
         if (!guild_config.leave.enabled) return;
-        if (member.user.bot && !guild_config.announce.bots) return;
+        if (user.bot && !guild_config.announce.bots) return;
 
         const channel = guild.channels.cache.get(guild_config.announce.channel) as Discord.TextChannel | undefined;
         if (!channel) return;
@@ -145,15 +146,15 @@ class MemberLog {
         await this.locale.send(channel, new TranslationFormatter(
             guild_config.leave.text ||
             await this.locale.translate(channel, new Translation("memberlog.leave", "*{{user}}* has left the server. Bye bye")),
-            { user: userToString(member) }
+            { user: userToString(user) }
         ));
     }
 
     async guildBanAdd(guild: Discord.Guild, user: Discord.User | Discord.PartialUser): Promise<void> {
-        if (user.partial) user = await user.fetch();
-
         this.bot_stats.set(TOTAL_USERS, this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0));
         this.user_count.set(new Date(), guild.id, null, guild.memberCount).catch(doNothing);
+
+        if (user.partial) user = await user.fetch();
 
         const guild_config = await this.config.get(guild.id);
 

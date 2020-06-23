@@ -1,5 +1,13 @@
 # Changelog
 
+### [3.10.3](https://github.com/LonelessCodes/trixiebot/compare/v3.10.2...v3.10.3) (2020-06-23)
+
+
+### Bug Fixes
+
+* deletedata command should be usable in DMs ([3bd8397](https://github.com/LonelessCodes/trixiebot/commit/3bd839714436f3cb5099bb32a424b68f7fe0d441))
+* fixed unwanted errors when users not found ([5551caa](https://github.com/LonelessCodes/trixiebot/commit/5551caaf9d34ef093cbe1e9715ad18d38b8bc2da))
+
 ### [3.10.2](https://github.com/LonelessCodes/trixiebot/compare/v3.10.1...v3.10.2) (2020-06-20)
 
 

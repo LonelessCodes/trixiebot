@@ -15,6 +15,7 @@
  */
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
+const { default: CommandScope } = require("../util/commands/CommandScope");
 const HelpContent = require("../util/commands/HelpContent").default;
 const Category = require("../util/commands/Category").default;
 
@@ -42,5 +43,6 @@ module.exports = function install(cr, { db }) {
         .setHelp(new HelpContent()
             .setDescription("This deletes all personal data Trixie holds that is connected to your account.\n**B E W A R E**: This will reset all your slots, your birthday, your user stats, unsubscribe you from the newsletter, reset all your waifus, reset your credits to 0 and wipe all transactions, resets your whole soundboard and removes those samples from other users soundboards, if they imported them and finally, deletes your penis settings.")
             .setUsage("", "Delete all personal data Trixie holds of you."))
-        .setCategory(Category.TRIXIE);
+        .setCategory(Category.TRIXIE)
+        .setScope(CommandScope.ALL);
 };

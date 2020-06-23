@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { userToString } = require("../../util/util");
+const { userToString, doNothing } = require("../../util/util");
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const TreeCommand = require("../../core/commands/TreeCommand").default;
@@ -138,7 +138,7 @@ module.exports = function install(cr, { client, db }) {
             const timestamp = deleted_message.deletedAt.toLocaleString().slice(0, -3);
             str += ` | ${timestamp} | `;
 
-            const member = await client.users.fetch(deleted_message.userId);
+            const member = await client.users.fetch(deleted_message.userId).catch(doNothing);
             if (member) str += `${userToString(member)}: `;
             else str += `**${deleted_message.name}**: `;
 

@@ -242,7 +242,7 @@ module.exports = function install(cr, { db }) {
                     const w = await database.findOne({ waifuId: mentioned_member.user.id, guildId: message.guild.id });
 
                     if (w) {
-                        const owner_member = await message.guild.members.fetch(w.ownerId);
+                        const owner_member = await fetchMember(message.guild, w.ownerId);
                         if (owner_member) {
                             waifu = w;
                         } else {

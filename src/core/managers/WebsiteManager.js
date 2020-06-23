@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const { userToString, isOwner } = require("../../util/util");
+const { userToString, isOwner, doNothing } = require("../../util/util");
 const getChangelog = require("../../modules/getChangelog").default;
 const ipc = require("../../modules/concurrency/ipc");
 const LocaleManager = require("./LocaleManager").default;
@@ -362,7 +362,7 @@ class WebsiteManager {
 
             for (const row of deleted_raw.filter(m => "deletedAt" in m)) {
                 const channel = guild.channels.cache.get(row.channelId);
-                const user = await this.client.users.fetch(row.userId);
+                const user = await this.client.users.fetch(row.userId).catch(doNothing);
                 deleted.push({
                     user: user ? userToString(user, true) : row.name, // "unknown-user" for backwards compatability support
                     channel: {
@@ -562,7 +562,7 @@ class WebsiteManager {
         // ADMIN
 
         ipc.answer("admin:isadmin", async userId => {
-            const user = await this.client.users.fetch(userId);
+            const user = await this.client.users.fetch(userId).catch(doNothing);
             if (!user) return false;
 
             const isAdmin = isOwner(user);

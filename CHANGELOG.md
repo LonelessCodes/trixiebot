@@ -1,5 +1,13 @@
 # Changelog
 
+### [3.10.4](https://github.com/LonelessCodes/trixiebot/compare/v3.10.3...v3.10.4) (2020-06-25)
+
+
+### Bug Fixes
+
+* fixed member leave announcements and statistics in large servers and member ban announcements and statistics ([51a7bed](https://github.com/LonelessCodes/trixiebot/commit/51a7bed0eaabbe008c0829a4c0f896cd2859fbeb))
+* fixed too long error cases in viewerrors command ([76d885f](https://github.com/LonelessCodes/trixiebot/commit/76d885f14ce7c9395eea38d148e3956c3f230682))
+
 ### [3.10.3](https://github.com/LonelessCodes/trixiebot/compare/v3.10.2...v3.10.3) (2020-06-23)
 
 

@@ -19,6 +19,7 @@ const log = require("../log").default;
 const Derpibooru = require("../modules/Derpibooru").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
+const DeprecationCommand = require("../core/commands/DeprecationCommand");
 const HelpContent = require("../util/commands/HelpContent").default;
 const Category = require("../util/commands/Category").default;
 const CommandScope = require("../util/commands/CommandScope").default;
@@ -46,11 +47,19 @@ module.exports = function install(cr) {
     if (!config.has("derpibooru.key"))
         return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
-    cr.registerCommand("horsepussy", new SimpleCommand(() => process(config.get("derpibooru.key"))))
+    cr.registerCommand("horsepussy", new DeprecationCommand(
+        "*Until Derpibooru has resolved their guidelines on hateful ideologies and hatespeech to something TrixieBot can identify with, all features relying on Derpibooru are going to be unavailable.*"
+    ))
         .setHelp(new HelpContent().setUsage("", "Get some gud quality horse pussi OwO"))
         .setExplicit(true)
         .setCategory(Category.IMAGE)
         .setScope(CommandScope.ALL);
+
+    // cr.registerCommand("horsepussy", new SimpleCommand(() => process(config.get("derpibooru.key"))))
+    //     .setHelp(new HelpContent().setUsage("", "Get some gud quality horse pussi OwO"))
+    //     .setExplicit(true)
+    //     .setCategory(Category.IMAGE)
+    //     .setScope(CommandScope.ALL);
 
     cr.registerAlias("horsepussy", "horsepussi", "ponypussy", "ponypussi", "ponepussi", "ponypoossy");
 };

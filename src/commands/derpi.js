@@ -23,6 +23,7 @@ const Derpibooru = require("../modules/Derpibooru").default;
 
 const SimpleCommand = require("../core/commands/SimpleCommand");
 const OverloadCommand = require("../core/commands/OverloadCommand");
+const DeprecationCommand = require("../core/commands/DeprecationCommand");
 const TreeCommand = require("../core/commands/TreeCommand").default;
 const HelpContent = require("../util/commands/HelpContent").default;
 const Category = require("../util/commands/Category").default;
@@ -227,6 +228,19 @@ module.exports = function install(cr) {
         return log.namespace("config", "Found no API token for Derpibooru - Disabled horsepussy command");
 
     const key = config.get("derpibooru.key");
+
+    cr.registerCommand("derpi", new DeprecationCommand(
+        "*Until Derpibooru has resolved their guidelines on hateful ideologies and hatespeech to something TrixieBot can identify with, all features relying on Derpibooru are going to be unavailable.*"
+    ))
+        .setHelp(
+            new HelpContent().setDescription(
+                "Search images on Derpibooru. If used in non-nsfw channels, it will only show safe posts. The bot will automatically filter posts containing content violating Discord's Community Guidelines."
+            )
+        )
+        .setCategory(Category.IMAGE)
+        .setScope(CommandScope.ALL, true);
+
+    return;
 
     const derpiCommand = cr
         .registerCommand("derpi", new TreeCommand())

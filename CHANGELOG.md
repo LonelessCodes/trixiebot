@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.10.5](https://github.com/LonelessCodes/trixiebot/compare/v3.10.4...v3.10.5) (2020-07-02)
+
+
+### Changes
+
+* make features using Derpibooru unavailable until they've sorted their shit ([a6be2be](https://github.com/LonelessCodes/trixiebot/commit/a6be2beb9d3ed966d1deadd290d385467b9dad73))
+
 ### [3.10.4](https://github.com/LonelessCodes/trixiebot/compare/v3.10.3...v3.10.4) (2020-06-25)
 
 

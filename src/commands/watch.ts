@@ -24,6 +24,7 @@ import mongo from "mongodb";
 import SimpleCommand from "../core/commands/SimpleCommand";
 import OverloadCommand from "../core/commands/OverloadCommand";
 import TreeCommand from "../core/commands/TreeCommand";
+import DeprecationCommand from "../core/commands/DeprecationCommand";
 import HelpContent from "../util/commands/HelpContent";
 import Category from "../util/commands/Category";
 import CommandPermission from "../util/commands/CommandPermission";
@@ -62,26 +63,30 @@ export default function install(cr: CommandRegistry, { client, db, locale }: { c
      * SUB COMMANDS
      */
 
-    watchCommand.registerSubCommand("derpi", new OverloadCommand())
-        .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
-            const g_channel = message.mentions.channels.first() || message.channel;
+    watchCommand.registerSubCommand("derpi", new DeprecationCommand(
+        "*Until Derpibooru has resolved their guidelines on hateful ideologies and hatespeech to something TrixieBot can identify with, all features relying on Derpibooru are going to be unavailable.*"
+    ));
 
-            const tags = content.replace(/<#\d+>/, "").trim();
+    // watchCommand.registerSubCommand("derpi", new OverloadCommand())
+    //     .registerOverload("1+", new SimpleCommand(async ({ message, content }) => {
+    //         const g_channel = message.mentions.channels.first() || message.channel;
 
-            await watch_managers.derpi.addConfig(g_channel as Discord.TextChannel, tags);
+    //         const tags = content.replace(/<#\d+>/, "").trim();
 
-            if (g_channel.id === message.channel.id)
-                return new Translation("watch.derpi.success_here", "Alright! I'll be posting all new uploads for {{tags}} here", {
-                    tags: Derpibooru.resolveTags(tags).join(", "),
-                });
-            return new Translation("watch.derpi.success_there", "Alright! I'll be posting all new uploads for {{tags}} there", {
-                tags: Derpibooru.resolveTags(tags).join(", "),
-            });
-        }))
-        .setHelp(new HelpContent()
-            .setUsage("<?channel> <tags>", "Subscribe to Derpibooru tags and Trixie automatically posts new uploads in `channel`.")
-            .addParameterOptional("channel", "The channel to post new uploads into. If omitted: will be the current channel")
-            .addParameter("tags", "The search query (e.g. `artist:loneless`). [__How to use Derpi search syntax__](https://derpibooru.org/pages/search_syntax)"));
+    //         await watch_managers.derpi.addConfig(g_channel as Discord.TextChannel, tags);
+
+    //         if (g_channel.id === message.channel.id)
+    //             return new Translation("watch.derpi.success_here", "Alright! I'll be posting all new uploads for {{tags}} here", {
+    //                 tags: Derpibooru.resolveTags(tags).join(", "),
+    //             });
+    //         return new Translation("watch.derpi.success_there", "Alright! I'll be posting all new uploads for {{tags}} there", {
+    //             tags: Derpibooru.resolveTags(tags).join(", "),
+    //         });
+    //     }))
+    //     .setHelp(new HelpContent()
+    //         .setUsage("<?channel> <tags>", "Subscribe to Derpibooru tags and Trixie automatically posts new uploads in `channel`.")
+    //         .addParameterOptional("channel", "The channel to post new uploads into. If omitted: will be the current channel")
+    //         .addParameter("tags", "The search query (e.g. `artist:loneless`). [__How to use Derpi search syntax__](https://derpibooru.org/pages/search_syntax)"));
 
     async function removeById(guild: Discord.Guild, id: number): Promise<Translation> {
         const is_removed = await watch_managers.derpi.removeConfig(guild, id);

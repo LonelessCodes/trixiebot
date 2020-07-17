@@ -1,5 +1,12 @@
 # Changelog
 
+### [3.10.6](https://github.com/LonelessCodes/trixiebot/compare/v3.10.5...v3.10.6) (2020-07-17)
+
+
+### Changes
+
+* make Derpibooru features available again. At least it's better than ponybooru ([995d18c](https://github.com/LonelessCodes/trixiebot/commit/995d18cc6719d79801f118e64b02fe592346b755))
+
 ### [3.10.5](https://github.com/LonelessCodes/trixiebot/compare/v3.10.4...v3.10.5) (2020-07-02)
 
 

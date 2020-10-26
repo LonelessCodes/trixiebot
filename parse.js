@@ -1,3 +1,5 @@
+#!/usr/bin/node
+
 // @ts-nocheck
 
 const fs = require("fs-extra");
@@ -15,9 +17,8 @@ walk("./src/").then(files => {
             const id = JSON.parse(match[1]);
             let phrase = match[2];
             const regex = /((?<!\\)")/g;
-            while ((match = regex.exec(phrase.slice(1, -1)))) {
+            if ((match = regex.exec(phrase.slice(1, -1)))) {
                 phrase = phrase.slice(0, match.index + 2);
-                break;
             }
             arr.push({ id: id, phrase: JSON.parse(phrase) });
         }

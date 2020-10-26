@@ -28,6 +28,8 @@ import Translation from "../../modules/i18n/Translation";
 import TranslationMerge from "../../modules/i18n/TranslationMerge";
 import TranslationPlural from "../../modules/i18n/TranslationPlural";
 
+type CommandFilter = (ctx: MessageContext, command_name: string | RegExp) => (Promise<boolean> | boolean);
+
 export default abstract class BaseCommand {
     protected _rateLimitMessageRateLimiter: RateLimiter | null = null;
 
@@ -39,6 +41,7 @@ export default abstract class BaseCommand {
     aliases: string[] = [];
     explicit: boolean = false;
     scope: CommandScope = new CommandScope(CommandScope.DEFAULT);
+    filter: CommandFilter = () => true; // additional custom testing if command should be executed
 
     async rateLimit(context: MessageContext): Promise<void> {
         if (
@@ -126,14 +129,19 @@ export default abstract class BaseCommand {
         return CommandScope.hasScope(this.scope, channel);
     }
 
+    setFilter(filter: CommandFilter): this {
+        this.filter = filter;
+        return this;
+    }
+
     linkTo?(c: BaseCommand): void;
 
     async run(ctx: MessageContext, command_name: string | RegExp): Promise<void> {
         return await this.call(ctx, command_name);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    call(ctx: MessageContext, command_name?: string | RegExp): Promise<void> {
+    call(ctx: MessageContext, command_name: string | RegExp): Promise<void>;
+    call(): Promise<void> {
         return Promise.resolve(undefined);
     }
 }

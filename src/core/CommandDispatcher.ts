@@ -100,7 +100,7 @@ class CommandDispatcher {
             if (cc && cc.enabled) return await this.processCC(ctx, command_name, cc);
         }
 
-        const command = this.REGISTRY.getCommand(message, prefix_used, command_name);
+        const command = await this.REGISTRY.getCommand(ctx, command_name);
         if (command) return await this.processCommand(ctx, command.type, command.trigger, command.command);
 
         return await this.processCommand(ctx, -1, command_name, null);

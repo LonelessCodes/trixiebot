@@ -42,14 +42,12 @@ export default class CommandRegistry {
         this.processed_handlers = [];
     }
 
-    getCommand(message: Discord.Message, prefix_used: boolean, command_name: string): { type: number; trigger: string | RegExp; command: BaseCommand; } | undefined {
-        if (prefix_used) {
+    async getCommand(ctx: MessageContext, command_name: string): Promise<{ type: number; trigger: string | RegExp; command: BaseCommand; } | undefined> {
+        if (ctx.prefix_used) {
             const command = this.commands.get(command_name);
-            if (command)
+            if (command && await command.filter(ctx, command_name))
                 return {
                     type: CommandRegistry.TYPE.COMMAND,
-                    trigger: command_name,
-                    command: command,
                     ...CommandRegistry.resolveCommand(command_name, command),
                 };
         }
@@ -59,11 +57,9 @@ export default class CommandRegistry {
             // every second time. Setting lastIndex to 0 before a test solves that
             regex.lastIndex = 0;
 
-            if (regex.test(message.content))
+            if (regex.test(ctx.message.content) && await command.filter(ctx, command_name))
                 return {
                     type: CommandRegistry.TYPE.KEYWORD,
-                    trigger: regex,
-                    command: command,
                     ...CommandRegistry.resolveCommand(regex, command),
                 };
         }

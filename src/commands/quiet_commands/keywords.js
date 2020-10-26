@@ -39,9 +39,9 @@ module.exports = function install(cr) {
         await message.channel.send(`${await secureRandom(emoticons)} ***(${member.displayName})***`);
     }));
 
-    cr.registerKeyword(/lone pone\b/gi, new SimpleCommand(async message => {
-        const attachment = new Discord.MessageAttachment("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
+    // cr.registerKeyword(/lone pone\b/gi, new SimpleCommand(async message => {
+    //     const attachment = new Discord.MessageAttachment("https://cdn.discordapp.com/attachments/364776152176263171/519631563835572287/lone_sneak.png");
 
-        await message.channel.send(attachment);
-    }));
+    //     await message.channel.send(attachment);
+    // }));
 };

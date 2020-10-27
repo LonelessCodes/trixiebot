@@ -92,12 +92,12 @@
         "npm": ">= 6.9.0"
     },
     "scripts": {
-        "build": "rimraf dist && tsc",
-        "start:watch": "nodemon --watch src --ext .ts,.js --exec cross-env NODE_ENV=development ts-node -T src/index.ts",
-        "start:dev": "cross-env NODE_ENV=development node --icu-data-dir ./node_modules/full-icu dist/index.js",
-        "start": "cross-env NODE_ENV=production node --icu-data-dir ./node_modules/full-icu dist/index.js",
+        "build": "rimraf dist/ && tsc",
         "lint": "eslint src/ --ext .ts,.js",
         "lint:fix": "eslint src/ --ext .ts,.js --fix",
+        "start:watch": "nodemon --watch src --ext .ts,.js --exec cross-env NODE_ENV=development ts-node -P tsconfig.json -T src/index.ts",
+        "start:dev": "cross-env NODE_ENV=development node --unhandled-rejections=strict --icu-data-dir ./node_modules/full-icu dist/index.js",
+        "start": "cross-env NODE_ENV=production node --icu-data-dir ./node_modules/full-icu dist/index.js",
         "pm2": "pm2 start npm --no-automation --name trixiebot -- start",
         "pm2:dev": "pm2 start npm --no-automation --name trixiedev -- run start:dev",
         "parse": "node parse.js",

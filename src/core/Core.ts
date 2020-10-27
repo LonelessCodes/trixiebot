@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,44 +14,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs-extra");
-const path = require("path");
+import fs from "fs-extra";
+import path from "path";
+import { Db } from "mongodb";
+import Discord from "discord.js";
 
 const log = require("../log").default.namespace("core");
-const INFO = require("../info").default;
-const config = require("../config").default;
-const { walk } = require("../util/files");
-const helpToJSON = require("../util/commands/helpToJSON").default;
-const nanoTimer = require("../modules/timer").default;
+import INFO from "../info";
+import config from "../config";
+import { walk } from "../util/files";
+import helpToJSON, { HelpJSON } from "../util/commands/helpToJSON";
+import nanoTimer from "../modules/timer";
 
-const CommandProcessor = require("./CommandProcessor");
+import CommandProcessor from "./CommandProcessor";
 
-const DatabaseManager = require("./managers/DatabaseManager").default;
-const CM = require("./managers/ConfigManager");
-const LocaleManager = require("./managers/LocaleManager").default;
-const WebsiteManager = require("./managers/WebsiteManager");
-const UpvotesManager = require("./managers/UpvotesManager");
-const MemberLog = require("./listeners/MemberLog").default;
+import DatabaseManager from "./managers/DatabaseManager";
+import CM from "./managers/ConfigManager";
+import LocaleManager from "./managers/LocaleManager";
+import WebsiteManager from "./managers/WebsiteManager";
+import UpvotesManager from "./managers/UpvotesManager";
+import MemberLog from "./listeners/MemberLog";
 
-const Discord = require("discord.js");
+import CommandScope from "../util/commands/CommandScope";
+import AliasCommand from "./commands/AliasCommand";
+import BotStatsManager, { MESSAGES_TODAY, COMMANDS_EXECUTED } from "./managers/BotStatsManager";
+import GuildStatsManager from "./managers/GuildStatsManager";
+import Translation from "../modules/i18n/Translation";
 
-const CommandScope = require("../util/commands/CommandScope").default;
-const AliasCommand = require("./commands/AliasCommand");
-const { default: BotStatsManager, MESSAGES_TODAY, COMMANDS_EXECUTED } = require("./managers/BotStatsManager");
-const { default: GuildStatsManager } = require("./managers/GuildStatsManager");
-const Translation = require("../modules/i18n/Translation").default;
+import BotListManager from "./managers/BotListManager";
+import PresenceStatusManager from "./managers/PresenceStatusManager";
+import ErrorCaseManager from "./managers/ErrorCaseManager";
+import CommandRegistry from "./CommandRegistry";
+import BaseCommand from "./commands/BaseCommand";
 
-const BotListManager = require("./managers/BotListManager").default;
-const PresenceStatusManager = require("./managers/PresenceStatusManager").default;
+export interface CmdInstallerArgs {
+    client: Discord.Client;
+    config: CM;
+    locale: LocaleManager;
+    db: Db;
+    error_cases: ErrorCaseManager;
+    presence_status: PresenceStatusManager;
+    bot_stats: BotStatsManager;
+    guild_stats: GuildStatsManager;
+}
 
-class Core {
-    /**
-     * @param {Discord.Client} client
-     * @param {Db} db
-     */
-    constructor(client, db) {
+export type CmdInstallerFileFunc = (cr: CommandRegistry, opts: CmdInstallerArgs) => (Promise<void> | void);
+export type CmdInstallerFile =
+    CmdInstallerFileFunc
+    & { default: CmdInstallerFileFunc; }
+    & { install: CmdInstallerFileFunc; };
+
+export default class Core {
+    client: Discord.Client;
+    db: Db;
+    config: CM;
+    locale: LocaleManager;
+    bot_stats: BotStatsManager;
+    guild_stats: GuildStatsManager;
+    processor: CommandProcessor;
+    website: WebsiteManager;
+    upvotes: UpvotesManager;
+    member_log: MemberLog;
+    botlist: BotListManager;
+    presence_status: PresenceStatusManager;
+
+    constructor(client: Discord.Client, db: Db) {
         this.client = client;
-        this.db = new DatabaseManager(db);
+        // TODO: Unbedingt das mit dem DatabaseManager fixen
+        this.db = new DatabaseManager(db) as unknown as Db;
 
         this.config = new CM(this.client, this.db, [
             new CM.Parameter("prefix", new Translation("config.prefix", "❗ Prefix"), config.get("prefix") || "!", String),
@@ -94,10 +124,7 @@ class Core {
         this.presence_status = new PresenceStatusManager(this.client, this.db);
     }
 
-    /**
-     * @param {string} commands_package
-     */
-    async init(commands_package) {
+    async init(commands_package: string): Promise<void> {
         if (this.client.voice) for (const voice of this.client.voice.connections.values()) voice.disconnect();
 
         await this.bot_stats.load(COMMANDS_EXECUTED);
@@ -111,10 +138,7 @@ class Core {
         this.attachListeners();
     }
 
-    /**
-     * @param {string} commands_package
-     */
-    async loadCommands(commands_package) {
+    async loadCommands(commands_package: string): Promise<void> {
         if (!commands_package || typeof commands_package !== "string")
             throw new Error("Cannot load commands if not given a path to look at!");
 
@@ -128,66 +152,70 @@ class Core {
                 return ext === ".js" || ext === ".ts";
             }));
 
-        const install_opts = {
+        const install_opts: CmdInstallerArgs = {
             client: this.client,
             config: this.config, locale: this.locale, db: this.db, error_cases: this.processor.error_cases,
             presence_status: this.presence_status, bot_stats: this.bot_stats, guild_stats: this.guild_stats,
         };
         await Promise.all(files.map(async file => {
-            log("%s:", file, "installing...");
+            log("%s: installing...", file);
             const time = nanoTimer();
 
-            const install = require(file);
+            const install = require(file) as CmdInstallerFile;
             if (typeof install.default === "function") await install.default(this.processor.REGISTRY, install_opts);
             else if (typeof install.install === "function") await install.install(this.processor.REGISTRY, install_opts);
             else await install(this.processor.REGISTRY, install_opts);
 
-            log("%s:", file, "installed.", nanoTimer.diffMs(time).toFixed(3), "ms");
+            log("%s: installed. %s ms", file, nanoTimer.diffMs(time).toFixed(3));
         }));
 
         const install_time = nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC;
 
-        log("Building commands.json");
-
-        const jason = {
-            prefix: this.config.default_config.prefix,
-            commands: [],
-        };
-
-        for (const [name, cmd] of this.processor.REGISTRY.commands) {
-            if (cmd instanceof AliasCommand) continue;
-            if (!cmd.help) continue;
-            if (!cmd.scope.has(CommandScope.FLAGS.GUILD)) continue;
-            jason.commands.push({
-                name,
-                help: helpToJSON(this.config.default_config, name, cmd),
-            });
-        }
-
-        // by sorting we're getting around an always different order of commands, which
-        // confuses git
-        jason.commands = jason.commands.sort((a, b) => {
-            if (a.name < b.name) return -1;
-            if (a.name > b.name) return 1;
-            return 0;
-        });
-
-        const var_dir = path.join(process.cwd(), ".var");
-        const src = path.join(var_dir, "commands.json");
-        const dest = path.join(process.cwd(), "..", "trixieweb", "client", "src", "assets", "commands.json");
-
-        if (!await fs.pathExists(var_dir)) await fs.mkdir(var_dir);
-        await fs.writeFile(src, JSON.stringify(jason, null, 2));
-        await fs.copy(src, dest, { overwrite: true });
-
-        const build_time = (nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC) - install_time;
-
-        log(`Commands installed. files:${files.length} commands:${this.processor.REGISTRY.commands.size} install_time:${install_time.toFixed(3)}s build_time:${build_time.toFixed(3)}s`);
+        log(`Commands installed. files:${files.length} commands:${this.processor.REGISTRY.commands.size} install_time:${install_time.toFixed(3)}s`);
     }
 
-    attachListeners() {
+    attachListeners(): void {
         this.client.addListener("message", message => this.processor.onMessage(message));
     }
 }
 
-module.exports = Core;
+async function commandJsonBuilder(prefix: string, commands: Map<string, BaseCommand>): Promise<number> {
+    const timer = nanoTimer();
+
+    const jason: {
+        prefix: string;
+        commands: {
+            name: string;
+            help: HelpJSON;
+        }[];
+    } = {
+        prefix,
+        commands: [],
+    };
+
+    for (const [name, cmd] of commands) {
+        if (cmd instanceof AliasCommand) continue;
+        if (!cmd.help) continue;
+        if (!cmd.scope.has(CommandScope.FLAGS.GUILD)) continue;
+        jason.commands.push({
+            name,
+            help: helpToJSON(prefix, name, cmd),
+        });
+    }
+
+    // by sorting we're getting around an always different order of commands, which
+    // confuses git
+    jason.commands.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+    });
+
+    const var_dir = path.join(process.cwd(), ".var");
+    const src = path.join(var_dir, "commands.json");
+
+    if (!await fs.pathExists(var_dir)) await fs.mkdir(var_dir);
+    await fs.writeFile(src, JSON.stringify(jason, null, 2));
+
+    return (nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC);
+}

@@ -29,9 +29,7 @@ export interface HelpJSON {
     category?: string;
 }
 
-export default function helpToJSON(config: any, name: string, command: BaseCommand) {
-    const prefix = config.prefix;
-
+export default function helpToJSON(prefix: string, name: string, command: BaseCommand): HelpJSON {
     const json: HelpJSON = {};
     if (command.explicit) json.explicit = true;
     if (command.help && command.help.description) json.description = command.help.description;

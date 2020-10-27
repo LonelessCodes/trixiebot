@@ -39,11 +39,11 @@ function index(obj, is, value) {
 
 class Parameter {
     /**
-     * @param {string} name
+     * @param {string|Parameter[]} name
      * @param {Resolvable<string>} humanName
-     * @param {*} defaultValue
-     * @param {*} type
-     * @param {boolean} allowEmpty
+     * @param {*} [defaultValue]
+     * @param {*} [type]
+     * @param {boolean} [allowEmpty]
      */
     constructor(name, humanName, defaultValue, type, allowEmpty) {
         this.name = name;

@@ -15,7 +15,7 @@
  */
 
 const Discord = require("discord.js");
-const { APIErrors } = require("discord.js/src/util/Constants");
+const { APIErrors } = Discord.Constants;
 const toEmoji = require("emoji-name-map");
 const { Member, Channel, Emoji, Role, Message } = require("./cc_classes");
 

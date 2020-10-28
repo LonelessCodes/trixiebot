@@ -267,7 +267,7 @@
         ],
         "linebreak-style": [
             "warn",
-            "windows"
+            "unix"
         ],
         "quotes": "off",
         "@typescript-eslint/quotes": [

@@ -25,10 +25,10 @@ const promise = MongoClient.connect(`mongodb://${config.get("database.host")}:${
     appname: "trixiebot",
     useUnifiedTopology: true,
     auth: config.has("database.auth")
-        ? (config.get("database.auth") as {
+        ? config.get<{
             user: string;
             password: string;
-        })
+        }>("database.auth")
         : undefined,
 });
 

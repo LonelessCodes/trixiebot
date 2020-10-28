@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const cpc = require("trixie-ipc/cpc")(process);
+const cpc = new (require("@trixiebot/ipc").ChildProcessLayer)(process);
 
 const lexer = require("./lexer/lexer");
 const parser = require("./parser");

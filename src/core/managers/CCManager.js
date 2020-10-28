@@ -14,8 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const cpc = require("trixie-ipc/cpc");
-const respawn = require("trixie-ipc/respawn");
+const { respawn, ChildProcessLayer } = require("@trixiebot/ipc");
 const nanoTimer = require("../../modules/timer").default;
 const log = require("../../log").default.namespace("cc manager");
 const path = require("path");
@@ -125,7 +124,7 @@ class CCManager {
         const dir = path.join(__dirname, "cc_worker");
         const file = path.join(dir, "worker.js");
         this.fork = respawn(file, { cwd: dir, fork: true, env: process.env }).restart();
-        this.cpc = cpc(this.fork);
+        this.cpc = new ChildProcessLayer(this.fork);
         this.cpc.addListener("ready", () => {
             const time = nanoTimer.diff(timer) / nanoTimer.NS_PER_MS;
             log(`Worker ready. boot_time:${time.toFixed(1)}ms`);

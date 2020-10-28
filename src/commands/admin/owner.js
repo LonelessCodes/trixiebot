@@ -24,7 +24,7 @@ import CalendarRange from "../../modules/calendar/CalendarRange";
 const { findDefaultChannel, doNothing } = require("../../util/util");
 const { resolveStdout } = require("../../util/string");
 const { splitArgs } = require("../../util/string");
-const ipc = require("../../modules/concurrency/ipc");
+const ipc = require("../../modules/concurrency/ipc").default;
 
 const SimpleCommand = require("../../core/commands/SimpleCommand");
 const BaseCommand = require("../../core/commands/BaseCommand").default;

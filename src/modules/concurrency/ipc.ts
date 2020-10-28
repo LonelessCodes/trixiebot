@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Christian Schäfer / Loneless
+ * Copyright (C) 2018-2020 Christian Schäfer / Loneless
  *
  * TrixieBot is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,23 +14,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const info = require("../../info").default;
 const log = require("../../log").default.namespace("ipc");
-const ipc = require("node-ipc");
-const cpc = require("trixie-ipc/cpc");
-const IPCServerAdapter = require("trixie-ipc/IPCServerAdapter");
+import * as veza from "veza";
+import { VezaServerLayer } from "@trixiebot/ipc";
+import config from "../../config";
 
-ipc.config.silent = true;
-ipc.config.id = info.DEV ? "trixiedev" : "trixiebot";
-ipc.config.retry = 1000;
-ipc.config.logger = log;
+const server = new veza.Server("trixie")
+    .on("connect", client => log(`Client Connected: ${client.name}`))
+    .on("disconnect", client => log(`Client Disconnected: ${client.name}`))
+    .on("error", (error, client) => log.error(`Error from ${client?.name}`, error));
 
-ipc.serve();
+server.listen(
+    config.has("ipc.port") ? config.get("ipc.port") : 6969,
+    config.has("ipc.host") ? config.get("ipc.host") : "0.0.0.0"
+).catch(error => log.error("Cloud not bind to IPC Port:", error));
 
-module.exports = cpc(
-    new IPCServerAdapter(ipc.server)
-        .on("connect", socket_id => log(`Connected to ${socket_id}`))
-        .on("disconnect", socket_id => log(`Disconnected from ${socket_id}`))
-);
-
-ipc.server.start();
+export default new VezaServerLayer(server);

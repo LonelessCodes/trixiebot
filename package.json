@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "@discordjs/opus": "^0.3.2",
+        "@trixiebot/ipc": "^2.1.0",
         "bson": "^4.2.0",
         "bufferutil": "^4.0.1",
         "cat-ascii-faces": "^2.0.0",
@@ -44,19 +45,18 @@
         "mongodb": "^3.6.2",
         "nanoid": "^3.1.12",
         "node-fetch": "^2.6.1",
-        "node-ipc": "^9.1.1",
         "prism-media": "^1.2.2",
         "random-number-csprng": "^1.0.2",
         "read-chunk": "^3.2.0",
         "source-map-support": "^0.5.19",
         "tiny-text": "^1.0.1",
         "tmp": "^0.2.1",
-        "trixie-ipc": "github:lonelesscodes/trixie-ipc",
         "twit": "^2.2.11",
         "twitch": "^4.2.7",
         "type-fest": "^0.16.0",
         "utf-8-validate": "^5.0.2",
         "uuid": "^8.3.1",
+        "veza": "^1.1.0",
         "zlib-sync": "^0.1.7"
     },
     "devDependencies": {

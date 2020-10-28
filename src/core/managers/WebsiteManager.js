@@ -16,7 +16,7 @@
 
 const { userToString, isOwner, doNothing } = require("../../util/util");
 const getChangelog = require("../../modules/getChangelog").default;
-const ipc = require("../../modules/concurrency/ipc");
+const ipc = require("../../modules/concurrency/ipc").default;
 const LocaleManager = require("./LocaleManager").default;
 const AliasCommand = require("../commands/AliasCommand");
 const Category = require("../../util/commands/Category").default;

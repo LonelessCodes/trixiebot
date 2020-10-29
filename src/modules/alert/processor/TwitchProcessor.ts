@@ -22,11 +22,13 @@ import ParsedStream from "../stream/ParsedStream";
 import OnlineStream, { OnlineStreamOptions } from "../stream/OnlineStream";
 import Stream from "../stream/Stream";
 
-import TwitchClient, { Stream as TwitchStream } from "twitch";
+import * as twitch from "twitch";
 import { doNothing } from "../../../util/util";
 
 class TwitchProcessor extends Processor {
-    twitch = TwitchClient.withClientCredentials(config.get("twitch.client_id"), config.get("twitch.client_secret"));
+    twitch = new twitch.ApiClient({
+        authProvider: new twitch.ClientCredentialsAuthProvider(config.get("twitch.client_id"), config.get("twitch.client_secret")),
+    });
 
     constructor(manager: import("../AlertManager").default) {
         super(manager);
@@ -78,7 +80,7 @@ class TwitchProcessor extends Processor {
         }
     }
 
-    private async _checkChange(online_streams: TwitchStream[], savedConfig: Stream) {
+    private async _checkChange(online_streams: twitch.Stream[], savedConfig: Stream) {
         const oldStream = this.online.find(
             oldStream => savedConfig.userId === oldStream.userId && savedConfig.guild.id === oldStream.guild.id
         );
@@ -113,7 +115,7 @@ class TwitchProcessor extends Processor {
         this.emit("online", new OnlineStream(savedConfig, this.serializeRaw(streamPage)));
     }
 
-    serializeRaw(streamPage: TwitchStream): OnlineStreamOptions {
+    serializeRaw(streamPage: twitch.Stream): OnlineStreamOptions {
         return {
             username: streamPage.channel.displayName,
             userId: streamPage.channel.id,

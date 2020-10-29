@@ -41,18 +41,19 @@ Trixie is dependant on:
 * node.js v12.x
 * graphicsmagick
 * ffmpeg
-* mongodb
+* mongodb 4.2
 
-so make sure to have those installed before working with Trixie. There's a `install.sh` in the project's root that could help with installing what you need if you're on Ubuntu 18.04.
+so make sure to have those installed before working with Trixie.
 
 Also, this should be obvious, but for Trixie to work you will need a Discord API key and a bot user account.
 
-Now clone the repository to your machine and install the dependencies.
+Now clone the repository to your machine, install the dependencies and transpile the source files.
 
 ```
 git clone https://github.com/LonelessCodes/trixiebot.git
 cd trixiebot
 npm install
+npm run build
 ```
 
 This might take one or more minutes, depending on your internet connection and the speed of your machine.
@@ -65,9 +66,9 @@ Trixie creates the database automatically when starting.
 
 ### Running
 
-To run in development mode (beware: development means development. Don't run in public servers!) go `npm run dev` or if you're on windows `node dev`.
+To run in development mode (beware: development means development. Don't run in public servers!) go `npm run start:dev` or `npm run start:watch` to compile at runtime and reload on src changes.
 
-For crash savety and restart on reboot official Trixie uses pm2 with the configs at `pm2dev.json` and `pm2prod.json`.
+If you want to use pm2 for crash savety and restart on reboot, run `npm run pm2` or `npm run pm2:dev` for development.
 
 ### Editing
 

@@ -23,8 +23,6 @@
 
 let incr = 0;
 
-function Symbol() {
+export default function Symbol(): number {
     return incr++;
 }
-
-module.exports = Symbol;

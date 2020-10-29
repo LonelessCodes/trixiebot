@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const Symbol = require("../../../../modules/Symbol");
+const Symbol = require("../../../../modules/Symbol").default;
 
 class StatementStack {
     /** @param {symbol[]} arr */

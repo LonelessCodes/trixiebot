@@ -19,14 +19,23 @@ import * as veza from "veza";
 import { VezaServerLayer } from "@trixiebot/ipc";
 import config from "../../config";
 
+const retry_timeout = 3000;
+
 const server = new veza.Server("trixie")
+    .on("open", () => log("Open success"))
     .on("connect", client => log(`Client Connected: ${client.name}`))
     .on("disconnect", client => log(`Client Disconnected: ${client.name}`))
     .on("error", (error, client) => log.error(`Error from ${client?.name}`, error));
 
-server.listen(
-    config.has("ipc.port") ? config.get("ipc.port") : 6969,
-    config.has("ipc.host") ? config.get("ipc.host") : "0.0.0.0"
-).catch(error => log.error("Cloud not bind to IPC Port:", error));
+(function connect() {
+    log("Starting server...");
+    server.listen(
+        config.has("ipc.port") ? config.get("ipc.port") : 6969,
+        config.has("ipc.host") ? config.get("ipc.host") : "0.0.0.0"
+    ).catch(error => {
+        log.error("Cloud not start server... retrying", error);
+        setTimeout(connect, retry_timeout);
+    });
+}());
 
 export default new VezaServerLayer(server);

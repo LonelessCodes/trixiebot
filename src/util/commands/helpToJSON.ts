@@ -14,11 +14,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CommandPermission from "./CommandPermission";
-import HelpBuilder from "./HelpBuilder";
-import { format } from "../string";
-import BaseCommand from "../../core/commands/BaseCommand";
 import { MessageTarget } from "discord.js";
+import { format } from "../string";
+import HelpBuilder from "./HelpBuilder";
+import CommandScope from "./CommandScope";
+import CommandPermission from "./CommandPermission";
+import BaseCommand from "../../core/commands/BaseCommand";
+import AliasCommand from "../../core/commands/AliasCommand";
 
 export interface HelpJSON {
     explicit?: boolean;
@@ -29,7 +31,12 @@ export interface HelpJSON {
     category?: string;
 }
 
-export default function helpToJSON(prefix: string, name: string, command: BaseCommand): HelpJSON {
+export interface JSONCommand {
+    name: string;
+    help: HelpJSON;
+}
+
+export function helpToJSON(prefix: string, name: string, command: BaseCommand): HelpJSON {
     const json: HelpJSON = {};
     if (command.explicit) json.explicit = true;
     if (command.help && command.help.description) json.description = command.help.description;
@@ -48,4 +55,26 @@ export default function helpToJSON(prefix: string, name: string, command: BaseCo
     if (command.category) json.category = command.category.toString();
 
     return json;
+}
+
+export function buildCommandsList(prefix: string, commands: Map<string, BaseCommand>): { prefix: string; commands: JSONCommand[]; } {
+    const jason: {
+        prefix: string;
+        commands: JSONCommand[];
+    } = {
+        prefix,
+        commands: [],
+    };
+
+    for (const [name, cmd] of commands) {
+        if (cmd instanceof AliasCommand) continue;
+        if (!cmd.help) continue;
+        if (!cmd.scope.has(CommandScope.FLAGS.GUILD)) continue;
+        jason.commands.push({
+            name,
+            help: helpToJSON(prefix, name, cmd),
+        });
+    }
+
+    return jason;
 }

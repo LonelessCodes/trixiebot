@@ -14,7 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fs from "fs-extra";
 import path from "path";
 import { Db } from "mongodb";
 import Discord from "discord.js";
@@ -23,7 +22,6 @@ const log = require("../log").default.namespace("core");
 import INFO from "../info";
 import config from "../config";
 import { walk } from "../util/files";
-import helpToJSON, { HelpJSON } from "../util/commands/helpToJSON";
 import nanoTimer from "../modules/timer";
 
 import CommandProcessor from "./CommandProcessor";
@@ -35,8 +33,6 @@ import WebsiteManager from "./managers/WebsiteManager";
 import UpvotesManager from "./managers/UpvotesManager";
 import MemberLog from "./listeners/MemberLog";
 
-import CommandScope from "../util/commands/CommandScope";
-import AliasCommand from "./commands/AliasCommand";
 import BotStatsManager, { MESSAGES_TODAY, COMMANDS_EXECUTED } from "./managers/BotStatsManager";
 import GuildStatsManager from "./managers/GuildStatsManager";
 import Translation from "../modules/i18n/Translation";
@@ -45,7 +41,6 @@ import BotListManager from "./managers/BotListManager";
 import PresenceStatusManager from "./managers/PresenceStatusManager";
 import ErrorCaseManager from "./managers/ErrorCaseManager";
 import CommandRegistry from "./CommandRegistry";
-import BaseCommand from "./commands/BaseCommand";
 
 export interface CmdInstallerArgs {
     client: Discord.Client;
@@ -177,45 +172,4 @@ export default class Core {
     attachListeners(): void {
         this.client.addListener("message", message => this.processor.onMessage(message));
     }
-}
-
-async function commandJsonBuilder(prefix: string, commands: Map<string, BaseCommand>): Promise<number> {
-    const timer = nanoTimer();
-
-    const jason: {
-        prefix: string;
-        commands: {
-            name: string;
-            help: HelpJSON;
-        }[];
-    } = {
-        prefix,
-        commands: [],
-    };
-
-    for (const [name, cmd] of commands) {
-        if (cmd instanceof AliasCommand) continue;
-        if (!cmd.help) continue;
-        if (!cmd.scope.has(CommandScope.FLAGS.GUILD)) continue;
-        jason.commands.push({
-            name,
-            help: helpToJSON(prefix, name, cmd),
-        });
-    }
-
-    // by sorting we're getting around an always different order of commands, which
-    // confuses git
-    jason.commands.sort((a, b) => {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
-        return 0;
-    });
-
-    const var_dir = path.join(process.cwd(), ".var");
-    const src = path.join(var_dir, "commands.json");
-
-    if (!await fs.pathExists(var_dir)) await fs.mkdir(var_dir);
-    await fs.writeFile(src, JSON.stringify(jason, null, 2));
-
-    return (nanoTimer.diff(timer) / nanoTimer.NS_PER_SEC);
 }

@@ -23,7 +23,11 @@ interface ChangelogVersion {
     date: string;
 }
 
-export default async function getChangelog() {
+let changelog: ChangelogVersion[] | null = null;
+
+export default async function getChangelog(): Promise<ChangelogVersion[]> {
+    if (changelog) return changelog;
+
     const p = path.join(__dirname, "..", "..", "CHANGELOG.md");
     const file = await fs.readFile(p, "utf8");
 
@@ -50,6 +54,8 @@ export default async function getChangelog() {
             body += line.replace(/\(\[[\w]{7}\]\(http[\w+.:/]+\)\)/g, "") + "\n";
         }
     }
+
+    changelog = releases;
 
     return releases;
 }

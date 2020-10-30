@@ -30,7 +30,7 @@ import DatabaseManager from "./managers/DatabaseManager";
 import CM from "./managers/ConfigManager";
 import LocaleManager from "./managers/LocaleManager";
 import WebsiteManager from "./managers/WebsiteManager";
-import UpvotesManager from "./managers/UpvotesManager";
+// import UpvotesManager from "./managers/UpvotesManager";
 import MemberLog from "./listeners/MemberLog";
 
 import BotStatsManager, { MESSAGES_TODAY, COMMANDS_EXECUTED } from "./managers/BotStatsManager";
@@ -68,7 +68,7 @@ export default class Core {
     guild_stats: GuildStatsManager;
     processor: CommandProcessor;
     website: WebsiteManager;
-    upvotes: UpvotesManager;
+    // upvotes: UpvotesManager;
     member_log: MemberLog;
     botlist: BotListManager;
     presence_status: PresenceStatusManager;
@@ -111,7 +111,7 @@ export default class Core {
 
         this.processor = new CommandProcessor(this.client, this.config, this.locale, this.bot_stats, this.guild_stats, this.db);
         this.website = new WebsiteManager(this.processor.REGISTRY, this.client, this.config, this.locale, this.guild_stats, this.db);
-        this.upvotes = new UpvotesManager(this.client, this.db);
+        // this.upvotes = new UpvotesManager(this.client, this.db);
 
         this.member_log = new MemberLog(this.client, this.config, this.locale, this.bot_stats, this.guild_stats);
 

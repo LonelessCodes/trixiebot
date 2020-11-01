@@ -15,7 +15,7 @@
         "@discordjs/opus": "^0.3.3",
         "@trixiebot/ipc": "^2.1.1",
         "bson": "^4.2.0",
-        "bufferutil": "^4.0.1",
+        "bufferutil": "^4.0.2",
         "cat-ascii-faces": "^2.0.0",
         "chalk": "^4.0.0",
         "cheerio": "^1.0.0-rc.3",
@@ -54,7 +54,7 @@
         "twit": "^2.2.11",
         "twitch": "^4.2.7",
         "type-fest": "^0.16.0",
-        "utf-8-validate": "^5.0.2",
+        "utf-8-validate": "^5.0.3",
         "uuid": "^8.3.1",
         "veza": "^1.1.0",
         "zlib-sync": "^0.1.7"

@@ -20,17 +20,25 @@ import path from "path";
 import config from "./config";
 import fs from "fs-extra";
 
-const package_file: PackageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
+const package_file: PackageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "package.json"), "utf8"));
 
 const dev = process.env.NODE_ENV === "development";
 
-if (!config.has("user_files_dir")) throw new Error("No user files dir specified in config");
+const ROOT = path.resolve(__dirname, "..");
+const FILES_BASE = path.resolve(
+    ROOT,
+    config.has("data_dir")
+        ? config.get<string>("data_dir")
+        : "data"
+);
+
+fs.mkdirpSync(FILES_BASE);
 
 export default Object.freeze({
-    WEBSITE: config.has("website_url") ? (config.get("website_url") as string) : null,
-    INVITE: config.has("invite_url") ? (config.get("invite_url") as string) : null,
+    WEBSITE: config.has("website_url") ? config.get<string>("website_url") : null,
+    INVITE: config.has("invite_url") ? config.get<string>("invite_url") : null,
     VERSION: package_file.version as string,
     DEV: dev,
-    FILES_BASE: path.resolve(path.join(__dirname, "..", "..", config.get("user_files_dir"))),
-    ROOT: path.resolve(path.join(__dirname, "..")),
+    FILES_BASE,
+    ROOT,
 });

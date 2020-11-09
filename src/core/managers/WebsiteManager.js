@@ -324,7 +324,7 @@ class WebsiteManager {
             }
         });
 
-        ipc.answer("cc:geterrors", async ({ guildId, commandId }) => {
+        ipc.answer("cc:getErrors", async ({ guildId, commandId }) => {
             if (!this.client.guilds.cache.has(guildId)) return { errors: [], success: false };
 
             if (!(await this.REGISTRY.CC.hasCommand(guildId, commandId))) return { errors: [], success: false };
@@ -562,7 +562,7 @@ class WebsiteManager {
 
         // ADMIN
 
-        ipc.answer("admin:isadmin", async userId => {
+        ipc.answer("admin:isAdmin", async userId => {
             const user = await this.client.users.fetch(userId).catch(doNothing);
             if (!user) return false;
 

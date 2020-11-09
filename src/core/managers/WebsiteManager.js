@@ -570,48 +570,6 @@ class WebsiteManager {
             return isAdmin;
         });
 
-        ipc.answer("admin:fucks", async (req = {}) => {
-            let fucks = [];
-            if (req.all == true) {
-                fucks = await this.db.collection("fuck").find({}).toArray();
-            } else {
-                fucks = await this.db
-                    .collection("fuck")
-                    .find({
-                        verified: {
-                            $not: {
-                                $eq: true,
-                            },
-                        },
-                    })
-                    .toArray();
-            }
-
-            return {
-                success: true,
-                fucks,
-            };
-        });
-
-        ipc.answer("admin:verifyFuck", async ({ fuckId, verified }) => {
-            await this.db.collection("fuck").updateOne(
-                {
-                    _id: fuckId,
-                },
-                { $set: { verified: !!verified } }
-            );
-
-            return { success: true };
-        });
-
-        ipc.answer("admin:deleteFuck", async _id => {
-            await this.db.collection("fuck").deleteOne({
-                _id,
-            });
-
-            return { success: true };
-        });
-
         ipc.answer("site:commands", () => {
             const c = buildCommandsList(this.config.default_config.prefix, this.REGISTRY.commands);
             return c;

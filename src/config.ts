@@ -15,7 +15,7 @@
  */
 
 import path from "path";
-process.env["NODE_CONFIG_DIR"] = path.join(__dirname, "..", "config");
+process.env["NODE_CONFIG_DIR"] = process.env["NODE_CONFIG_DIR"] || path.join(__dirname, "..", "config");
 import config from "config";
 
 export default config;

@@ -81,10 +81,9 @@
         "cross-env": "^7.0.2",
         "eslint": "^7.12.1",
         "madge": "^3.11.0",
-        "nodemon": "^2.0.6",
         "rimraf": "^3.0.2",
         "standard-version": "^9.0.0",
-        "ts-node": "^9.0.0",
+        "ts-node-dev": "^1.0.0",
         "typescript": "^4.0.5"
     },
     "engines": {
@@ -95,7 +94,7 @@
         "build": "rimraf dist/ && tsc",
         "lint": "eslint src/ --ext .ts,.js",
         "lint:fix": "eslint src/ --ext .ts,.js --fix",
-        "start:watch": "nodemon --watch src --ext .ts,.js --exec cross-env NODE_ENV=development ts-node -P tsconfig.json -T src/index.ts",
+        "start:watch": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.json --no-notify --transpile-only src/index.ts",
         "start:dev": "cross-env NODE_ENV=development node --unhandled-rejections=strict --icu-data-dir ./node_modules/full-icu dist/index.js",
         "start": "cross-env NODE_ENV=production node --icu-data-dir ./node_modules/full-icu dist/index.js",
         "pm2": "pm2 start npm --no-automation --name trixiebot -- start",
